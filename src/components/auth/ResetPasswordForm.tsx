@@ -40,16 +40,18 @@ export default function ResetPasswordForm() {
   const [emailSent, setEmailSent] = useState(false);
   const [buttonState, setButtonState] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    watch,
-  } = useForm<EmailFormData | ResetPasswordFormData>({
-    resolver: zodResolver(step === 'email' ? emailSchema : resetPasswordSchema),
+  const emailForm = useForm<EmailFormData>({
+    resolver: zodResolver(emailSchema),
   });
 
-  const email = watch('email');
+  const resetForm = useForm<ResetPasswordFormData>({
+    resolver: zodResolver(resetPasswordSchema),
+  });
+
+  const { register: registerEmail, handleSubmit: handleEmailSubmit, formState: { errors: emailErrors }, watch: watchEmail } = emailForm;
+  const { register: registerReset, handleSubmit: handleResetSubmit, formState: { errors: resetErrors }, watch: watchReset } = resetForm;
+
+  const email = watchEmail('email');
 
   const onRequestOTP = async (data: EmailFormData) => {
     console.log('🚀 Send Reset Link clicked!', data);
@@ -164,7 +166,7 @@ export default function ResetPasswordForm() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit(onRequestOTP)} className="space-y-4">
+          <form onSubmit={handleEmailSubmit(onRequestOTP)} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input
@@ -316,7 +318,7 @@ export default function ResetPasswordForm() {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit(onResetPassword)} className="space-y-4">
+        <form onSubmit={handleResetSubmit(onResetPassword)} className="space-y-4">
           {otpSent && (
             <div className="p-4 bg-muted rounded-lg">
               <p className="text-sm text-muted-foreground">
