@@ -16,12 +16,19 @@ export async function POST(request: NextRequest) {
     let supabaseConfigured = false;
     
     try {
-      supabase = await createClient();
-      // Check if Supabase is properly configured
+      // Check if Supabase environment variables are properly configured
       if (process.env.NEXT_PUBLIC_SUPABASE_URL && 
           !process.env.NEXT_PUBLIC_SUPABASE_URL.includes('your-') &&
-          process.env.NEXT_PUBLIC_SUPABASE_URL.startsWith('http')) {
+          process.env.NEXT_PUBLIC_SUPABASE_URL.startsWith('http') &&
+          process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY &&
+          !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY.includes('your-')) {
+        
+        supabase = await createClient();
         supabaseConfigured = true;
+        console.log('Supabase client created successfully');
+      } else {
+        console.log('Supabase environment variables not properly configured, using fallback');
+        supabaseConfigured = false;
       }
     } catch (error) {
       console.log('Supabase client creation failed, using fallback:', error);
