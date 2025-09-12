@@ -2,7 +2,7 @@
 
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { motion, HTMLMotionProps } from 'framer-motion';
+import { HTMLMotionProps, motion } from 'framer-motion';
 import React from 'react';
 
 interface AnimatedButtonProps extends Omit<HTMLMotionProps<'button'>, 'children'> {
@@ -32,6 +32,40 @@ export const AnimatedButton = React.forwardRef<HTMLButtonElement, AnimatedButton
     type = 'button',
     ...props 
   }, ref) => {
+    // Separate motion props from button props
+    const { 
+      initial, 
+      animate, 
+      exit, 
+      transition, 
+      variants, 
+      whileHover, 
+      whileTap, 
+      whileFocus, 
+      whileInView, 
+      viewport, 
+      drag, 
+      dragConstraints, 
+      dragElastic, 
+      dragMomentum, 
+      dragPropagation, 
+      dragSnapToOrigin, 
+      dragTransition, 
+      onDrag, 
+      onDragStart, 
+      onDragEnd, 
+      layout, 
+      layoutId, 
+      layoutDependency, 
+      layoutScroll, 
+      layoutRoot, 
+      style, 
+      transformTemplate, 
+      transformValues, 
+      custom, 
+      inherit, 
+      ...buttonProps 
+    } = props as any;
     const [isPressed, setIsPressed] = React.useState(false);
     const [ripples, setRipples] = React.useState<Array<{ id: number; x: number; y: number }>>([]);
 
@@ -79,12 +113,21 @@ export const AnimatedButton = React.forwardRef<HTMLButtonElement, AnimatedButton
     };
 
     const pulseVariants = {
+      initial: { scale: 1 },
+      hover: { 
+        scale: 1.05,
+        transition: { duration: 0.2 }
+      },
+      tap: { 
+        scale: 0.95,
+        transition: { duration: 0.1 }
+      },
       animate: {
         scale: [1, 1.02, 1],
         transition: {
           duration: 2,
           repeat: Infinity,
-          ease: 'easeInOut'
+          ease: 'easeInOut' as const
         }
       }
     };
@@ -131,10 +174,12 @@ export const AnimatedButton = React.forwardRef<HTMLButtonElement, AnimatedButton
             gradientClass,
             glowClass,
             pulseClass,
-            loading && 'cursor-not-allowed opacity-70',
+            loading && 'cursor-wait opacity-70',
+            disabled && 'cursor-not-allowed',
+            !disabled && !loading && 'cursor-pointer',
             className
           )}
-          {...props}
+          {...buttonProps}
         >
           {loading && (
             <motion.div

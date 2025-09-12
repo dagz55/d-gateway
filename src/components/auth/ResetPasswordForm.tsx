@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { createClient } from '@/lib/supabase/client';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AnimatePresence, motion } from 'framer-motion';
 import { CheckCircle, Loader2, Mail, Send } from 'lucide-react';
@@ -18,96 +19,67 @@ const emailSchema = z.object({
   email: z.string().email('Invalid email address'),
 });
 
-// Schema for OTP and password reset step
-const resetPasswordSchema = z.object({
-  email: z.string().email('Invalid email address'),
-  otp: z.string().length(6, 'OTP must be 6 digits'),
-  newPassword: z.string().min(8, 'Password must be at least 8 characters'),
-  confirmPassword: z.string(),
-}).refine((data) => data.newPassword === data.confirmPassword, {
-  message: "Passwords don't match",
-  path: ["confirmPassword"],
-});
-
 type EmailFormData = z.infer<typeof emailSchema>;
-type ResetPasswordFormData = z.infer<typeof resetPasswordSchema>;
 
 export default function ResetPasswordForm() {
   const [isLoading, setIsLoading] = useState(false);
-  const [step, setStep] = useState<'email' | 'otp'>('email');
-  const [otpSent, setOtpSent] = useState(false);
-  const [otpCode, setOtpCode] = useState('');
   const [emailSent, setEmailSent] = useState(false);
   const [buttonState, setButtonState] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const supabase = createClient();
 
   const emailForm = useForm<EmailFormData>({
     resolver: zodResolver(emailSchema),
   });
 
-  const resetForm = useForm<ResetPasswordFormData>({
-    resolver: zodResolver(resetPasswordSchema),
-  });
+  const { register, handleSubmit, formState: { errors }, watch } = emailForm;
+  const email = watch('email');
 
-  const { register: registerEmail, handleSubmit: handleEmailSubmit, formState: { errors: emailErrors }, watch: watchEmail } = emailForm;
-  const { register: registerReset, handleSubmit: handleResetSubmit, formState: { errors: resetErrors }, watch: watchReset } = resetForm;
-
-  const email = watchEmail('email');
-
-  const onRequestOTP = async (data: EmailFormData) => {
+  const onRequestReset = async (data: EmailFormData) => {
     console.log('🚀 Send Reset Link clicked!', data);
     setIsLoading(true);
     setButtonState('loading');
     
     try {
-      const response = await fetch('/api/auth/request-reset', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email: data.email }),
+      // Get the current origin for the redirect URL
+      const origin = window.location.origin;
+      const redirectTo = `${origin}/reset-password/confirm`;
+
+      // Use Supabase Auth to send password reset email
+      const { error } = await supabase.auth.resetPasswordForEmail(data.email, {
+        redirectTo,
       });
 
-      const result = await response.json();
-
-      if (result.success) {
-        setButtonState('success');
-        setEmailSent(true);
+      if (error) {
+        console.error('Supabase password reset error:', error);
+        setButtonState('error');
         
-        // Check if we're in development mode with OTP
-        if (result.data.otp) {
-          // Development mode with OTP
-          setOtpCode(result.data.otp);
-          setOtpSent(true);
-          setStep('otp');
-          toast.success(result.message || 'Development mode: OTP generated', {
-            description: 'Check the form below for your OTP code',
-            duration: 5000,
-          });
-          if (result.data.note) {
-            toast.info(result.data.note, { duration: 4000 });
-          }
-        } else {
-          // Production mode with email
-          toast.success('Password reset link sent!', {
+        // Handle specific error cases
+        if (error.message.includes('not found') || error.status === 404) {
+          // Don't reveal if email exists or not for security
+          toast.success('If an account exists with this email, you will receive a password reset link.', {
             description: 'Please check your email for the reset link',
             duration: 6000,
           });
+          setButtonState('success');
+          setEmailSent(true);
+        } else {
+          toast.error('Failed to send reset link', {
+            description: error.message || 'Please try again later',
+            duration: 5000,
+          });
         }
-        
-        // Reset button state after animation
-        setTimeout(() => setButtonState('idle'), 2000);
       } else {
-        setButtonState('error');
-        // Show specific error message
-        const errorMessage = result.message || 'Failed to send reset email';
-        toast.error('Failed to send reset link', {
-          description: errorMessage,
-          duration: 5000,
+        // Success - email sent via Supabase
+        setButtonState('success');
+        setEmailSent(true);
+        toast.success('Password reset link sent!', {
+          description: 'If an account exists with this email, you will receive a password reset link.',
+          duration: 6000,
         });
-        
-        // Reset button state
-        setTimeout(() => setButtonState('idle'), 2000);
       }
+      
+      // Reset button state after animation
+      setTimeout(() => setButtonState('idle'), 2000);
     } catch (error) {
       console.error('Reset password error:', error);
       setButtonState('error');
@@ -123,50 +95,16 @@ export default function ResetPasswordForm() {
     }
   };
 
-  const onResetPassword = async (data: ResetPasswordFormData) => {
-    setIsLoading(true);
-    try {
-      const response = await fetch('/api/auth/verify-otp', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email: data.email,
-          otp: data.otp,
-          newPassword: data.newPassword,
-        }),
-      });
-
-      const result = await response.json();
-
-      if (result.success) {
-        toast.success('Password reset successful! You can now sign in.');
-        // Reset form and go back to email step
-        setStep('email');
-        setOtpSent(false);
-        setOtpCode('');
-      } else {
-        toast.error(result.message || 'Failed to reset password');
-      }
-    } catch {
-      toast.error('An error occurred. Please try again.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  if (step === 'email') {
-    return (
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle>Reset Password</CardTitle>
-          <CardDescription>
-            Enter your email address to receive a password reset link
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleEmailSubmit(onRequestOTP)} className="space-y-4">
+  return (
+    <Card className="w-full max-w-md">
+      <CardHeader>
+        <CardTitle>Reset Password</CardTitle>
+        <CardDescription>
+          Enter your email address to receive a password reset link
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={handleSubmit(onRequestReset)} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input
@@ -258,7 +196,7 @@ export default function ResetPasswordForm() {
 
             {/* Success message with animation */}
             <AnimatePresence>
-              {emailSent && !otpSent && (
+              {emailSent && (
                 <motion.div
                   initial={{ opacity: 0, y: 10, scale: 0.95 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -307,86 +245,4 @@ export default function ResetPasswordForm() {
         </CardContent>
       </Card>
     );
-  }
-
-  return (
-    <Card className="w-full max-w-md">
-      <CardHeader>
-        <CardTitle>Enter Reset Code</CardTitle>
-        <CardDescription>
-          Enter the 6-digit code sent to {email}
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleResetSubmit(onResetPassword)} className="space-y-4">
-          {otpSent && (
-            <div className="p-4 bg-muted rounded-lg">
-              <p className="text-sm text-muted-foreground">
-                <strong>OTP Code:</strong> {otpCode}
-              </p>
-              <p className="text-xs text-muted-foreground mt-1">
-                This code is for development purposes only.
-              </p>
-            </div>
-          )}
-
-          <div className="space-y-2">
-            <Label htmlFor="otp">Reset Code</Label>
-            <Input
-              id="otp"
-              {...register('otp')}
-              placeholder="123456"
-              maxLength={6}
-              disabled={isLoading}
-            />
-            {errors.otp && (
-              <p className="text-sm text-destructive">{errors.otp.message}</p>
-            )}
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="newPassword">New Password</Label>
-            <Input
-              id="newPassword"
-              type="password"
-              {...register('newPassword')}
-              placeholder="••••••••"
-              disabled={isLoading}
-            />
-            {errors.newPassword && (
-              <p className="text-sm text-destructive">{errors.newPassword.message}</p>
-            )}
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="confirmPassword">Confirm New Password</Label>
-            <Input
-              id="confirmPassword"
-              type="password"
-              {...register('confirmPassword')}
-              placeholder="••••••••"
-              disabled={isLoading}
-            />
-            {errors.confirmPassword && (
-              <p className="text-sm text-destructive">{errors.confirmPassword.message}</p>
-            )}
-          </div>
-
-          <Button type="submit" className="w-full" disabled={isLoading}>
-            {isLoading ? 'Resetting...' : 'Reset Password'}
-          </Button>
-
-          <Button
-            type="button"
-            variant="outline"
-            className="w-full"
-            onClick={() => setStep('email')}
-            disabled={isLoading}
-          >
-            Back to Email
-          </Button>
-        </form>
-      </CardContent>
-    </Card>
-  );
 }

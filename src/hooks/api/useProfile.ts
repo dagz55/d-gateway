@@ -1,5 +1,6 @@
 import { ChangePasswordData, User } from '@/types';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useSession } from 'next-auth/react';
 
 async function fetchProfile(): Promise<User> {
   const response = await fetch('/api/profile');
@@ -51,10 +52,13 @@ async function changePassword(data: ChangePasswordData): Promise<void> {
 }
 
 export function useProfile() {
+  const { data: session, status } = useSession();
+  
   return useQuery({
     queryKey: ['profile'],
     queryFn: fetchProfile,
     staleTime: 300000, // 5 minutes
+    enabled: status === 'authenticated' && !!session, // Only run query if user is authenticated
   });
 }
 

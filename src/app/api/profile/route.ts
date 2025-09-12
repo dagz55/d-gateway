@@ -1,4 +1,5 @@
 import { authOptions } from '@/lib/auth';
+import { createClient } from '@/lib/supabase/server';
 import { getServerSession } from 'next-auth/next';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
@@ -6,7 +7,7 @@ import { z } from 'zod';
 const updateProfileSchema = z.object({
   fullName: z.string().min(2, 'Full name must be at least 2 characters').optional(),
   username: z.string().min(3, 'Username must be at least 3 characters').optional(),
-  avatarUrl: z.string().url('Invalid URL').optional(),
+  avatarUrl: z.string().url('Invalid URL').optional().nullable(),
 });
 
 const changePasswordSchema = z.object({
@@ -28,15 +29,30 @@ export async function GET() {
       );
     }
 
-    // TODO: Implement real user profile fetching with database
-    // - Query user profile from database
-    // - Return user data without sensitive information
+    const supabase = createClient();
+    const userId = (session as any).user.id;
 
+    // Get user profile from Supabase
+    const { data: profile, error } = await supabase
+      .from('user_profiles')
+      .select('*')
+      .eq('user_id', userId)
+      .single();
+    
+    if (error || !profile) {
+      return NextResponse.json(
+        { success: false, message: 'User profile not found' },
+        { status: 404 }
+      );
+    }
+
+    // Return user profile data
     return NextResponse.json(
-      { success: false, message: 'Profile retrieval not implemented - requires database integration' },
-      { status: 501 }
+      { success: true, data: profile },
+      { status: 200 }
     );
-  } catch {
+  } catch (error) {
+    console.error('Profile GET error:', error);
     return NextResponse.json(
       { success: false, message: 'Internal server error' },
       { status: 500 }
@@ -54,34 +70,74 @@ export async function PATCH(request: NextRequest) {
       );
     }
 
+    const supabase = createClient();
+    const userId = (session as any).user.id;
     const body = await request.json();
     const { action, ...data } = body;
 
     if (action === 'updateProfile') {
       const validatedData = updateProfileSchema.parse(data);
 
-      // TODO: Implement real profile update with database
-      // - Check if username is already taken in database
-      // - Update user profile in database
-      // - Return updated user data
+      // Check if username is already taken (if username is being updated)
+      if (validatedData.username) {
+        const { data: existingProfile } = await supabase
+          .from('user_profiles')
+          .select('user_id')
+          .eq('username', validatedData.username)
+          .neq('user_id', userId)
+          .single();
+        
+        if (existingProfile) {
+          return NextResponse.json(
+            { success: false, message: 'Username already taken' },
+            { status: 409 }
+          );
+        }
+      }
+
+      // Update user profile in Supabase
+      const { data: updatedProfile, error: updateError } = await supabase
+        .from('user_profiles')
+        .update({
+          full_name: validatedData.fullName,
+          username: validatedData.username,
+          avatar_url: validatedData.avatarUrl,
+        })
+        .eq('user_id', userId)
+        .select()
+        .single();
+      
+      if (updateError || !updatedProfile) {
+        return NextResponse.json(
+          { success: false, message: 'Failed to update profile' },
+          { status: 500 }
+        );
+      }
 
       return NextResponse.json(
-        { success: false, message: 'Profile update not implemented - requires database integration' },
-        { status: 501 }
+        { success: true, data: updatedProfile },
+        { status: 200 }
       );
     }
 
     if (action === 'changePassword') {
       const validatedData = changePasswordSchema.parse(data);
 
-      // TODO: Implement real password change with database
-      // - Verify current password against database hash
-      // - Hash new password
-      // - Update password in database
+      // Update password using Supabase Auth
+      const { error: passwordError } = await supabase.auth.updateUser({
+        password: validatedData.newPassword
+      });
+
+      if (passwordError) {
+        return NextResponse.json(
+          { success: false, message: passwordError.message },
+          { status: 400 }
+        );
+      }
 
       return NextResponse.json(
-        { success: false, message: 'Password change not implemented - requires database integration' },
-        { status: 501 }
+        { success: true, message: 'Password changed successfully' },
+        { status: 200 }
       );
     }
 
@@ -97,6 +153,7 @@ export async function PATCH(request: NextRequest) {
       );
     }
 
+    console.error('Profile PATCH error:', error);
     return NextResponse.json(
       { success: false, message: 'Internal server error' },
       { status: 500 }

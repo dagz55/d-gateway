@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
+import { createClient } from '@/lib/supabase/client';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { signIn } from 'next-auth/react';
 import Link from 'next/link';
@@ -16,7 +17,7 @@ import { z } from 'zod';
 import { GoogleSignInButton } from './GoogleSignInButton';
 
 const loginSchema = z.object({
-  username: z.string().min(1, 'Username is required'),
+  email: z.string().email('Invalid email address'),
   password: z.string().min(1, 'Password is required'),
 });
 
@@ -37,19 +38,36 @@ export default function LoginForm() {
   const onSubmit = async (data: LoginFormData) => {
     setIsLoading(true);
     try {
-      const result = await signIn('credentials', {
-        username: data.username,
+      const supabase = createClient();
+      
+      // Sign in with Supabase Auth
+      const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+        email: data.email,
         password: data.password,
-        redirect: false,
       });
 
-      if (result?.error) {
-        toast.error('Invalid credentials');
-      } else {
-        toast.success('Login successful!');
-        router.push('/dashboard');
+      if (authError) {
+        toast.error(authError.message);
+        return;
       }
-    } catch {
+
+      if (authData.user) {
+        // Sign in with NextAuth to get session
+        const result = await signIn('credentials', {
+          email: data.email,
+          password: data.password,
+          redirect: false,
+        });
+
+        if (result?.error) {
+          toast.error('Session creation failed');
+        } else {
+          toast.success('Login successful!');
+          router.push('/dashboard');
+        }
+      }
+    } catch (error) {
+      console.error('Login error:', error);
       toast.error('An error occurred. Please try again.');
     } finally {
       setIsLoading(false);
@@ -83,15 +101,16 @@ export default function LoginForm() {
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="username">Username</Label>
+            <Label htmlFor="email">Email</Label>
             <Input
-              id="username"
-              {...register('username')}
-              placeholder="johndoe"
+              id="email"
+              type="email"
+              {...register('email')}
+              placeholder="john@example.com"
               disabled={isLoading}
             />
-            {errors.username && (
-              <p className="text-sm text-destructive">{errors.username.message}</p>
+            {errors.email && (
+              <p className="text-sm text-destructive">{errors.email.message}</p>
             )}
           </div>
 

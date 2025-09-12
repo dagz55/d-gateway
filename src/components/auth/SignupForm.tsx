@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
+import { createClient } from '@/lib/supabase/client';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Link from 'next/link';
 import { useState } from 'react';
@@ -27,13 +28,12 @@ const signupSchema = z.object({
 type SignupFormData = z.infer<typeof signupSchema>;
 
 interface SignupFormProps {
-  onSuccess?: (data: { userId: string; otp: string }) => void;
+  onSuccess?: (data: { userId: string }) => void;
 }
 
 export default function SignupForm({ onSuccess }: SignupFormProps) {
   const [isLoading, setIsLoading] = useState(false);
-  const [otpSent, setOtpSent] = useState(false);
-  const [otpData, setOtpData] = useState<{ userId: string; otp: string } | null>(null);
+  const [emailSent, setEmailSent] = useState(false);
 
   const {
     register,
@@ -46,48 +46,52 @@ export default function SignupForm({ onSuccess }: SignupFormProps) {
   const onSubmit = async (data: SignupFormData) => {
     setIsLoading(true);
     try {
-      const response = await fetch('/api/auth/signup', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
+      const supabase = createClient();
+      
+      // Sign up with Supabase Auth
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email: data.email,
+        password: data.password,
+        options: {
+          data: {
+            full_name: data.fullName,
+            username: data.username,
+          }
+        }
       });
 
-      const result = await response.json();
-
-      if (result.success) {
-        setOtpSent(true);
-        setOtpData({ userId: result.data.userId, otp: result.data.otp });
-        toast.success('Account created! Please verify your email with the OTP.');
-        onSuccess?.(result.data);
-      } else {
-        toast.error(result.message || 'Failed to create account');
+      if (authError) {
+        toast.error(authError.message);
+        return;
       }
-    } catch {
+
+      if (authData.user) {
+        setEmailSent(true);
+        toast.success('Account created! Please check your email to verify your account.');
+        onSuccess?.({ userId: authData.user.id });
+      }
+    } catch (error) {
+      console.error('Signup error:', error);
       toast.error('An error occurred. Please try again.');
     } finally {
       setIsLoading(false);
     }
   };
 
-  if (otpSent && otpData) {
+  if (emailSent) {
     return (
       <Card className="w-full max-w-md">
         <CardHeader>
-          <CardTitle>Verify Email</CardTitle>
+          <CardTitle>Check Your Email</CardTitle>
           <CardDescription>
-            We&apos;ve sent a 6-digit code to your email. Please enter it below.
+            We&apos;ve sent a verification link to your email address. Please click the link to verify your account.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="p-4 bg-muted rounded-lg">
-              <p className="text-sm text-muted-foreground">
-                <strong>OTP Code:</strong> {otpData.otp}
-              </p>
-              <p className="text-xs text-muted-foreground mt-1">
-                This code is for development purposes only.
-              </p>
+            <p className="text-sm text-muted-foreground">
+              Check your email inbox and spam folder for the verification link.
+            </p>
           </div>
           <div className="space-y-2">
             <Button asChild className="w-full">
@@ -96,7 +100,7 @@ export default function SignupForm({ onSuccess }: SignupFormProps) {
             <Button
               variant="outline"
               className="w-full"
-              onClick={() => setOtpSent(false)}
+              onClick={() => setEmailSent(false)}
             >
               Back to Signup
             </Button>

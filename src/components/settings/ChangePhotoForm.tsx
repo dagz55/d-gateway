@@ -5,16 +5,27 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useUpdateProfile } from '@/hooks/api/useProfile';
+import { useProfile } from '@/hooks/api/useProfile';
 import { Upload, User } from 'lucide-react';
+import { useSession } from 'next-auth/react';
 import { useRef, useState } from 'react';
 import { toast } from 'sonner';
 
 export default function ChangePhotoForm() {
+  const { data: session, update: updateSession } = useSession();
+  const { refetch: refetchProfile } = useProfile();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const updateProfile = useUpdateProfile();
+  
+  // Use the current user's avatar as initial preview
+  const currentAvatarUrl = (session?.user as any)?.avatarUrl;
+
+  // Don't render if user is not authenticated
+  if (!session) {
+    return null;
+  }
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -34,39 +45,47 @@ export default function ChangePhotoForm() {
       // Create preview URL
       const url = URL.createObjectURL(file);
       setPreviewUrl(url);
+      setSelectedFile(file);
     }
   };
 
   const handleSubmit = async () => {
-    const file = fileInputRef.current?.files?.[0];
-    if (!file) {
+    if (!selectedFile) {
       toast.error('Please select a file');
       return;
     }
 
     setIsSubmitting(true);
     try {
-      // In a real app, you would upload the file to a storage service
-      // For development purposes, we'll create a mock URL
-      const mockUrl = `https://images.unsplash.com/photo-${Date.now()}?w=150&h=150&fit=crop&crop=face`;
+      // Upload the file to the server
+      const formData = new FormData();
+      formData.append('file', selectedFile);
       
-      await updateProfile.mutateAsync({
-        avatarUrl: mockUrl,
+      const uploadResponse = await fetch('/api/upload/avatar', {
+        method: 'POST',
+        body: formData,
       });
+      
+      if (!uploadResponse.ok) {
+        const error = await uploadResponse.json();
+        throw new Error(error.message || 'Failed to upload photo');
+      }
+      
+      const result = await uploadResponse.json();
+      
+      // Update session to reflect new avatar
+      await updateSession();
+      await refetchProfile();
       
       toast.success('Profile photo updated successfully!');
       setPreviewUrl(null);
+      setSelectedFile(null);
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
       }
     } catch (error) {
-      // Show a more user-friendly message for 501 errors
       const errorMessage = error instanceof Error ? error.message : 'Failed to update photo';
-      if (errorMessage.includes('501') || errorMessage.includes('not implemented')) {
-        toast.error('Profile photo update feature is currently under development. Please try again later.');
-      } else {
-        toast.error(errorMessage);
-      }
+      toast.error(errorMessage);
     } finally {
       setIsSubmitting(false);
     }
@@ -75,23 +94,28 @@ export default function ChangePhotoForm() {
   const handleRemovePhoto = async () => {
     setIsSubmitting(true);
     try {
-      await updateProfile.mutateAsync({
-        avatarUrl: undefined,
+      const response = await fetch('/api/upload/avatar', {
+        method: 'DELETE',
       });
+      
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Failed to remove photo');
+      }
+      
+      // Update session to reflect removal
+      await updateSession();
+      await refetchProfile();
       
       toast.success('Profile photo removed successfully!');
       setPreviewUrl(null);
+      setSelectedFile(null);
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
       }
     } catch (error) {
-      // Show a more user-friendly message for 501 errors
       const errorMessage = error instanceof Error ? error.message : 'Failed to remove photo';
-      if (errorMessage.includes('501') || errorMessage.includes('not implemented')) {
-        toast.error('Profile photo update feature is currently under development. Please try again later.');
-      } else {
-        toast.error(errorMessage);
-      }
+      toast.error(errorMessage);
     } finally {
       setIsSubmitting(false);
     }
@@ -108,7 +132,7 @@ export default function ChangePhotoForm() {
       <CardContent className="space-y-4">
         <div className="flex items-center space-x-4">
           <Avatar className="h-20 w-20">
-            <AvatarImage src={previewUrl || undefined} />
+            <AvatarImage src={previewUrl || currentAvatarUrl || undefined} />
             <AvatarFallback>
               <User className="h-8 w-8" />
             </AvatarFallback>
@@ -158,7 +182,7 @@ export default function ChangePhotoForm() {
           <Button 
             variant="outline" 
             onClick={handleRemovePhoto}
-            disabled={isSubmitting}
+            disabled={isSubmitting || (!currentAvatarUrl && !previewUrl)}
           >
             Remove Photo
           </Button>

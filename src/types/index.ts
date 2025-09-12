@@ -4,7 +4,7 @@ export interface User {
   username: string;
   email: string;
   password?: string; // Optional for security - not always returned
-  avatarUrl?: string;
+  avatarUrl?: string | null;
   age?: number;
   gender?: 'MALE' | 'FEMALE' | 'OTHER' | 'PREFER_NOT_TO_SAY';
   traderLevel: 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED' | 'EXPERT' | 'PROFESSIONAL';

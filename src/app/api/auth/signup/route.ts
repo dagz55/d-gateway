@@ -1,9 +1,6 @@
-import { initializeMockData, mockDb } from '@/server/mock-db';
+import { createClient } from '@/lib/supabase/server';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-
-// Initialize mock data if not already done
-initializeMockData();
 
 const signupSchema = z.object({
   fullName: z.string().min(2, 'Full name must be at least 2 characters'),
@@ -23,62 +20,58 @@ export async function POST(request: NextRequest) {
 
     const { fullName, username, email, password } = validatedData;
 
-    // Check if user already exists
-    const existingUser = Array.from(mockDb.users.values()).find(
-      user => user.email === email || user.username === username
-    );
+    const supabase = createClient();
 
-    if (existingUser) {
+    // Check if user already exists in user_profiles table
+    const { data: existingProfile } = await supabase
+      .from('user_profiles')
+      .select('user_id')
+      .or(`email.eq.${email},username.eq.${username}`)
+      .single();
+
+    if (existingProfile) {
       return NextResponse.json(
         { success: false, message: 'User with this email or username already exists' },
         { status: 409 }
       );
     }
 
-    // Create new user
-    const userId = (mockDb.users.size + 1).toString();
-    const newUser = {
-      id: userId,
+    // Sign up with Supabase Auth
+    const { data: authData, error: authError } = await supabase.auth.signUp({
       email,
-      username,
-      fullName,
-      age: 25, // Default age
-      gender: 'PREFER_NOT_TO_SAY' as const,
-      traderLevel: 'BEGINNER' as const,
-      accountBalance: 0,
-      isVerified: false,
-      package: 'BASIC' as const,
-      status: 'OFFLINE' as const,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
-
-    // Store user in mock database
-    mockDb.users.set(userId, newUser);
-
-    // Generate OTP for email verification
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
-
-    mockDb.otpCodes.set(email, {
-      code: otp,
-      expiresAt,
-      email,
+      password,
+      options: {
+        data: {
+          full_name: fullName,
+          username: username,
+        }
+      }
     });
 
-    // In a real app, you would send the OTP via email
-    // For development, we'll return it in the response
+    if (authError) {
+      return NextResponse.json(
+        { success: false, message: authError.message },
+        { status: 400 }
+      );
+    }
+
+    if (authData.user) {
+      return NextResponse.json(
+        {
+          success: true,
+          message: 'User registered successfully. Please check your email to verify your account.',
+          data: {
+            userId: authData.user.id,
+            message: 'Verification email sent to your email address'
+          }
+        },
+        { status: 201 }
+      );
+    }
+
     return NextResponse.json(
-      {
-        success: true,
-        message: 'User registered successfully. Please check your email for OTP.',
-        data: {
-          userId,
-          otp, // Only for development - remove in production
-          message: 'OTP sent to your email for verification'
-        }
-      },
-      { status: 201 }
+      { success: false, message: 'Failed to create user' },
+      { status: 500 }
     );
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -89,6 +82,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    console.error('Signup error:', error);
     return NextResponse.json(
       { success: false, message: 'Internal server error' },
       { status: 500 }

@@ -1,7 +1,7 @@
 'use client';
 
 import { cn } from '@/lib/utils';
-import { motion, useAnimationControls, useInView } from 'framer-motion';
+import { motion, useInView } from 'framer-motion';
 import React, { useEffect, useRef } from 'react';
 
 interface AnimatedNumberProps {
@@ -24,24 +24,31 @@ export const AnimatedNumber: React.FC<AnimatedNumberProps> = ({
   format = 'number'
 }) => {
   const [displayValue, setDisplayValue] = React.useState(0);
-  const controls = useAnimationControls();
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: '-20px' });
 
   useEffect(() => {
     if (inView) {
-      controls.start({
-        from: 0,
-        to: value,
-        transition: { duration, ease: 'easeOut' },
-        onUpdate: (latest) => {
-          if (typeof latest === 'number') {
-            setDisplayValue(latest);
-          }
+      const startTime = Date.now();
+      const startValue = 0;
+      const endValue = value;
+      
+      const animate = () => {
+        const elapsed = Date.now() - startTime;
+        const progress = Math.min(elapsed / (duration * 1000), 1);
+        const easeOut = 1 - Math.pow(1 - progress, 3);
+        const currentValue = startValue + (endValue - startValue) * easeOut;
+        
+        setDisplayValue(currentValue);
+        
+        if (progress < 1) {
+          requestAnimationFrame(animate);
         }
-      });
+      };
+      
+      animate();
     }
-  }, [inView, value, duration, controls]);
+  }, [inView, value, duration]);
 
   const formatValue = (val: number): string => {
     switch (format) {
@@ -62,7 +69,6 @@ export const AnimatedNumber: React.FC<AnimatedNumberProps> = ({
   return (
     <motion.span
       ref={ref}
-      animate={controls}
       className={cn('tabular-nums', className)}
     >
       {prefix}{formatValue(displayValue)}{suffix}

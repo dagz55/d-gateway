@@ -2,7 +2,7 @@
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 -- Create profiles table (extends auth.users)
-CREATE TABLE public.profiles (
+CREATE TABLE IF NOT EXISTS public.profiles (
     id UUID REFERENCES auth.users(id) ON DELETE CASCADE PRIMARY KEY,
     username TEXT UNIQUE NOT NULL,
     full_name TEXT NOT NULL,
@@ -13,7 +13,7 @@ CREATE TABLE public.profiles (
 );
 
 -- Create trades table
-CREATE TABLE public.trades (
+CREATE TABLE IF NOT EXISTS public.trades (
     id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
     user_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE NOT NULL,
     pair TEXT NOT NULL,
@@ -27,7 +27,7 @@ CREATE TABLE public.trades (
 );
 
 -- Create signals table
-CREATE TABLE public.signals (
+CREATE TABLE IF NOT EXISTS public.signals (
     id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
     user_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE NOT NULL,
     pair TEXT NOT NULL,
@@ -42,7 +42,7 @@ CREATE TABLE public.signals (
 );
 
 -- Create transactions table
-CREATE TABLE public.transactions (
+CREATE TABLE IF NOT EXISTS public.transactions (
     id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
     user_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE NOT NULL,
     type TEXT CHECK (type IN ('DEPOSIT', 'WITHDRAWAL')) NOT NULL,
@@ -57,7 +57,7 @@ CREATE TABLE public.transactions (
 );
 
 -- Create crypto_prices table
-CREATE TABLE public.crypto_prices (
+CREATE TABLE IF NOT EXISTS public.crypto_prices (
     id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
     symbol TEXT UNIQUE NOT NULL,
     price DECIMAL(20,8) NOT NULL CHECK (price > 0),
@@ -68,7 +68,7 @@ CREATE TABLE public.crypto_prices (
 );
 
 -- Create news table
-CREATE TABLE public.news (
+CREATE TABLE IF NOT EXISTS public.news (
     id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
     title TEXT NOT NULL,
     summary TEXT,
@@ -80,24 +80,24 @@ CREATE TABLE public.news (
 );
 
 -- Create indexes for better performance
-CREATE INDEX idx_trades_user_id ON public.trades(user_id);
-CREATE INDEX idx_trades_created_at ON public.trades(created_at DESC);
-CREATE INDEX idx_trades_pair ON public.trades(pair);
+CREATE INDEX IF NOT EXISTS idx_trades_user_id ON public.trades(user_id);
+CREATE INDEX IF NOT EXISTS idx_trades_created_at ON public.trades(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_trades_pair ON public.trades(pair);
 
-CREATE INDEX idx_signals_user_id ON public.signals(user_id);
-CREATE INDEX idx_signals_status ON public.signals(status);
-CREATE INDEX idx_signals_created_at ON public.signals(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_signals_user_id ON public.signals(user_id);
+CREATE INDEX IF NOT EXISTS idx_signals_status ON public.signals(status);
+CREATE INDEX IF NOT EXISTS idx_signals_created_at ON public.signals(created_at DESC);
 
-CREATE INDEX idx_transactions_user_id ON public.transactions(user_id);
-CREATE INDEX idx_transactions_type ON public.transactions(type);
-CREATE INDEX idx_transactions_status ON public.transactions(status);
-CREATE INDEX idx_transactions_created_at ON public.transactions(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_transactions_user_id ON public.transactions(user_id);
+CREATE INDEX IF NOT EXISTS idx_transactions_type ON public.transactions(type);
+CREATE INDEX IF NOT EXISTS idx_transactions_status ON public.transactions(status);
+CREATE INDEX IF NOT EXISTS idx_transactions_created_at ON public.transactions(created_at DESC);
 
-CREATE INDEX idx_crypto_prices_symbol ON public.crypto_prices(symbol);
-CREATE INDEX idx_crypto_prices_updated_at ON public.crypto_prices(updated_at DESC);
+CREATE INDEX IF NOT EXISTS idx_crypto_prices_symbol ON public.crypto_prices(symbol);
+CREATE INDEX IF NOT EXISTS idx_crypto_prices_updated_at ON public.crypto_prices(updated_at DESC);
 
-CREATE INDEX idx_news_published_at ON public.news(published_at DESC);
-CREATE INDEX idx_news_source ON public.news(source);
+CREATE INDEX IF NOT EXISTS idx_news_published_at ON public.news(published_at DESC);
+CREATE INDEX IF NOT EXISTS idx_news_source ON public.news(source);
 
 -- Create function to handle updated_at timestamp
 CREATE OR REPLACE FUNCTION public.handle_updated_at()
@@ -109,7 +109,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- Create triggers for updated_at
-CREATE TRIGGER set_updated_at
+CREATE OR REPLACE TRIGGER set_updated_at
     BEFORE UPDATE ON public.profiles
     FOR EACH ROW
     EXECUTE FUNCTION public.handle_updated_at();

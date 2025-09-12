@@ -8,7 +8,7 @@ import { createClient } from '@/lib/supabase/client';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { z } from 'zod';
@@ -23,7 +23,7 @@ const resetPasswordSchema = z.object({
 
 type ResetPasswordFormData = z.infer<typeof resetPasswordSchema>;
 
-export default function ResetPasswordConfirmPage() {
+function ResetPasswordConfirmContent() {
   const [isLoading, setIsLoading] = useState(false);
   const [isValidToken, setIsValidToken] = useState<boolean | null>(null);
   const router = useRouter();
@@ -45,9 +45,20 @@ export default function ResetPasswordConfirmPage() {
       const type = searchParams.get('type');
       
       if (type === 'recovery' && token) {
-        setIsValidToken(true);
+        // Verify the token with Supabase
+        const { error } = await supabase.auth.verifyOtp({
+          token_hash: token,
+          type: 'recovery'
+        });
+        
+        if (error) {
+          console.error('Token verification error:', error);
+          setIsValidToken(false);
+        } else {
+          setIsValidToken(true);
+        }
       } else {
-        // Check if user came from email link
+        // Check if user came from email link and has an active session
         const { data: { session }, error } = await supabase.auth.getSession();
         
         if (error || !session) {
@@ -192,5 +203,23 @@ export default function ResetPasswordConfirmPage() {
         </CardContent>
       </Card>
     </div>
+  );
+}
+
+export default function ResetPasswordConfirmPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-muted/50 p-4">
+        <Card className="w-full max-w-md">
+          <CardContent className="pt-6">
+            <div className="text-center">
+              <p className="text-muted-foreground">Loading...</p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    }>
+      <ResetPasswordConfirmContent />
+    </Suspense>
   );
 }

@@ -1,0 +1,20 @@
+
+> zignal@1.0.0 dev
+> next dev
+
+   ▲ Next.js 15.5.2
+   - Local:        http://localhost:3000
+   - Network:      http://192.168.1.160:3000
+   - Environments: .env.local
+   - Experiments (use with caution):
+     · optimizePackageImports
+
+ ✓ Starting...
+ ✓ Ready in 1452ms
+ ✓ Compiled /middleware in 92ms (114 modules)
+ ○ Compiling /api/profile ...
+ ✓ Compiled /api/profile in 754ms (675 modules)
+ GET /api/profile 401 in 961ms
+ ✓ Compiled in 237ms (483 modules)
+ ✓ Compiled in 83ms (483 modules)
+[?25h
