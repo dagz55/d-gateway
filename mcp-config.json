@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "reactbits": {
+      "command": "npx",
+      "args": ["reactbits-dev-mcp-server"],
+      "description": "ReactBits MCP Server - Access to 135+ animated React components",
+      "env": {
+        "NODE_ENV": "development"
+      }
+    }
+  }
+}
