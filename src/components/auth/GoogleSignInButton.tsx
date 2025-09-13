@@ -26,10 +26,12 @@ export function GoogleSignInButton({
     try {
       const supabase = createClient();
       
-      // Use Supabase Auth - let it handle the callback automatically
-      // The redirect URI should be configured in Supabase Dashboard, not here
+      // Use Supabase Auth with explicit redirect URL for OAuth callback
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+        },
       });
 
       if (error) {
