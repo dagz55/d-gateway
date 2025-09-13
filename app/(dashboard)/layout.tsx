@@ -1,6 +1,6 @@
 import AppLayout from '@/components/layout/AppLayout';
 
-export default function AuthenticatedLayout({
+export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;

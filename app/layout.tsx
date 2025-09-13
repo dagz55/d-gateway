@@ -4,12 +4,13 @@ import { GeistSans } from "geist/font/sans"
 import { GeistMono } from "geist/font/mono"
 import { Analytics } from "@vercel/analytics/next"
 import { Suspense } from "react"
+import { Providers } from "./providers"
 import "./globals.css"
 
 export const metadata: Metadata = {
-  title: "Zignal — Crypto Signals Login",
+  title: "Zignal — Crypto Signals Platform",
   description:
-    "Trade the future. Zignal turns pro signals into clear actions. Login to access member dashboards and admin tools.",
+    "Trade the future. Zignal turns pro signals into clear actions. Access trading dashboard and analytics.",
   generator: "v0.app",
   icons: {
     icon: "/favicon.ico",
@@ -26,7 +27,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`font-sans ${GeistSans.variable} ${GeistMono.variable} antialiased`}>
-        <Suspense fallback={null}>{children}</Suspense>
+        <Providers>
+          <Suspense fallback={null}>{children}</Suspense>
+        </Providers>
         <Analytics />
       </body>
     </html>
