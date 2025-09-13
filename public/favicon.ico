@@ -1,0 +1,43 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="64" height="64" fill="white"/>
+  
+  <!-- Main Z shape with gradient -->
+  <defs>
+    <linearGradient id="zGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#33E1DA;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1A7FB3;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Z shape -->
+  <path d="M8 8 L48 8 L40 16 L8 16 L8 8 Z" fill="url(#zGradient)"/>
+  <path d="M8 16 L40 16 L32 24 L8 24 L8 16 Z" fill="url(#zGradient)"/>
+  <path d="M8 24 L32 24 L24 32 L8 32 L8 24 Z" fill="url(#zGradient)"/>
+  
+  <!-- Network dots -->
+  <circle cx="12" cy="12" r="1.5" fill="#EAF2FF" opacity="0.8"/>
+  <circle cx="16" cy="10" r="1.5" fill="#EAF2FF" opacity="0.8"/>
+  <circle cx="20" cy="12" r="1.5" fill="#EAF2FF" opacity="0.8"/>
+  <circle cx="18" cy="14" r="1.5" fill="#EAF2FF" opacity="0.8"/>
+  <circle cx="14" cy="14" r="1.5" fill="#EAF2FF" opacity="0.8"/>
+  
+  <!-- Chart -->
+  <g transform="translate(28, 20)">
+    <polyline points="0,8 4,6 8,10 12,4 16,12 20,6 24,14" 
+              fill="none" 
+              stroke="#EAF2FF" 
+              stroke-width="1.5"/>
+    
+    <circle cx="0" cy="8" r="1" fill="#EAF2FF"/>
+    <circle cx="4" cy="6" r="1" fill="#EAF2FF"/>
+    <circle cx="8" cy="10" r="1" fill="#EAF2FF"/>
+    <circle cx="12" cy="4" r="1" fill="#EAF2FF"/>
+    <circle cx="16" cy="12" r="1" fill="#EAF2FF"/>
+    <circle cx="20" cy="6" r="1" fill="#EAF2FF"/>
+    <circle cx="24" cy="14" r="1" fill="#EAF2FF"/>
+    
+    <!-- Arrow -->
+    <path d="M20 8 L22 6 L24 8 L22 10 Z" fill="#EAF2FF"/>
+  </g>
+</svg>
