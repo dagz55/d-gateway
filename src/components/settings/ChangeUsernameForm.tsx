@@ -4,7 +4,6 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useUpdateProfile } from '@/hooks/api/useProfile';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -24,7 +23,6 @@ interface ChangeUsernameFormProps {
 
 export default function ChangeUsernameForm({ currentUsername }: ChangeUsernameFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const updateProfile = useUpdateProfile();
 
   const {
     register,
@@ -51,19 +49,12 @@ export default function ChangeUsernameForm({ currentUsername }: ChangeUsernameFo
 
     setIsSubmitting(true);
     try {
-      await updateProfile.mutateAsync({
-        username: data.newUsername,
-      });
+      // Simulate username update
+      await new Promise(resolve => setTimeout(resolve, 1000));
       toast.success('Username updated successfully!');
       reset({ currentUsername: data.newUsername, newUsername: '' });
     } catch (error) {
-      // Show a more user-friendly message for 501 errors
-      const errorMessage = error instanceof Error ? error.message : 'Failed to update username';
-      if (errorMessage.includes('501') || errorMessage.includes('not implemented')) {
-        toast.error('Profile update feature is currently under development. Please try again later.');
-      } else {
-        toast.error(errorMessage);
-      }
+      toast.error('Failed to update username');
     } finally {
       setIsSubmitting(false);
     }

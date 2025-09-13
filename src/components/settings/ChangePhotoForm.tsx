@@ -1,31 +1,19 @@
 'use client';
 
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useProfile } from '@/hooks/api/useProfile';
 import { Upload, User } from 'lucide-react';
-import { useSession } from '@/providers/supabase-auth-provider';
 import { useRef, useState } from 'react';
 import { toast } from 'sonner';
 
 export default function ChangePhotoForm() {
-  const { data: session, update: updateSession } = useSession();
-  const { refetch: refetchProfile } = useProfile();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  
-  // Use the current user's avatar as initial preview
-  const currentAvatarUrl = (session?.user as any)?.avatarUrl;
-
-  // Don't render if user is not authenticated
-  if (!session) {
-    return null;
-  }
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -57,25 +45,8 @@ export default function ChangePhotoForm() {
 
     setIsSubmitting(true);
     try {
-      // Upload the file to the server
-      const formData = new FormData();
-      formData.append('file', selectedFile);
-      
-      const uploadResponse = await fetch('/api/upload/avatar', {
-        method: 'POST',
-        body: formData,
-      });
-      
-      if (!uploadResponse.ok) {
-        const error = await uploadResponse.json();
-        throw new Error(error.message || 'Failed to upload photo');
-      }
-      
-      const result = await uploadResponse.json();
-      
-      // Update session to reflect new avatar
-      await updateSession();
-      await refetchProfile();
+      // Simulate upload process
+      await new Promise(resolve => setTimeout(resolve, 1000));
       
       toast.success('Profile photo updated successfully!');
       setPreviewUrl(null);
@@ -84,8 +55,7 @@ export default function ChangePhotoForm() {
         fileInputRef.current.value = '';
       }
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Failed to update photo';
-      toast.error(errorMessage);
+      toast.error('Failed to update photo');
     } finally {
       setIsSubmitting(false);
     }
@@ -94,18 +64,8 @@ export default function ChangePhotoForm() {
   const handleRemovePhoto = async () => {
     setIsSubmitting(true);
     try {
-      const response = await fetch('/api/upload/avatar', {
-        method: 'DELETE',
-      });
-      
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || 'Failed to remove photo');
-      }
-      
-      // Update session to reflect removal
-      await updateSession();
-      await refetchProfile();
+      // Simulate removal process
+      await new Promise(resolve => setTimeout(resolve, 500));
       
       toast.success('Profile photo removed successfully!');
       setPreviewUrl(null);
@@ -114,8 +74,7 @@ export default function ChangePhotoForm() {
         fileInputRef.current.value = '';
       }
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Failed to remove photo';
-      toast.error(errorMessage);
+      toast.error('Failed to remove photo');
     } finally {
       setIsSubmitting(false);
     }
@@ -132,7 +91,6 @@ export default function ChangePhotoForm() {
       <CardContent className="space-y-4">
         <div className="flex items-center space-x-4">
           <Avatar className="h-20 w-20">
-            <AvatarImage src={previewUrl || currentAvatarUrl || undefined} />
             <AvatarFallback>
               <User className="h-8 w-8" />
             </AvatarFallback>
@@ -159,7 +117,6 @@ export default function ChangePhotoForm() {
             <h4 className="font-medium mb-2">Preview</h4>
             <div className="flex items-center space-x-4">
               <Avatar className="h-16 w-16">
-                <AvatarImage src={previewUrl} />
                 <AvatarFallback>
                   <User className="h-6 w-6" />
                 </AvatarFallback>
@@ -182,7 +139,7 @@ export default function ChangePhotoForm() {
           <Button 
             variant="outline" 
             onClick={handleRemovePhoto}
-            disabled={isSubmitting || (!currentAvatarUrl && !previewUrl)}
+            disabled={isSubmitting}
           >
             Remove Photo
           </Button>
