@@ -5,6 +5,30 @@ All notable changes to the Zignal Trading Platform will be documented in this fi
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.0] - 2024-12-13
+
+### Added
+- Modern password visibility toggle component with smooth animations
+- Password strength indicator with real-time feedback
+- Animated eye icon transitions (300ms rotation/scale effects)
+- Color-coded strength bars (red → orange → yellow → green)
+- Password complexity validation (length, mixed case, numbers, special chars)
+- Accessible password inputs with ARIA labels and keyboard navigation
+
+### Changed
+- Enhanced LoginForm with modern password input component
+- Updated SignupForm with password strength indicator
+- Improved ChangePasswordForm with visual strength feedback
+- Modernized ResetPasswordConfirm with animated password fields
+- Better UX with focus state highlighting and hover effects
+
+### UI Improvements
+- Smooth icon transitions between Eye/EyeOff states
+- Real-time password strength feedback
+- Descriptive strength text (Very Weak, Weak, Fair, Good, Strong)
+- Consistent 200ms-300ms animation durations
+- Fully responsive password inputs
+
 ## [2.0.0] - 2024-12-13
 
 ### BREAKING CHANGES

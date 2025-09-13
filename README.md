@@ -1,15 +1,19 @@
-# Zignal - Advanced Trading Signals Platform
+# Zignal - Advanced Trading Signals Platform v2.1.0
 
-A production-ready Next.js trading platform featuring advanced signals analytics, real-time market data, and comprehensive trading tools with modern UI/UX.
+A production-ready Next.js trading platform featuring advanced signals analytics, real-time market data, comprehensive trading tools, and modern authentication with enhanced security UI/UX.
 
 ## 🚀 Features
 
-### Authentication
+### Authentication (v2.1.0 Enhanced)
 
-- **Sign Up** with email verification (OTP simulation)
-- **Login** with username/password
-- **Password Reset** with OTP verification
-- **Protected Routes** with NextAuth.js middleware
+- **Supabase Auth Integration** - Secure, scalable authentication system
+- **Modern Password UI** - Animated visibility toggles with smooth transitions
+- **Password Strength Indicator** - Real-time feedback with color-coded bars
+- **Sign Up** with email verification and password strength validation
+- **Login** with email/password and modern password field
+- **Password Reset** with secure token-based flow
+- **Protected Routes** with middleware-based session management
+- **Google OAuth** - Ready for configuration
 
 ### Dashboard
 
@@ -30,9 +34,10 @@ A production-ready Next.js trading platform featuring advanced signals analytics
 
 - **Framework**: Next.js 15+ (App Router, TypeScript, ESLint)
 - **Database**: Supabase (PostgreSQL) with Row Level Security
-- **Authentication**: Supabase Auth + NextAuth.js integration
+- **Authentication**: Supabase Auth with SSR support (v2.0.0+)
 - **Styling**: Tailwind CSS 4 + shadcn/ui + lucide-react
 - **Animations**: Framer Motion for smooth interactions
+- **UI Components**: Custom PasswordInput with strength meter (v2.1.0)
 - **State Management**: Zustand + React Query (TanStack Query)
 - **Charts**: Recharts for crypto price visualization
 - **Forms**: Zod + react-hook-form for validation
@@ -146,10 +151,16 @@ The application starts with an empty database. You'll need to create an account 
 
 - **Responsive Design**: Mobile-first approach with collapsible sidebar
 - **Dark Mode**: System preference detection with theme switching
+- **Modern Password Fields** (v2.1.0):
+  - Animated eye icon toggle (300ms transitions)
+  - Password strength indicator with real-time feedback
+  - Color-coded strength bars (red → orange → yellow → green)
+  - Complexity validation (length, mixed case, numbers, special chars)
 - **Accessibility**: ARIA labels, keyboard navigation, focus management
 - **Loading States**: Skeleton loaders and loading indicators
 - **Error Handling**: Toast notifications and form validation
 - **Empty States**: Helpful CTAs for empty data states
+- **Cursor & Hover Effects**: Enhanced button interactions (v2.0.0)
 
 ## 🔧 API Endpoints
 
