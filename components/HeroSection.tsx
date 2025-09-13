@@ -106,7 +106,7 @@ export function HeroSection() {
             alt="Zignal Logo"
             width={200}
             height={80}
-            className="w-auto h-16 lg:h-20"
+            className="w-auto h-16 mix-blend-screen lg:h-28 rounded-full opacity-75 font-thin"
             priority
           />
         </div>

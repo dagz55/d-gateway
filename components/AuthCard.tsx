@@ -11,6 +11,8 @@ import { Separator } from "@/components/ui/separator"
 import { Eye, EyeOff, ExternalLink, AlertCircle } from "lucide-react"
 import Link from "next/link"
 import { supabase } from "@/lib/supabase/browserClient"
+import { TermsModal } from "./TermsModal"
+import { PrivacyModal } from "./PrivacyModal"
 
 export function AuthCard() {
   const [showEmailForm, setShowEmailForm] = useState(false)
@@ -18,14 +20,45 @@ export function AuthCard() {
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [showForgotPassword, setShowForgotPassword] = useState(false)
+  const [resetEmailSent, setResetEmailSent] = useState(false)
   const [formData, setFormData] = useState({
     email: "",
     password: "",
     confirmPassword: "",
   })
 
-  // Check if Supabase is configured
   const isSupabaseConfigured = process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault()
+
+    if (!isSupabaseConfigured) {
+      setError("Supabase is not configured. Please add your Supabase environment variables.")
+      return
+    }
+
+    setLoading(true)
+    setError(null)
+
+    try {
+      const { error } = await supabase().auth.resetPasswordForEmail(formData.email, {
+        redirectTo: `${window.location.origin}/auth/callback?next=/dashboard&type=recovery`,
+      })
+
+      if (error) {
+        console.error("[v0] Password reset error:", error)
+        setError(error.message)
+      } else {
+        setResetEmailSent(true)
+      }
+    } catch (error) {
+      console.error("[v0] Password reset error:", error)
+      setError("Supabase is not configured. Please add your environment variables.")
+    } finally {
+      setLoading(false)
+    }
+  }
 
   const handleGoogleSignIn = async () => {
     if (!isSupabaseConfigured) {
@@ -100,7 +133,6 @@ export function AuthCard() {
           console.error("[v0] Sign in error:", error)
           setError(error.message)
         } else if (data.session) {
-          // Redirect to dashboard on successful sign in
           window.location.href = "/dashboard"
         }
       }
@@ -116,19 +148,28 @@ export function AuthCard() {
     <Card className="w-full max-w-md glass glass-hover border-[#33E1DA]/20 shadow-2xl">
       <CardHeader className="space-y-1 text-center">
         <CardTitle className="text-2xl font-bold text-[#EAF2FF]">
-          {showEmailForm ? (isSignUp ? "Create Account" : "Sign In") : "Welcome to Zignal"}
+          {showForgotPassword
+            ? "Reset Password"
+            : showEmailForm
+              ? isSignUp
+                ? "Create Account"
+                : "Sign In"
+              : "Welcome to Zignal"}
         </CardTitle>
         <CardDescription className="text-[#EAF2FF]/70">
-          {showEmailForm
-            ? isSignUp
-              ? "Create your account to get started"
-              : "Sign in to your account"
-            : "Access your trading dashboard"}
+          {showForgotPassword
+            ? resetEmailSent
+              ? "Check your email for reset instructions"
+              : "Enter your email to reset your password"
+            : showEmailForm
+              ? isSignUp
+                ? "Create your account to get started"
+                : "Sign in to your account"
+              : "Access your trading dashboard"}
         </CardDescription>
       </CardHeader>
 
       <CardContent className="space-y-4">
-        {/* Error Message */}
         {error && (
           <div className="flex items-center space-x-2 p-3 bg-red-500/10 border border-red-500/20 rounded-md">
             <AlertCircle className="h-4 w-4 text-red-400" />
@@ -136,7 +177,6 @@ export function AuthCard() {
           </div>
         )}
 
-        {/* Supabase Configuration Warning */}
         {!isSupabaseConfigured && (
           <div className="flex items-center space-x-2 p-3 bg-yellow-500/10 border border-yellow-500/20 rounded-md">
             <AlertCircle className="h-4 w-4 text-yellow-400" />
@@ -147,9 +187,70 @@ export function AuthCard() {
           </div>
         )}
 
-        {!showEmailForm ? (
+        {showForgotPassword ? (
           <>
-            {/* Google Sign-In Button */}
+            {resetEmailSent ? (
+              <div className="text-center space-y-4">
+                <div className="p-4 bg-green-500/10 border border-green-500/20 rounded-md">
+                  <p className="text-sm text-green-400">
+                    Password reset email sent! Check your inbox and follow the instructions to reset your password.
+                  </p>
+                </div>
+                <Button
+                  variant="ghost"
+                  onClick={() => {
+                    setShowForgotPassword(false)
+                    setResetEmailSent(false)
+                    setError(null)
+                  }}
+                  className="w-full text-[#33E1DA] hover:text-[#33E1DA]/80 hover:bg-[#33E1DA]/10"
+                >
+                  ← Back to Sign In
+                </Button>
+              </div>
+            ) : (
+              <>
+                <form onSubmit={handleForgotPassword} className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="reset-email" className="text-[#EAF2FF]">
+                      Email Address
+                    </Label>
+                    <Input
+                      id="reset-email"
+                      type="email"
+                      placeholder="Enter your email address"
+                      value={formData.email}
+                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                      required
+                      disabled={!isSupabaseConfigured}
+                      className="bg-[#1E2A44]/50 border-[#33E1DA]/30 text-[#EAF2FF] placeholder:text-[#EAF2FF]/50 focus:border-[#33E1DA] focus:ring-[#33E1DA] disabled:opacity-50"
+                    />
+                  </div>
+
+                  <Button
+                    type="submit"
+                    disabled={loading || !isSupabaseConfigured}
+                    className="w-full bg-gradient-to-r from-[#1A7FB3] to-[#33E1DA] hover:from-[#1A7FB3]/90 hover:to-[#33E1DA]/90 text-white font-medium h-12 focus:ring-2 focus:ring-[#33E1DA] disabled:opacity-50"
+                  >
+                    {loading ? "Sending..." : "Send Reset Email"}
+                  </Button>
+                </form>
+
+                <Button
+                  variant="ghost"
+                  onClick={() => {
+                    setShowForgotPassword(false)
+                    setError(null)
+                  }}
+                  className="w-full text-[#EAF2FF]/60 hover:text-[#EAF2FF] hover:bg-[#33E1DA]/10"
+                >
+                  ← Back to Sign In
+                </Button>
+              </>
+            )}
+          </>
+        ) : !showEmailForm ? (
+          <>
             <Button
               onClick={handleGoogleSignIn}
               disabled={loading || !isSupabaseConfigured}
@@ -185,7 +286,6 @@ export function AuthCard() {
               </div>
             </div>
 
-            {/* Email Toggle Button */}
             <Button
               variant="ghost"
               onClick={() => setShowEmailForm(true)}
@@ -197,7 +297,6 @@ export function AuthCard() {
           </>
         ) : (
           <>
-            {/* Email Form */}
             <form onSubmit={handleEmailAuth} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="email" className="text-[#EAF2FF]">
@@ -216,9 +315,25 @@ export function AuthCard() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="password" className="text-[#EAF2FF]">
-                  Password
-                </Label>
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="password" className="text-[#EAF2FF]">
+                    Password
+                  </Label>
+                  {!isSignUp && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      onClick={() => {
+                        setShowForgotPassword(true)
+                        setError(null)
+                      }}
+                      disabled={!isSupabaseConfigured}
+                      className="h-auto p-0 text-xs text-[#33E1DA] hover:text-[#33E1DA]/80 hover:bg-transparent disabled:opacity-50"
+                    >
+                      Forgot password?
+                    </Button>
+                  )}
+                </div>
                 <div className="relative">
                   <Input
                     id="password"
@@ -297,7 +412,6 @@ export function AuthCard() {
 
         <Separator className="bg-[#33E1DA]/20" />
 
-        {/* Dashboard Links */}
         <div className="space-y-2">
           <div className="text-sm text-[#EAF2FF]/60 text-center mb-3">Quick Access (Sign in required)</div>
 
@@ -332,14 +446,13 @@ export function AuthCard() {
           </div>
         </div>
 
-        {/* Footer Links */}
         <div className="flex justify-center space-x-4 text-xs text-[#EAF2FF]/50">
-          <Link href="/terms" className="hover:text-[#33E1DA] transition-colors">
-            Terms
-          </Link>
-          <Link href="/privacy" className="hover:text-[#33E1DA] transition-colors">
-            Privacy
-          </Link>
+          <TermsModal>
+            <button className="hover:text-[#33E1DA] transition-colors cursor-pointer">Terms</button>
+          </TermsModal>
+          <PrivacyModal>
+            <button className="hover:text-[#33E1DA] transition-colors cursor-pointer">Privacy</button>
+          </PrivacyModal>
           <Link href="/support" className="hover:text-[#33E1DA] transition-colors">
             Support
           </Link>
