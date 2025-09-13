@@ -1,20 +1,21 @@
-import { authOptions } from '@/lib/auth';
 import { createClient } from '@/lib/supabase/server';
-import { getServerSession } from 'next-auth/next';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session || !(session as any).user?.id) {
+    // Create Supabase client and get current user
+    const supabase = await createClient();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    
+    if (authError || !user) {
       return NextResponse.json(
         { success: false, message: 'Unauthorized' },
         { status: 401 }
       );
     }
 
-    const userId = (session as any).user.id;
-    const userName = (session as any).user.name || 'user';
+    const userId = user.id;
+    const userName = user.user_metadata?.full_name || user.email?.split('@')[0] || 'user';
     const formData = await request.formData();
     const file = formData.get('file') as File;
     
@@ -43,8 +44,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Create Supabase client
-    const supabase = await createClient();
+    // Supabase client already created above
 
     // Generate unique filename with user's name as folder
     const timestamp = Date.now();
@@ -123,19 +123,19 @@ export async function POST(request: NextRequest) {
 
 export async function DELETE(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session || !(session as any).user?.id) {
+    // Create Supabase client and get current user
+    const supabase = await createClient();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    
+    if (authError || !user) {
       return NextResponse.json(
         { success: false, message: 'Unauthorized' },
         { status: 401 }
       );
     }
 
-    const userId = (session as any).user.id;
-    const userName = (session as any).user.name || 'user';
-    
-    // Create Supabase client
-    const supabase = await createClient();
+    const userId = user.id;
+    const userName = user.user_metadata?.full_name || user.email?.split('@')[0] || 'user';
 
     // Get current user profile to find existing avatar
     const { data: currentProfile } = await supabase

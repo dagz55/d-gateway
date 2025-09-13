@@ -1,8 +1,21 @@
-import { NextResponse } from 'next/server';
+import { createClient } from '@/lib/supabase/server';
+import { NextRequest, NextResponse } from 'next/server';
 
-export async function POST() {
+export async function POST(request: NextRequest) {
   try {
-    // Mock logout - in a real app, you would invalidate the session
+    const supabase = await createClient();
+
+    // Sign out from Supabase
+    const { error } = await supabase.auth.signOut();
+
+    if (error) {
+      console.error('Supabase logout error:', error);
+      return NextResponse.json(
+        { success: false, message: 'Failed to logout' },
+        { status: 500 }
+      );
+    }
+
     return NextResponse.json({
       success: true,
       message: 'Logged out successfully',

@@ -1,6 +1,6 @@
 import { ChangePasswordData, User } from '@/types';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useSession } from 'next-auth/react';
+import { useSession } from '@/providers/supabase-auth-provider';
 
 async function fetchProfile(): Promise<User> {
   const response = await fetch('/api/profile');

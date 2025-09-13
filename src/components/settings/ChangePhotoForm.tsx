@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useProfile } from '@/hooks/api/useProfile';
 import { Upload, User } from 'lucide-react';
-import { useSession } from 'next-auth/react';
+import { useSession } from '@/providers/supabase-auth-provider';
 import { useRef, useState } from 'react';
 import { toast } from 'sonner';
 

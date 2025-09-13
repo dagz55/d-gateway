@@ -7,7 +7,6 @@ import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { createClient } from '@/lib/supabase/client';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { signIn } from 'next-auth/react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -52,19 +51,8 @@ export default function LoginForm() {
       }
 
       if (authData.user) {
-        // Sign in with NextAuth to get session
-        const result = await signIn('credentials', {
-          email: data.email,
-          password: data.password,
-          redirect: false,
-        });
-
-        if (result?.error) {
-          toast.error('Session creation failed');
-        } else {
-          toast.success('Login successful!');
-          router.push('/dashboard');
-        }
+        toast.success('Login successful!');
+        router.push('/dashboard');
       }
     } catch (error) {
       console.error('Login error:', error);

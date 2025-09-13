@@ -10,21 +10,24 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { useUser } from '@/hooks/useUser';
+import { createClient } from '@/lib/supabase/client';
 import { LogOut, Settings } from 'lucide-react';
-import { signOut, useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
 export default function AccountMenu() {
-  const { data: session } = useSession();
+  const { user } = useUser();
   const router = useRouter();
   const [isSigningOut, setIsSigningOut] = useState(false);
 
   const handleSignOut = async () => {
     setIsSigningOut(true);
     try {
-      await signOut({ callbackUrl: '/login' });
+      const supabase = createClient();
+      await supabase.auth.signOut();
+      router.push('/login');
       toast.success('Signed out successfully');
     } catch {
       toast.error('Failed to sign out');
@@ -51,9 +54,9 @@ export default function AccountMenu() {
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="relative h-8 w-8 rounded-full">
           <Avatar className="h-8 w-8">
-            <AvatarImage src={(session?.user as any)?.avatarUrl || session?.user?.image || ''} alt={session?.user?.name || ''} />
+            <AvatarImage src={user?.user_metadata?.avatar_url || user?.user_metadata?.picture || ''} alt={user?.user_metadata?.full_name || user?.email || ''} />
             <AvatarFallback>
-              {session?.user?.name ? getInitials(session.user.name) : 'U'}
+              {user?.user_metadata?.full_name ? getInitials(user.user_metadata.full_name) : 'U'}
             </AvatarFallback>
           </Avatar>
         </Button>
@@ -62,10 +65,10 @@ export default function AccountMenu() {
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
             <p className="text-sm font-medium leading-none">
-              {session?.user?.name || 'User'}
+              {user?.user_metadata?.full_name || user?.email || 'User'}
             </p>
             <p className="text-xs leading-none text-muted-foreground">
-              {session?.user?.email || 'user@example.com'}
+              {user?.email || 'user@example.com'}
             </p>
           </div>
         </DropdownMenuLabel>

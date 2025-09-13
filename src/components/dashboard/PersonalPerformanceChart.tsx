@@ -15,42 +15,14 @@ interface PerformanceData {
   trades: number;
 }
 
-const generateMockData = (period: string, seed: number = 12345): PerformanceData[] => {
-  const days = period === '7d' ? 7 : period === '30d' ? 30 : period === '90d' ? 90 : 365;
-  const data: PerformanceData[] = [];
-  let currentBalance = 10000;
-  
-  // Use a seeded random number generator for consistent data
-  let seedValue = seed;
-  const seededRandom = () => {
-    seedValue = (seedValue * 9301 + 49297) % 233280;
-    return seedValue / 233280;
-  };
-  
-  for (let i = days; i >= 0; i--) {
-    const date = new Date();
-    date.setDate(date.getDate() - i);
-    
-    // Simulate realistic trading performance with seeded random
-    const dailyChange = (seededRandom() - 0.45) * 200; // Slight positive bias
-    const dailyProfit = dailyChange;
-    const dailyTrades = Math.floor(seededRandom() * 8) + 1;
-    
-    currentBalance += dailyChange;
-    
-    data.push({
-      date: date.toLocaleDateString('en-US', { 
-        month: 'short', 
-        day: 'numeric',
-        ...(period === '1y' && { year: '2-digit' })
-      }),
-      balance: Math.round(currentBalance * 100) / 100,
-      profit: Math.round(dailyProfit * 100) / 100,
-      trades: dailyTrades,
-    });
-  }
-  
-  return data;
+// TODO: Replace with real performance data from Supabase
+// This should fetch from user's trading history and calculate performance over time
+const getPerformanceData = async (period: string): Promise<PerformanceData[]> => {
+  // In a real implementation, this would:
+  // 1. Fetch user's trades from Supabase for the specified period
+  // 2. Calculate daily balance changes based on trade P&L
+  // 3. Return actual performance data
+  return [];
 };
 
 export default function PersonalPerformanceChart() {
@@ -61,9 +33,12 @@ export default function PersonalPerformanceChart() {
   useEffect(() => {
     setIsClient(true);
     setLastUpdated(new Date().toLocaleString());
-  }, []);
+    
+    // TODO: Fetch real performance data
+    // getPerformanceData(timePeriod).then(setData);
+  }, [timePeriod]);
   
-  const data = isClient ? generateMockData(timePeriod) : [];
+  const [data, setData] = useState<PerformanceData[]>([]);
   
   const currentBalance = data[data.length - 1]?.balance || 0;
   const initialBalance = data[0]?.balance || 0;
@@ -197,6 +172,7 @@ export default function PersonalPerformanceChart() {
 
         {/* Performance Chart */}
         <div className="h-80">
+          {data.length > 0 ? (
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart data={data} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
               <defs>
@@ -249,6 +225,15 @@ export default function PersonalPerformanceChart() {
               />
             </AreaChart>
           </ResponsiveContainer>
+          ) : (
+            <div className="flex items-center justify-center h-full border-2 border-dashed border-muted rounded-lg">
+              <div className="text-center">
+                <TrendingUp className="h-12 w-12 mx-auto mb-4 text-muted-foreground/50" />
+                <p className="text-lg font-medium text-muted-foreground">No Performance Data</p>
+                <p className="text-sm text-muted-foreground mt-1">Start trading to track your performance</p>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Additional Stats */}

@@ -3,8 +3,8 @@
 import { Toaster } from '@/components/ui/sonner';
 import { ThemeProvider } from '@/contexts/ThemeContext';
 import { suppressExtensionErrors } from '@/lib/suppress-extension-errors';
+import { SupabaseAuthProvider } from '@/providers/supabase-auth-provider';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { SessionProvider } from 'next-auth/react';
 import { useEffect, useState } from 'react';
 
 export function Providers({ children }: { children: React.ReactNode }) {
@@ -23,13 +23,13 @@ export function Providers({ children }: { children: React.ReactNode }) {
   }, []);
 
   return (
-    <SessionProvider>
-      <QueryClientProvider client={queryClient}>
+    <QueryClientProvider client={queryClient}>
+      <SupabaseAuthProvider>
         <ThemeProvider>
           {children}
           <Toaster />
         </ThemeProvider>
-      </QueryClientProvider>
-    </SessionProvider>
+      </SupabaseAuthProvider>
+    </QueryClientProvider>
   );
 }

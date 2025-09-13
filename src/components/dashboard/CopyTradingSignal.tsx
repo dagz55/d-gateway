@@ -29,60 +29,12 @@ interface CopyTradingSignal {
   rating: number;
 }
 
-const mockSignals: CopyTradingSignal[] = [
-  {
-    id: '1',
-    traderName: 'CryptoMaster Pro',
-    traderId: '@cryptomaster',
-    winRate: 87.5,
-    totalFollowers: 1250,
-    monthlyReturn: 23.4,
-    riskLevel: 'Medium',
-    isFollowing: true,
-    verified: true,
-    rating: 4.8,
-    recentTrades: [
-      { symbol: 'BTC/USDT', type: 'BUY', profit: 2.3, timestamp: '2 hours ago' },
-      { symbol: 'ETH/USDT', type: 'SELL', profit: 1.8, timestamp: '4 hours ago' },
-      { symbol: 'ADA/USDT', type: 'BUY', profit: -0.5, timestamp: '6 hours ago' },
-    ]
-  },
-  {
-    id: '2',
-    traderName: 'Bitcoin Whale',
-    traderId: '@btcwhale',
-    winRate: 92.1,
-    totalFollowers: 2850,
-    monthlyReturn: 31.7,
-    riskLevel: 'High',
-    isFollowing: false,
-    verified: true,
-    rating: 4.9,
-    recentTrades: [
-      { symbol: 'BTC/USDT', type: 'BUY', profit: 5.2, timestamp: '1 hour ago' },
-      { symbol: 'SOL/USDT', type: 'SELL', profit: 3.1, timestamp: '3 hours ago' },
-    ]
-  },
-  {
-    id: '3',
-    traderName: 'DeFi Specialist',
-    traderId: '@defispec',
-    winRate: 79.3,
-    totalFollowers: 890,
-    monthlyReturn: 18.9,
-    riskLevel: 'Low',
-    isFollowing: false,
-    verified: false,
-    rating: 4.6,
-    recentTrades: [
-      { symbol: 'UNI/USDT', type: 'BUY', profit: 1.2, timestamp: '3 hours ago' },
-      { symbol: 'LINK/USDT', type: 'BUY', profit: 2.7, timestamp: '5 hours ago' },
-    ]
-  }
-];
+// TODO: Replace with real trading signals from Supabase
+// This should fetch from a copy_trading_signals table or external API
+const tradingSignals: CopyTradingSignal[] = [];
 
 export default function CopyTradingSignal() {
-  const [signals, setSignals] = useState<CopyTradingSignal[]>(mockSignals);
+  const [signals, setSignals] = useState<CopyTradingSignal[]>(tradingSignals);
 
   const toggleFollow = (signalId: string) => {
     setSignals(prev => prev.map(signal => 
@@ -126,7 +78,7 @@ export default function CopyTradingSignal() {
         </div>
       </CardHeader>
       <CardContent className="space-y-4">
-        {signals.map((signal) => (
+        {signals.length > 0 ? signals.map((signal) => (
           <div key={signal.id} className="border rounded-lg p-4 space-y-4">
             <div className="flex items-start justify-between">
               <div className="flex items-center gap-3">
@@ -235,12 +187,26 @@ export default function CopyTradingSignal() {
               </div>
             )}
           </div>
-        ))}
+        )) : (
+          <div className="text-center py-12 border-2 border-dashed border-muted rounded-lg">
+            <Users className="h-12 w-12 mx-auto mb-4 text-muted-foreground/50" />
+            <h3 className="text-lg font-medium text-muted-foreground mb-2">No Trading Signals Available</h3>
+            <p className="text-sm text-muted-foreground mb-4">
+              Trading signals from professional traders will appear here
+            </p>
+            <Button variant="outline" size="sm">
+              <Copy className="h-4 w-4 mr-2" />
+              Explore Traders
+            </Button>
+          </div>
+        )}
 
-        <Button variant="outline" className="w-full">
-          <Copy className="h-4 w-4 mr-2" />
-          Discover More Traders
-        </Button>
+        {signals.length > 0 && (
+          <Button variant="outline" className="w-full">
+            <Copy className="h-4 w-4 mr-2" />
+            Discover More Traders
+          </Button>
+        )}
       </CardContent>
     </Card>
   );

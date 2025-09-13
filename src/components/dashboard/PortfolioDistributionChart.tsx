@@ -18,72 +18,19 @@ interface PortfolioAsset {
   color: string;
 }
 
-const mockPortfolioData: PortfolioAsset[] = [
-  {
-    symbol: 'BTC',
-    name: 'Bitcoin',
-    value: 4250.50,
-    percentage: 42.5,
-    change24h: 2.4,
-    amount: 0.12,
-    color: '#f7931a'
-  },
-  {
-    symbol: 'ETH',
-    name: 'Ethereum',
-    value: 2800.75,
-    percentage: 28.0,
-    change24h: -1.2,
-    amount: 1.45,
-    color: '#627eea'
-  },
-  {
-    symbol: 'ADA',
-    name: 'Cardano',
-    value: 1200.30,
-    percentage: 12.0,
-    change24h: 5.8,
-    amount: 2450,
-    color: '#0033ad'
-  },
-  {
-    symbol: 'SOL',
-    name: 'Solana',
-    value: 850.20,
-    percentage: 8.5,
-    change24h: 3.1,
-    amount: 15.2,
-    color: '#9945ff'
-  },
-  {
-    symbol: 'DOT',
-    name: 'Polkadot',
-    value: 500.15,
-    percentage: 5.0,
-    change24h: -2.7,
-    amount: 85.5,
-    color: '#e6007a'
-  },
-  {
-    symbol: 'USDT',
-    name: 'Tether',
-    value: 400.10,
-    percentage: 4.0,
-    change24h: 0.1,
-    amount: 400.1,
-    color: '#26a17b'
-  }
-];
+// TODO: Replace with real portfolio data from Supabase
+// This should fetch from user's actual holdings from trades/positions table
+const portfolioData: PortfolioAsset[] = [];
 
 export default function PortfolioDistributionChart() {
   const [view, setView] = useState<'chart' | 'list'>('chart');
   
-  const totalValue = mockPortfolioData.reduce((sum, asset) => sum + asset.value, 0);
-  const totalChange24h = mockPortfolioData.reduce((sum, asset) => {
+  const totalValue = portfolioData.reduce((sum, asset) => sum + asset.value, 0);
+  const totalChange24h = portfolioData.reduce((sum, asset) => {
     const change = (asset.value * asset.change24h) / 100;
     return sum + change;
   }, 0);
-  const totalChange24hPercentage = (totalChange24h / totalValue) * 100;
+  const totalChange24hPercentage = totalValue > 0 ? (totalChange24h / totalValue) * 100 : 0;
 
   const CustomTooltip = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
@@ -187,7 +134,7 @@ export default function PortfolioDistributionChart() {
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
-                    data={mockPortfolioData}
+                    data={portfolioData}
                     cx="50%"
                     cy="50%"
                     outerRadius={120}
@@ -195,7 +142,7 @@ export default function PortfolioDistributionChart() {
                     paddingAngle={2}
                     dataKey="value"
                   >
-                    {mockPortfolioData.map((entry, index) => (
+                    {portfolioData.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={entry.color} />
                     ))}
                   </Pie>
@@ -207,7 +154,7 @@ export default function PortfolioDistributionChart() {
             {/* Legend */}
             <div className="space-y-3">
               <h4 className="font-semibold text-sm">Asset Breakdown</h4>
-              {mockPortfolioData.map((asset) => (
+              {portfolioData.length > 0 ? portfolioData.map((asset) => (
                 <div key={asset.symbol} className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <div 
@@ -226,13 +173,18 @@ export default function PortfolioDistributionChart() {
                     </p>
                   </div>
                 </div>
-              ))}
+              )) : (
+                <div className="text-center text-muted-foreground py-8">
+                  <p className="text-sm">No portfolio data available</p>
+                  <p className="text-xs mt-1">Start trading to see your portfolio distribution</p>
+                </div>
+              )}
             </div>
           </div>
         ) : (
           /* List View */
           <div className="space-y-4">
-            {mockPortfolioData.map((asset) => (
+            {portfolioData.length > 0 ? portfolioData.map((asset) => (
               <div key={asset.symbol} className="border rounded-lg p-4 space-y-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
@@ -267,7 +219,16 @@ export default function PortfolioDistributionChart() {
                   </div>
                 </div>
               </div>
-            ))}
+            )) : (
+              <div className="text-center text-muted-foreground py-12 border rounded-lg border-dashed">
+                <Wallet className="h-12 w-12 mx-auto mb-4 text-muted-foreground/50" />
+                <p className="text-lg font-medium">No Portfolio Data</p>
+                <p className="text-sm mt-1 mb-4">Your portfolio is empty. Start by making your first trade.</p>
+                <Button variant="outline" size="sm">
+                  View Trading Signals
+                </Button>
+              </div>
+            )}
           </div>
         )}
 

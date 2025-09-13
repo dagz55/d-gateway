@@ -1,9 +1,10 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
+import { createClient } from '@/lib/supabase/client';
 import { Loader2 } from 'lucide-react';
-import { signIn } from 'next-auth/react';
 import { useState } from 'react';
+import { toast } from 'sonner';
 
 interface GoogleSignInButtonProps {
   className?: string;
@@ -23,12 +24,21 @@ export function GoogleSignInButton({
   const handleGoogleSignIn = async () => {
     setIsLoading(true);
     try {
-      await signIn('google', { 
-        callbackUrl: '/dashboard',
-        redirect: true 
+      const supabase = createClient();
+      
+      // Use Supabase Auth - let it handle the callback automatically
+      // The redirect URI should be configured in Supabase Dashboard, not here
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
       });
+
+      if (error) {
+        console.error('Google sign-in error:', error);
+        toast.error('Failed to sign in with Google');
+      }
     } catch (error) {
       console.error('Google sign-in error:', error);
+      toast.error('An unexpected error occurred');
     } finally {
       setIsLoading(false);
     }

@@ -20,12 +20,12 @@ export async function POST(request: NextRequest) {
 
     const { fullName, username, email, password } = validatedData;
 
-    const supabase = createClient();
+    const supabase = await createClient();
 
-    // Check if user already exists in user_profiles table
+    // Check if user already exists in profiles table
     const { data: existingProfile } = await supabase
-      .from('user_profiles')
-      .select('user_id')
+      .from('profiles')
+      .select('id')
       .or(`email.eq.${email},username.eq.${username}`)
       .single();
 
