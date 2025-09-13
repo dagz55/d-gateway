@@ -82,10 +82,11 @@ export async function POST(request: NextRequest) {
     const avatarUrl = urlData.publicUrl;
 
     // Update user's avatar URL in Supabase profiles table
+    // @ts-expect-error - Supabase types issue with profiles table
     const { error: updateError } = await supabase
       .from('profiles')
       .update({ avatar_url: avatarUrl })
-      .eq('user_id', userId);
+      .eq('id', userId);
     
     if (updateError) {
       // Clean up uploaded file if database update fails
@@ -141,7 +142,7 @@ export async function DELETE(request: NextRequest) {
     const { data: currentProfile } = await supabase
       .from('profiles')
       .select('avatar_url')
-      .eq('user_id', userId)
+      .eq('id', userId)
       .single();
       
     if (currentProfile?.avatar_url) {
@@ -166,10 +167,11 @@ export async function DELETE(request: NextRequest) {
     }
     
     // Update user's avatar URL to null in Supabase
+    // @ts-expect-error - Supabase types issue with profiles table
     const { error: updateError } = await supabase
       .from('profiles')
       .update({ avatar_url: null })
-      .eq('user_id', userId);
+      .eq('id', userId);
     
     if (updateError) {
       return NextResponse.json(

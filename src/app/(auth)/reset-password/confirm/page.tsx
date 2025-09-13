@@ -2,8 +2,8 @@
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { PasswordInput } from '@/components/ui/password-input';
 import { createClient } from '@/lib/supabase/client';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Link from 'next/link';
@@ -164,12 +164,12 @@ function ResetPasswordConfirmContent() {
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="newPassword">New Password</Label>
-              <Input
+              <PasswordInput
                 id="newPassword"
-                type="password"
                 {...register('newPassword')}
-                placeholder="••••••••"
+                placeholder="Create your new password"
                 disabled={isLoading}
+                showStrengthIndicator
               />
               {errors.newPassword && (
                 <p className="text-sm text-destructive">{errors.newPassword.message}</p>
@@ -178,11 +178,10 @@ function ResetPasswordConfirmContent() {
 
             <div className="space-y-2">
               <Label htmlFor="confirmPassword">Confirm New Password</Label>
-              <Input
+              <PasswordInput
                 id="confirmPassword"
-                type="password"
                 {...register('confirmPassword')}
-                placeholder="••••••••"
+                placeholder="Re-enter your new password"
                 disabled={isLoading}
               />
               {errors.confirmPassword && (

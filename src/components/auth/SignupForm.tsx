@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { PasswordInput } from '@/components/ui/password-input';
 import { Separator } from '@/components/ui/separator';
 import { createClient } from '@/lib/supabase/client';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -181,13 +182,13 @@ export default function SignupForm({ onSuccess }: SignupFormProps) {
 
           <div className="space-y-2">
             <Label htmlFor="password">Password</Label>
-            <Input
+            <PasswordInput
               id="password"
-              type="password"
               {...register('password')}
-              placeholder="••••••••"
+              placeholder="Create a strong password"
               disabled={isLoading}
               autoComplete="new-password"
+              showStrengthIndicator
             />
             {errors.password && (
               <p className="text-sm text-destructive">{errors.password.message}</p>
@@ -196,11 +197,10 @@ export default function SignupForm({ onSuccess }: SignupFormProps) {
 
           <div className="space-y-2">
             <Label htmlFor="confirmPassword">Confirm Password</Label>
-            <Input
+            <PasswordInput
               id="confirmPassword"
-              type="password"
               {...register('confirmPassword')}
-              placeholder="••••••••"
+              placeholder="Re-enter your password"
               disabled={isLoading}
               autoComplete="new-password"
             />
