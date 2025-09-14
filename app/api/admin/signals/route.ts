@@ -25,7 +25,7 @@ export async function GET(request: NextRequest) {
     const pair = searchParams.get('pair') || undefined
     const action = searchParams.get('action') || undefined
 
-    let query = admin.from('signals').select('*', { count: 'exact' }).order('issued_at', { ascending: false })
+    let query = (admin as any).from('signals').select('*', { count: 'exact' }).order('issued_at', { ascending: false })
     if (pair) query = query.eq('pair', pair)
     if (action) query = query.eq('action', action)
 
@@ -49,7 +49,7 @@ export async function POST(request: NextRequest) {
 
     const admin = createAdminClient()
     const body = await request.json()
-    const payload: Database['public']['Tables']['signals']['Insert'] = {
+    const payload = {
       user_id: body.user_id || user.id,
       pair: body.pair,
       action: body.action,
@@ -61,7 +61,7 @@ export async function POST(request: NextRequest) {
       issued_at: body.issued_at || new Date().toISOString(),
       expires_at: body.expires_at || null,
     }
-    const { data, error } = await admin.from('signals').insert(payload).select('*').single()
+    const { data, error } = await (admin as any).from('signals').insert(payload).select('*').single()
     if (error) throw error
     return NextResponse.json({ success: true, data })
   } catch (error: any) {
@@ -81,13 +81,13 @@ export async function PUT(request: NextRequest) {
     if (!body?.id) {
       return NextResponse.json({ success: false, message: 'Missing id' }, { status: 400 })
     }
-    const updates: Database['public']['Tables']['signals']['Update'] = {}
+    const updates: any = {}
     for (const key of ['pair','action','target_price','stop_loss','status','confidence','issued_at','expires_at','take_profits','user_id']) {
       if (key in body) {
-        (updates as any)[key] = body[key]
+        updates[key] = body[key]
       }
     }
-    const { data, error } = await admin.from('signals').update(updates).eq('id', body.id).select('*').single()
+    const { data, error } = await (admin as any).from('signals').update(updates).eq('id', body.id).select('*').single()
     if (error) throw error
     return NextResponse.json({ success: true, data })
   } catch (error: any) {
@@ -106,7 +106,7 @@ export async function DELETE(request: NextRequest) {
     if (!id) return NextResponse.json({ success: false, message: 'Missing id' }, { status: 400 })
 
     const admin = createAdminClient()
-    const { error } = await admin.from('signals').delete().eq('id', id)
+    const { error } = await (admin as any).from('signals').delete().eq('id', id)
     if (error) throw error
     return NextResponse.json({ success: true })
   } catch (error: any) {

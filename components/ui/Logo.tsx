@@ -10,11 +10,11 @@ interface LogoProps {
   textClassName?: string;
 }
 
-const sizeClasses = {
-  sm: 'h-6 w-6',
-  md: 'h-8 w-8', 
-  lg: 'h-12 w-12',
-  xl: 'h-16 w-16'
+const sizeMap = {
+  sm: { width: 24, height: 24 },
+  md: { width: 32, height: 32 }, 
+  lg: { width: 48, height: 48 },
+  xl: { width: 64, height: 64 }
 };
 
 const textSizeClasses = {
@@ -30,22 +30,18 @@ export default function Logo({
   showText = true, 
   textClassName 
 }: LogoProps) {
-  const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
-    const img = e.target as HTMLImageElement;
-    // Fallback to Supabase URL if local image fails
-    if (img.src.includes('/zignal_logo.png')) {
-      img.src = 'https://nmockaibjbavenndxexd.supabase.co/storage/v1/object/public/image/zignal_logo.png';
-    }
-  };
+  const { width, height } = sizeMap[size];
 
   return (
     <div className={cn("flex items-center space-x-2", className)}>
       <div className="relative">
-        <img 
+        <Image 
           src="/zignal_logo.png"
           alt="Zignal Logo"
-          className={cn("object-contain", sizeClasses[size])}
-          onError={handleImageError}
+          width={width}
+          height={height}
+          className="object-contain"
+          priority={size === 'lg' || size === 'xl'}
         />
       </div>
       {showText && (

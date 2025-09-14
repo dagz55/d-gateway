@@ -76,7 +76,7 @@ export async function PUT(request: NextRequest) {
     }
 
     const admin = createAdminClient()
-    const { data, error } = await admin
+    const { data, error } = await (admin as any)
       .from('profiles')
       .update({ is_admin: newValue })
       .eq('id', targetId)

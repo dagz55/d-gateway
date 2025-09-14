@@ -25,7 +25,6 @@ const nextConfig: NextConfig = {
   // Disables filesystem cache during `next dev` to improve stability
   webpack: (config, { dev }) => {
     if (dev) {
-      // @ts-expect-error - Next/webpack types don't expose this union well
       config.cache = false
     }
     return config

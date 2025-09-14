@@ -45,7 +45,7 @@ export default function ProfileDropdown() {
           .select('is_admin')
           .eq('id', user.id)
           .single();
-        setIsAdmin(!!profile?.is_admin);
+        setIsAdmin(!!(profile as any)?.is_admin);
       } else {
         setIsAdmin(false);
       }
@@ -67,7 +67,7 @@ export default function ProfileDropdown() {
             .select('is_admin')
             .eq('id', user.id)
             .single();
-          setIsAdmin(!!profile?.is_admin);
+          setIsAdmin(!!(profile as any)?.is_admin);
         } else {
           setIsAdmin(false);
         }
