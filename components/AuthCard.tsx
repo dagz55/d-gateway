@@ -38,19 +38,17 @@ export function AuthCard() {
     setError(null)
 
     try {
+      // Let Supabase handle OAuth redirects internally - no custom redirectTo needed
       const { data, error } = await supabase().auth.signInWithOAuth({
         provider: "google",
-        options: {
-          redirectTo: `${window.location.origin}/auth/callback?next=/dashboard`,
-        },
       })
 
       if (error) {
-        console.error("[v0] Google sign-in error:", error)
+        console.error("Google sign-in error:", error)
         setError("Failed to sign in with Google. Please try again.")
       }
     } catch (error) {
-      console.error("[v0] Google sign-in error:", error)
+      console.error("Google sign-in error:", error)
       setError("Supabase is not configured. Please add your environment variables.")
     } finally {
       setLoading(false)
@@ -79,9 +77,7 @@ export function AuthCard() {
           email: formData.email,
           password: formData.password,
           options: {
-            emailRedirectTo:
-              process.env.NEXT_PUBLIC_DEV_SUPABASE_REDIRECT_URL ||
-              `${window.location.origin}/auth/callback?next=/dashboard`,
+            emailRedirectTo: `${window.location.origin}/dashboard`,
           },
         })
 

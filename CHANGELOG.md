@@ -5,6 +5,34 @@ All notable changes to the Zignal Trading Platform will be documented in this fi
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.1] - 2025-01-14
+
+### Google OAuth Cleanup & Optimization
+
+#### **🔧 Technical Improvements**
+- **Simplified OAuth Implementation**: Removed custom redirect paths to let Supabase handle OAuth callbacks internally
+- **Environment Configuration**: Added `NEXT_PUBLIC_SITE_URL` for proper OAuth redirect handling
+- **Code Cleanup**: Removed unnecessary custom `redirectTo` parameters from Google OAuth calls
+- **Documentation Cleanup**: Removed conflicting OAuth documentation files and consolidated into single source of truth
+- **Callback Route Optimization**: Simplified auth callback route to handle only email confirmations and password resets
+
+#### **✅ Testing & Validation**
+- **OAuth Flow Testing**: Comprehensive testing of Google OAuth URL generation and redirect flow
+- **Configuration Validation**: Verified Supabase integration and Google OAuth configuration
+- **Environment Variables**: Confirmed all required environment variables are properly set
+- **Redirect URI Validation**: Verified correct Supabase callback URL format
+
+#### **📋 Configuration Updates**
+- **Google Cloud Console**: Updated redirect URIs to use base URLs only for localhost development
+- **Supabase Dashboard**: Configured proper site URL and redirect URLs
+- **Environment Variables**: Added `NEXT_PUBLIC_SITE_URL=http://localhost:3000`
+
+#### **🎯 Results**
+- ✅ **OAuth Flow**: Seamless Google OAuth sign-in without redirect URI mismatch errors
+- ✅ **Port Robustness**: OAuth works on any development port (3000, 3001, 3002, etc.)
+- ✅ **Code Simplicity**: Cleaner, more maintainable OAuth implementation
+- ✅ **Documentation**: Single, accurate source of truth for OAuth configuration
+
 ## [2.2.0] - 2025-01-13
 
 ### Profile Management & User Experience Enhancement

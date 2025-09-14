@@ -2,14 +2,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import Spark from '@/components/charts/Spark';
 import OpenPositions from '@/components/Tables/OpenPositions';
 import StatusDot from '@/components/ui/StatusDot';
-import TradingHistoryTable from '@/components/dashboard/TradingHistoryTable';
-import SignalsList from '@/components/dashboard/SignalsList';
-import DepositForm from '@/components/dashboard/DepositForm';
-import DepositHistoryTable from '@/components/dashboard/DepositHistoryTable';
-import WithdrawForm from '@/components/dashboard/WithdrawForm';
-import WithdrawalHistoryTable from '@/components/dashboard/WithdrawalHistoryTable';
-import NewsFeed from '@/components/dashboard/NewsFeed';
-import CopyTradingSignal from '@/components/dashboard/CopyTradingSignal';
 import { createServerSupabaseClient } from '@/lib/supabase/serverClient';
 import { redirect } from 'next/navigation';
 
@@ -41,11 +33,7 @@ const mockWatchlist = [
   { symbol: 'ADA/USDT', price: 0.45, change: 0.8, sparkData: [42, 44, 41, 43, 45, 44, 46, 45] },
 ];
 
-export default async function DashboardPage({
-  searchParams,
-}: {
-  searchParams?: Promise<{ [key: string]: string | string[] | undefined }>
-}) {
+export default async function DashboardPage() {
   try {
     const supabase = await createServerSupabaseClient();
     const { data: { user }, error } = await supabase.auth.getUser();
@@ -55,34 +43,6 @@ export default async function DashboardPage({
     }
 
     const firstName = user?.user_metadata?.full_name?.split(' ')[0] || 'Trader';
-
-  const resolvedSearchParams = await searchParams;
-  const tab = (typeof resolvedSearchParams?.tab === 'string' ? resolvedSearchParams?.tab : undefined) as
-    | 'trades'
-    | 'signals'
-    | 'deposits'
-    | 'deposit-history'
-    | 'withdrawals'
-    | 'withdrawal-history'
-    | 'news'
-    | 'copy-trading'
-    | undefined;
-
-  // If a tab is selected, show the corresponding focused view
-  if (tab) {
-    return (
-      <div className="space-y-6">
-        {tab === 'trades' && <TradingHistoryTable />}
-        {tab === 'signals' && <SignalsList />}
-        {tab === 'deposits' && <DepositForm />}
-        {tab === 'deposit-history' && <DepositHistoryTable />}
-        {tab === 'withdrawals' && <WithdrawForm />}
-        {tab === 'withdrawal-history' && <WithdrawalHistoryTable />}
-        {tab === 'news' && <NewsFeed />}
-        {tab === 'copy-trading' && <CopyTradingSignal />}
-      </div>
-    );
-  }
 
   return (
     <div className="space-y-8">

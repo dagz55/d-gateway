@@ -8,17 +8,9 @@ export async function GET(request: NextRequest) {
   const errorDescription = searchParams.get("error_description")
   const next = searchParams.get("next") ?? "/dashboard"
 
-  // Handle OAuth errors (like bad_oauth_state) more gracefully
+  // Handle errors gracefully
   if (error) {
-    // Don't log expected OAuth flow errors
-    if (error === 'invalid_request' && errorDescription?.includes('bad_oauth_state')) {
-      // This is a common error when users refresh or navigate back during OAuth
-      // Just redirect to sign in without logging
-      return NextResponse.redirect(`${origin}/`)
-    }
-    
-    // Log other unexpected errors
-    console.warn(`OAuth error: ${error} - ${errorDescription}`)
+    console.warn(`Auth error: ${error} - ${errorDescription}`)
     return NextResponse.redirect(`${origin}/auth/auth-code-error?error=${error}`)
   }
 
@@ -40,7 +32,7 @@ export async function GET(request: NextRequest) {
           return NextResponse.redirect(`${origin}/auth/reset-password`)
         }
 
-        // Normal sign-in flow
+        // Normal sign-in flow (for email confirmations)
         if (isLocalEnv) {
           // In development, redirect to localhost
           return NextResponse.redirect(`${origin}${next}`)

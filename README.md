@@ -5,7 +5,7 @@ Zignal is a comprehensive crypto trading platform built with [Next.js 15.5.2](ht
 ## 🚀 Features
 
 ### Core Platform
-- 🔐 **Advanced Authentication**: Google OAuth and email-based authentication with Supabase
+- 🔐 **Advanced Authentication**: Streamlined Google OAuth and email-based authentication with Supabase
 - 📊 **Trading Dashboard**: Complete trading interface with real-time charts and analytics
 - 📈 **Signal Management**: Professional trading signals with copy trading capabilities
 - 💰 **Portfolio Management**: Track profits, losses, and portfolio distribution
@@ -23,6 +23,7 @@ Zignal is a comprehensive crypto trading platform built with [Next.js 15.5.2](ht
 - 🏗️ **Architecture**: Clean separation with protected route groups
 - 📸 **File Upload**: Dual-path photo upload system (Supabase Storage + Base64 fallback)
 - 🔄 **Real-time Updates**: Live avatar and profile updates across the application
+- 🔐 **OAuth Optimization**: Streamlined Google OAuth implementation with proper redirect handling
 
 ## Getting Started
 

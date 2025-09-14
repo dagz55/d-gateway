@@ -4,6 +4,9 @@ const nextConfig: NextConfig = {
   // Fix lockfile warning by setting the correct root
   outputFileTracingRoot: process.cwd(),
   
+  // Allow cross-origin requests from localhost during development
+  allowedDevOrigins: ['localhost'],
+  
   // Configure font optimization and Server Actions
   experimental: {
     optimizePackageImports: ['@radix-ui/react-icons', 'lucide-react'],
