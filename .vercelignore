@@ -1,0 +1,6 @@
+# Vercel ignore file
+test-*.js
+*.log
+reports/
+docs/
+scripts/
