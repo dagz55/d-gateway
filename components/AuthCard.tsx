@@ -11,6 +11,7 @@ import { Separator } from "@/components/ui/separator"
 import { Eye, EyeOff, ExternalLink, AlertCircle } from "lucide-react"
 import Link from "next/link"
 import { supabase } from "@/lib/supabase/browserClient"
+import { TermsModal, PrivacyModal, SupportModal } from "@/components/modals"
 
 export function AuthCard() {
   const [showEmailForm, setShowEmailForm] = useState(false)
@@ -346,15 +347,21 @@ export function AuthCard() {
 
         {/* Footer Links */}
         <div className="flex justify-center space-x-4 text-xs text-[#EAF2FF]/50">
-          <Link href="/terms" className="hover:text-[#33E1DA] transition-colors">
-            Terms
-          </Link>
-          <Link href="/privacy" className="hover:text-[#33E1DA] transition-colors">
-            Privacy
-          </Link>
-          <Link href="/support" className="hover:text-[#33E1DA] transition-colors">
-            Support
-          </Link>
+          <TermsModal>
+            <button className="hover:text-[#33E1DA] transition-colors cursor-pointer">
+              Terms
+            </button>
+          </TermsModal>
+          <PrivacyModal>
+            <button className="hover:text-[#33E1DA] transition-colors cursor-pointer">
+              Privacy
+            </button>
+          </PrivacyModal>
+          <SupportModal>
+            <button className="hover:text-[#33E1DA] transition-colors cursor-pointer">
+              Support
+            </button>
+          </SupportModal>
         </div>
       </CardContent>
     </Card>
