@@ -1,17 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // Allow cross-origin requests from common development origins
-  allowedDevOrigins: [
-    '127.0.0.1',
-    'localhost',
-    '192.168.1.160', // Your local network IP
-  ],
-  
   // Fix lockfile warning by setting the correct root
   outputFileTracingRoot: process.cwd(),
-  
-  // Font optimization is enabled by default in Next.js 15
   
   // Configure font optimization and Server Actions
   experimental: {
