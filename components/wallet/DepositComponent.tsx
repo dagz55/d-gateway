@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { ArrowUpRight, Upload, DollarSign, Hash, Image as ImageIcon } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 
 interface DepositFormData {
   amount: string;
@@ -35,6 +35,7 @@ export default function DepositComponent() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const handleInputChange = (field: keyof DepositFormData, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -65,6 +66,12 @@ export default function DepositComponent() {
       notes: ''
     });
     setPreviewUrl(null);
+    
+    // Clear file input to allow re-selecting the same file
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+    
     setIsSubmitting(false);
     
     // Show success message (you can implement a toast notification here)
@@ -152,6 +159,7 @@ export default function DepositComponent() {
             <div className="space-y-3">
               <div className="flex items-center gap-4">
                 <Input
+                  ref={fileInputRef}
                   type="file"
                   accept="image/*"
                   onChange={handleFileChange}
@@ -161,7 +169,9 @@ export default function DepositComponent() {
                   type="button"
                   variant="outline"
                   size="sm"
-                  onClick={() => document.querySelector('input[type="file"]')?.click()}
+                  onClick={() => {
+                    fileInputRef.current?.click();
+                  }}
                   className="flex items-center gap-2"
                 >
                   <Upload className="h-4 w-4" />
@@ -176,7 +186,9 @@ export default function DepositComponent() {
                     <img
                       src={previewUrl}
                       alt="Screenshot preview"
-                      className="max-w-xs max-h-48 rounded-lg border border-border/30"
+                      width={320}
+                      height={192}
+                      className="max-w-xs max-h-48 rounded-lg border border-border/30 object-contain"
                     />
                   </div>
                 </div>

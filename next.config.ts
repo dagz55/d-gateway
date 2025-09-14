@@ -38,13 +38,23 @@ const nextConfig: NextConfig = {
       },
     ];
   },
-  
-  // Workaround for sporadic ENOENT on Webpack persistent cache in dev
-  // Disables filesystem cache during `next dev` to improve stability
-  webpack: (config, { dev }) => {
+
+  // Configure webpack to handle Supabase Edge Runtime warnings and cache issues
+  webpack: (config, { dev, isServer }) => {
     if (dev) {
       config.cache = false
     }
+    
+    // Handle Node.js APIs in Edge Runtime for Supabase
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        fs: false,
+        net: false,
+        tls: false,
+      }
+    }
+    
     return config
   },
 };
