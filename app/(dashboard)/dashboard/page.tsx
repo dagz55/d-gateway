@@ -2,6 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import Spark from '@/components/charts/Spark';
 import OpenPositions from '@/components/Tables/OpenPositions';
 import StatusDot from '@/components/ui/StatusDot';
+import ZigTradesWorkflow from '@/components/dashboard/ZigTradesWorkflow';
 import { createServerSupabaseClient } from '@/lib/supabase/serverClient';
 import { redirect } from 'next/navigation';
 
@@ -209,6 +210,11 @@ export default async function DashboardPage() {
       {/* Open Positions - Full Width */}
       <div className="w-full">
         <OpenPositions />
+      </div>
+
+      {/* ZIG TRADES Workflow - Full Width */}
+      <div className="w-full">
+        <ZigTradesWorkflow />
       </div>
 
       {/* Bottom Grid */}

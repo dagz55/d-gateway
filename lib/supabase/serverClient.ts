@@ -26,7 +26,28 @@ export const createServerSupabaseClient = async () => {
       },
       setAll(cookiesToSet) {
         try {
-          cookiesToSet.forEach(({ name, value, options }) => cookieStore.set(name, value, options))
+          // Filter out large cookies to prevent header overflow
+          const filteredCookies = cookiesToSet.filter(({ name, value }) => {
+            // Skip very large cookies that might cause header overflow
+            if (value.length > 4000) { // 4KB per cookie limit
+              console.warn(`Skipping large cookie in server client: ${name} (${value.length} bytes)`)
+              return false
+            }
+            return true
+          })
+
+          filteredCookies.forEach(({ name, value, options }) => {
+            // Set secure cookie options to prevent issues
+            const secureOptions = {
+              ...options,
+              secure: process.env.NODE_ENV === 'production',
+              httpOnly: true,
+              sameSite: 'lax' as const,
+              path: '/',
+              maxAge: options?.maxAge || 60 * 60 * 24 * 7 // 7 days default
+            }
+            cookieStore.set(name, value, secureOptions)
+          })
         } catch {
           // The `setAll` method was called from a Server Component.
           // This can be ignored if you have middleware refreshing

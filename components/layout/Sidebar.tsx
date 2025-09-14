@@ -13,6 +13,7 @@ import {
   Newspaper,
   Settings,
   Signal,
+  Wallet,
   X,
 } from 'lucide-react';
 import Link from 'next/link';
@@ -36,24 +37,9 @@ const navigation = [
     icon: Signal,
   },
   {
-    name: 'Deposit',
-    href: '/dashboard?tab=deposits',
-    icon: ArrowUpRight,
-  },
-  {
-    name: 'Deposit History',
-    href: '/dashboard?tab=deposit-history',
-    icon: History,
-  },
-  {
-    name: 'Withdraw',
-    href: '/dashboard?tab=withdrawals',
-    icon: ArrowDownLeft,
-  },
-  {
-    name: 'Withdrawal History',
-    href: '/dashboard?tab=withdrawal-history',
-    icon: History,
+    name: 'Wallet',
+    href: '/wallet',
+    icon: Wallet,
   },
   {
     name: 'Crypto News',

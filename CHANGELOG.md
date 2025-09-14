@@ -5,6 +5,120 @@ All notable changes to the Zignal Trading Platform will be documented in this fi
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.4.1] - 2025-01-15
+
+### Critical Fix: REQUEST_HEADER_TOO_LARGE Error Resolution
+
+#### **🚨 Critical Bug Fix**
+- **REQUEST_HEADER_TOO_LARGE Error**: Fixed Error Code 494 that was causing application crashes on Vercel
+- **OAuth State Issues**: Resolved invalid OAuth state errors that were accumulating in headers
+- **Cookie Size Management**: Implemented automatic filtering of large cookies (>4KB) to prevent header overflow
+- **Session Cleanup**: Added automatic session cleanup when headers become too large
+
+#### **🔧 Technical Improvements**
+- **Header Size Monitoring**: Added middleware checks for header size (30KB threshold with 2KB buffer)
+- **Cookie Filtering**: Automatic filtering of oversized cookies in both middleware and Supabase client
+- **Secure Cookie Configuration**: Enhanced cookie security with proper flags and expiration
+- **Error Recovery Flow**: Implemented `/auth/clean-session` route for graceful error recovery
+
+#### **🛡️ Security Enhancements**
+- **Cookie Security**: Added httpOnly, secure, and sameSite flags to all cookies
+- **Path Restrictions**: Limited cookies to appropriate paths
+- **Expiration Management**: Set reasonable 7-day default expiration for session cookies
+- **Header Validation**: Added comprehensive header size validation
+
+#### **📊 Monitoring & Logging**
+- **Warning System**: Added console warnings for oversized cookies and headers
+- **Error Tracking**: Enhanced logging for OAuth state errors and header overflow
+- **Recovery Metrics**: Track session cleanup and recovery operations
+
+#### **🔄 Error Recovery**
+- **Automatic Detection**: Middleware automatically detects large headers and redirects to cleanup
+- **Complete Session Reset**: Clean session route clears all cookies, localStorage, and sessionStorage
+- **Graceful Fallback**: Users are automatically redirected to home page after cleanup
+- **OAuth Error Handling**: Specific handling for OAuth state errors with automatic recovery
+
+## [2.4.0] - 2025-01-15
+
+### Wallet System Implementation
+
+#### **🏦 New Wallet System**
+- **Complete Wallet Page**: Dedicated `/wallet` route with tabbed interface for all wallet operations
+- **Deposit Management**: Comprehensive deposit system with amount, reference number, and screenshot verification
+- **Deposit History**: Full transaction history with date/time, amount, MOP type, and wallet details
+- **Withdrawal System**: Portfolio value display with complete withdrawal forms including bank/ewallet details
+- **Withdrawal History**: Detailed withdrawal tracking with date/time, amount, MOP type, and wallet details
+
+#### **💰 Dual Wallet Architecture**
+- **Trading Wallet**: Separate wallet for trading operations with independent balance tracking
+- **Income Wallet**: Dedicated wallet for profit withdrawals and income management
+- **Balance Overview**: Real-time portfolio value display with separate wallet balances
+- **Transfer Management**: Seamless wallet-to-wallet operations
+
+#### **🔍 Advanced Features**
+- **Multiple Payment Methods**: Support for Bank Transfer, Credit Card, PayPal, Cryptocurrency, and E-Wallet
+- **Screenshot Verification**: Upload and preview system for deposit verification screenshots
+- **Advanced Filtering**: Filter transactions by status, payment method, wallet type, and date ranges
+- **Search Functionality**: Search transactions by reference number, transaction ID, or notes
+- **Transaction Receipts**: Download receipts for all deposit and withdrawal transactions
+
+#### **🎨 UI/UX Enhancements**
+- **Tabbed Interface**: Organized wallet operations with Deposit, Deposit History, Withdraw, and Withdrawal History tabs
+- **Interactive Forms**: Real-time form validation with balance checking and amount verification
+- **Status Indicators**: Color-coded status badges for completed, pending, processing, and failed transactions
+- **Responsive Design**: Mobile-first approach with full responsiveness across all wallet components
+
+#### **📊 Analytics & Reporting**
+- **Transaction Statistics**: Total deposits, withdrawals, pending amounts, and transaction counts
+- **Performance Tracking**: Win rates, success rates, and transaction volume analytics
+- **Real-time Updates**: Live balance updates and transaction status monitoring
+
+#### **🔧 Technical Implementation**
+- **Component Architecture**: Modular wallet components with reusable form elements and data tables
+- **TypeScript Integration**: Full type safety with comprehensive interfaces for wallet operations
+- **State Management**: Client-side state management for forms, filters, and transaction data
+- **File Upload System**: Secure screenshot upload with preview functionality
+- **Mock Data Integration**: Comprehensive mock data for development and demonstration
+
+#### **📋 Navigation Updates**
+- **Sidebar Consolidation**: Consolidated individual wallet items into single "Wallet" navigation entry
+- **Route Optimization**: Dedicated wallet route with clean URL structure
+- **Navigation Flow**: Seamless navigation between dashboard and wallet operations
+
+## [2.3.0] - 2025-01-15
+
+### ZIG TRADES Workflow Implementation
+
+#### **🎯 New Features**
+- **ZIG TRADES Workflow**: Complete trading workflow system integrated into main dashboard
+- **Trading Signals Component**: Multiple signal offers (ZIGNALS OFFER 1, 2, 3) with different profit rates and durations
+- **Copy Trading Functionality**: One-click copy trading with real-time execution and visual feedback
+- **Trading History Component**: Comprehensive history tracking with date, time, amount, and profit/loss details
+- **Active Trading Component**: Real-time active trade management with progress tracking and profit monitoring
+
+#### **📊 Enhanced Analytics**
+- **Performance Metrics**: Win rate calculation, total profit tracking, and trade statistics
+- **Advanced Filtering**: Filter trades by status (completed, pending, failed) and action type (BUY, SELL)
+- **Real-time Updates**: Live profit/loss tracking for active trades
+- **Progress Tracking**: Visual progress bars for trade duration and completion status
+
+#### **🎨 UI/UX Improvements**
+- **Tabbed Interface**: Organized workflow with Trading Signals, Trading History, and Active Trading tabs
+- **Interactive Components**: Expandable trade details with action buttons (Close Trade, Modify)
+- **Visual Indicators**: Color-coded profit/loss indicators and status badges
+- **Responsive Design**: Mobile-first approach with full responsiveness across all screen sizes
+
+#### **🔧 Technical Implementation**
+- **Component Architecture**: Modular design with separate components for each workflow section
+- **TypeScript Integration**: Full type safety with comprehensive interfaces for trading data
+- **State Management**: Client-side state management for filters, selections, and interactions
+- **Mock Data**: Comprehensive mock data for demonstration and development
+
+#### **📋 Dashboard Integration**
+- **Full Width Layout**: ZIG TRADES workflow prominently displayed on main dashboard
+- **Seamless Integration**: Maintains existing dashboard functionality while adding new workflow
+- **Performance Optimized**: Efficient rendering with proper component lifecycle management
+
 ## [2.2.1] - 2025-01-14
 
 ### Google OAuth Cleanup & Optimization

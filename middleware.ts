@@ -17,6 +17,13 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next()
   }
 
+  // Check header size to prevent REQUEST_HEADER_TOO_LARGE errors
+  const headersSize = JSON.stringify(request.headers).length
+  if (headersSize > 30000) { // Leave some buffer below 32KB limit
+    console.warn('Request headers too large, redirecting to clean state:', headersSize)
+    return NextResponse.redirect(new URL('/auth/clean-session', request.url))
+  }
+
   let supabaseResponse = NextResponse.next({
     request,
   })
@@ -27,11 +34,21 @@ export async function middleware(request: NextRequest) {
         return request.cookies.getAll()
       },
       setAll(cookiesToSet) {
-        cookiesToSet.forEach(({ name, value, options }) => request.cookies.set(name, value))
+        // Filter and limit cookie size to prevent header overflow
+        const filteredCookies = cookiesToSet.filter(({ name, value }) => {
+          // Skip very large cookies that might cause header overflow
+          if (value.length > 4000) { // 4KB per cookie limit
+            console.warn(`Skipping large cookie: ${name} (${value.length} bytes)`)
+            return false
+          }
+          return true
+        })
+
+        filteredCookies.forEach(({ name, value, options }) => request.cookies.set(name, value))
         supabaseResponse = NextResponse.next({
           request,
         })
-        cookiesToSet.forEach(({ name, value, options }) => supabaseResponse.cookies.set(name, value, options))
+        filteredCookies.forEach(({ name, value, options }) => supabaseResponse.cookies.set(name, value, options))
       },
     },
   })

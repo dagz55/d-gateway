@@ -6,12 +6,20 @@ export async function GET(request: NextRequest) {
   const code = searchParams.get("code")
   const error = searchParams.get("error")
   const errorDescription = searchParams.get("error_description")
+  const state = searchParams.get("state")
   const next = searchParams.get("next") ?? "/dashboard"
 
   // Handle errors gracefully
   if (error) {
     console.warn(`Auth error: ${error} - ${errorDescription}`)
-    return NextResponse.redirect(`${origin}/auth/auth-code-error?error=${error}`)
+    
+    // Handle specific OAuth state errors that might cause header overflow
+    if (error === 'invalid_request' && errorDescription?.includes('bad_oauth_state')) {
+      console.warn('OAuth state error detected, redirecting to clean session')
+      return NextResponse.redirect(`${origin}/auth/clean-session`)
+    }
+    
+    return NextResponse.redirect(`${origin}/auth/auth-code-error?error=${encodeURIComponent(error)}&description=${encodeURIComponent(errorDescription || '')}`)
   }
 
   if (code) {

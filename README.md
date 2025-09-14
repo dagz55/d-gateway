@@ -8,9 +8,10 @@ Zignal is a comprehensive crypto trading platform built with [Next.js 15.5.2](ht
 - 🔐 **Advanced Authentication**: Streamlined Google OAuth and email-based authentication with Supabase
 - 📊 **Trading Dashboard**: Complete trading interface with real-time charts and analytics
 - 📈 **Signal Management**: Professional trading signals with copy trading capabilities
+- 🎯 **ZIG TRADES Workflow**: Comprehensive trading workflow with signals, history, and active trading management
 - 💰 **Portfolio Management**: Track profits, losses, and portfolio distribution
+- 🏦 **Wallet System**: Complete wallet management with deposits, withdrawals, and transaction history
 - 📰 **News Integration**: Real-time cryptocurrency news feed
-- 💳 **Financial Operations**: Deposit and withdrawal management
 - 👤 **Profile Management**: Complete user profile system with photo uploads and settings
 - 🎨 **Profile Dropdown**: Interactive user menu with subscription status and quick access
 
@@ -24,6 +25,23 @@ Zignal is a comprehensive crypto trading platform built with [Next.js 15.5.2](ht
 - 📸 **File Upload**: Dual-path photo upload system (Supabase Storage + Base64 fallback)
 - 🔄 **Real-time Updates**: Live avatar and profile updates across the application
 - 🔐 **OAuth Optimization**: Streamlined Google OAuth implementation with proper redirect handling
+
+### ZIG TRADES Workflow
+- 🎯 **Trading Signals**: Multiple signal offers (ZIGNALS OFFER 1, 2, 3) with different profit rates and durations
+- 📋 **Copy Trading**: One-click copy trading functionality with real-time execution
+- 📊 **Trading History**: Complete history tracking with date, time, amount, and profit/loss details
+- ⚡ **Active Trading**: Real-time active trade management with progress tracking and profit monitoring
+- 📈 **Performance Analytics**: Win rate calculation, total profit tracking, and trade statistics
+- 🎛️ **Advanced Filters**: Filter trades by status, action type, and time periods
+
+### Wallet System
+- 💳 **Deposit Management**: Complete deposit system with amount, reference number, and screenshot verification
+- 📊 **Deposit History**: Comprehensive history with date/time, amount, MOP type, and wallet details
+- 💰 **Withdrawal System**: Portfolio value display with complete withdrawal forms including bank/ewallet details
+- 📋 **Withdrawal History**: Detailed withdrawal tracking with date/time, amount, MOP type, and wallet details
+- 🏦 **Dual Wallet Support**: Separate Trading Wallet and Income Wallet with independent balances
+- 🔍 **Advanced Search & Filters**: Filter transactions by status, payment method, wallet type, and date ranges
+- 📄 **Transaction Receipts**: Download receipts for all deposit and withdrawal transactions
 
 ## Getting Started
 
@@ -116,6 +134,7 @@ zignal-login/
 - **Landing Page**: `/` - Original login/landing page (preserved)
 - **Authentication**: `/auth/*` - Login system with OAuth support
 - **Dashboard**: `/dashboard` - Main trading dashboard with analytics
+- **Wallet**: `/wallet` - Complete wallet management with deposits and withdrawals
 - **Profile**: `/profile` - User profile management
 - **Settings**: `/settings` - User preferences and account settings
 - **Admin**: `/admin` - Admin panel for system management
