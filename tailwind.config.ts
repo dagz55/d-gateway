@@ -1,7 +1,7 @@
 import type { Config } from "tailwindcss";
 
 const config: Config = {
-    darkMode: ["class"],
+    darkMode: "class",
     content: [
     "./pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
@@ -49,12 +49,22 @@ const config: Config = {
   				'3': 'hsl(var(--chart-3))',
   				'4': 'hsl(var(--chart-4))',
   				'5': 'hsl(var(--chart-5))'
-  			}
+  			},
+  			// Zignal theme colors
+  			zincard: "rgba(21, 33, 54, 0.6)",      // glass card
+  			zinborder: "rgba(255,255,255,0.08)",
+  			zinbg: "#0a1020",                       // page bg
+  			zinbg2: "#0f1a2e",                      // panel bg
+  			zincyan: "#33E1DA",                     // accent
+  			zinblue: "#1A7FB3",                     // primary
   		},
   		borderRadius: {
   			lg: 'var(--radius)',
   			md: 'calc(var(--radius) - 2px)',
   			sm: 'calc(var(--radius) - 4px)'
+  		},
+  		boxShadow: {
+  			zinglass: "0 10px 30px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.04)",
   		}
   	}
   },

@@ -247,6 +247,18 @@ export function AuthCard() {
                 </div>
               </div>
 
+              {/* Forgot Password Link - only show for sign in */}
+              {!isSignUp && (
+                <div className="flex justify-end">
+                  <Link 
+                    href="/auth/forgot-password"
+                    className="text-xs text-[#33E1DA] hover:text-[#33E1DA]/80 transition-colors"
+                  >
+                    Forgot password?
+                  </Link>
+                </div>
+              )}
+
               {isSignUp && (
                 <div className="space-y-2">
                   <Label htmlFor="confirmPassword" className="text-[#EAF2FF]">

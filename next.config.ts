@@ -9,13 +9,26 @@ const nextConfig: NextConfig = {
   ],
   
   // Fix lockfile warning by setting the correct root
-  outputFileTracingRoot: '/Users/robertsuarez/big4trading/member-dashboard',
+  outputFileTracingRoot: '/Users/robertsuarez/zignals/zignal-login',
   
   // Font optimization is enabled by default in Next.js 15
   
-  // Configure font optimization
+  // Configure font optimization and Server Actions
   experimental: {
     optimizePackageImports: ['@radix-ui/react-icons', 'lucide-react'],
+    // Configure Server Actions body size limit for file uploads
+    serverActions: {
+      bodySizeLimit: '6mb', // Allow 6MB to accommodate 5MB files plus form data
+    },
+  },
+  // Workaround for sporadic ENOENT on Webpack persistent cache in dev
+  // Disables filesystem cache during `next dev` to improve stability
+  webpack: (config, { dev }) => {
+    if (dev) {
+      // @ts-expect-error - Next/webpack types don't expose this union well
+      config.cache = false
+    }
+    return config
   },
 };
 

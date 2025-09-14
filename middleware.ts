@@ -11,6 +11,12 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next()
   }
 
+  // Additional validation to prevent HTML responses
+  if (!supabaseUrl.startsWith('https://') || !supabaseUrl.includes('.supabase.co')) {
+    console.warn('Invalid Supabase URL format in middleware:', supabaseUrl)
+    return NextResponse.next()
+  }
+
   let supabaseResponse = NextResponse.next({
     request,
   })
@@ -34,15 +40,56 @@ export async function middleware(request: NextRequest) {
   // supabase.auth.getUser(). A simple mistake could make it very hard to debug
   // issues with users being randomly logged out.
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  try {
+    const {
+      data: { user },
+      error
+    } = await supabase.auth.getUser()
 
-  // If user is signed in and the current path is / redirect the user to /dashboard
-  if (user && request.nextUrl.pathname === "/") {
-    const url = request.nextUrl.clone()
-    url.pathname = "/dashboard"
-    return NextResponse.redirect(url)
+    // If there's an auth error, handle it appropriately
+    if (error) {
+      // Only log non-session-related errors
+      if (!error.message.includes('session') && !error.message.includes('missing')) {
+        console.warn('Supabase auth error in middleware:', error.message)
+      }
+      return supabaseResponse
+    }
+
+    // If user is signed in and the current path is / redirect the user to /dashboard
+    if (user && request.nextUrl.pathname === "/") {
+      const url = request.nextUrl.clone()
+      url.pathname = "/dashboard"
+      return NextResponse.redirect(url)
+    }
+  } catch (error) {
+    // Handle different types of errors gracefully
+    if (error instanceof Error) {
+      const errorMessage = error.message.toLowerCase()
+      
+      // Define patterns for expected/ignorable errors
+      const ignorablePatterns = [
+        'fetch failed',
+        'network',
+        'timeout', 
+        'unexpected token',
+        'not valid json',
+        'auth session missing',
+        'session missing',
+        'invalid json',
+        'html',
+        'bad_oauth_state',
+        'invalid_request'
+      ]
+      
+      // Skip logging for common, expected errors
+      if (ignorablePatterns.some(pattern => errorMessage.includes(pattern))) {
+        // These are typically network/connectivity/session issues, don't log them
+        return supabaseResponse
+      }
+      
+      // Only log truly unexpected errors
+      console.warn('Unexpected Supabase error in middleware:', error.message)
+    }
   }
 
   // IMPORTANT: You *must* return the supabaseResponse object as it is. If you're

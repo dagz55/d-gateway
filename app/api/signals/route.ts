@@ -1,34 +1,57 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server'
+import { createServerSupabaseClient } from '@/lib/supabase/serverClient'
 
 export async function GET(request: NextRequest) {
   try {
-    const { searchParams } = new URL(request.url);
-    const page = parseInt(searchParams.get('page') || '1');
-    const limit = parseInt(searchParams.get('limit') || '10');
-    const search = searchParams.get('search') || '';
-    const pair = searchParams.get('pair') || '';
-    const action = searchParams.get('action') || '';
+    const supabase = await createServerSupabaseClient()
+    const { data: { user }, error: authError } = await supabase.auth.getUser()
+    if (authError || !user) {
+      return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 })
+    }
 
-    // TODO: Implement real signals fetching with database
-    // - Query signals from database
-    // - Apply search, pair, and action filters
-    // - Implement proper pagination
-    // - Sort by issuedAt timestamp
+    const { searchParams } = new URL(request.url)
+    const page = parseInt(searchParams.get('page') || '1')
+    const limit = parseInt(searchParams.get('limit') || '10')
+    const search = searchParams.get('search')?.toLowerCase()
+    const pair = searchParams.get('pair') || undefined
+    const action = (searchParams.get('action') as 'BUY' | 'SELL' | 'HOLD' | null) || undefined
+
+    let query = supabase
+      .from('signals')
+      .select('*', { count: 'exact' })
+      .eq('user_id', user.id)
+      .order('issued_at', { ascending: false })
+
+    if (pair) query = query.eq('pair', pair)
+    if (action) query = query.eq('action', action)
+    if (search) {
+      query = query.or(`pair.ilike.%${search}%,action.ilike.%${search}%`)
+    }
+
+    const start = (page - 1) * limit
+    const end = start + limit - 1
+    const { data, error, count } = await query.range(start, end)
+    if (error) throw error
+
+    const items = (data || []).map((row) => ({
+      id: row.id,
+      pair: row.pair,
+      action: row.action === 'HOLD' ? 'BUY' : row.action, // map HOLD to BUY for UI if needed
+      entry: row.target_price,
+      sl: row.stop_loss ?? 0,
+      tp: (row as any).take_profits ?? [],
+      issuedAt: row.issued_at,
+      status: row.status,
+    }))
+
+    const total = count || 0
+    const totalPages = Math.max(1, Math.ceil(total / limit))
 
     return NextResponse.json({
       success: true,
-      data: {
-        items: [],
-        total: 0,
-        page,
-        limit,
-        totalPages: 0,
-      },
-    });
-  } catch {
-    return NextResponse.json(
-      { success: false, message: 'Internal server error' },
-      { status: 500 }
-    );
+      data: { items, total, page, limit, totalPages }
+    })
+  } catch (error: any) {
+    return NextResponse.json({ success: false, message: error?.message || 'Internal server error' }, { status: 500 })
   }
 }

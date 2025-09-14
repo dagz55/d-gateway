@@ -130,15 +130,20 @@ export default function Sidebar({ className }: SidebarProps) {
       {/* Sidebar */}
       <div
         className={cn(
-          'fixed left-0 top-0 z-40 h-full w-64 bg-background border-r transform transition-transform duration-200 ease-in-out md:translate-x-0',
+          'fixed left-0 top-0 z-40 h-full w-64 glass border-r border-border transform transition-all duration-300 ease-in-out md:translate-x-0',
           isOpen ? 'translate-x-0' : '-translate-x-full',
           className
         )}
       >
         <div className="flex h-full flex-col">
           {/* Logo */}
-          <div className="flex h-16 items-center px-6 border-b">
-            <h1 className="text-xl font-bold">Trading Platform</h1>
+          <div className="flex h-16 items-center px-6 border-b border-border">
+            <div className="flex items-center space-x-2">
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-accent to-primary flex items-center justify-center">
+                <span className="text-sm font-bold text-white">Z</span>
+              </div>
+              <h1 className="text-xl font-bold gradient-text">Zignal</h1>
+            </div>
           </div>
 
           {/* Navigation */}
@@ -152,10 +157,10 @@ export default function Sidebar({ className }: SidebarProps) {
                     href={item.href}
                     onClick={() => setIsOpen(false)}
                     className={cn(
-                      'flex items-center px-3 py-2 text-sm font-medium rounded-md transition-all duration-200 relative',
+                      'flex items-center px-3 py-3 text-sm font-medium rounded-xl transition-all duration-300 relative group',
                       isActive(item.href)
-                        ? 'bg-primary text-primary-foreground shadow-sm border-l-4 border-primary-foreground'
-                        : 'text-muted-foreground hover:bg-muted hover:text-foreground hover:shadow-sm'
+                        ? 'bg-accent/20 text-accent shadow-lg border border-accent/30 card-glow'
+                        : 'text-foreground/70 hover:bg-muted hover:text-foreground hover:shadow-md hover:border hover:border-border'
                     )}
                   >
                     <Icon className={cn(

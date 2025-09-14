@@ -1,6 +1,6 @@
 {
   "name": "zignal",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "private": true,
   "description": "Zignal - Advanced Trading Signals & Analytics Platform",
   "author": "Big4Trading",
@@ -15,7 +15,10 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "clean": "rm -rf .next && rm -rf node_modules/.cache",
+    "clean:cache": "rm -rf .next/cache",
+    "fresh": "npm run clean && npm install && npm run dev"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.1",

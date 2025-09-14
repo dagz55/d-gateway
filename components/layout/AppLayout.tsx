@@ -10,14 +10,16 @@ interface AppLayoutProps {
 
 export default function AppLayout({ children }: AppLayoutProps) {
   return (
-    <div className="min-h-screen bg-background">
-      <Suspense fallback={<div className="fixed left-0 top-0 h-full w-64 bg-background border-r" />}>
+    <div className="min-h-screen dashboard-bg">
+      <Suspense fallback={<div className="fixed left-0 top-0 h-full w-64 glass border-r border-border" />}>
         <Sidebar />
       </Suspense>
       <div className="md:ml-64">
         <Header />
-        <main className="p-6">
-          {children}
+        <main className="p-6 relative">
+          <div className="max-w-7xl mx-auto">
+            {children}
+          </div>
         </main>
       </div>
     </div>

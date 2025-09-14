@@ -1,6 +1,5 @@
 "use client"
 
-import Image from "next/image"
 import { useEffect, useRef } from "react"
 
 export function HeroSection() {
@@ -99,18 +98,6 @@ export function HeroSection() {
 
       {/* Content */}
       <div className="relative z-10 flex flex-col justify-center items-start p-8 lg:p-16 h-full min-h-[50vh] lg:min-h-screen">
-        {/* Logo */}
-        <div className="mb-8 lg:mb-12">
-          <Image
-            src="/zignal-logo.svg"
-            alt="Zignal Logo"
-            width={200}
-            height={80}
-            className="w-auto h-16 lg:h-20"
-            priority
-          />
-        </div>
-
         {/* Main Heading */}
         <h1 className="text-4xl lg:text-6xl font-bold text-[#EAF2FF] mb-6 leading-tight text-balance">
           Trade the future.{" "}
