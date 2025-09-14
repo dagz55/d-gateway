@@ -9,7 +9,7 @@ const nextConfig: NextConfig = {
   ],
   
   // Fix lockfile warning by setting the correct root
-  outputFileTracingRoot: '/Users/robertsuarez/zignals/zignal-login',
+  outputFileTracingRoot: process.cwd(),
   
   // Font optimization is enabled by default in Next.js 15
   
