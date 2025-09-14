@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerSupabaseClient } from '@/lib/supabase/serverClient'
 import { createAdminClient } from '@/lib/supabase/adminClient'
+import { Database } from '@/lib/supabase/types'
 
 async function assertAdmin() {
   const supabase = await createServerSupabaseClient()
@@ -48,7 +49,7 @@ export async function POST(request: NextRequest) {
 
     const admin = createAdminClient()
     const body = await request.json()
-    const payload = {
+    const payload: Database['public']['Tables']['signals']['Insert'] = {
       user_id: body.user_id || user.id,
       pair: body.pair,
       action: body.action,
@@ -80,9 +81,11 @@ export async function PUT(request: NextRequest) {
     if (!body?.id) {
       return NextResponse.json({ success: false, message: 'Missing id' }, { status: 400 })
     }
-    const updates: any = {}
+    const updates: Database['public']['Tables']['signals']['Update'] = {}
     for (const key of ['pair','action','target_price','stop_loss','status','confidence','issued_at','expires_at','take_profits','user_id']) {
-      if (key in body) updates[key] = body[key]
+      if (key in body) {
+        (updates as any)[key] = body[key]
+      }
     }
     const { data, error } = await admin.from('signals').update(updates).eq('id', body.id).select('*').single()
     if (error) throw error
