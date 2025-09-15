@@ -19,6 +19,7 @@ import {
 import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { useState } from 'react';
+import ProfileSection from './ProfileSection';
 
 const navigation = [
   {
@@ -159,6 +160,9 @@ export default function Sidebar({ className }: SidebarProps) {
               })}
             </nav>
           </ScrollArea>
+
+          {/* Enhanced Profile Section */}
+          <ProfileSection onNavigate={() => setIsOpen(false)} />
         </div>
       </div>
     </>

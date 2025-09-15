@@ -14,10 +14,12 @@ Zignal is a comprehensive crypto trading platform built with [Next.js 15.5.2](ht
 - 📰 **News Integration**: Real-time cryptocurrency news feed
 - 👤 **Profile Management**: Complete user profile system with photo uploads and settings
 - 🎨 **Profile Dropdown**: Interactive user menu with subscription status and quick access
+- 🏷️ **Enhanced Profile Section**: Comprehensive sidebar profile component with avatar, user info, admin badges, and quick actions
 
 ### Technical Features
 - 🎨 **Modern UI**: Built with Tailwind CSS and complete shadcn/ui component library
 - 👤 **Enhanced Profile System**: Modern user profile dropdown with comprehensive account management
+- 🏷️ **ProfileSection Component**: Comprehensive sidebar profile component with loading states, error handling, and accessibility
 - 🧠 **Memory Management**: Optimized memory usage with proper object URL cleanup
 - ✅ **Type Safety**: Full TypeScript implementation with strict type checking
 - 📱 **Responsive Design**: Mobile-first approach with full responsiveness
@@ -29,6 +31,7 @@ Zignal is a comprehensive crypto trading platform built with [Next.js 15.5.2](ht
 - 🔐 **OAuth Optimization**: Streamlined Google OAuth implementation with proper redirect handling
 - 🛡️ **Enhanced Validation**: Robust file upload validation with HEIC/HEIF support and security improvements
 - 🎯 **Better UX**: Improved error messages and user feedback for authentication and file operations
+- ♿ **Accessibility**: Full ARIA support and screen reader compatibility
 
 ### ZIG TRADES Workflow
 - 🎯 **Trading Signals**: Multiple signal offers (ZIGNALS OFFER 1, 2, 3) with different profit rates and durations
@@ -46,6 +49,19 @@ Zignal is a comprehensive crypto trading platform built with [Next.js 15.5.2](ht
 - 🏦 **Dual Wallet Support**: Separate Trading Wallet and Income Wallet with independent balances
 - 🔍 **Advanced Search & Filters**: Filter transactions by status, payment method, wallet type, and date ranges
 - 📄 **Transaction Receipts**: Download receipts for all deposit and withdrawal transactions
+
+### ProfileSection Component
+- 🖼️ **Avatar Display**: User profile pictures with fallback initials and proper loading states
+- 👑 **Admin Badge**: Special visual indicator for admin users with crown icon
+- 🔄 **Loading States**: Skeleton animations during data fetching for smooth UX
+- ⚠️ **Error Handling**: Graceful error displays with retry mechanisms
+- 📱 **Responsive Design**: Adapts perfectly to desktop and mobile screen sizes
+- ♿ **Accessible**: Full ARIA support and keyboard navigation compatibility
+- ⚙️ **Quick Actions**: Fast access to profile editing, settings, notifications, security, billing, and help
+- 🔐 **Admin Panel Access**: Special admin panel button for administrator users
+- 🚪 **Secure Sign Out**: Loading states during logout process with proper error handling
+- 🌐 **Online Status**: Real-time online/offline status indicator
+- 🎨 **Modern Design**: Consistent with application theme and branding
 
 ## Getting Started
 
@@ -120,7 +136,7 @@ zignal-login/
 │   └── page.tsx                 # Landing page
 ├── components/
 │   ├── dashboard/               # Complete trading dashboard components
-│   ├── layout/                  # AppLayout, Header, Sidebar, ProfileDropdown
+│   ├── layout/                  # AppLayout, Header, Sidebar, ProfileDropdown, ProfileSection
 │   ├── ui/                      # Full shadcn/ui component library
 │   └── settings/                # Profile settings and photo upload forms
 ├── hooks/api/                   # Data fetching hooks
@@ -142,6 +158,7 @@ zignal-login/
 - **Profile**: `/profile` - User profile management
 - **Settings**: `/settings` - User preferences and account settings
 - **Admin**: `/admin` - Admin panel for system management
+- **Demo**: `/demo/profile-section` - Interactive ProfileSection component demonstration
 
 ## 🔧 Development
 
