@@ -5,6 +5,27 @@ All notable changes to the Zignal Trading Platform will be documented in this fi
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.4.2] - 2025-01-15
+
+### Bug Fixes and Performance Improvements
+
+#### **🐛 Memory Management Fixes**
+- **Memory Leak Prevention**: Fixed memory leaks in ChangePhotoForm.tsx by properly revoking object URLs before clearing state
+- **Blob URL Management**: Added proper cleanup of blob URLs to prevent memory accumulation during file preview operations
+
+#### **🔧 Validation Improvements**
+- **Accurate Error Messages**: Fixed file size validation to use Math.floor instead of Math.round for precise error messaging
+- **File Size Limits**: Ensured error messages accurately reflect the actual file size limits (5MB)
+
+#### **⚡ TypeScript Compilation Fixes**
+- **Server Client Error**: Resolved TypeScript compilation error in serverClient.ts with cookies().getAll() method
+- **Build Stability**: Fixed build failures and improved overall compilation stability
+
+#### **📝 Code Quality**
+- **Linting**: All files now pass linting checks without errors
+- **Type Safety**: Improved TypeScript type safety across the application
+- **Performance**: Enhanced memory management and reduced potential memory leaks
+
 ## [2.4.1] - 2025-01-15
 
 ### Critical Fix: REQUEST_HEADER_TOO_LARGE Error Resolution
