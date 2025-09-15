@@ -10,7 +10,7 @@ import { useRef, useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import { createClient } from '@/lib/supabase/client';
 import { uploadAvatar, uploadAvatarBase64, removeAvatar } from '@/lib/actions';
-import { validateImageFile, ACCEPT_FILE_TYPES } from '@/lib/validation';
+import { validateImageFile, ACCEPT_FILE_TYPES, ACCEPT_FILE_EXTENSIONS, ALLOWED_IMAGE_EXTENSIONS } from '@/lib/validation';
 
 interface User {
   id: string;
@@ -113,7 +113,12 @@ export default function ChangePhotoForm() {
   };
 
   const handleSubmit = async () => {
-    if (!selectedFile || !user) {
+    if (!user) {
+      toast.error('You must be signed in to change your photo');
+      return;
+    }
+    
+    if (!selectedFile) {
       toast.error('Please select a file');
       return;
     }
@@ -132,7 +137,9 @@ export default function ChangePhotoForm() {
 
       // If storage fails, try base64 only
       if (!result.success && result.error?.includes('Storage')) {
-        console.log('Storage failed, trying base64 only...');
+        if (process.env.NODE_ENV === 'development') {
+          console.log('Storage failed, trying base64 only...');
+        }
         result = await uploadAvatarBase64(base64Data);
       }
 
@@ -154,7 +161,9 @@ export default function ChangePhotoForm() {
         toast.error(result.error || 'Failed to update photo');
       }
     } catch (error) {
-      console.error('Error uploading photo:', error);
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Error uploading photo:', error);
+      }
       toast.error('Failed to update photo');
     } finally {
       setIsSubmitting(false);
@@ -186,7 +195,9 @@ export default function ChangePhotoForm() {
         toast.error(result.error || 'Failed to remove photo');
       }
     } catch (error) {
-      console.error('Error removing photo:', error);
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Error removing photo:', error);
+      }
       toast.error('Failed to remove photo');
     } finally {
       setIsSubmitting(false);
@@ -214,14 +225,14 @@ export default function ChangePhotoForm() {
             <Input
               id="photo"
               type="file"
-              accept={ACCEPT_FILE_TYPES}
+              accept={[ACCEPT_FILE_TYPES, ACCEPT_FILE_EXTENSIONS, '.heic', '.heif'].filter(Boolean).join(',')}
               onChange={handleFileChange}
               ref={fileInputRef}
               disabled={isSubmitting}
               className="file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-primary-foreground hover:file:bg-primary/90"
             />
             <p className="text-xs text-muted-foreground">
-              JPG, PNG, GIF or WEBP. Max size 5MB.
+              JPG, PNG, GIF, WEBP, HEIC, or HEIF. Max size 5MB.
             </p>
           </div>
         </div>
@@ -246,7 +257,7 @@ export default function ChangePhotoForm() {
         <div className="flex gap-2">
           <Button 
             onClick={handleSubmit} 
-            disabled={isSubmitting || !previewUrl}
+            disabled={isSubmitting || !previewUrl || !user || !selectedFile}
           >
             <Upload className="mr-2 h-4 w-4" />
             {isSubmitting ? 'Uploading...' : 'Upload Photo'}

@@ -7,7 +7,9 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { ArrowUpRight, Upload, DollarSign, Hash, Image as ImageIcon } from 'lucide-react';
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
+import { validateImageFile, ACCEPT_FILE_TYPES } from '@/lib/validation';
+import { toast } from 'sonner';
 
 interface DepositFormData {
   amount: string;
@@ -36,6 +38,20 @@ export default function DepositComponent() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const objectUrlRef = useRef<string | null>(null);
+  const isMountedRef = useRef<boolean>(false);
+
+  // Cleanup object URL on component unmount
+  useEffect(() => {
+    isMountedRef.current = true;
+    return () => {
+      isMountedRef.current = false;
+      if (objectUrlRef.current) {
+        URL.revokeObjectURL(objectUrlRef.current);
+        objectUrlRef.current = null;
+      }
+    };
+  }, []);
 
   const handleInputChange = (field: keyof DepositFormData, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -44,9 +60,38 @@ export default function DepositComponent() {
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      setFormData(prev => ({ ...prev, screenshot: file }));
-      const url = URL.createObjectURL(file);
-      setPreviewUrl(url);
+      // Validate file using shared validation
+      const validation = validateImageFile(file);
+      if (!validation.isValid) {
+        toast.error(validation.error!);
+        // Revoke any created object URL and clear preview
+        if (objectUrlRef.current) {
+          URL.revokeObjectURL(objectUrlRef.current);
+          objectUrlRef.current = null;
+        }
+        if (isMountedRef.current) {
+          setPreviewUrl(null);
+          setFormData(prev => ({ ...prev, screenshot: null }));
+        }
+        if (fileInputRef.current) {
+          fileInputRef.current.value = '';
+          fileInputRef.current.focus();
+        }
+        return;
+      }
+
+      // Revoke previous object URL if it exists
+      if (objectUrlRef.current) {
+        URL.revokeObjectURL(objectUrlRef.current);
+        objectUrlRef.current = null;
+      }
+      
+      if (isMountedRef.current) {
+        setFormData(prev => ({ ...prev, screenshot: file }));
+        const url = URL.createObjectURL(file);
+        objectUrlRef.current = url;
+        setPreviewUrl(url);
+      }
     }
   };
 
@@ -58,24 +103,36 @@ export default function DepositComponent() {
     await new Promise(resolve => setTimeout(resolve, 2000));
     
     // Reset form
-    setFormData({
-      amount: '',
-      referenceNumber: '',
-      methodOfPayment: '',
-      screenshot: null,
-      notes: ''
-    });
-    setPreviewUrl(null);
+    if (isMountedRef.current) {
+      setFormData({
+        amount: '',
+        referenceNumber: '',
+        methodOfPayment: '',
+        screenshot: null,
+        notes: ''
+      });
+      
+      // Clear preview first, then revoke object URL
+      setPreviewUrl(null);
+    }
+    if (objectUrlRef.current) {
+      URL.revokeObjectURL(objectUrlRef.current);
+      objectUrlRef.current = null;
+    }
     
     // Clear file input to allow re-selecting the same file
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
     
-    setIsSubmitting(false);
+    if (isMountedRef.current) {
+      setIsSubmitting(false);
+    }
     
-    // Show success message (you can implement a toast notification here)
-    alert('Deposit request submitted successfully!');
+    // Show success message
+    if (isMountedRef.current) {
+      toast.success('Deposit request submitted successfully!');
+    }
   };
 
   const isFormValid = formData.amount && formData.referenceNumber && formData.methodOfPayment;
@@ -161,7 +218,7 @@ export default function DepositComponent() {
                 <Input
                   ref={fileInputRef}
                   type="file"
-                  accept="image/*"
+                  accept={ACCEPT_FILE_TYPES}
                   onChange={handleFileChange}
                   className="bg-card/50 border-border/30 focus:border-accent file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-accent/20 file:text-accent hover:file:bg-accent/30"
                 />
