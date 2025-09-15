@@ -10,6 +10,7 @@ import { ArrowUpRight, Upload, DollarSign, Hash, Image as ImageIcon } from 'luci
 import { useState, useRef, useEffect } from 'react';
 import { validateImageFile, ACCEPT_FILE_TYPES } from '@/lib/validation';
 import { toast } from 'sonner';
+import Image from 'next/image';
 
 interface DepositFormData {
   amount: string;
@@ -240,7 +241,7 @@ export default function DepositComponent() {
                 <div className="mt-4">
                   <p className="text-sm text-muted-foreground mb-2">Preview:</p>
                   <div className="relative inline-block">
-                    <img
+                    <Image
                       src={previewUrl}
                       alt="Screenshot preview"
                       width={320}
