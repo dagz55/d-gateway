@@ -9,6 +9,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { z } from 'zod';
+import { updatePassword } from '@/lib/actions';
 
 const changePasswordSchema = z.object({
   currentPassword: z.string().min(1, 'Current password is required'),
@@ -41,10 +42,14 @@ export default function ChangePasswordForm() {
 
     setIsSubmitting(true);
     try {
-      // Simulate password change
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      toast.success('Password changed successfully!');
-      reset();
+      const result = await updatePassword(data.currentPassword, data.newPassword);
+      
+      if (result.success) {
+        toast.success('Password changed successfully!');
+        reset();
+      } else {
+        toast.error(result.error || 'Failed to change password');
+      }
     } catch (error) {
       toast.error('Failed to change password');
     } finally {

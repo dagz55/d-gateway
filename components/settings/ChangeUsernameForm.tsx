@@ -9,6 +9,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { z } from 'zod';
+import { updateUsername } from '@/lib/actions';
 
 const changeUsernameSchema = z.object({
   currentUsername: z.string().min(1, 'Current username is required'),
@@ -49,10 +50,16 @@ export default function ChangeUsernameForm({ currentUsername }: ChangeUsernameFo
 
     setIsSubmitting(true);
     try {
-      // Simulate username update
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      toast.success('Username updated successfully!');
-      reset({ currentUsername: data.newUsername, newUsername: '' });
+      const result = await updateUsername(data.newUsername);
+      
+      if (result.success) {
+        toast.success('Username updated successfully!');
+        reset({ currentUsername: data.newUsername, newUsername: '' });
+        // Update the currentUsername prop by refreshing the page or using a callback
+        window.location.reload();
+      } else {
+        toast.error(result.error || 'Failed to update username');
+      }
     } catch (error) {
       toast.error('Failed to update username');
     } finally {

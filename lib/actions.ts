@@ -34,6 +34,20 @@ export async function uploadAvatarBase64(base64Data: string) {
       throw updateError
     }
 
+    // Update user_profiles table
+    const { error: profileError } = await supabase
+      .from('user_profiles')
+      .update({ 
+        avatar_url: base64Data,
+        updated_at: new Date().toISOString()
+      })
+      .eq('user_id', user.id)
+
+    if (profileError) {
+      console.warn('Could not update avatar in user_profiles:', profileError)
+      // Don't fail the entire operation if profile update fails
+    }
+
     revalidatePath('/profile')
     return { success: true, avatarUrl: base64Data }
   } catch (error) {
@@ -159,6 +173,20 @@ export async function uploadAvatar(formData: FormData) {
       throw updateError
     }
 
+    // Update user_profiles table
+    const { error: profileError } = await supabase
+      .from('user_profiles')
+      .update({ 
+        avatar_url: avatarUrl,
+        updated_at: new Date().toISOString()
+      })
+      .eq('user_id', user.id)
+
+    if (profileError) {
+      console.warn('Could not update avatar in user_profiles:', profileError)
+      // Don't fail the entire operation if profile update fails
+    }
+
     revalidatePath('/profile')
     return { success: true, avatarUrl }
   } catch (error) {
@@ -192,6 +220,17 @@ export async function removeAvatar() {
       throw updateError
     }
 
+    // Update user_profiles table
+    const { error: profileError } = await supabase
+      .from('user_profiles')
+      .update({ avatar_url: null })
+      .eq('user_id', user.id)
+
+    if (profileError) {
+      console.warn('Could not update avatar in user_profiles:', profileError)
+      // Don't fail the entire operation if profile update fails
+    }
+
     // Delete the file from storage if it exists (not base64)
     if (currentAvatarUrl && currentAvatarUrl.includes('supabase')) {
       try {
@@ -214,6 +253,167 @@ export async function removeAvatar() {
     return { 
       success: false, 
       error: error instanceof Error ? error.message : 'Failed to remove avatar' 
+    }
+  }
+}
+
+// Profile update actions
+export async function updateProfile(data: {
+  full_name?: string;
+  username?: string;
+  bio?: string;
+  phone?: string;
+  country?: string;
+  timezone?: string;
+  language?: string;
+}) {
+  try {
+    const supabase = await createServerSupabaseClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    
+    if (!user) {
+      throw new Error('User not authenticated')
+    }
+
+    // Update user_profiles table
+    const { error: profileError } = await supabase
+      .from('user_profiles')
+      .update({
+        ...data,
+        updated_at: new Date().toISOString()
+      })
+      .eq('user_id', user.id)
+
+    if (profileError) {
+      throw new Error(`Profile update failed: ${profileError.message}`)
+    }
+
+    // Update auth user metadata for fields that should be synced
+    const authUpdateData: any = {}
+    if (data.full_name) authUpdateData.full_name = data.full_name
+
+    if (Object.keys(authUpdateData).length > 0) {
+      const { error: authError } = await supabase.auth.updateUser({
+        data: authUpdateData
+      })
+
+      if (authError) {
+        console.warn('Could not update auth metadata:', authError)
+        // Don't fail the entire operation if auth update fails
+      }
+    }
+
+    revalidatePath('/profile')
+    return { success: true }
+  } catch (error) {
+    console.error('Error updating profile:', error)
+    return { 
+      success: false, 
+      error: error instanceof Error ? error.message : 'Failed to update profile' 
+    }
+  }
+}
+
+export async function updateUsername(newUsername: string) {
+  try {
+    const supabase = await createServerSupabaseClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    
+    if (!user) {
+      throw new Error('User not authenticated')
+    }
+
+    // Check if username is already taken
+    const { data: existingUser } = await supabase
+      .from('user_profiles')
+      .select('username')
+      .eq('username', newUsername)
+      .neq('user_id', user.id)
+      .single()
+
+    if (existingUser) {
+      throw new Error('Username is already taken')
+    }
+
+    // Update username in user_profiles table
+    const { error: profileError } = await supabase
+      .from('user_profiles')
+      .update({ 
+        username: newUsername,
+        updated_at: new Date().toISOString()
+      })
+      .eq('user_id', user.id)
+
+    if (profileError) {
+      throw new Error(`Username update failed: ${profileError.message}`)
+    }
+
+    revalidatePath('/profile')
+    return { success: true }
+  } catch (error) {
+    console.error('Error updating username:', error)
+    return { 
+      success: false, 
+      error: error instanceof Error ? error.message : 'Failed to update username' 
+    }
+  }
+}
+
+export async function updatePassword(currentPassword: string, newPassword: string) {
+  try {
+    const supabase = await createServerSupabaseClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    
+    if (!user) {
+      throw new Error('User not authenticated')
+    }
+
+    // Update password using Supabase Auth
+    const { error: updateError } = await supabase.auth.updateUser({
+      password: newPassword
+    })
+
+    if (updateError) {
+      throw new Error(`Password update failed: ${updateError.message}`)
+    }
+
+    revalidatePath('/profile')
+    return { success: true }
+  } catch (error) {
+    console.error('Error updating password:', error)
+    return { 
+      success: false, 
+      error: error instanceof Error ? error.message : 'Failed to update password' 
+    }
+  }
+}
+
+export async function getUserProfile() {
+  try {
+    const supabase = await createServerSupabaseClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    
+    if (!user) {
+      throw new Error('User not authenticated')
+    }
+
+    // Get user profile from user_profiles table
+    const { data: profile, error } = await supabase
+      .from('user_profiles')
+      .select('*')
+      .eq('user_id', user.id)
+      .single()
+
+    if (error) {
+      throw new Error(`Failed to fetch profile: ${error.message}`)
+    }
+
+    return { success: true, profile }
+  } catch (error) {
+    console.error('Error fetching user profile:', error)
+    return { 
+      success: false, 
+      error: error instanceof Error ? error.message : 'Failed to fetch profile' 
     }
   }
 }

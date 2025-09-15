@@ -4,7 +4,10 @@ import { Separator } from '@/components/ui/separator';
 import { User, Settings } from 'lucide-react';
 import ChangeUsernameForm from '@/components/settings/ChangeUsernameForm';
 import ChangePasswordForm from '@/components/settings/ChangePasswordForm';
+import ProfileForm from '@/components/settings/ProfileForm';
+import ChangePhotoForm from '@/components/settings/ChangePhotoForm';
 import { createServerSupabaseClient } from '@/lib/supabase/serverClient';
+import { getUserProfile } from '@/lib/actions';
 import { redirect } from 'next/navigation';
 
 export const dynamic = 'force-dynamic';
@@ -25,6 +28,10 @@ export default async function ProfilePage() {
   const fullName = user.user_metadata?.full_name || 'User';
   const email = user.email || '';
 
+  // Get user profile from database
+  const profileResult = await getUserProfile();
+  const profile = profileResult.success ? profileResult.profile : null;
+
   return (
     <div className="container mx-auto py-6 space-y-6 max-w-4xl">
       <div className="flex items-center justify-between">
@@ -34,6 +41,26 @@ export default async function ProfilePage() {
         </div>
       </div>
 
+      {/* Profile Photo */}
+      <Suspense fallback={<div>Loading...</div>}>
+        <ChangePhotoForm />
+      </Suspense>
+
+      {/* Profile Information */}
+      <Suspense fallback={<div>Loading...</div>}>
+        <ProfileForm 
+          initialData={{
+            full_name: profile?.full_name || fullName,
+            bio: profile?.bio || '',
+            phone: profile?.phone || '',
+            country: profile?.country || '',
+            timezone: profile?.timezone || 'UTC',
+            language: profile?.language || 'en',
+          }}
+        />
+      </Suspense>
+
+      {/* Account Information */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -45,12 +72,20 @@ export default async function ProfilePage() {
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <h4 className="font-medium text-sm text-muted-foreground mb-1">Full Name</h4>
-              <p className="text-sm">{fullName}</p>
+              <h4 className="font-medium text-sm text-muted-foreground mb-1">Username</h4>
+              <p className="text-sm">{profile?.username || 'Not set'}</p>
             </div>
             <div>
               <h4 className="font-medium text-sm text-muted-foreground mb-1">Email Address</h4>
               <p className="text-sm">{email}</p>
+            </div>
+            <div>
+              <h4 className="font-medium text-sm text-muted-foreground mb-1">Account Type</h4>
+              <p className="text-sm">{profile?.package || 'Basic'}</p>
+            </div>
+            <div>
+              <h4 className="font-medium text-sm text-muted-foreground mb-1">Trader Level</h4>
+              <p className="text-sm">{profile?.trader_level || 'Beginner'}</p>
             </div>
           </div>
         </CardContent>
@@ -65,7 +100,7 @@ export default async function ProfilePage() {
           
           <div className="space-y-6">
             <Suspense fallback={<div>Loading...</div>}>
-              <ChangeUsernameForm currentUsername={fullName} />
+              <ChangeUsernameForm currentUsername={profile?.username || fullName} />
             </Suspense>
             
             <Suspense fallback={<div>Loading...</div>}>
