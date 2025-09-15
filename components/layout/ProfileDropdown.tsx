@@ -14,7 +14,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { User, Settings, LogOut, CreditCard, Wifi, WifiOff, ShieldCheck } from 'lucide-react';
+import { User, Settings, LogOut, CreditCard, Wifi, WifiOff, ShieldCheck, Crown, Edit3, Bell, HelpCircle, ChevronDown } from 'lucide-react';
 
 interface User {
   id: string;
@@ -102,6 +102,20 @@ export default function ProfileDropdown() {
     router.push('/settings');
   };
 
+  const handleEditProfile = () => {
+    router.push('/profile');
+  };
+
+  const handleNotifications = () => {
+    // TODO: Implement notifications page
+    console.log('Navigate to notifications');
+  };
+
+  const handleHelp = () => {
+    // TODO: Implement help/support page
+    console.log('Navigate to help');
+  };
+
   if (!user) return null;
 
   const fullName = user.user_metadata?.full_name || 'User';
@@ -111,18 +125,30 @@ export default function ProfileDropdown() {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger className="flex items-center space-x-2 rounded-full p-1 hover:bg-accent transition-colors relative">
-        <Avatar className="h-8 w-8">
-          <AvatarImage src={avatarUrl} alt={fullName} />
-          <AvatarFallback className="text-xs font-medium">
-            {initials}
-          </AvatarFallback>
-        </Avatar>
-        {isAdmin && (
-          <Badge variant="secondary" className="absolute -top-1 -right-1 h-4 px-1 text-[10px] leading-4">
-            Admin
-          </Badge>
-        )}
+      <DropdownMenuTrigger className="flex items-center space-x-3 rounded-lg px-3 py-2 hover:bg-accent/50 transition-all duration-200 border border-border/50 hover:border-accent/50 focus:ring-2 focus:ring-accent/20 focus:outline-none group">
+        <div className="relative">
+          <Avatar className="h-8 w-8 ring-2 ring-accent/20 group-hover:ring-accent/40 transition-all duration-200">
+            <AvatarImage src={avatarUrl} alt={fullName} />
+            <AvatarFallback className="text-xs font-medium bg-gradient-to-br from-accent to-primary text-white">
+              {initials}
+            </AvatarFallback>
+          </Avatar>
+          {isAdmin && (
+            <Badge variant="secondary" className="absolute -top-1 -right-1 h-4 px-1 text-[10px] leading-4 bg-gradient-to-r from-yellow-400 to-orange-500 text-white border-0">
+              <Crown className="h-2 w-2 mr-0.5" />
+              Admin
+            </Badge>
+          )}
+        </div>
+        <div className="flex flex-col items-start">
+          <span className="text-sm font-medium text-foreground group-hover:text-accent transition-colors">
+            {fullName}
+          </span>
+          <span className="text-xs text-muted-foreground group-hover:text-accent/70 transition-colors">
+            {isOnline ? 'Online' : 'Offline'}
+          </span>
+        </div>
+        <ChevronDown className="h-4 w-4 text-muted-foreground group-hover:text-accent transition-colors" />
       </DropdownMenuTrigger>
       
       <DropdownMenuContent align="end" className="w-64">
