@@ -27,6 +27,8 @@ Zignal is a comprehensive crypto trading platform built with [Next.js 15.5.2](ht
 - 📸 **File Upload**: Dual-path photo upload system (Supabase Storage + Base64 fallback)
 - 🔄 **Real-time Updates**: Live avatar and profile updates across the application
 - 🔐 **OAuth Optimization**: Streamlined Google OAuth implementation with proper redirect handling
+- 🛡️ **Enhanced Validation**: Robust file upload validation with HEIC/HEIF support and security improvements
+- 🎯 **Better UX**: Improved error messages and user feedback for authentication and file operations
 
 ### ZIG TRADES Workflow
 - 🎯 **Trading Signals**: Multiple signal offers (ZIGNALS OFFER 1, 2, 3) with different profit rates and durations

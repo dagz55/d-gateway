@@ -5,6 +5,31 @@ All notable changes to the Zignal Trading Platform will be documented in this fi
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.4.3] - 2025-01-15
+
+### UI/UX Improvements and Validation Enhancements
+
+#### **🎨 UI/UX Fixes**
+- **HTML Entity Cleanup**: Fixed HTML entities (`&quot;`) in PrivacyModal and TermsModal components, replaced with proper double-quote characters
+- **Better Error Messages**: Improved ChangePhotoForm validation with separate user authentication and file selection error messages
+- **Enhanced Button States**: Fixed Upload button disabled state to properly check for both user authentication and file selection
+
+#### **🛡️ File Upload Security & Validation**
+- **HEIC/HEIF Support**: Added support for HEIC and HEIF image formats in file upload validation
+- **Single Source of Truth**: Created centralized file extension management in validation.ts to prevent duplication
+- **MIME Type Security**: Fixed MIME type validation to prevent spoofed files from bypassing security checks
+- **Improved Accept Attribute**: Fixed file input accept attribute to properly handle multiple file types without duplicates
+
+#### **🔧 Component Reliability**
+- **Mount State Management**: Fixed isMountedRef initialization in DepositComponent to accurately reflect component mount state
+- **Memory Leak Prevention**: Added proper mount guards to prevent state updates after component unmount
+- **Error Recovery**: Enhanced error handling in file upload operations with better user feedback
+
+#### **📝 Code Quality**
+- **TypeScript Improvements**: Enhanced type safety across file upload and validation components
+- **Linting Compliance**: All modified files pass linting checks without errors
+- **Performance Optimization**: Improved memory management and reduced potential memory leaks
+
 ## [2.4.2] - 2025-01-15
 
 ### Bug Fixes and Performance Improvements
