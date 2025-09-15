@@ -10,6 +10,7 @@ import { useRef, useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import { createClient } from '@/lib/supabase/client';
 import { uploadAvatar, uploadAvatarBase64, removeAvatar } from '@/lib/actions';
+import { validateImageFile, ACCEPT_FILE_TYPES } from '@/lib/validation';
 
 interface User {
   id: string;
@@ -27,6 +28,17 @@ export default function ChangePhotoForm() {
   const [currentAvatarUrl, setCurrentAvatarUrl] = useState<string | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const objectUrlRef = useRef<string | null>(null);
+
+  // Cleanup object URL on component unmount
+  useEffect(() => {
+    return () => {
+      if (objectUrlRef.current) {
+        URL.revokeObjectURL(objectUrlRef.current);
+        objectUrlRef.current = null;
+      }
+    };
+  }, []);
 
   useEffect(() => {
     const supabase = createClient();
@@ -59,27 +71,33 @@ export default function ChangePhotoForm() {
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      // Validate file type to supported formats
-      const allowedTypes = new Set([
-        'image/jpeg',
-        'image/jpg',
-        'image/png',
-        'image/gif',
-        'image/webp',
-      ]);
-      if (!allowedTypes.has(file.type)) {
-        toast.error('Unsupported image type. Please use JPG, PNG, GIF, or WEBP.');
+      // Validate file using shared validation
+      const validation = validateImageFile(file);
+      if (!validation.isValid) {
+        toast.error(validation.error!);
+        // Reset the file input so user can select the same file again
+        if (fileInputRef.current) {
+          fileInputRef.current.value = '';
+        }
+        // Revoke existing object URL to prevent memory leak
+        if (previewUrl) {
+          URL.revokeObjectURL(previewUrl);
+        }
+        // Clear selected file and preview state to avoid stale UI
+        setSelectedFile(null);
+        setPreviewUrl(null);
         return;
       }
 
-      // Validate file size (5MB max)
-      if (file.size > 5 * 1024 * 1024) {
-        toast.error('File size must be less than 5MB');
-        return;
+      // Revoke previous object URL if it exists
+      if (objectUrlRef.current) {
+        URL.revokeObjectURL(objectUrlRef.current);
+        objectUrlRef.current = null;
       }
-
+      
       // Create preview URL
       const url = URL.createObjectURL(file);
+      objectUrlRef.current = url;
       setPreviewUrl(url);
       setSelectedFile(file);
     }
@@ -121,7 +139,13 @@ export default function ChangePhotoForm() {
       if (result.success) {
         setCurrentAvatarUrl(result.avatarUrl!);
         toast.success('Profile photo updated successfully!');
+        
+        // Clear preview first, then revoke object URL
         setPreviewUrl(null);
+        if (objectUrlRef.current) {
+          URL.revokeObjectURL(objectUrlRef.current);
+          objectUrlRef.current = null;
+        }
         setSelectedFile(null);
         if (fileInputRef.current) {
           fileInputRef.current.value = '';
@@ -147,7 +171,13 @@ export default function ChangePhotoForm() {
       if (result.success) {
         setCurrentAvatarUrl(null);
         toast.success('Profile photo removed successfully!');
+        
+        // Clear preview first, then revoke object URL
         setPreviewUrl(null);
+        if (objectUrlRef.current) {
+          URL.revokeObjectURL(objectUrlRef.current);
+          objectUrlRef.current = null;
+        }
         setSelectedFile(null);
         if (fileInputRef.current) {
           fileInputRef.current.value = '';
@@ -184,7 +214,7 @@ export default function ChangePhotoForm() {
             <Input
               id="photo"
               type="file"
-              accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
+              accept={ACCEPT_FILE_TYPES}
               onChange={handleFileChange}
               ref={fileInputRef}
               disabled={isSubmitting}
