@@ -4,8 +4,8 @@ const nextConfig: NextConfig = {
   // Fix lockfile warning by setting the correct root
   outputFileTracingRoot: process.cwd(),
   
-  // Allow cross-origin requests from localhost during development
-  allowedDevOrigins: ['localhost'],
+  // Allow cross-origin requests from localhost and network IP during development
+  allowedDevOrigins: ['localhost', '192.168.1.160'],
   
   // Configure font optimization and Server Actions
   experimental: {
