@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getCurrentUser } from '@/lib/workos';
-import { createClient } from '@/lib/supabase/serverClient';
+import { getCurrentUser } from '@/lib/auth-middleware';
+import { createClient } from '@/lib/supabase/client';
 import { validateImageFile } from '@/lib/validation';
-import { logSecurityEvent } from '@/lib/security-events';
+import { logSecurityEvent } from '@/lib/security-logger';
 
 // Configure route to handle larger files
 export const runtime = 'nodejs';

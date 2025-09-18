@@ -95,7 +95,7 @@ export async function POST(request: NextRequest) {
         }
       );
 
-      result.method = 'rule-based';
+      (result as any).method = 'rule-based';
     }
 
     return NextResponse.json({
