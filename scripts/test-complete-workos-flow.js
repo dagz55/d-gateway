@@ -41,10 +41,11 @@ async function testCompleteWorkOSFlow() {
     console.log('\n2️⃣ Simulating WorkOS user authentication...');
     const crypto = require('crypto');
     
-    // Simulate a WorkOS user
+    // Simulate a WorkOS user with unique identifiers
+    const timestamp = Date.now();
     const workosUser = {
-      id: 'workos-user-' + Date.now(),
-      email: 'test@zignals.org',
+      id: 'workos-user-' + timestamp,
+      email: `test-${timestamp}@zignals.org`,
       firstName: 'Test',
       lastName: 'User',
       profilePictureUrl: 'https://example.com/avatar.jpg'
@@ -71,37 +72,81 @@ async function testCompleteWorkOSFlow() {
     }
     console.log('✅ Auth user created:', authUser.user.id);
 
-    // Step 2b: Create user profile (simulating what the callback does)
-    console.log('   📝 Creating user profile...');
-    const profileData = {
-      user_id: authUser.user.id,
-      email: workosUser.email,
-      username: workosUser.email.split('@')[0],
-      full_name: `${workosUser.firstName} ${workosUser.lastName}`,
-      avatar_url: workosUser.profilePictureUrl,
-      package: 'PREMIUM',
-      trader_level: 'BEGINNER',
-      status: 'ONLINE',
-      is_verified: true
-    };
-
-    const { data: insertedProfile, error: profileError } = await supabase
+    // Step 2b: Check if user profile was automatically created (trigger) or create it manually
+    console.log('   📝 Checking/creating user profile...');
+    
+    // First, check if profile was auto-created by trigger
+    let { data: existingProfile, error: fetchError } = await supabase
       .from('user_profiles')
-      .insert(profileData)
-      .select()
+      .select('*')
+      .eq('user_id', authUser.user.id)
       .single();
 
-    if (profileError) {
-      console.error('❌ Profile creation error:', profileError);
+    if (fetchError && fetchError.code !== 'PGRST116') {
+      console.error('❌ Profile fetch error:', fetchError);
       return;
     }
-    console.log('✅ User profile created:', insertedProfile.id);
+
+    let userProfile;
+    if (existingProfile) {
+      console.log('✅ User profile auto-created by trigger:', existingProfile.id);
+      
+      // Update the profile with test data
+      const { data: updatedProfile, error: updateError } = await supabase
+        .from('user_profiles')
+        .update({
+          username: `test-user-${timestamp}`,
+          full_name: `${workosUser.firstName} ${workosUser.lastName}`,
+          avatar_url: workosUser.profilePictureUrl,
+          package: 'PREMIUM',
+          trader_level: 'BEGINNER',
+          status: 'ONLINE',
+          is_verified: true
+        })
+        .eq('user_id', authUser.user.id)
+        .select()
+        .single();
+
+      if (updateError) {
+        console.error('❌ Profile update error:', updateError);
+        return;
+      }
+      userProfile = updatedProfile;
+      console.log('✅ User profile updated with test data');
+    } else {
+      // Create profile manually if trigger didn't work
+      const profileData = {
+        user_id: authUser.user.id,
+        email: workosUser.email,
+        username: `test-user-${timestamp}`,
+        full_name: `${workosUser.firstName} ${workosUser.lastName}`,
+        avatar_url: workosUser.profilePictureUrl,
+        package: 'PREMIUM',
+        trader_level: 'BEGINNER',
+        status: 'ONLINE',
+        is_verified: true
+      };
+
+      const { data: insertedProfile, error: profileError } = await supabase
+        .from('user_profiles')
+        .insert(profileData)
+        .select()
+        .single();
+
+      if (profileError) {
+        console.error('❌ Profile creation error:', profileError);
+        return;
+      }
+      userProfile = insertedProfile;
+      console.log('✅ User profile created manually:', insertedProfile.id);
+    }
 
     // Test 3: Test admin user creation
     console.log('\n3️⃣ Testing admin user creation...');
+    const adminTimestamp = Date.now() + 1; // Ensure different timestamp
     const adminWorkosUser = {
-      id: 'workos-admin-' + Date.now(),
-      email: 'admin@zignals.org',
+      id: 'workos-admin-' + adminTimestamp,
+      email: `admin-${adminTimestamp}@zignals.org`,
       firstName: 'Zignals',
       lastName: 'Administrator',
       profilePictureUrl: null
@@ -126,29 +171,64 @@ async function testCompleteWorkOSFlow() {
     } else {
       console.log('✅ Admin auth user created:', adminAuthUser.user.id);
 
-      // Create admin profile
-      const adminProfileData = {
-        user_id: adminAuthUser.user.id,
-        email: adminWorkosUser.email,
-        username: adminWorkosUser.email.split('@')[0],
-        full_name: `${adminWorkosUser.firstName} ${adminWorkosUser.lastName}`,
-        avatar_url: adminWorkosUser.profilePictureUrl,
-        package: 'VIP',
-        trader_level: 'ADVANCED',
-        status: 'ONLINE',
-        is_verified: true
-      };
-
-      const { data: insertedAdminProfile, error: adminProfileError } = await supabase
+      // Check if admin profile was auto-created by trigger
+      let { data: existingAdminProfile, error: adminFetchError } = await supabase
         .from('user_profiles')
-        .insert(adminProfileData)
-        .select()
+        .select('*')
+        .eq('user_id', adminAuthUser.user.id)
         .single();
 
-      if (adminProfileError) {
-        console.error('❌ Admin profile creation error:', adminProfileError);
+      if (adminFetchError && adminFetchError.code !== 'PGRST116') {
+        console.error('❌ Admin profile fetch error:', adminFetchError);
+      } else if (existingAdminProfile) {
+        console.log('✅ Admin profile auto-created by trigger:', existingAdminProfile.id);
+        
+        // Update the profile with test data
+        const { data: updatedAdminProfile, error: adminUpdateError } = await supabase
+          .from('user_profiles')
+          .update({
+            username: `admin-${adminTimestamp}`,
+            full_name: `${adminWorkosUser.firstName} ${adminWorkosUser.lastName}`,
+            avatar_url: adminWorkosUser.profilePictureUrl,
+            package: 'VIP',
+            trader_level: 'ADVANCED',
+            status: 'ONLINE',
+            is_verified: true
+          })
+          .eq('user_id', adminAuthUser.user.id)
+          .select()
+          .single();
+
+        if (adminUpdateError) {
+          console.error('❌ Admin profile update error:', adminUpdateError);
+        } else {
+          console.log('✅ Admin profile updated with test data');
+        }
       } else {
-        console.log('✅ Admin profile created:', insertedAdminProfile.id);
+        // Create admin profile manually if trigger didn't work
+        const adminProfileData = {
+          user_id: adminAuthUser.user.id,
+          email: adminWorkosUser.email,
+          username: `admin-${adminTimestamp}`,
+          full_name: `${adminWorkosUser.firstName} ${adminWorkosUser.lastName}`,
+          avatar_url: adminWorkosUser.profilePictureUrl,
+          package: 'VIP',
+          trader_level: 'ADVANCED',
+          status: 'ONLINE',
+          is_verified: true
+        };
+
+        const { data: insertedAdminProfile, error: adminProfileError } = await supabase
+          .from('user_profiles')
+          .insert(adminProfileData)
+          .select()
+          .single();
+
+        if (adminProfileError) {
+          console.error('❌ Admin profile creation error:', adminProfileError);
+        } else {
+          console.log('✅ Admin profile created manually:', insertedAdminProfile.id);
+        }
       }
     }
 

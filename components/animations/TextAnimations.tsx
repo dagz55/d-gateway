@@ -1,6 +1,6 @@
 "use client"
 
-import { ReactNode, useEffect, useState, forwardRef } from 'react'
+import { ReactNode, useEffect, useState, forwardRef, ElementType } from 'react'
 import { useIntersectionObserver, useTypewriter, useStaggeredAnimation, useReducedMotion } from '@/hooks/useAnimation'
 
 interface BaseAnimationProps {
@@ -8,7 +8,7 @@ interface BaseAnimationProps {
   className?: string
   delay?: number
   duration?: number
-  as?: keyof JSX.IntrinsicElements
+  as?: ElementType
 }
 
 // Fade in with stagger effect

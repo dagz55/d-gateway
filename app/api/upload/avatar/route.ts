@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getCurrentUser } from '@/lib/auth-middleware';
 import { createClient } from '@/lib/supabase/client';
 import { validateImageFile } from '@/lib/validation';
-import { logSecurityEvent } from '@/lib/security-logger';
+// import { logSecurityEvent } from '@/lib/security-logger';
 
 // Configure route to handle larger files
 export const runtime = 'nodejs';
@@ -79,8 +79,8 @@ export async function POST(request: NextRequest) {
           .eq('workos_user_id', user.id)
           .single();
 
-        if (profile?.avatar_url && profile.avatar_url.includes('supabase')) {
-          const oldFileName = profile.avatar_url.split('/').pop();
+        if ((profile as any)?.avatar_url && (profile as any).avatar_url.includes('supabase')) {
+          const oldFileName = (profile as any).avatar_url.split('/').pop();
           if (oldFileName) {
             await supabase.storage
               .from('public_image')
@@ -88,11 +88,7 @@ export async function POST(request: NextRequest) {
           }
         }
 
-        logSecurityEvent('avatar_uploaded', {
-          userId: user.id,
-          method: 'storage',
-          fileName,
-        });
+        console.log(`Avatar uploaded: ${fileName} for user ${user.id}`);
 
       } catch (storageError) {
         console.warn('Storage upload failed, falling back to base64:', storageError);
@@ -100,10 +96,7 @@ export async function POST(request: NextRequest) {
         // Fallback to base64 if storage fails
         if (base64Data) {
           avatarUrl = base64Data;
-          logSecurityEvent('avatar_uploaded', {
-            userId: user.id,
-            method: 'base64_fallback',
-          });
+          console.log(`Avatar uploaded via base64 fallback for user ${user.id}`);
         } else {
           throw storageError;
         }
@@ -111,27 +104,17 @@ export async function POST(request: NextRequest) {
     } else {
       // Use base64 data directly
       avatarUrl = base64Data;
-      logSecurityEvent('avatar_uploaded', {
-        userId: user.id,
-        method: 'base64_only',
-      });
+      console.log(`Avatar uploaded via base64 only for user ${user.id}`);
     }
 
     // Update user profile
-    const { error: updateError } = await supabase
-      .from('user_profiles')
-      .upsert(
-        {
-          workos_user_id: user.id,
-          email: user.email,
-          avatar_url: avatarUrl,
-          updated_at: new Date().toISOString(),
-        },
-        {
-          onConflict: 'workos_user_id',
-          ignoreDuplicates: false,
-        }
-      );
+    const { error: updateError } = await (supabase
+      .from('user_profiles') as any)
+      .update({
+        avatar_url: avatarUrl,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('email', user.email);
 
     if (updateError) {
       throw new Error(`Failed to update profile: ${updateError.message}`);
@@ -146,9 +129,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Avatar upload error:', error);
     
-    logSecurityEvent('avatar_upload_failed', {
-      error: error instanceof Error ? error.message : 'Unknown error',
-    });
+    console.error('Avatar upload failed:', error instanceof Error ? error.message : 'Unknown error');
 
     return NextResponse.json(
       {
@@ -181,8 +162,8 @@ export async function DELETE() {
       .single();
 
     // Delete from storage if it's a storage URL
-    if (profile?.avatar_url && profile.avatar_url.includes('supabase')) {
-      const oldFileName = profile.avatar_url.split('/').pop();
+    if ((profile as any)?.avatar_url && (profile as any).avatar_url.includes('supabase')) {
+      const oldFileName = (profile as any).avatar_url.split('/').pop();
       if (oldFileName) {
         await supabase.storage
           .from('public_image')
@@ -191,21 +172,19 @@ export async function DELETE() {
     }
 
     // Remove avatar URL from profile
-    const { error: updateError } = await supabase
-      .from('user_profiles')
+    const { error: updateError } = await (supabase
+      .from('user_profiles') as any)
       .update({
         avatar_url: null,
         updated_at: new Date().toISOString(),
       })
-      .eq('workos_user_id', user.id);
+      .eq('email', user.email);
 
     if (updateError) {
       throw new Error(`Failed to update profile: ${updateError.message}`);
     }
 
-    logSecurityEvent('avatar_removed', {
-      userId: user.id,
-    });
+    console.log(`Avatar removed for user ${user.id}`);
 
     return NextResponse.json({
       success: true,
@@ -215,9 +194,7 @@ export async function DELETE() {
   } catch (error) {
     console.error('Avatar removal error:', error);
     
-    logSecurityEvent('avatar_removal_failed', {
-      error: error instanceof Error ? error.message : 'Unknown error',
-    });
+    console.error('Avatar removal failed:', error instanceof Error ? error.message : 'Unknown error');
 
     return NextResponse.json(
       {

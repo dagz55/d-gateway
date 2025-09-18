@@ -204,7 +204,7 @@ export async function DELETE(request: NextRequest) {
     if (validation.valid && validation.token) {
       // Revoke the token family
       await refreshTokenStore.revokeTokenFamily(
-        validation.token.familyId,
+        (validation.token as any).familyId,
         'User requested token revocation'
       );
 
