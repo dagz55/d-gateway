@@ -105,15 +105,15 @@ export const AnimatedStatCard: React.FC<AnimatedStatCardProps> = ({
   const inView = useInView(ref, { once: true, margin: '-20px' });
 
   const trendColor = {
-    up: 'text-green-600 dark:text-green-400',
-    down: 'text-red-600 dark:text-red-400',
-    neutral: 'text-gray-600 dark:text-gray-400'
+    up: 'text-green-400',
+    down: 'text-red-400',
+    neutral: 'text-[#EAF2FF]/60'
   }[trend];
 
   const trendBg = {
-    up: 'bg-green-50 dark:bg-green-950/20',
-    down: 'bg-red-50 dark:bg-red-950/20',
-    neutral: 'bg-gray-50 dark:bg-gray-950/20'
+    up: 'bg-green-600/20',
+    down: 'bg-red-600/20',
+    neutral: 'bg-[#1E2A44]/20'
   }[trend];
 
   return (
@@ -258,7 +258,7 @@ export const AnimatedProgress: React.FC<AnimatedProgressProps> = ({
   return (
     <div ref={ref} className={cn('relative w-full', className)}>
       <div className={cn(
-        'w-full bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden',
+        'w-full bg-[#1E2A44]/40 rounded-full overflow-hidden',
         heightClasses
       )}>
         <motion.div

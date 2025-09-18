@@ -105,8 +105,12 @@ VALUES
 ON CONFLICT (url) DO NOTHING;
 
 -- =====================================================
--- SAMPLE TRADING SIGNALS (SYSTEM GENERATED)
+-- SAMPLE TRADING SIGNALS (SYSTEM GENERATED) - COMMENTED OUT FOR PRODUCTION
 -- =====================================================
+-- The following sample signals are commented out to avoid mock data in production
+-- Uncomment for development/testing purposes only
+
+/*
 INSERT INTO public.trading_signals (
     signal_provider_id,
     pair,
@@ -169,10 +173,15 @@ VALUES
         NOW() + INTERVAL '3 days'
     )
 ON CONFLICT DO NOTHING;
+*/
 
 -- =====================================================
--- SAMPLE SYSTEM NOTIFICATIONS
+-- SAMPLE SYSTEM NOTIFICATIONS - COMMENTED OUT FOR PRODUCTION
 -- =====================================================
+-- The following sample notifications are commented out to avoid mock data in production
+-- Uncomment for development/testing purposes only
+
+/*
 INSERT INTO public.notifications (
     user_id,
     title,
@@ -189,3 +198,4 @@ SELECT
 FROM public.user_profiles up
 WHERE up.created_at > NOW() - INTERVAL '1 hour'
 ON CONFLICT DO NOTHING;
+*/

@@ -1,8 +1,10 @@
 import type { NextConfig } from "next";
+import path from "path";
 
 const nextConfig: NextConfig = {
-  // Fix lockfile warning by setting the correct root
-  outputFileTracingRoot: process.cwd(),
+  // Fix lockfile warning by setting the correct project root
+  // This resolves conflicts when multiple lockfiles are detected
+  outputFileTracingRoot: path.resolve(__dirname),
   
   // Allow cross-origin requests from localhost and network IP during development
   allowedDevOrigins: ['localhost', '192.168.1.160'],

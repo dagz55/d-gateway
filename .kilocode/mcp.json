@@ -1,0 +1,44 @@
+{
+  "mcpServers": {
+    "filesystem": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-filesystem",
+        "/Users/robertsuarez/zignals/zignal-login"
+      ]
+    },
+    "git": {
+      "command": "uvx",
+      "args": [
+        "mcp-server-git",
+        "--repository",
+        "/Users/robertsuarez/zignals/zignal-login"
+      ]
+    },
+    "tavily": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "tavily-mcp@0.2.3"
+      ],
+      "env": {
+        "TAVILY_API_KEY": "/Users/robertsuarez/zignals/zignal-login"
+      }
+    },
+    "figma-dev-mode": {
+      "type": "sse",
+      "url": "http://127.0.0.1:3845/sse"
+    },
+    "playwright": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@playwright/mcp@latest",
+        "--browser=chromium",
+        "--headless=true",
+        "--viewport-size=1280x720"
+      ]
+    }
+  }
+}

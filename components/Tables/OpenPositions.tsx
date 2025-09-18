@@ -20,41 +20,11 @@ interface OpenPositionsProps {
   className?: string;
 }
 
-const mockPositions: Position[] = [
-  {
-    id: '1',
-    symbol: 'BTC/USDT',
-    side: 'long',
-    quantity: 0.5,
-    entryPrice: 45000,
-    markPrice: 46500,
-    pnl: 750,
-    status: 'open'
-  },
-  {
-    id: '2',
-    symbol: 'ETH/USDT',
-    side: 'short',
-    quantity: 2.0,
-    entryPrice: 3200,
-    markPrice: 3150,
-    pnl: 100,
-    status: 'open'
-  },
-  {
-    id: '3',
-    symbol: 'SOL/USDT',
-    side: 'long',
-    quantity: 10,
-    entryPrice: 95,
-    markPrice: 98,
-    pnl: 30,
-    status: 'open'
-  }
-];
+// Default empty positions array
+const defaultPositions: Position[] = [];
 
 export default function OpenPositions({ 
-  positions = mockPositions, 
+  positions = defaultPositions, 
   className 
 }: OpenPositionsProps) {
   const getStatusColor = (status: Position['status']) => {
@@ -106,7 +76,7 @@ export default function OpenPositions({
               </tr>
             </thead>
             <tbody>
-              {positions.map((position) => (
+              {positions.length > 0 ? positions.map((position) => (
                 <tr 
                   key={position.id} 
                   className="border-b border-zinborder hover:bg-white/5 transition-colors"
@@ -133,7 +103,14 @@ export default function OpenPositions({
                     </div>
                   </td>
                 </tr>
-              ))}
+              )) : (
+                <tr>
+                  <td colSpan={7} className="py-8 text-center">
+                    <div className="text-white/70">No open positions</div>
+                    <div className="text-sm text-white/50 mt-2">Your open positions will appear here when you start trading.</div>
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>

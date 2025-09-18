@@ -18,94 +18,28 @@ interface TradingHistoryEntry {
   status: 'completed' | 'pending' | 'failed';
 }
 
-const mockHistoryData: TradingHistoryEntry[] = [
-  {
-    id: '1',
-    date: '2024-01-15',
-    time: '14:30:25',
-    amount: 1000,
-    profit: 32,
-    profitPercentage: 3.2,
-    pair: 'BTC/USDT',
-    action: 'BUY',
-    status: 'completed'
-  },
-  {
-    id: '2',
-    date: '2024-01-15',
-    time: '11:15:42',
-    amount: 500,
-    profit: 14,
-    profitPercentage: 2.8,
-    pair: 'ETH/USDT',
-    action: 'BUY',
-    status: 'completed'
-  },
-  {
-    id: '3',
-    date: '2024-01-14',
-    time: '16:45:18',
-    amount: 2000,
-    profit: 82,
-    profitPercentage: 4.1,
-    pair: 'SOL/USDT',
-    action: 'SELL',
-    status: 'completed'
-  },
-  {
-    id: '4',
-    date: '2024-01-14',
-    time: '09:22:35',
-    amount: 750,
-    profit: -15,
-    profitPercentage: -2.0,
-    pair: 'ADA/USDT',
-    action: 'BUY',
-    status: 'completed'
-  },
-  {
-    id: '5',
-    date: '2024-01-13',
-    time: '13:18:55',
-    amount: 1200,
-    profit: 36,
-    profitPercentage: 3.0,
-    pair: 'BTC/USDT',
-    action: 'BUY',
-    status: 'completed'
-  },
-  {
-    id: '6',
-    date: '2024-01-13',
-    time: '08:05:12',
-    amount: 800,
-    profit: 0,
-    profitPercentage: 0,
-    pair: 'ETH/USDT',
-    action: 'BUY',
-    status: 'pending'
-  }
-];
+// Trading history will be loaded from the database
+const historyData: TradingHistoryEntry[] = [];
 
 export default function ZigTradingHistory() {
   const [filterStatus, setFilterStatus] = useState<'all' | 'completed' | 'pending' | 'failed'>('all');
   const [filterAction, setFilterAction] = useState<'all' | 'BUY' | 'SELL'>('all');
 
-  const filteredData = mockHistoryData.filter(entry => {
+  const filteredData = historyData.filter(entry => {
     const statusMatch = filterStatus === 'all' || entry.status === filterStatus;
     const actionMatch = filterAction === 'all' || entry.action === filterAction;
     return statusMatch && actionMatch;
   });
 
-  const totalProfit = mockHistoryData
+  const totalProfit = historyData
     .filter(entry => entry.status === 'completed')
     .reduce((sum, entry) => sum + entry.profit, 0);
 
-  const totalAmount = mockHistoryData
+  const totalAmount = historyData
     .filter(entry => entry.status === 'completed')
     .reduce((sum, entry) => sum + entry.amount, 0);
 
-  const winRate = mockHistoryData.filter(entry => entry.profit > 0).length / mockHistoryData.length * 100;
+  const winRate = historyData.length > 0 ? (historyData.filter(entry => entry.profit > 0).length / historyData.length * 100) : 0;
 
   return (
     <Card className="glass glass-hover card-glow-hover border-border/50">
@@ -265,12 +199,18 @@ export default function ZigTradingHistory() {
           ))}
         </div>
 
-        {filteredData.length === 0 && (
+        {historyData.length === 0 ? (
+          <div className="text-center py-8">
+            <Calendar className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+            <p className="text-muted-foreground">No trading history available</p>
+            <p className="text-sm text-muted-foreground mt-2">Your trading history will appear here once you start trading.</p>
+          </div>
+        ) : filteredData.length === 0 ? (
           <div className="text-center py-8">
             <Filter className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
             <p className="text-muted-foreground">No trading history found with current filters</p>
           </div>
-        )}
+        ) : null}
       </CardContent>
     </Card>
   );

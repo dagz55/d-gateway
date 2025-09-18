@@ -2,8 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { createClient } from '@/lib/supabase/client';
-import { signOut } from '@/lib/actions';
+import { useWorkOSAuth } from '@/contexts/WorkOSAuthContext';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
@@ -21,98 +20,32 @@ import {
   UserCircle,
   Loader2,
   AlertCircle,
+  Wifi,
+  WifiOff,
 } from 'lucide-react';
-
-interface User {
-  id: string;
-  email?: string;
-  user_metadata?: {
-    full_name?: string;
-    avatar_url?: string;
-  };
-}
-
-interface Profile {
-  id: string;
-  username: string;
-  full_name: string;
-  avatar_url: string | null;
-  email: string;
-  is_admin: boolean;
-}
 
 interface ProfileSectionProps {
   className?: string;
-  onNavigate?: () => void; // Callback for mobile navigation close
+  onNavigate?: () => void;
 }
 
 export default function ProfileSection({ className, onNavigate }: ProfileSectionProps) {
-  const [user, setUser] = useState<User | null>(null);
-  const [profile, setProfile] = useState<Profile | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const {
+    user,
+    profile,
+    loading,
+    profileLoading,
+    error,
+    signOut,
+    isAuthenticated,
+    isAdmin,
+    refreshProfile
+  } = useWorkOSAuth();
+  
   const [isOnline, setIsOnline] = useState(true);
-  const [isSigningOut, setIsSigningOut] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
-    const supabase = createClient();
-    
-    // Get initial user and profile data
-    const getUserAndProfile = async () => {
-      try {
-        setIsLoading(true);
-        setError(null);
-
-        const { data: { user }, error: userError } = await supabase.auth.getUser();
-        
-        if (userError) throw userError;
-        
-        setUser(user);
-
-        if (user) {
-          // Fetch full profile data from profiles table
-          const { data: profileData, error: profileError } = await supabase
-            .from('profiles')
-            .select('*')
-            .eq('id', user.id)
-            .single();
-
-          if (profileError) {
-            console.warn('Profile not found, using auth data only:', profileError);
-            // Create a basic profile from auth data
-            setProfile({
-              id: user.id,
-              username: user.user_metadata?.full_name || 'User',
-              full_name: user.user_metadata?.full_name || 'User',
-              avatar_url: user.user_metadata?.avatar_url || null,
-              email: user.email || '',
-              is_admin: false,
-            });
-          } else {
-            setProfile(profileData);
-          }
-        }
-      } catch (err) {
-        console.error('Error fetching user data:', err);
-        setError('Failed to load profile data');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    
-    getUserAndProfile();
-
-    // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event: string, session: any) => {
-      if (event === 'SIGNED_OUT') {
-        setUser(null);
-        setProfile(null);
-      } else if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
-        await getUserAndProfile();
-      }
-    });
-
     // Listen for online/offline status
     const handleOnline = () => setIsOnline(true);
     const handleOffline = () => setIsOnline(false);
@@ -123,7 +56,6 @@ export default function ProfileSection({ className, onNavigate }: ProfileSection
     setIsOnline(navigator.onLine);
 
     return () => {
-      subscription.unsubscribe();
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
     };
@@ -131,14 +63,10 @@ export default function ProfileSection({ className, onNavigate }: ProfileSection
 
   const handleSignOut = async () => {
     try {
-      setIsSigningOut(true);
-      await signOut();
       onNavigate?.();
+      signOut();
     } catch (error) {
       console.error('Error signing out:', error);
-      setError('Failed to sign out');
-    } finally {
-      setIsSigningOut(false);
     }
   };
 
@@ -151,7 +79,7 @@ export default function ProfileSection({ className, onNavigate }: ProfileSection
     {
       label: 'Edit Profile',
       icon: Edit3,
-      onClick: () => handleNavigation('/settings'),
+      onClick: () => handleNavigation('/profile'),
       description: 'Update your personal information',
       color: 'blue',
     },
@@ -193,7 +121,7 @@ export default function ProfileSection({ className, onNavigate }: ProfileSection
   ];
 
   // Loading skeleton
-  if (isLoading) {
+  if (loading || profileLoading) {
     return (
       <div className={cn("border-t border-border p-4 animate-pulse", className)}>
         <div className="flex items-center space-x-3 mb-4">
@@ -213,7 +141,7 @@ export default function ProfileSection({ className, onNavigate }: ProfileSection
   }
 
   // Error state
-  if (error && !user) {
+  if (error && !isAuthenticated) {
     return (
       <div className={cn("border-t border-border p-4", className)}>
         <div className="flex items-center space-x-3 text-red-600">
@@ -228,7 +156,7 @@ export default function ProfileSection({ className, onNavigate }: ProfileSection
   }
 
   // No user state
-  if (!user) {
+  if (!isAuthenticated || !user) {
     return (
       <div className={cn("border-t border-border p-4", className)}>
         <div className="flex items-center space-x-3">
@@ -244,14 +172,26 @@ export default function ProfileSection({ className, onNavigate }: ProfileSection
     );
   }
 
-  const displayName = profile?.full_name || user.user_metadata?.full_name || 'User';
-  const displayEmail = profile?.email || user.email || '';
-  const avatarUrl = profile?.avatar_url || user.user_metadata?.avatar_url;
-  const isAdmin = profile?.is_admin || false;
-  const initials = displayName.split(' ').map(name => name[0]).join('').toUpperCase();
+  const displayName = profile?.full_name || `${user?.firstName || ''} ${user?.lastName || ''}`.trim() || 'User';
+  const displayEmail = profile?.email || user?.email || '';
+  const avatarUrl = profile?.avatar_url || profile?.profile_picture_url || user?.profilePictureUrl;
+  const userIsAdmin = profile?.is_admin || isAdmin || false;
+  
+  // Safe initials calculation
+  const initials = displayName
+    .trim()
+    .split(/\s+/)
+    .filter(segment => segment.length > 0)
+    .map(segment => segment[0])
+    .join('')
+    .toUpperCase() || 
+    (user?.firstName?.[0] || '') + (user?.lastName?.[0] || '') || 
+    'U';
+  const profileStatus = profile?.status || 'ONLINE';
+  const isUserOnline = isOnline && profileStatus === 'ONLINE';
 
   return (
-    <div 
+    <div
       className={cn("border-t border-border p-4", className)}
       role="region"
       aria-label="User profile section"
@@ -259,15 +199,23 @@ export default function ProfileSection({ className, onNavigate }: ProfileSection
       {/* User Info */}
       <div className="flex items-center space-x-3 mb-4">
         <div className="relative">
-          <Avatar 
+          <Avatar
             className="h-10 w-10 ring-2 ring-accent/20 transition-all duration-200"
             aria-label={`${displayName}'s profile picture`}
           >
-            <AvatarImage 
-              src={avatarUrl} 
+            <AvatarImage
+              src={avatarUrl}
               alt={displayName}
               onError={(e) => {
-                console.warn('Avatar image failed to load:', avatarUrl);
+                const target = e.target as HTMLImageElement;
+                const failedUrl = target.src;
+                
+                // Prevent infinite loop by checking if already using fallback
+                if (!failedUrl.includes('/default-avatar.svg')) {
+                  target.src = '/default-avatar.svg'; // Set to a default avatar URL
+                }
+                
+                console.warn('Avatar image failed to load:', failedUrl);
               }}
             />
             <AvatarFallback className="text-sm font-medium bg-gradient-to-br from-accent to-primary text-white">
@@ -275,9 +223,9 @@ export default function ProfileSection({ className, onNavigate }: ProfileSection
             </AvatarFallback>
           </Avatar>
           
-          {isAdmin && (
-            <Badge 
-              variant="secondary" 
+          {userIsAdmin && (
+            <Badge
+              variant="secondary"
               className="absolute -top-1 -right-1 h-4 px-1 text-[10px] leading-4 bg-gradient-to-r from-yellow-400 to-orange-500 text-white border-0"
               aria-label="Administrator user"
             >
@@ -288,25 +236,30 @@ export default function ProfileSection({ className, onNavigate }: ProfileSection
         </div>
         
         <div className="flex-1 min-w-0">
-          <p 
+          <p
             className="text-sm font-medium text-foreground truncate"
             title={displayName}
           >
             {displayName}
           </p>
-          <p 
-            className="text-xs text-muted-foreground truncate"
+          <p
+            className="text-xs text-muted-enhanced truncate"
             title={displayEmail}
           >
             {displayEmail}
           </p>
           <div className="flex items-center space-x-1 mt-1">
-            <div 
-              className={`w-2 h-2 rounded-full ${isOnline ? 'bg-green-400' : 'bg-gray-400'}`}
-              aria-label={isOnline ? 'Online' : 'Offline'}
+            {isUserOnline ? (
+              <Wifi className="w-2 h-2 text-green-400" />
+            ) : (
+              <WifiOff className="w-2 h-2 text-[#EAF2FF]/60" />
+            )}
+            <div
+              className={`w-2 h-2 rounded-full ${isUserOnline ? 'bg-green-400' : 'bg-[#EAF2FF]/60'}`}
+              aria-label={isUserOnline ? 'Online' : 'Offline'}
             />
-            <span className="text-xs text-muted-foreground">
-              {isOnline ? 'Online' : 'Offline'}
+            <span className="text-xs text-muted-enhanced">
+              {isUserOnline ? 'Online' : 'Offline'}
             </span>
           </div>
         </div>
@@ -322,7 +275,7 @@ export default function ProfileSection({ className, onNavigate }: ProfileSection
               variant="ghost"
               size="sm"
               onClick={action.onClick}
-              className="w-full justify-start text-sm text-foreground/70 hover:text-foreground hover:bg-muted transition-all duration-200"
+              className="w-full justify-start text-sm text-tertiary hover:text-primary hover:bg-muted transition-all duration-200"
               aria-label={action.description}
             >
               <Icon className="mr-2 h-4 w-4" />
@@ -332,7 +285,7 @@ export default function ProfileSection({ className, onNavigate }: ProfileSection
         })}
         
         {/* Admin Panel Button */}
-        {isAdmin && (
+        {userIsAdmin && (
           <Button
             variant="ghost"
             size="sm"
@@ -350,23 +303,23 @@ export default function ProfileSection({ className, onNavigate }: ProfileSection
           variant="ghost"
           size="sm"
           onClick={handleSignOut}
-          disabled={isSigningOut}
+          disabled={loading}
           className="w-full justify-start text-sm text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all duration-200 disabled:opacity-50"
           aria-label="Sign out of your account"
         >
-          {isSigningOut ? (
+          {loading ? (
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
           ) : (
             <LogOut className="mr-2 h-4 w-4" />
           )}
-          {isSigningOut ? 'Signing Out...' : 'Sign Out'}
+          {loading ? 'Signing Out...' : 'Sign Out'}
         </Button>
       </div>
 
       {/* Error Message */}
       {error && (
-        <div className="mt-2 p-2 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md">
-          <p className="text-xs text-red-600 dark:text-red-400">{error}</p>
+        <div className="mt-2 p-2 bg-red-600/20 border border-red-600/30 rounded-md">
+          <p className="text-xs text-red-400">{error}</p>
         </div>
       )}
     </div>

@@ -19,6 +19,7 @@ import {
   Menu,
   Search
 } from 'lucide-react';
+import ProfileDropdown from '@/components/layout/ProfileDropdown';
 
 // Mock data for the enhanced dashboard
 const mockStats = [
@@ -104,6 +105,7 @@ export default function EnhancedDashboardPage() {
               <Button variant="ghost" size="sm" className="glass-hover">
                 <Settings className="h-4 w-4" />
               </Button>
+              <ProfileDropdown />
             </div>
           </div>
         </div>

@@ -2,8 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { createClient } from '@/lib/supabase/client';
-import { signOut } from '@/lib/actions';
+import { useWorkOSAuth } from '@/contexts/WorkOSAuthContext';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,64 +15,21 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { User, Settings, LogOut, CreditCard, Wifi, WifiOff, ShieldCheck, Crown, Edit3, Bell, HelpCircle, ChevronDown } from 'lucide-react';
 
-interface User {
-  id: string;
-  email?: string;
-  user_metadata?: {
-    full_name?: string;
-    avatar_url?: string;
-  };
-}
-
 export default function ProfileDropdown() {
-  const [user, setUser] = useState<User | null>(null);
-  const [isAdmin, setIsAdmin] = useState(false);
+  const {
+    user,
+    profile,
+    loading,
+    signOut,
+    isAuthenticated,
+    isAdmin,
+    refreshProfile
+  } = useWorkOSAuth();
+  
   const [isOnline, setIsOnline] = useState(true);
   const router = useRouter();
 
   useEffect(() => {
-    const supabase = createClient();
-    
-    // Get initial user
-    const getUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      setUser(user);
-      if (user) {
-        // Fetch admin flag from profiles table
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('is_admin')
-          .eq('id', user.id)
-          .single();
-        setIsAdmin(!!(profile as any)?.is_admin);
-      } else {
-        setIsAdmin(false);
-      }
-    };
-    
-    getUser();
-
-    // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event: string, session: any) => {
-      if (event === 'SIGNED_OUT') {
-        setUser(null);
-      } else if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
-        // Use getUser() for secure user data instead of session.user
-        const { data: { user } } = await supabase.auth.getUser();
-        setUser(user);
-        if (user) {
-          const { data: profile } = await supabase
-            .from('profiles')
-            .select('is_admin')
-            .eq('id', user.id)
-            .single();
-          setIsAdmin(!!(profile as any)?.is_admin);
-        } else {
-          setIsAdmin(false);
-        }
-      }
-    });
-
     // Listen for online/offline status
     const handleOnline = () => setIsOnline(true);
     const handleOffline = () => setIsOnline(false);
@@ -84,7 +40,6 @@ export default function ProfileDropdown() {
     setIsOnline(navigator.onLine);
 
     return () => {
-      subscription.unsubscribe();
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
     };
@@ -92,7 +47,7 @@ export default function ProfileDropdown() {
 
   const handleSignOut = async () => {
     try {
-      await signOut();
+      signOut();
     } catch (error) {
       console.error('Error signing out:', error);
     }
@@ -116,42 +71,55 @@ export default function ProfileDropdown() {
     console.log('Navigate to help');
   };
 
-  if (!user) return null;
+  if (!isAuthenticated || !user) return null;
 
-  const fullName = user.user_metadata?.full_name || 'User';
-  const email = user.email || '';
-  const avatarUrl = user.user_metadata?.avatar_url;
+  const fullName = profile?.full_name || `${user?.firstName || ''} ${user?.lastName || ''}`.trim() || 'User';
+  const email = profile?.email || user?.email || '';
+  const avatarUrl = profile?.avatar_url || profile?.profile_picture_url || user?.profilePictureUrl;
   const initials = fullName.split(' ').map(name => name[0]).join('').toUpperCase();
+  const profileStatus = profile?.status || 'ONLINE';
+  const isUserOnline = isOnline && profileStatus === 'ONLINE';
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger className="flex items-center space-x-3 rounded-lg px-3 py-2 hover:bg-accent/50 transition-all duration-200 border border-border/50 hover:border-accent/50 focus:ring-2 focus:ring-accent/20 focus:outline-none group">
+      <DropdownMenuTrigger className="flex items-center space-x-2 sm:space-x-3 rounded-lg px-2 sm:px-3 py-2 hover:bg-accent/10 hover:shadow-lg hover:shadow-accent/10 transition-all duration-300 ease-in-out border border-border/30 hover:border-accent/30 focus:ring-2 focus:ring-accent/20 focus:outline-none group bg-gradient-to-r from-background to-card/50 backdrop-blur-sm">
         <div className="relative">
-          <Avatar className="h-8 w-8 ring-2 ring-accent/20 group-hover:ring-accent/40 transition-all duration-200">
+          <Avatar className="h-8 w-8 ring-2 ring-accent/20 group-hover:ring-accent/60 group-hover:scale-105 transition-all duration-300 shadow-sm">
             <AvatarImage src={avatarUrl} alt={fullName} />
-            <AvatarFallback className="text-xs font-medium bg-gradient-to-br from-accent to-primary text-white">
+            <AvatarFallback className="text-xs font-medium bg-gradient-to-br from-accent to-primary text-white shadow-inner">
               {initials}
             </AvatarFallback>
           </Avatar>
+          {/* Online/Offline Indicator */}
+          <div className={`absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-background transition-all duration-300 ${
+            isUserOnline ? 'bg-green-400 shadow-green-400/50' : 'bg-gray-400'
+          } ${isUserOnline ? 'shadow-md' : ''}`} />
           {isAdmin && (
-            <Badge variant="secondary" className="absolute -top-1 -right-1 h-4 px-1 text-[10px] leading-4 bg-gradient-to-r from-yellow-400 to-orange-500 text-white border-0">
+            <Badge variant="secondary" className="absolute -top-1.5 -right-1.5 h-4 px-1 text-[9px] leading-4 bg-gradient-to-r from-yellow-400 to-orange-500 text-white border-0 shadow-md animate-pulse">
               <Crown className="h-2 w-2 mr-0.5" />
               Admin
             </Badge>
           )}
         </div>
-        <div className="flex flex-col items-start">
-          <span className="text-sm font-medium text-foreground group-hover:text-accent transition-colors">
+        <div className="hidden sm:flex flex-col items-start min-w-0 flex-1">
+          <span className="text-sm font-medium text-foreground group-hover:text-accent transition-all duration-300 truncate max-w-[120px]">
             {fullName}
           </span>
-          <span className="text-xs text-muted-foreground group-hover:text-accent/70 transition-colors">
-            {isOnline ? 'Online' : 'Offline'}
-          </span>
+          <div className="flex items-center space-x-1">
+            {isUserOnline ? <Wifi className="h-2.5 w-2.5 text-green-400" /> : <WifiOff className="h-2.5 w-2.5 text-[#EAF2FF]/60" />}
+            <span className="text-xs text-muted-foreground group-hover:text-accent/70 transition-all duration-300">
+              {isUserOnline ? 'Online' : 'Offline'}
+            </span>
+          </div>
         </div>
-        <ChevronDown className="h-4 w-4 text-muted-foreground group-hover:text-accent transition-colors" />
+        <ChevronDown className="h-4 w-4 text-muted-foreground group-hover:text-accent group-hover:rotate-180 transition-all duration-300 transform" />
       </DropdownMenuTrigger>
       
-      <DropdownMenuContent align="end" className="w-72 p-2">
+      <DropdownMenuContent
+        align="end"
+        className="w-80 p-3 glass border border-border/50 shadow-2xl shadow-accent/5 animate-in slide-in-from-top-2 duration-300"
+        sideOffset={8}
+      >
         <DropdownMenuLabel className="font-normal p-3">
           <div className="flex flex-col space-y-2">
             <div className="flex items-center gap-3">
@@ -187,11 +155,11 @@ export default function ProfileDropdown() {
               </div>
               <div>
                 <p className="text-sm font-medium">Membership Status</p>
-                <p className="text-xs text-muted-foreground">Premium Plan Active</p>
+                <p className="text-xs text-muted-foreground">{profile?.package || 'Premium'} Plan Active</p>
               </div>
             </div>
             <Badge className="bg-gradient-to-r from-accent to-primary text-white border-0">
-              Pro
+              {profile?.package || 'Pro'}
             </Badge>
           </div>
         </div>
@@ -201,8 +169,8 @@ export default function ProfileDropdown() {
         {/* Profile Actions */}
         <div className="space-y-1">
           <DropdownMenuItem onClick={handleEditProfile} className="flex items-center space-x-3 p-3 rounded-lg hover:bg-accent/10 cursor-pointer">
-            <div className="p-2 rounded-full bg-blue-100 dark:bg-blue-900/30">
-              <Edit3 className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+            <div className="p-2 rounded-full bg-[#1A7FB3]/20">
+              <Edit3 className="h-4 w-4 text-[#1A7FB3]" />
             </div>
             <div className="flex-1">
               <p className="text-sm font-medium">Edit Profile</p>
@@ -211,8 +179,8 @@ export default function ProfileDropdown() {
           </DropdownMenuItem>
 
           <DropdownMenuItem onClick={handleProfileSettings} className="flex items-center space-x-3 p-3 rounded-lg hover:bg-accent/10 cursor-pointer">
-            <div className="p-2 rounded-full bg-gray-100 dark:bg-gray-800">
-              <Settings className="h-4 w-4 text-gray-600 dark:text-gray-400" />
+            <div className="p-2 rounded-full bg-[#1E2A44]/40">
+              <Settings className="h-4 w-4 text-[#EAF2FF]/70" />
             </div>
             <div className="flex-1">
               <p className="text-sm font-medium">Account Settings</p>
@@ -244,12 +212,12 @@ export default function ProfileDropdown() {
         {isAdmin && (
           <>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => router.push('/admin')} className="flex items-center space-x-3 p-3 rounded-lg hover:bg-yellow-50 dark:hover:bg-yellow-900/20 cursor-pointer">
-              <div className="p-2 rounded-full bg-yellow-100 dark:bg-yellow-900/30">
-                <ShieldCheck className="h-4 w-4 text-yellow-600 dark:text-yellow-400" />
+            <DropdownMenuItem onClick={() => router.push('/admin')} className="flex items-center space-x-3 p-3 rounded-xl hover:bg-yellow-50 dark:hover:bg-yellow-900/20 cursor-pointer group/admin transition-all duration-300 border border-transparent hover:border-yellow-300/50">
+              <div className="p-2.5 rounded-full bg-yellow-100 dark:bg-yellow-900/30 group-hover/admin:bg-yellow-200 dark:group-hover/admin:bg-yellow-900/50 transition-all duration-300 group-hover/admin:scale-105">
+                <ShieldCheck className="h-4 w-4 text-yellow-600 dark:text-yellow-400 group-hover/admin:animate-bounce transition-all duration-300" />
               </div>
               <div className="flex-1">
-                <p className="text-sm font-medium">Admin Panel</p>
+                <p className="text-sm font-medium group-hover/admin:text-yellow-600 transition-colors duration-300">Admin Panel</p>
                 <p className="text-xs text-muted-foreground">Access administrative functions</p>
               </div>
             </DropdownMenuItem>
@@ -258,12 +226,12 @@ export default function ProfileDropdown() {
         
         <DropdownMenuSeparator />
         
-        <DropdownMenuItem onClick={handleSignOut} className="flex items-center space-x-3 p-3 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 cursor-pointer text-red-600 dark:text-red-400">
-          <div className="p-2 rounded-full bg-red-100 dark:bg-red-900/30">
-            <LogOut className="h-4 w-4" />
+        <DropdownMenuItem onClick={handleSignOut} className="flex items-center space-x-3 p-3 rounded-xl hover:bg-red-50 dark:hover:bg-red-900/20 cursor-pointer text-red-600 dark:text-red-400 group/logout transition-all duration-300 border border-transparent hover:border-red-300/50">
+          <div className="p-2.5 rounded-full bg-red-100 dark:bg-red-900/30 group-hover/logout:bg-red-200 dark:group-hover/logout:bg-red-900/50 transition-all duration-300 group-hover/logout:scale-105">
+            <LogOut className="h-4 w-4 group-hover/logout:-rotate-12 transition-transform duration-300" />
           </div>
           <div className="flex-1">
-            <p className="text-sm font-medium">Sign Out</p>
+            <p className="text-sm font-medium group-hover/logout:text-red-700 transition-colors duration-300">Sign Out</p>
             <p className="text-xs text-muted-foreground">Sign out of your account</p>
           </div>
         </DropdownMenuItem>

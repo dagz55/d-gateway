@@ -6,17 +6,16 @@ import ChangeUsernameForm from '@/components/settings/ChangeUsernameForm';
 import ChangePasswordForm from '@/components/settings/ChangePasswordForm';
 import ProfileForm from '@/components/settings/ProfileForm';
 import ChangePhotoForm from '@/components/settings/ChangePhotoForm';
-import { createServerSupabaseClient } from '@/lib/supabase/serverClient';
+import { getCurrentUser } from '@/lib/auth-middleware';
 import { getUserProfile } from '@/lib/actions';
 import { redirect } from 'next/navigation';
 
 export const dynamic = 'force-dynamic';
 
 async function getUser() {
-  const supabase = await createServerSupabaseClient();
-  const { data: { user }, error } = await supabase.auth.getUser();
+  const user = await getCurrentUser();
   
-  if (error || !user) {
+  if (!user) {
     redirect('/');
   }
   
@@ -25,7 +24,7 @@ async function getUser() {
 
 export default async function ProfilePage() {
   const user = await getUser();
-  const fullName = user.user_metadata?.full_name || 'User';
+  const fullName = `${user.firstName} ${user.lastName}` || 'User';
   const email = user.email || '';
 
   // Get user profile from database

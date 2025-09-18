@@ -1,14 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { getCurrentUser } from '@/lib/auth-middleware'
 import { createServerSupabaseClient } from '@/lib/supabase/serverClient'
 import { createAdminClient } from '@/lib/supabase/adminClient'
 import { Database } from '@/lib/supabase/types'
 
 async function assertAdmin() {
-  const supabase = await createServerSupabaseClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const user = await getCurrentUser()
   if (!user) return { user: null, isAdmin: false }
-  const { data: profile } = await supabase.from('profiles').select('is_admin').eq('id', user.id).single()
-  return { user, isAdmin: !!profile?.is_admin }
+  
+  // For now, we'll check if the user's email contains 'admin' or is a specific admin email
+  const isAdminUser = user.email?.includes('admin') || user.email === 'admin@zignals.org'
+  return { user, isAdmin: isAdminUser }
 }
 
 export async function GET(request: NextRequest) {

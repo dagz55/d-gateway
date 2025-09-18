@@ -1,13 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { getCurrentUser } from '@/lib/auth-middleware'
 import { createServerSupabaseClient } from '@/lib/supabase/serverClient'
 
 export async function GET(request: NextRequest) {
   try {
-    const supabase = await createServerSupabaseClient()
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
-    if (authError || !user) {
+    const user = await getCurrentUser()
+    if (!user) {
       return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 })
     }
+
+    const supabase = await createServerSupabaseClient()
 
     const { searchParams } = new URL(request.url)
     const page = parseInt(searchParams.get('page') || '1')
@@ -47,11 +49,12 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const supabase = await createServerSupabaseClient()
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
-    if (authError || !user) {
+    const user = await getCurrentUser()
+    if (!user) {
       return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 })
     }
+
+    const supabase = await createServerSupabaseClient()
 
     const body = await request.json()
     const amount = Number(body?.amount)

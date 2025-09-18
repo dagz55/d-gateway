@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useRef } from "react"
+import { HeroSlideshow } from "./HeroSlideshow"
 
 export function HeroSection() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -92,43 +93,13 @@ export function HeroSection() {
       {/* Animated Background Canvas */}
       <canvas
         ref={canvasRef}
-        className="absolute inset-0 w-full h-full opacity-30"
+        className="absolute inset-0 w-full h-full opacity-20"
         style={{ width: "100%", height: "100%" }}
       />
 
-      {/* Content */}
-      <div className="relative z-10 flex flex-col justify-center items-start p-8 lg:p-16 h-full min-h-[50vh] lg:min-h-screen">
-        {/* Main Heading */}
-        <h1 className="text-4xl lg:text-6xl font-bold text-[#EAF2FF] mb-6 leading-tight text-balance">
-          Trade the future.{" "}
-          <span className="text-transparent bg-gradient-to-r from-[#1A7FB3] to-[#33E1DA] bg-clip-text">Zignal</span>{" "}
-          turns pro signals into clear actions.
-        </h1>
-
-        {/* Subtitle */}
-        <p className="text-xl lg:text-2xl text-[#EAF2FF]/80 mb-8 lg:mb-12 max-w-2xl leading-relaxed text-pretty">
-          Login to access member dashboards and admin tools.
-        </p>
-
-        {/* Signal Chart Visualization */}
-        <div className="flex items-center space-x-4 text-[#33E1DA]">
-          <div className="flex items-end space-x-1">
-            {[20, 35, 25, 45, 60, 40, 55].map((height, i) => (
-              <div
-                key={i}
-                className="w-2 bg-gradient-to-t from-[#1A7FB3] to-[#33E1DA] animate-pulse"
-                style={{
-                  height: `${height}px`,
-                  animationDelay: `${i * 0.2}s`,
-                }}
-              />
-            ))}
-          </div>
-          <div className="text-sm font-mono">
-            <div className="text-[#33E1DA]">+24.7%</div>
-            <div className="text-[#EAF2FF]/60">Live Signals</div>
-          </div>
-        </div>
+      {/* Content - Now using slideshow */}
+      <div className="relative z-10 h-full min-h-[50vh] lg:min-h-screen">
+        <HeroSlideshow />
       </div>
 
       {/* Gradient Overlay */}

@@ -2,8 +2,6 @@
 @import "tw-animate-css";
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
 
-@custom-variant dark (&:is(.dark *));
-
 :root {
   /* Zignal Brand Colors */
   --zignal-primary: #1a7fb3; /* teal-blue */
@@ -12,7 +10,7 @@
   --zignal-background: #0a0f1f; /* dark background */
   --zignal-text: #eaf2ff; /* light text */
 
-  /* Enhanced theme colors for Zignal dashboard */
+  /* Enhanced theme colors for Zignal dashboard - DARK THEME ONLY */
   --background: #0a0f1f;
   --foreground: #eaf2ff;
   --card: rgba(30, 42, 68, 0.4);
@@ -48,43 +46,8 @@
   --sidebar-ring: #33e1da;
 }
 
-.dark {
-  --background: #0a0f1f;
-  --foreground: #eaf2ff;
-  --card: rgba(30, 42, 68, 0.4);
-  --card-foreground: #eaf2ff;
-  --popover: rgba(30, 42, 68, 0.9);
-  --popover-foreground: #eaf2ff;
-  --primary: #1a7fb3;
-  --primary-foreground: #eaf2ff;
-  --secondary: rgba(30, 42, 68, 0.6);
-  --secondary-foreground: #eaf2ff;
-  --muted: rgba(234, 242, 255, 0.1);
-  --muted-foreground: rgba(234, 242, 255, 0.7);
-  --accent: #33e1da;
-  --accent-foreground: #0a0f1f;
-  --destructive: #ef4444;
-  --destructive-foreground: #eaf2ff;
-  --border: rgba(51, 225, 218, 0.2);
-  --input: rgba(30, 42, 68, 0.5);
-  --ring: #33e1da;
-  --chart-1: #33e1da;
-  --chart-2: #1a7fb3;
-  --chart-3: #10b981;
-  --chart-4: #f59e0b;
-  --chart-5: #ef4444;
-  --sidebar: rgba(21, 33, 54, 0.8);
-  --sidebar-foreground: #eaf2ff;
-  --sidebar-primary: #33e1da;
-  --sidebar-primary-foreground: #0a0f1f;
-  --sidebar-accent: rgba(51, 225, 218, 0.1);
-  --sidebar-accent-foreground: #eaf2ff;
-  --sidebar-border: rgba(51, 225, 218, 0.2);
-  --sidebar-ring: #33e1da;
-}
-
 @theme inline {
-  /* optional: --font-sans, --font-serif, --font-mono if they are applied in the layout.tsx */
+  /* Zignal theme colors */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -157,12 +120,83 @@
   }
 }
 
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+@keyframes spin-slow {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes reverse-spin {
+  from {
+    transform: rotate(360deg);
+  }
+  to {
+    transform: rotate(0deg);
+  }
+}
+
+@keyframes gradient-shift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes parallax-float {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  33% {
+    transform: translateY(-10px) rotate(2deg);
+  }
+  66% {
+    transform: translateY(10px) rotate(-2deg);
+  }
+}
+
 .animate-grid-pulse {
   animation: grid-pulse 3s ease-in-out infinite;
 }
 
 .animate-signal-line {
   animation: signal-line 2s ease-in-out infinite;
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+.animate-spin-slow {
+  animation: spin-slow 20s linear infinite;
+}
+
+.animate-reverse-spin {
+  animation: reverse-spin 20s linear infinite;
+}
+
+.animate-gradient-shift {
+  animation: gradient-shift 4s ease-in-out infinite;
+}
+
+.animate-parallax-float {
+  animation: parallax-float 8s ease-in-out infinite;
 }
 
 /* Enhanced glassmorphism and dashboard utilities */
@@ -213,4 +247,110 @@
   &:hover {
     box-shadow: 0 0 30px rgba(51, 225, 218, 0.2);
   }
+}
+
+/* Performance optimizations for 60fps animations */
+* {
+  /* Enable hardware acceleration for all elements with transforms */
+  -webkit-transform: translateZ(0);
+  -webkit-backface-visibility: hidden;
+  -webkit-perspective: 1000;
+}
+
+.animate-float,
+.animate-spin-slow,
+.animate-reverse-spin,
+.animate-parallax-float {
+  /* Force GPU acceleration for smooth animations */
+  transform: translate3d(0, 0, 0);
+  will-change: transform;
+  backface-visibility: hidden;
+}
+
+/* Optimize transitions for performance */
+.transition-all,
+.transition-transform,
+.transition-opacity {
+  /* Use hardware acceleration */
+  transform: translateZ(0);
+  will-change: transform, opacity;
+}
+
+/* Reduce motion on lower-end devices */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Performance optimizations for mobile devices */
+@media (max-width: 768px) {
+  .animate-float {
+    animation-duration: 8s; /* Slower on mobile */
+  }
+  
+  .animate-parallax-float {
+    animation-duration: 12s; /* Slower on mobile */
+  }
+  
+  /* Disable complex animations on very small screens */
+  @media (max-width: 480px) {
+    .animate-gradient-shift {
+      animation: none;
+      background-position: 0% 50%;
+    }
+  }
+}
+
+/* Container queries for responsive animations */
+@container (max-width: 600px) {
+  .crypto-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@container (max-width: 400px) {
+  .crypto-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Improve scroll performance */
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+/* Optimize for retina displays */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .crypto-icon {
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+  }
+}
+
+/* Focus states for accessibility */
+button:focus-visible,
+a:focus-visible {
+  outline: 2px solid #33E1DA;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Preload critical animations */
+.preload-animations {
+  content: '';
+  position: absolute;
+  left: -9999px;
+  animation: float 0s, spin-slow 0s, gradient-shift 0s;
 }

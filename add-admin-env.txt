@@ -1,0 +1,5 @@
+# Add this line to your .env.local file to enable admin email detection:
+
+ALLOWED_ADMIN_EMAILS=dagz55@gmail.com,admin@signals.org,admin@zignals.org
+
+# This will allow the profile API to automatically detect admin users

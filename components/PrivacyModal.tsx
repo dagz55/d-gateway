@@ -120,7 +120,7 @@ export function PrivacyModal({ children }: PrivacyModalProps) {
               <h3 className="text-[#33E1DA] font-semibold mb-2">10. Contact Us</h3>
               <p>
                 If you have any questions about this privacy policy or our privacy practices, please contact us at
-                privacy@zignal.com.
+                privacy@zignals.org.
               </p>
             </section>
 

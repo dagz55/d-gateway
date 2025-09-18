@@ -35,72 +35,21 @@ interface ActiveTrade {
   stopLoss?: number;
 }
 
-const mockActiveTrades: ActiveTrade[] = [
-  {
-    id: '1',
-    pair: 'BTC/USDT',
-    action: 'BUY',
-    amount: 1000,
-    entryPrice: 46500,
-    currentPrice: 47200,
-    profit: 15.05,
-    profitPercentage: 1.5,
-    duration: '2h 15m',
-    startTime: '2024-01-15 12:30:00',
-    endTime: '2024-01-15 18:30:00',
-    progress: 37.5,
-    status: 'active',
-    targetPrice: 48000,
-    stopLoss: 45000
-  },
-  {
-    id: '2',
-    pair: 'ETH/USDT',
-    action: 'BUY',
-    amount: 500,
-    entryPrice: 3150,
-    currentPrice: 3180,
-    profit: 4.76,
-    profitPercentage: 0.95,
-    duration: '45m',
-    startTime: '2024-01-15 14:15:00',
-    endTime: '2024-01-15 16:15:00',
-    progress: 75,
-    status: 'active',
-    targetPrice: 3250,
-    stopLoss: 3100
-  },
-  {
-    id: '3',
-    pair: 'SOL/USDT',
-    action: 'SELL',
-    amount: 2000,
-    entryPrice: 98.5,
-    currentPrice: 96.2,
-    profit: 46.7,
-    profitPercentage: 2.34,
-    duration: '1h 30m',
-    startTime: '2024-01-15 10:45:00',
-    endTime: '2024-01-15 14:45:00',
-    progress: 62.5,
-    status: 'active',
-    targetPrice: 95.0,
-    stopLoss: 100.0
-  }
-];
+// Active trades will be loaded from the database
+const activeTrades: ActiveTrade[] = [];
 
 export default function ActiveTrading() {
   const [selectedTrade, setSelectedTrade] = useState<string | null>(null);
 
-  const totalActiveAmount = mockActiveTrades
+  const totalActiveAmount = activeTrades
     .filter(trade => trade.status === 'active')
     .reduce((sum, trade) => sum + trade.amount, 0);
 
-  const totalProfit = mockActiveTrades
+  const totalProfit = activeTrades
     .filter(trade => trade.status === 'active')
     .reduce((sum, trade) => sum + trade.profit, 0);
 
-  const activeTradesCount = mockActiveTrades.filter(trade => trade.status === 'active').length;
+  const activeTradesCount = activeTrades.filter(trade => trade.status === 'active').length;
 
   return (
     <Card className="glass glass-hover card-glow-hover border-border/50">
@@ -145,7 +94,7 @@ export default function ActiveTrading() {
 
         {/* Active Trades List */}
         <div className="space-y-4">
-          {mockActiveTrades.filter(trade => trade.status === 'active').map((trade) => (
+          {activeTrades.length > 0 ? activeTrades.filter(trade => trade.status === 'active').map((trade) => (
             <div
               key={trade.id}
               className={`bg-card/30 rounded-lg p-4 border border-border/20 hover:border-border/40 transition-all duration-200 cursor-pointer ${
@@ -258,7 +207,15 @@ export default function ActiveTrading() {
                 )}
               </div>
             </div>
-          ))}
+          )) : (
+            <div className="text-center py-8">
+              <Activity className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+              <p className="text-muted-foreground">No active trades at the moment</p>
+              <p className="text-sm text-muted-foreground mt-1">
+                Start a new trade or copy from available signals
+              </p>
+            </div>
+          )}
         </div>
 
         {activeTradesCount === 0 && (

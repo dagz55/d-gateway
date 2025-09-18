@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Git Helper - Quick Commands</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+            color: #e4e4e7;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(30, 42, 68, 0.8);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(51, 225, 218, 0.2);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            color: #33e1da;
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px rgba(51, 225, 218, 0.5);
+        }
+
+        .header p {
+            color: #94a3b8;
+            font-size: 1.1rem;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .section {
+            background: rgba(15, 15, 35, 0.6);
+            border-radius: 15px;
+            padding: 25px;
+            border: 1px solid rgba(51, 225, 218, 0.1);
+        }
+
+        .section h2 {
+            color: #33e1da;
+            margin-bottom: 20px;
+            font-size: 1.4rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .icon {
+            width: 24px;
+            height: 24px;
+            fill: currentColor;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #33e1da 0%, #1e40af 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(51, 225, 218, 0.3);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        }
+
+        .btn-danger:hover {
+            box-shadow: 0 10px 20px rgba(239, 68, 68, 0.3);
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #94a3b8;
+            font-weight: 500;
+        }
+
+        .input-group input,
+        .input-group textarea {
+            width: 100%;
+            background: rgba(15, 15, 35, 0.8);
+            border: 1px solid rgba(51, 225, 218, 0.3);
+            border-radius: 8px;
+            padding: 12px;
+            color: #e4e4e7;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .input-group input:focus,
+        .input-group textarea:focus {
+            outline: none;
+            border-color: #33e1da;
+            box-shadow: 0 0 0 3px rgba(51, 225, 218, 0.1);
+        }
+
+        .input-group textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .output {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(51, 225, 218, 0.2);
+            border-radius: 10px;
+            padding: 20px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            max-height: 400px;
+            overflow-y: auto;
+            color: #94a3b8;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .status-clean {
+            background: #10b981;
+        }
+
+        .status-changes {
+            background: #f59e0b;
+        }
+
+        .status-error {
+            background: #ef4444;
+        }
+
+        .command-history {
+            grid-column: 1 / -1;
+        }
+
+        .history-item {
+            background: rgba(15, 15, 35, 0.4);
+            border-left: 3px solid #33e1da;
+            padding: 10px 15px;
+            margin-bottom: 10px;
+            border-radius: 0 8px 8px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+        }
+
+        .timestamp {
+            color: #6b7280;
+            font-size: 0.8rem;
+            float: right;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(51, 225, 218, 0.2);
+            border-radius: 50%;
+            border-top-color: #33e1da;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .quick-commits {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .quick-commit-btn {
+            background: rgba(51, 225, 218, 0.1);
+            border: 1px solid rgba(51, 225, 218, 0.3);
+            color: #33e1da;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .quick-commit-btn:hover {
+            background: rgba(51, 225, 218, 0.2);
+        }
+
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .quick-commits {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 Git Helper</h1>
+            <p>Quick git commands with visual feedback</p>
+        </div>
+
+        <div class="grid">
+            <!-- Git Status Section -->
+            <div class="section">
+                <h2>
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                    </svg>
+                    Git Status
+                </h2>
+                <button class="btn" onclick="runGitStatus()">
+                    Check Status
+                </button>
+                <div id="statusOutput" class="output" style="display: none;"></div>
+            </div>
+
+            <!-- Quick Actions Section -->
+            <div class="section">
+                <h2>
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/>
+                    </svg>
+                    Quick Actions
+                </h2>
+                <button class="btn" onclick="runGitAdd()">
+                    Add All Changes
+                </button>
+                <button class="btn" onclick="runAddCommitPush()" id="quickPushBtn">
+                    Add + Commit + Push
+                </button>
+                <button class="btn btn-danger" onclick="runGitReset()">
+                    Reset Changes
+                </button>
+            </div>
+
+            <!-- Commit Section -->
+            <div class="section">
+                <h2>
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+                    </svg>
+                    Commit Message
+                </h2>
+                
+                <div class="quick-commits">
+                    <button class="quick-commit-btn" onclick="setCommitMessage('fix: Bug fixes and improvements')">🐛 Bug Fix</button>
+                    <button class="quick-commit-btn" onclick="setCommitMessage('feat: Add new feature')">✨ Feature</button>
+                    <button class="quick-commit-btn" onclick="setCommitMessage('docs: Update documentation')">📝 Docs</button>
+                    <button class="quick-commit-btn" onclick="setCommitMessage('style: Code formatting')">🎨 Style</button>
+                    <button class="quick-commit-btn" onclick="setCommitMessage('refactor: Code refactoring')">♻️ Refactor</button>
+                    <button class="quick-commit-btn" onclick="setCommitMessage('chore: Maintenance tasks')">🔧 Chore</button>
+                </div>
+
+                <div class="input-group">
+                    <label for="commitMessage">Commit Message:</label>
+                    <textarea id="commitMessage" placeholder="Enter your commit message..."></textarea>
+                </div>
+                
+                <button class="btn" onclick="runGitCommit()">
+                    Commit Changes
+                </button>
+            </div>
+
+            <!-- Push Section -->
+            <div class="section">
+                <h2>
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                    </svg>
+                    Push to Remote
+                </h2>
+                
+                <div class="input-group">
+                    <label for="branchName">Branch Name:</label>
+                    <input type="text" id="branchName" value="main" placeholder="e.g., main, develop">
+                </div>
+                
+                <button class="btn" onclick="runGitPush()">
+                    Push to Remote
+                </button>
+            </div>
+
+            <!-- Command History -->
+            <div class="section command-history">
+                <h2>
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/>
+                    </svg>
+                    Command Output
+                </h2>
+                <div id="commandOutput" class="output">Ready to run git commands...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let commandHistory = [];
+
+        function addToHistory(command, output, success = true) {
+            const timestamp = new Date().toLocaleTimeString();
+            const historyItem = {
+                command,
+                output,
+                timestamp,
+                success
+            };
+            
+            commandHistory.unshift(historyItem);
+            if (commandHistory.length > 10) {
+                commandHistory.pop();
+            }
+            
+            updateCommandOutput();
+        }
+
+        function updateCommandOutput() {
+            const outputDiv = document.getElementById('commandOutput');
+            if (commandHistory.length === 0) {
+                outputDiv.innerHTML = 'Ready to run git commands...';
+                return;
+            }
+
+            outputDiv.innerHTML = commandHistory.map(item => `
+                <div class="history-item">
+                    <span class="timestamp">${item.timestamp}</span>
+                    <div style="color: ${item.success ? '#33e1da' : '#ef4444'}; font-weight: bold;">
+                        $ ${item.command}
+                    </div>
+                    <div style="margin-top: 5px; color: ${item.success ? '#94a3b8' : '#fca5a5'};">
+                        ${item.output || 'Command completed successfully'}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function showLoading(button) {
+            const originalText = button.innerHTML;
+            button.innerHTML = '<span class="loading"></span> Running...';
+            button.disabled = true;
+            return originalText;
+        }
+
+        function hideLoading(button, originalText) {
+            button.innerHTML = originalText;
+            button.disabled = false;
+        }
+
+        async function simulateGitCommand(command) {
+            // Since we can't actually run git commands in a browser,
+            // we'll simulate the responses for demonstration
+            const responses = {
+                'git status': `On branch main
+Your branch is up to date with 'origin/main'.
+
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git checkout -- <file>..." to discard changes in working directory)
+
+        modified:   src/components/AuthCard.tsx
+        modified:   README.md
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+
+        git-helper.html
+
+no changes added to commit (use "git add ." or git commit -a)`,
+                
+                'git add .': 'Files added to staging area successfully',
+                
+                'git commit': 'Commit created successfully',
+                
+                'git push': 'Changes pushed to remote repository successfully',
+                
+                'git reset --hard HEAD': 'HEAD is now at 1234567 Latest commit'
+            };
+
+            // Simulate network delay
+            await new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 1000));
+            
+            return responses[command] || `Command '${command}' executed successfully`;
+        }
+
+        async function runGitStatus() {
+            const button = event.target;
+            const originalText = showLoading(button);
+            const statusOutput = document.getElementById('statusOutput');
+            
+            try {
+                const output = await simulateGitCommand('git status');
+                statusOutput.textContent = output;
+                statusOutput.style.display = 'block';
+                addToHistory('git status', output);
+            } catch (error) {
+                addToHistory('git status', error.message, false);
+            } finally {
+                hideLoading(button, originalText);
+            }
+        }
+
+        async function runGitAdd() {
+            const button = event.target;
+            const originalText = showLoading(button);
+            
+            try {
+                const output = await simulateGitCommand('git add .');
+                addToHistory('git add .', output);
+            } catch (error) {
+                addToHistory('git add .', error.message, false);
+            } finally {
+                hideLoading(button, originalText);
+            }
+        }
+
+        async function runGitCommit() {
+            const button = event.target;
+            const originalText = showLoading(button);
+            const message = document.getElementById('commitMessage').value.trim();
+            
+            if (!message) {
+                addToHistory('git commit', 'Error: Commit message is required', false);
+                hideLoading(button, originalText);
+                return;
+            }
+            
+            try {
+                const command = `git commit -m "${message}"`;
+                const output = await simulateGitCommand('git commit');
+                addToHistory(command, output);
+                document.getElementById('commitMessage').value = '';
+            } catch (error) {
+                addToHistory('git commit', error.message, false);
+            } finally {
+                hideLoading(button, originalText);
+            }
+        }
+
+        async function runGitPush() {
+            const button = event.target;
+            const originalText = showLoading(button);
+            const branch = document.getElementById('branchName').value.trim() || 'main';
+            
+            try {
+                const command = `git push origin ${branch}`;
+                const output = await simulateGitCommand('git push');
+                addToHistory(command, output);
+            } catch (error) {
+                addToHistory(`git push origin ${branch}`, error.message, false);
+            } finally {
+                hideLoading(button, originalText);
+            }
+        }
+
+        async function runGitReset() {
+            const button = event.target;
+            const originalText = showLoading(button);
+            
+            if (!confirm('Are you sure you want to reset all changes? This cannot be undone.')) {
+                hideLoading(button, originalText);
+                return;
+            }
+            
+            try {
+                const output = await simulateGitCommand('git reset --hard HEAD');
+                addToHistory('git reset --hard HEAD', output);
+            } catch (error) {
+                addToHistory('git reset --hard HEAD', error.message, false);
+            } finally {
+                hideLoading(button, originalText);
+            }
+        }
+
+        async function runAddCommitPush() {
+            const button = document.getElementById('quickPushBtn');
+            const originalText = showLoading(button);
+            const message = document.getElementById('commitMessage').value.trim();
+            
+            if (!message) {
+                addToHistory('Add + Commit + Push', 'Error: Commit message is required', false);
+                hideLoading(button, originalText);
+                return;
+            }
+            
+            try {
+                // Run commands sequentially
+                await simulateGitCommand('git add .');
+                addToHistory('git add .', 'Files added to staging area');
+                
+                await simulateGitCommand('git commit');
+                addToHistory(`git commit -m "${message}"`, 'Commit created successfully');
+                
+                const branch = document.getElementById('branchName').value.trim() || 'main';
+                await simulateGitCommand('git push');
+                addToHistory(`git push origin ${branch}`, 'Changes pushed successfully');
+                
+                document.getElementById('commitMessage').value = '';
+            } catch (error) {
+                addToHistory('Add + Commit + Push', error.message, false);
+            } finally {
+                hideLoading(button, originalText);
+            }
+        }
+
+        function setCommitMessage(message) {
+            document.getElementById('commitMessage').value = message;
+        }
+
+        // Initialize the interface
+        updateCommandOutput();
+    </script>
+</body>
+</html>

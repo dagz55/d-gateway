@@ -1,5 +1,6 @@
 'use client';
 
+import Image from "next/image";
 import { useState } from 'react';
 import ProfileSection from '@/components/layout/ProfileSection';
 
@@ -68,9 +69,11 @@ function MockProfileSection({ className, onNavigate }: { className?: string; onN
       <div className="flex items-center space-x-3 mb-4">
         <div className="relative">
           <div className="h-10 w-10 rounded-full overflow-hidden ring-2 ring-accent/20">
-            <img 
-              src={mockProfile.avatar_url} 
-              alt={mockProfile.full_name}
+            <Image
+              src={mockProfile.avatar_url}
+              alt={mockProfile.full_name || "User avatar"}
+              width={40}
+              height={40}
               className="w-full h-full object-cover"
             />
           </div>
@@ -159,9 +162,11 @@ function AdminProfileSection({ className, onNavigate }: { className?: string; on
       <div className="flex items-center space-x-3 mb-4">
         <div className="relative">
           <div className="h-10 w-10 rounded-full overflow-hidden ring-2 ring-accent/20">
-            <img 
+            <Image
               src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face"
               alt="Admin User"
+              width={40}
+              height={40}
               className="w-full h-full object-cover"
             />
           </div>

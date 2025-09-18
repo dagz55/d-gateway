@@ -96,7 +96,7 @@ export function TermsModal({ children }: TermsModalProps) {
 
             <section>
               <h3 className="text-[#33E1DA] font-semibold mb-2">9. Contact Information</h3>
-              <p>If you have any questions about these Terms, please contact us at legal@zignal.com.</p>
+              <p>If you have any questions about these Terms, please contact us at legal@zignals.org.</p>
             </section>
 
             <div className="text-xs text-[#EAF2FF]/60 mt-8 pt-4 border-t border-[#33E1DA]/20">

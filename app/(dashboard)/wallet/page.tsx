@@ -1,7 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Wallet, ArrowUpRight, ArrowDownLeft, History } from 'lucide-react';
-import { createServerSupabaseClient } from '@/lib/supabase/serverClient';
+import { getCurrentUser } from '@/lib/auth-middleware';
 import { redirect } from 'next/navigation';
 import DepositComponent from '@/components/wallet/DepositComponent';
 import DepositHistory from '@/components/wallet/DepositHistory';
@@ -12,14 +12,13 @@ export const dynamic = 'force-dynamic';
 
 export default async function WalletPage() {
   try {
-    const supabase = await createServerSupabaseClient();
-    const { data: { user }, error } = await supabase.auth.getUser();
+    const user = await getCurrentUser();
     
-    if (error || !user) {
+    if (!user) {
       redirect('/');
     }
 
-    const firstName = user?.user_metadata?.full_name?.split(' ')[0] || 'Trader';
+    const firstName = user.firstName || 'Trader';
 
     return (
       <div className="space-y-8">
@@ -141,7 +140,7 @@ export default async function WalletPage() {
       </div>
     );
   } catch (error) {
-    console.warn('Supabase auth error in wallet page:', error);
+    console.warn('WorkOS auth error in wallet page:', error);
     redirect('/');
   }
 }

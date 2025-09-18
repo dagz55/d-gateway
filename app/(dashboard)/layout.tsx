@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation';
-import { createServerSupabaseClient } from '@/lib/supabase/serverClient';
+import { getCurrentUser } from '@/lib/auth-middleware';
 import AppLayout from '@/components/layout/AppLayout';
 
 export const dynamic = 'force-dynamic';
@@ -10,16 +10,15 @@ export default async function DashboardLayout({
   children: React.ReactNode;
 }) {
   try {
-    const supabase = await createServerSupabaseClient();
-    const { data: { user }, error } = await supabase.auth.getUser();
+    const user = await getCurrentUser();
     
-    if (error || !user) {
+    if (!user) {
       redirect('/');
     }
 
     return <AppLayout>{children}</AppLayout>;
   } catch (error) {
-    console.warn('Supabase auth error in dashboard layout:', error);
+    console.warn('WorkOS auth error in dashboard layout:', error);
     redirect('/');
   }
 }

@@ -2,33 +2,57 @@
 
 ## Project Overview
 
-Zignal is a modern crypto signals platform built with Next.js 14 that turns professional trading signals into clear actions. The application provides a sleek interface for accessing member dashboards and admin tools with real-time signal visualization.
+Zignal is a modern crypto signals platform built with Next.js 15 that turns professional trading signals into clear actions. The application provides a sleek interface with enterprise-grade authentication, real-time trading signals, and comprehensive admin tools.
 
 ### Project Structure
 
 ```
 zignal/
 ├── app/                    # Next.js app directory (App Router)
-│   ├── auth/              # Authentication pages and routes
-│   ├── dashboard/         # Member dashboard
-│   ├── admin/             # Admin panel
+│   ├── (dashboard)/       # Protected route group with AppLayout
+│   │   ├── dashboard/     # Main trading dashboard
+│   │   ├── profile/       # User profile management
+│   │   └── wallet/        # Wallet management
+│   ├── admin/             # Admin panel with security controls
+│   ├── auth/              # Authentication pages (WorkOS + Supabase)
+│   ├── api/               # API routes for data and auth
+│   │   ├── auth/workos/   # WorkOS authentication endpoints
+│   │   └── admin/         # Admin API endpoints
+│   ├── enterprise/        # Enterprise landing page
 │   ├── globals.css        # Global styles with Tailwind CSS
-│   ├── layout.tsx         # Root layout with metadata
+│   ├── layout.tsx         # Root layout with providers
 │   └── page.tsx           # Home/login page
 ├── components/            # Reusable React components
-│   ├── ui/               # shadcn/ui components
-│   ├── AuthCard.tsx      # Authentication card component
-│   └── HeroSection.tsx   # Hero section with animated background
-├── lib/                  # Utility functions and configurations
-│   ├── supabase/         # Supabase client configurations
+│   ├── ui/               # Complete shadcn/ui library (30+ components)
+│   ├── dashboard/        # Trading dashboard components
+│   ├── layout/           # AppLayout, Header, Sidebar, ProfileDropdown
+│   ├── admin/            # Admin-specific components
+│   ├── settings/         # Profile settings and configuration
+│   ├── wallet/           # Wallet and transaction components
+│   └── WorkOSAuthCard.tsx # WorkOS authentication UI
+├── contexts/              # React Context providers
+│   ├── WorkOSAuthContext.tsx # Main authentication context
+│   └── ThemeContext.tsx   # Theme management context
+├── lib/                  # Core utilities and integrations
+│   ├── supabase/         # Supabase database clients
+│   ├── workos.ts         # WorkOS configuration
+│   ├── security/         # Security implementations
+│   │   ├── csrf-protection.ts      # CSRF token management
+│   │   ├── rate-limiter.ts         # Rate limiting engine
+│   │   ├── session-security.ts     # Session management
+│   │   ├── token-manager.ts        # JWT token rotation
+│   │   ├── security-logger.ts      # Security event logging
+│   │   └── threat-detection.ts     # Threat analysis system
 │   └── utils.ts          # Utility functions
+├── middleware/           # Middleware components
+│   ├── csrf.ts           # CSRF middleware
+│   └── rate-limiting.ts  # Rate limiting middleware
+├── hooks/                # Custom React hooks
+│   ├── api/              # Data fetching hooks (TanStack Query)
+│   └── useSessionManager.ts # Session management hook
 ├── public/               # Static assets
-│   ├── zignal-logo.svg   # Main logo (SVG)
-│   ├── zignal-logo.png   # Logo (PNG)
-│   └── favicon.ico       # Browser favicon
-├── middleware.ts         # Next.js middleware for auth
-├── tailwind.config.ts    # Tailwind CSS configuration
-├── postcss.config.mjs    # PostCSS configuration
+├── middleware.ts         # Simplified Edge-compatible middleware
+├── next.config.mjs       # Next.js configuration (optimized)
 └── package.json          # Dependencies and scripts
 ```
 
@@ -36,8 +60,9 @@ zignal/
 
 ### Prerequisites
 - Node.js 18+ 
-- npm, yarn, pnpm, or bun
-- Supabase account (for authentication)
+- npm (recommended) or yarn/pnpm
+- Supabase account (for database)
+- WorkOS account (for enterprise authentication)
 
 ### Installation
 ```bash
@@ -69,12 +94,26 @@ npm run lint
 Create a `.env.local` file with the following variables:
 
 ```bash
-# Supabase Configuration
+# App Configuration
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+NODE_ENV=development
+
+# Supabase Configuration (Database)
 NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
 
-# Optional: Development redirect URL
-NEXT_PUBLIC_DEV_SUPABASE_REDIRECT_URL=http://localhost:3000/auth/callback
+# WorkOS Authentication (Primary Auth)
+WORKOS_API_KEY=your_workos_api_key
+WORKOS_CLIENT_ID=your_workos_client_id
+WORKOS_COOKIE_PASSWORD=32_character_random_string_here
+WORKOS_REDIRECT_URI=http://localhost:3000/api/auth/workos/callback
+
+# Security Configuration
+CSRF_SECRET_KEY=your_csrf_secret_key
+JWT_SECRET=your_jwt_secret_key
+JWT_REFRESH_SECRET=your_jwt_refresh_secret
+SESSION_SECRET=your_session_secret_key
 ```
 
 ## Code Style Guidelines
@@ -154,89 +193,191 @@ npm run type-check
 - **E2E Tests**: Test complete user flows
 - **Coverage**: Aim for >80% code coverage
 
-## Authentication Flow
+## Authentication Architecture
 
-### Supabase Integration
-- **Client**: `lib/supabase/browserClient.ts`
-- **Server**: `lib/supabase/serverClient.ts`
-- **Providers**: Google OAuth and email/password
-- **Middleware**: `middleware.ts` handles route protection
+### Hybrid Authentication System
+- **Primary Auth**: WorkOS (Enterprise SSO, OAuth, Magic Links)
+- **Database**: Supabase (User data, profiles, application data)
+- **Session Management**: JWT tokens with rotation and versioning
+- **Security**: CSRF protection, rate limiting, threat detection
+
+### WorkOS Integration
+- **Client Context**: `contexts/WorkOSAuthContext.tsx`
+- **API Routes**: `/api/auth/workos/*` endpoints
+- **Configuration**: `lib/workos.ts`
+- **Middleware**: Simplified Edge-compatible authentication checks
+
+### Supabase Database
+- **Browser Client**: `lib/supabase/browserClient.ts`
+- **Server Client**: `lib/supabase/serverClient.ts`
+- **Admin Client**: Server-side with service role key
+- **Data Storage**: User profiles, signals, transactions
 
 ### Protected Routes
-- `/dashboard` - Member dashboard (requires auth)
-- `/admin` - Admin panel (requires auth)
-- `/auth/callback` - OAuth callback handler
+- `/dashboard/*` - Trading dashboard (requires auth)
+- `/profile` - User profile management (requires auth)
+- `/wallet` - Wallet management (requires auth)
+- `/admin/*` - Admin panel (requires auth + admin role)
+- `/api/admin/*` - Admin API endpoints (requires admin)
 
-### Authentication States
-- **Unauthenticated**: Shows login page
-- **Authenticated**: Redirects to dashboard
-- **Error**: Shows error page with retry options
+### Authentication Flow
+1. User initiates login via WorkOS (OAuth/Magic Link)
+2. WorkOS validates and returns user data
+3. System creates/updates Supabase profile
+4. JWT tokens issued with refresh capability
+5. Session tracked with versioning for invalidation
+6. Middleware validates tokens on protected routes
 
-## Security Considerations
+## Security Implementation
 
-### Environment Variables
-- **Never commit**: `.env.local` files
-- **Public variables**: Must be prefixed with `NEXT_PUBLIC_`
-- **Server variables**: Keep server-side only
-- **Validation**: Check for required variables at startup
+### Enhanced Security Features
+1. **CSRF Protection** (`lib/csrf-protection.ts`)
+   - Double-submit cookie pattern
+   - Token rotation on each request
+   - Origin/Referer validation
+   - Excluded paths configuration
 
-### Input Validation
-- **Client-side**: Basic validation with form libraries
-- **Server-side**: Validate all inputs with Zod schemas
-- **Sanitization**: Sanitize user inputs before processing
+2. **Rate Limiting** (`lib/rate-limiter.ts`)
+   - Sliding window algorithm
+   - IP-based and user-based limits
+   - Configurable per endpoint
+   - DDoS protection
+
+3. **Session Security** (`lib/session-security.ts`)
+   - Session versioning for invalidation
+   - Device fingerprinting
+   - Concurrent session limits
+   - Activity tracking
+
+4. **Token Management** (`lib/token-manager.ts`)
+   - JWT with automatic rotation
+   - Refresh token implementation
+   - Token family tracking
+   - Secure storage patterns
+
+5. **Security Monitoring** (`lib/security-logger.ts`)
+   - Real-time event logging
+   - Threat detection system
+   - Anomaly detection
+   - Alert notifications
+
+6. **Threat Detection** (`lib/threat-detection.ts`)
+   - Pattern-based threat analysis
+   - Risk scoring system
+   - Automated responses
+   - Security analytics
 
 ### Security Headers
-- **CSP**: Content Security Policy configured
-- **CORS**: Configured for allowed origins
-- **CSRF**: Protection via SameSite cookies
+- **X-Frame-Options**: DENY
+- **X-Content-Type-Options**: nosniff
+- **Referrer-Policy**: strict-origin-when-cross-origin
+- **X-XSS-Protection**: 1; mode=block
+- **Content-Security-Policy**: Configured with strict policies
 
 ## Database Schema (Supabase)
 
-### Tables Structure
+### Core Tables Structure
 ```sql
--- Users table (managed by Supabase Auth)
-users (
+-- User profiles (synced with WorkOS)
+profiles (
   id UUID PRIMARY KEY,
-  email TEXT UNIQUE,
-  created_at TIMESTAMP,
-  updated_at TIMESTAMP
+  user_id TEXT UNIQUE NOT NULL,      -- WorkOS user ID
+  email TEXT UNIQUE NOT NULL,
+  full_name TEXT,
+  avatar_url TEXT,
+  phone TEXT,
+  bio TEXT,
+  is_admin BOOLEAN DEFAULT false,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 )
 
--- Signals table
+-- Trading signals
 signals (
-  id UUID PRIMARY KEY,
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   symbol TEXT NOT NULL,
-  action TEXT NOT NULL, -- 'BUY', 'SELL', 'HOLD'
-  price DECIMAL,
+  action TEXT NOT NULL,              -- 'BUY', 'SELL', 'HOLD'
+  entry_price DECIMAL,
   target_price DECIMAL,
   stop_loss DECIMAL,
-  created_at TIMESTAMP,
-  expires_at TIMESTAMP
+  confidence INTEGER,                 -- 1-100
+  status TEXT DEFAULT 'active',
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  expires_at TIMESTAMP WITH TIME ZONE
 )
 
--- User subscriptions
-subscriptions (
-  id UUID PRIMARY KEY,
-  user_id UUID REFERENCES users(id),
-  plan TEXT NOT NULL,
-  status TEXT NOT NULL,
-  created_at TIMESTAMP
+-- User trades
+trades (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id TEXT REFERENCES profiles(user_id),
+  signal_id UUID REFERENCES signals(id),
+  symbol TEXT NOT NULL,
+  action TEXT NOT NULL,
+  quantity DECIMAL,
+  entry_price DECIMAL,
+  exit_price DECIMAL,
+  profit_loss DECIMAL,
+  status TEXT DEFAULT 'open',
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  closed_at TIMESTAMP WITH TIME ZONE
+)
+
+-- Security events table
+security_events (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  event_type TEXT NOT NULL,
+  severity TEXT NOT NULL,
+  user_id TEXT,
+  ip_address TEXT,
+  user_agent TEXT,
+  message TEXT,
+  metadata JSONB,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+)
+
+-- Session management
+user_sessions (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id TEXT NOT NULL,
+  session_token TEXT UNIQUE NOT NULL,
+  refresh_token TEXT UNIQUE,
+  device_id TEXT,
+  ip_address TEXT,
+  user_agent TEXT,
+  expires_at TIMESTAMP WITH TIME ZONE NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  last_activity TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 )
 ```
 
 ## API Endpoints
 
-### Authentication
-- `POST /auth/signup` - User registration
-- `POST /auth/signin` - User login
-- `POST /auth/signout` - User logout
-- `GET /auth/callback` - OAuth callback
+### WorkOS Authentication
+- `GET /api/auth/workos/login` - Initiate WorkOS login
+- `GET /api/auth/workos/callback` - OAuth callback handler
+- `POST /api/auth/workos/logout` - User logout
+- `GET /api/auth/workos/me` - Get current user
+- `POST /api/auth/workos/refresh` - Refresh JWT tokens
+- `GET /api/auth/workos/profile` - Get user profile
+- `POST /api/auth/workos/supabase-user` - Sync with Supabase
 
-### Signals
-- `GET /api/signals` - Get trading signals
+### Trading Signals
+- `GET /api/signals` - Get active trading signals
 - `POST /api/signals` - Create new signal (admin)
 - `PUT /api/signals/:id` - Update signal (admin)
 - `DELETE /api/signals/:id` - Delete signal (admin)
+
+### User Trades
+- `GET /api/trades` - Get user's trades
+- `POST /api/trades` - Create new trade
+- `PUT /api/trades/:id` - Update trade
+- `DELETE /api/trades/:id` - Close trade
+
+### Admin Endpoints
+- `GET /api/admin/users` - List all users
+- `GET /api/admin/signals` - Manage signals
+- `GET /api/admin/security` - Security dashboard
+- `POST /api/admin/security/events` - Log security events
 
 ## Deployment Instructions
 
@@ -254,15 +395,29 @@ vercel --prod
 
 ### Environment Variables (Production)
 Set the following in Vercel dashboard:
-- `NEXT_PUBLIC_SUPABASE_URL`
-- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-- `NEXT_PUBLIC_DEV_SUPABASE_REDIRECT_URL`
+
+**Public Variables:**
+- `NEXT_PUBLIC_APP_URL` - Production URL
+- `NEXT_PUBLIC_SUPABASE_URL` - Supabase project URL
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY` - Supabase anonymous key
+
+**Server Variables:**
+- `SUPABASE_SERVICE_ROLE_KEY` - Supabase service role
+- `WORKOS_API_KEY` - WorkOS API key
+- `WORKOS_CLIENT_ID` - WorkOS client ID
+- `WORKOS_COOKIE_PASSWORD` - 32-char password
+- `WORKOS_REDIRECT_URI` - Production callback URL
+- `CSRF_SECRET_KEY` - CSRF protection secret
+- `JWT_SECRET` - JWT signing key
+- `JWT_REFRESH_SECRET` - Refresh token secret
+- `SESSION_SECRET` - Session encryption key
 
 ### Build Configuration
-- **Node.js Version**: 18.x
+- **Node.js Version**: 18.x or 20.x
 - **Build Command**: `npm run build`
-- **Output Directory**: `.next`
+- **Output Directory**: `dist` (configured in next.config.mjs)
 - **Install Command**: `npm install`
+- **Framework Preset**: Next.js
 
 ## Git Workflow
 
@@ -315,34 +470,57 @@ npm run analyze
 
 ### Common Issues
 
-#### PostCSS Error
+#### Node.js Module in Edge Runtime
 ```
-Error: It looks like you're trying to use `tailwindcss` directly as a PostCSS plugin
+Error: Module build failed: Reading from 'node:crypto' is not handled
 ```
-**Solution**: Ensure `postcss.config.mjs` uses `@tailwindcss/postcss` instead of `tailwindcss`
+**Solution**: Use simplified middleware without Node.js imports. WorkOS SDK operations should be in API routes only.
 
-#### Supabase Connection Error
+#### WorkOS Import Error
 ```
-Error: Missing Supabase environment variables
+Error: 'getSession' is not exported from '@workos-inc/authkit-nextjs'
 ```
-**Solution**: Check `.env.local` file has correct Supabase credentials
+**Solution**: Use the correct WorkOS SDK methods. The getSession function may not be available in all versions.
 
-#### Image Loading Error
+#### Multiple Lockfiles Warning
 ```
-The requested resource isn't a valid image
+Warning: Multiple lockfiles found
 ```
-**Solution**: Ensure images are in `public/` directory and use correct paths
+**Solution**: Remove extra lockfiles (bun.lockb, yarn.lock) and keep only package-lock.json
+
+#### Webpack Devtool Warning
+```
+Warning: Changing webpack devtool can cause severe performance regressions
+```
+**Solution**: Remove custom devtool configuration from next.config.mjs
+
+#### Hydration Mismatch
+```
+Error: Prop className did not match
+```
+**Solution**: Add `suppressHydrationWarning` to html element and ensure theme provider is properly configured
+
+#### 401 Authentication Errors
+```
+GET /api/auth/workos/me 401 Unauthorized
+```
+**Note**: This is expected behavior for unauthenticated users, not an error
 
 ### Debug Commands
 ```bash
-# Check environment variables
-npm run env:check
-
-# Validate Supabase connection
-npm run supabase:test
-
 # Check TypeScript types
 npm run type-check
+
+# Clear Next.js cache
+rm -rf .next dist
+
+# Reinstall dependencies
+rm -rf node_modules package-lock.json
+npm install
+
+# Check for conflicting dependencies
+npm ls @workos-inc/node
+npm ls @supabase/supabase-js
 ```
 
 ## Additional Notes
@@ -358,20 +536,36 @@ npm run type-check
 - **Background**: `#0A0F1F` (Dark blue)
 - **Text**: `#EAF2FF` (Light blue)
 
-### Dependencies
-- **Framework**: Next.js 14.2.32
-- **Styling**: Tailwind CSS 4.1.9
-- **UI Components**: shadcn/ui
-- **Authentication**: Supabase
+### Core Dependencies
+- **Framework**: Next.js 15.5.3
+- **React**: 19.0.0
+- **Styling**: Tailwind CSS 4.1.9 with PostCSS plugin
+- **UI Components**: shadcn/ui (30+ components)
+- **Authentication**: WorkOS SDK + Supabase
+- **State Management**: Zustand + TanStack Query
+- **Charts**: Recharts for data visualization
 - **Icons**: Lucide React
 - **Fonts**: Geist Sans & Mono
+- **Theme**: next-themes for dark mode
+
+### Security Libraries
+- **JWT**: jsonwebtoken for token management
+- **Crypto**: Built-in crypto for secure operations
+- **Cookie Parser**: For secure cookie handling
+- **Rate Limiting**: Custom implementation
+- **CSRF**: Custom double-submit pattern
 
 ### Development Tools
-- **TypeScript**: 5.x
-- **ESLint**: Code linting
+- **TypeScript**: 5.x with strict mode
+- **ESLint**: Code linting with Next.js config
 - **Prettier**: Code formatting
-- **PostCSS**: CSS processing
+- **PostCSS**: CSS processing with Tailwind
 - **Vercel**: Deployment platform
+
+### Known Limitations
+- **Edge Runtime**: Some security features require API Routes instead of Edge middleware
+- **WorkOS SDK**: Must be used server-side only (Node.js runtime)
+- **Token Rotation**: Requires client-side implementation for refresh
 
 ---
 

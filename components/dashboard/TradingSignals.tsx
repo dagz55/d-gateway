@@ -17,38 +17,8 @@ interface ZignalOffer {
   copyCount: number;
 }
 
-const mockOffers: ZignalOffer[] = [
-  {
-    id: '1',
-    title: 'ZIGNALS OFFER 1',
-    description: 'TRADING OFFER',
-    dailyProfit: '3.2%',
-    duration: '7 DAYS',
-    minAmount: '1000',
-    status: 'active',
-    copyCount: 1247
-  },
-  {
-    id: '2',
-    title: 'ZIGNALS OFFER 2',
-    description: 'TRADING OFFER',
-    dailyProfit: '2.8%',
-    duration: '10 DAYS',
-    minAmount: '500',
-    status: 'active',
-    copyCount: 892
-  },
-  {
-    id: '3',
-    title: 'ZIGNALS OFFER 3',
-    description: 'TRADING OFFER',
-    dailyProfit: '4.1%',
-    duration: '5 DAYS',
-    minAmount: '2000',
-    status: 'active',
-    copyCount: 634
-  }
-];
+// Offers will be loaded from the database
+const offers: ZignalOffer[] = [];
 
 export default function TradingSignals() {
   const [copiedOffer, setCopiedOffer] = useState<string | null>(null);
@@ -73,7 +43,7 @@ export default function TradingSignals() {
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
-        {mockOffers.map((offer, index) => (
+        {offers.length > 0 ? offers.map((offer, index) => (
           <div key={offer.id} className="space-y-4">
             {/* Offer Header */}
             <div className="flex items-center justify-between">
@@ -144,13 +114,19 @@ export default function TradingSignals() {
             </div>
 
             {/* Separator between offers */}
-            {index < mockOffers.length - 1 && (
+            {index < offers.length - 1 && (
               <div className="border-t border-border/30 pt-6">
                 <div className="absolute left-0 right-0 h-px bg-gradient-to-r from-transparent via-border to-transparent"></div>
               </div>
             )}
           </div>
-        ))}
+        )) : (
+          <div className="text-center py-8">
+            <Target className="h-8 w-8 text-muted-foreground mx-auto mb-4" />
+            <p className="text-muted-foreground">No trading signals available</p>
+            <p className="text-sm text-muted-foreground mt-2">Professional trading signals will appear here when available.</p>
+          </div>
+        )}
       </CardContent>
     </Card>
   );

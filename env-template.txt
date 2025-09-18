@@ -1,0 +1,56 @@
+# WorkOS Configuration - REQUIRED
+# Get these from your WorkOS Dashboard: https://dashboard.workos.com/
+WORKOS_API_KEY=sk_test_your_api_key_here
+WORKOS_CLIENT_ID=client_your_client_id_here
+WORKOS_COOKIE_PASSWORD=your_exactly_32_character_password
+
+# JWT Configuration - REQUIRED (must be 32+ characters)
+JWT_SECRET=your_32_plus_character_jwt_secret_here
+
+# Site Configuration
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
+
+# WorkOS Domain Configuration (Optional - uses defaults if not set)
+WORKOS_EMAIL_DOMAIN=workos.dev
+WORKOS_ADMIN_PORTAL_DOMAIN=setup.workos.com
+WORKOS_AUTH_API_DOMAIN=auth.workos.com
+WORKOS_AUTHKIT_DOMAIN=exciting-tea-84-staging.authkit.app
+
+# WorkOS URLs (Optional - auto-generated if not set)
+WORKOS_REDIRECT_URI=http://localhost:3000/api/auth/workos/callback
+WORKOS_LOGOUT_REDIRECT_URI=http://localhost:3000/
+WORKOS_AUTHKIT_URL=https://exciting-tea-84-staging.authkit.app
+
+# Supabase Configuration
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
+
+# Serverless Configuration
+AUTH_SERVICE_MODE=serverless
+EDGE_COMPATIBLE=true
+SERVERLESS_FUNCTIONS_URL=http://localhost:3000/api
+AUTH_MICROSERVICE_URL=http://localhost:3000/api/auth
+
+# Admin Users (comma-separated emails)
+ALLOWED_ADMIN_EMAILS=admin@example.com,your-email@example.com
+
+# Security
+SECURITY_LOGGING_ENABLED=true
+SECURITY_LOG_LEVEL=info
+
+# Instructions:
+# 1. Copy this content to .env.local
+# 2. Replace placeholder values with your actual credentials
+# 3. Get WorkOS credentials from https://dashboard.workos.com/
+# 4. Generate secrets with correct lengths (see below)
+# 5. Restart your development server
+
+# Generate secrets with correct lengths:
+# npm run generate-secrets
+#
+# Or manually:
+# WORKOS_COOKIE_PASSWORD (exactly 32 chars):
+# node -e "console.log(require('crypto').randomBytes(16).toString('hex'))"
+# JWT_SECRET (32+ chars):
+# node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"

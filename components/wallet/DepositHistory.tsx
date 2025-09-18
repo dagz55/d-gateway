@@ -21,76 +21,8 @@ interface DepositHistoryEntry {
   notes?: string;
 }
 
-const mockDepositHistory: DepositHistoryEntry[] = [
-  {
-    id: '1',
-    date: '2024-01-15',
-    time: '14:30:25',
-    amount: 1000,
-    methodOfPayment: 'Bank Transfer',
-    referenceNumber: 'REF-2024-001',
-    status: 'completed',
-    walletType: 'Trading Wallet',
-    transactionId: 'TXN-001-2024',
-    notes: 'Initial deposit for trading'
-  },
-  {
-    id: '2',
-    date: '2024-01-14',
-    time: '09:15:42',
-    amount: 500,
-    methodOfPayment: 'Credit Card',
-    referenceNumber: 'REF-2024-002',
-    status: 'completed',
-    walletType: 'Trading Wallet',
-    transactionId: 'TXN-002-2024'
-  },
-  {
-    id: '3',
-    date: '2024-01-13',
-    time: '16:45:18',
-    amount: 2000,
-    methodOfPayment: 'Cryptocurrency',
-    referenceNumber: 'REF-2024-003',
-    status: 'completed',
-    walletType: 'Income Wallet',
-    transactionId: 'TXN-003-2024'
-  },
-  {
-    id: '4',
-    date: '2024-01-12',
-    time: '11:22:35',
-    amount: 750,
-    methodOfPayment: 'PayPal',
-    referenceNumber: 'REF-2024-004',
-    status: 'processing',
-    walletType: 'Trading Wallet',
-    transactionId: 'TXN-004-2024'
-  },
-  {
-    id: '5',
-    date: '2024-01-11',
-    time: '13:18:55',
-    amount: 1200,
-    methodOfPayment: 'E-Wallet',
-    referenceNumber: 'REF-2024-005',
-    status: 'pending',
-    walletType: 'Trading Wallet',
-    transactionId: 'TXN-005-2024'
-  },
-  {
-    id: '6',
-    date: '2024-01-10',
-    time: '08:05:12',
-    amount: 800,
-    methodOfPayment: 'Bank Transfer',
-    referenceNumber: 'REF-2024-006',
-    status: 'failed',
-    walletType: 'Income Wallet',
-    transactionId: 'TXN-006-2024',
-    notes: 'Insufficient funds'
-  }
-];
+// Deposit history will be loaded from the database
+const depositHistory: DepositHistoryEntry[] = [];
 
 export default function DepositHistory() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -98,7 +30,7 @@ export default function DepositHistory() {
   const [mopFilter, setMopFilter] = useState<string>('all');
   const [walletFilter, setWalletFilter] = useState<string>('all');
 
-  const filteredHistory = mockDepositHistory.filter(entry => {
+  const filteredHistory = depositHistory.filter(entry => {
     const matchesSearch = 
       entry.referenceNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
       entry.transactionId.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -111,11 +43,11 @@ export default function DepositHistory() {
     return matchesSearch && matchesStatus && matchesMop && matchesWallet;
   });
 
-  const totalDeposits = mockDepositHistory
+  const totalDeposits = depositHistory
     .filter(entry => entry.status === 'completed')
     .reduce((sum, entry) => sum + entry.amount, 0);
 
-  const pendingAmount = mockDepositHistory
+  const pendingAmount = depositHistory
     .filter(entry => entry.status === 'pending' || entry.status === 'processing')
     .reduce((sum, entry) => sum + entry.amount, 0);
 
@@ -175,7 +107,7 @@ export default function DepositHistory() {
               <CreditCard className="h-4 w-4 text-blue-400" />
               <span className="text-xs text-muted-foreground">Total Transactions</span>
             </div>
-            <div className="text-xl font-bold text-blue-400">{mockDepositHistory.length}</div>
+            <div className="text-xl font-bold text-blue-400">{depositHistory.length}</div>
           </div>
         </div>
 
@@ -310,12 +242,18 @@ export default function DepositHistory() {
           ))}
         </div>
 
-        {filteredHistory.length === 0 && (
+        {depositHistory.length === 0 ? (
+          <div className="text-center py-8">
+            <History className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+            <p className="text-muted-foreground">No deposit history available</p>
+            <p className="text-sm text-muted-foreground mt-2">Your deposit transactions will appear here.</p>
+          </div>
+        ) : filteredHistory.length === 0 ? (
           <div className="text-center py-8">
             <History className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
             <p className="text-muted-foreground">No deposit history found with current filters</p>
           </div>
-        )}
+        ) : null}
       </CardContent>
     </Card>
   );

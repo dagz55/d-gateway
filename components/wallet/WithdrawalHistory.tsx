@@ -22,82 +22,8 @@ interface WithdrawalHistoryEntry {
   notes?: string;
 }
 
-const mockWithdrawalHistory: WithdrawalHistoryEntry[] = [
-  {
-    id: '1',
-    date: '2024-01-15',
-    time: '14:30:25',
-    amount: 500,
-    methodOfPayment: 'Bank Transfer',
-    status: 'completed',
-    walletSource: 'Income Wallet',
-    transactionId: 'WTX-001-2024',
-    completeName: 'John Doe',
-    bankDetails: 'Account: ****1234, Bank: Chase Bank',
-    notes: 'Monthly profit withdrawal'
-  },
-  {
-    id: '2',
-    date: '2024-01-14',
-    time: '09:15:42',
-    amount: 250,
-    methodOfPayment: 'PayPal',
-    status: 'completed',
-    walletSource: 'Income Wallet',
-    transactionId: 'WTX-002-2024',
-    completeName: 'John Doe',
-    bankDetails: 'PayPal: john.doe@email.com'
-  },
-  {
-    id: '3',
-    date: '2024-01-13',
-    time: '16:45:18',
-    amount: 1000,
-    methodOfPayment: 'Cryptocurrency',
-    status: 'processing',
-    walletSource: 'Trading Wallet',
-    transactionId: 'WTX-003-2024',
-    completeName: 'John Doe',
-    bankDetails: 'BTC Address: bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh'
-  },
-  {
-    id: '4',
-    date: '2024-01-12',
-    time: '11:22:35',
-    amount: 300,
-    methodOfPayment: 'Credit Card',
-    status: 'pending',
-    walletSource: 'Income Wallet',
-    transactionId: 'WTX-004-2024',
-    completeName: 'John Doe',
-    bankDetails: 'Card: ****5678, Exp: 12/25'
-  },
-  {
-    id: '5',
-    date: '2024-01-11',
-    time: '13:18:55',
-    amount: 750,
-    methodOfPayment: 'E-Wallet',
-    status: 'completed',
-    walletSource: 'Trading Wallet',
-    transactionId: 'WTX-005-2024',
-    completeName: 'John Doe',
-    bankDetails: 'Venmo: @johndoe123'
-  },
-  {
-    id: '6',
-    date: '2024-01-10',
-    time: '08:05:12',
-    amount: 200,
-    methodOfPayment: 'Bank Transfer',
-    status: 'failed',
-    walletSource: 'Income Wallet',
-    transactionId: 'WTX-006-2024',
-    completeName: 'John Doe',
-    bankDetails: 'Account: ****9999, Bank: Wells Fargo',
-    notes: 'Insufficient account details'
-  }
-];
+// Withdrawal history will be loaded from the database
+const withdrawalHistory: WithdrawalHistoryEntry[] = [];
 
 export default function WithdrawalHistory() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -105,7 +31,7 @@ export default function WithdrawalHistory() {
   const [mopFilter, setMopFilter] = useState<string>('all');
   const [walletFilter, setWalletFilter] = useState<string>('all');
 
-  const filteredHistory = mockWithdrawalHistory.filter(entry => {
+  const filteredHistory = withdrawalHistory.filter(entry => {
     const matchesSearch = 
       entry.transactionId.toLowerCase().includes(searchTerm.toLowerCase()) ||
       entry.completeName.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -119,11 +45,11 @@ export default function WithdrawalHistory() {
     return matchesSearch && matchesStatus && matchesMop && matchesWallet;
   });
 
-  const totalWithdrawals = mockWithdrawalHistory
+  const totalWithdrawals = withdrawalHistory
     .filter(entry => entry.status === 'completed')
     .reduce((sum, entry) => sum + entry.amount, 0);
 
-  const pendingAmount = mockWithdrawalHistory
+  const pendingAmount = withdrawalHistory
     .filter(entry => entry.status === 'pending' || entry.status === 'processing')
     .reduce((sum, entry) => sum + entry.amount, 0);
 
@@ -183,7 +109,7 @@ export default function WithdrawalHistory() {
               <CreditCard className="h-4 w-4 text-blue-400" />
               <span className="text-xs text-muted-foreground">Total Transactions</span>
             </div>
-            <div className="text-xl font-bold text-blue-400">{mockWithdrawalHistory.length}</div>
+            <div className="text-xl font-bold text-blue-400">{withdrawalHistory.length}</div>
           </div>
         </div>
 
@@ -328,12 +254,18 @@ export default function WithdrawalHistory() {
           ))}
         </div>
 
-        {filteredHistory.length === 0 && (
+        {withdrawalHistory.length === 0 ? (
+          <div className="text-center py-8">
+            <History className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+            <p className="text-muted-foreground">No withdrawal history available</p>
+            <p className="text-sm text-muted-foreground mt-2">Your withdrawal transactions will appear here.</p>
+          </div>
+        ) : filteredHistory.length === 0 ? (
           <div className="text-center py-8">
             <History className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
             <p className="text-muted-foreground">No withdrawal history found with current filters</p>
           </div>
-        )}
+        ) : null}
       </CardContent>
     </Card>
   );

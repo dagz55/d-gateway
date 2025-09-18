@@ -1,0 +1,473 @@
+import { NextResponse, type NextRequest } from 'next/server'
+import { withCSRFProtection, shouldApplyCSRFProtection, addCSPHeaders } from '@/middleware/csrf'
+import { withRateLimiting } from '@/middleware/rate-limiting'
+import { tokenValidator, TokenSource } from '@/lib/token-validation'
+import { securityLogger, logSecurityEvent } from '@/lib/security-logger'
+import { threatDetection } from '@/lib/threat-detection'
+
+export async function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl
+  const startTime = Date.now()
+  
+  // Define public routes that don't require authentication
+  const publicRoutes = [
+    '/',
+    '/auth',
+    '/auth/signup', 
+    '/auth/forgot-password',
+    '/auth/reset-password',
+    '/auth/clean-session',
+    '/auth/auth-code-error',
+    '/enterprise',
+    '/page.enhancedui',
+    '/page.sophisticated',
+    '/api/auth/workos/login',
+    '/api/auth/workos/callback',
+    '/api/auth/workos/logout',
+    '/api/auth/workos/me',
+    '/api/auth/workos/supabase-user',
+    '/api/auth/workos/profile',
+    '/api/auth/workos/refresh', // Token refresh endpoint
+  ]
+
+  // Skip middleware for static files
+  if (
+    pathname.startsWith('/_next/') ||
+    pathname.startsWith('/favicon.ico') ||
+    pathname.match(/\.(svg|png|jpg|jpeg|gif|webp)$/)
+  ) {
+    return NextResponse.next()
+  }
+
+  let response: NextResponse
+  let securityEvents: any[] = []
+
+  try {
+    // 1. First, apply rate limiting
+    try {
+      response = await withRateLimiting(request)
+      
+      // If rate limiting blocked the request, log security event
+      if (response.status === 429 || response.status === 403) {
+        await logSecurityEvent('rate_limit_exceeded', {
+          request,
+          message: 'Rate limit exceeded in middleware',
+          metadata: {
+            endpoint: pathname,
+            status: response.status,
+            responseTime: Date.now() - startTime,
+          },
+        })
+        return response
+      }
+    } catch (error) {
+      console.error('Rate limiting error:', error)
+      // Log rate limiting system error
+      await logSecurityEvent('security_alert_triggered', {
+        request,
+        message: 'Rate limiting system error',
+        metadata: {
+          error: error instanceof Error ? error.message : 'Unknown error',
+          endpoint: pathname,
+        },
+      })
+      response = NextResponse.next()
+    }
+
+    // 2. Apply CSRF protection if needed
+    if (shouldApplyCSRFProtection(request)) {
+      try {
+        response = await withCSRFProtection(request)
+        
+        // If CSRF protection returned an error response, log security event
+        if (response.status >= 400) {
+          await logSecurityEvent('csrf_token_invalid', {
+            request,
+            message: 'CSRF protection failed in middleware',
+            metadata: {
+              endpoint: pathname,
+              status: response.status,
+              responseTime: Date.now() - startTime,
+            },
+          })
+          return response
+        }
+      } catch (error) {
+        console.error('CSRF protection error:', error)
+        
+        // Log CSRF system error
+        await logSecurityEvent('csrf_attack_detected', {
+          request,
+          message: 'CSRF protection system error',
+          metadata: {
+            error: error instanceof Error ? error.message : 'Unknown error',
+            endpoint: pathname,
+          },
+        })
+        
+        return NextResponse.json(
+          { error: 'Security validation failed', code: 'CSRF_ERROR' },
+          { status: 403 }
+        )
+      }
+    } else if (response.status !== 429 && response.status !== 403) {
+      // Only update response if not already handled by rate limiting
+      response = NextResponse.next()
+    }
+
+    // 3. Apply authentication checks for protected routes
+    if (!publicRoutes.includes(pathname)) {
+      const authResult = await checkAuthentication(request)
+      
+      if (!authResult.authenticated) {
+        // Log failed authentication attempt
+        await logSecurityEvent('authz_permission_denied', {
+          request,
+          message: 'Access denied to protected route',
+          metadata: {
+            endpoint: pathname,
+            reason: 'not_authenticated',
+            responseTime: Date.now() - startTime,
+          },
+        })
+        
+        // No valid authentication, redirect to login
+        return NextResponse.redirect(new URL('/', request.url))
+      }
+
+      // Log successful authentication
+      await logSecurityEvent('authz_permission_granted', {
+        request,
+        userId: authResult.user?.id,
+        message: 'Access granted to protected route',
+        metadata: {
+          endpoint: pathname,
+          authMethod: authResult.authMethod,
+          permissions: authResult.user?.permissions,
+          responseTime: Date.now() - startTime,
+        },
+      })
+
+      // Check if token needs refresh
+      if (authResult.shouldRefresh && authResult.authMethod === 'token') {
+        // Log token refresh requirement
+        await logSecurityEvent('auth_token_expired', {
+          request,
+          userId: authResult.user?.id,
+          message: 'Token refresh required',
+          metadata: {
+            authMethod: authResult.authMethod,
+            endpoint: pathname,
+          },
+        })
+        
+        // Add header to indicate client should refresh token
+        response.headers.set('X-Token-Refresh-Required', 'true')
+      }
+
+      // Check for admin access
+      if (pathname.startsWith('/admin') || pathname.startsWith('/api/admin')) {
+        const isAdmin = authResult.user?.permissions?.includes('admin') || false
+        
+        if (isAdmin) {
+          await logSecurityEvent('admin_login', {
+            request,
+            userId: authResult.user?.id,
+            message: 'Admin access granted',
+            metadata: {
+              endpoint: pathname,
+              permissions: authResult.user?.permissions,
+            },
+          })
+        } else {
+          await logSecurityEvent('authz_admin_access_attempt', {
+            request,
+            userId: authResult.user?.id,
+            message: 'Unauthorized admin access attempt',
+            metadata: {
+              endpoint: pathname,
+              userPermissions: authResult.user?.permissions,
+            },
+          })
+          
+          return NextResponse.json(
+            { error: 'Admin access required', code: 'INSUFFICIENT_PERMISSIONS' },
+            { status: 403 }
+          )
+        }
+      }
+
+      // Add user info to response headers for debugging (in development only)
+      if (process.env.NODE_ENV === 'development' && authResult.user) {
+        response.headers.set('X-Auth-Method', authResult.authMethod || 'unknown')
+        response.headers.set('X-Auth-User-ID', authResult.user.id)
+      }
+    }
+
+    // 4. Real-time threat analysis
+    try {
+      // Collect request metadata for threat analysis
+      const requestEvent = {
+        id: `req-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        timestamp: new Date().toISOString(),
+        eventType: 'network_request' as any,
+        severity: 'low' as any,
+        ipAddress: request.headers.get('x-forwarded-for') || 'unknown',
+        userAgent: request.headers.get('user-agent') || 'unknown',
+        message: `Request to ${pathname}`,
+        metadata: {
+          endpoint: pathname,
+          method: request.method,
+          responseTime: Date.now() - startTime,
+          responseStatus: response.status,
+        },
+        threatScore: 0,
+        riskLevel: 'low' as any,
+        requiresAction: false,
+        processed: false,
+        alertSent: false,
+        acknowledged: false,
+        createdAt: new Date().toISOString(),
+      }
+
+      // Run threat analysis
+      const threatAnalysis = await threatDetection.analyzeEvent(requestEvent, request)
+      
+      // If threats detected, log them
+      if (threatAnalysis.threats.length > 0) {
+        for (const threat of threatAnalysis.threats) {
+          await logSecurityEvent('security_policy_violation', {
+            request,
+            message: `Threat detected: ${threat.description}`,
+            metadata: {
+              threatType: threat.type,
+              confidence: threat.confidence,
+              severity: threat.severity,
+              evidence: threat.evidence,
+              riskScore: threat.riskScore,
+            },
+          })
+        }
+      }
+    } catch (threatError) {
+      console.error('Threat analysis error:', threatError)
+      // Don't block the request for threat analysis errors
+    }
+
+    // 5. Add security headers
+    response = addCSPHeaders(response)
+
+    // 6. Add additional security headers
+    response.headers.set('X-Robots-Tag', 'noindex, nofollow')
+    
+    // Add CSRF token to response headers for client access (if available)
+    const csrfToken = response.headers.get('X-CSRF-Token')
+    if (csrfToken) {
+      response.headers.set('X-CSRF-Token', csrfToken)
+    }
+
+    // Add security headers for monitoring
+    response.headers.set('X-Security-Monitored', 'true')
+    response.headers.set('X-Request-Time', (Date.now() - startTime).toString())
+
+    return response
+
+  } catch (error) {
+    console.error('Middleware error:', error)
+    
+    // Log critical middleware error
+    await logSecurityEvent('security_alert_triggered', {
+      request,
+      message: 'Critical middleware error',
+      metadata: {
+        error: error instanceof Error ? error.message : 'Unknown error',
+        stack: error instanceof Error ? error.stack?.substring(0, 500) : undefined,
+        endpoint: pathname,
+        responseTime: Date.now() - startTime,
+      },
+    })
+
+    // Return a safe error response
+    return NextResponse.json(
+      { error: 'Internal security error', code: 'MIDDLEWARE_ERROR' },
+      { status: 500 }
+    )
+  }
+}
+
+/**
+ * Check authentication using both session and token methods
+ */
+async function checkAuthentication(request: NextRequest): Promise<{
+  authenticated: boolean;
+  user?: { id: string; permissions?: string[] };
+  shouldRefresh?: boolean;
+  authMethod?: 'session' | 'token';
+}> {
+  try {
+    // First, try JWT token authentication
+    const tokenAuth = await checkTokenAuth(request)
+    if (tokenAuth.authenticated) {
+      return {
+        authenticated: true,
+        user: tokenAuth.user,
+        shouldRefresh: tokenAuth.shouldRefresh,
+        authMethod: 'token',
+      }
+    }
+
+    // Fallback to session authentication
+    const sessionAuth = await checkSessionAuth(request)
+    if (sessionAuth.authenticated) {
+      return {
+        authenticated: true,
+        user: sessionAuth.user,
+        authMethod: 'session',
+      }
+    }
+
+    return { authenticated: false }
+  } catch (error) {
+    console.error('Authentication check error:', error)
+    
+    // Log authentication system error
+    await logSecurityEvent('security_alert_triggered', {
+      request,
+      message: 'Authentication system error',
+      metadata: {
+        error: error instanceof Error ? error.message : 'Unknown error',
+        component: 'authentication_check',
+      },
+    })
+    
+    return { authenticated: false }
+  }
+}
+
+/**
+ * Check JWT token authentication
+ */
+async function checkTokenAuth(request: NextRequest): Promise<{
+  authenticated: boolean;
+  user?: { id: string; permissions?: string[] };
+  shouldRefresh?: boolean;
+}> {
+  try {
+    const validation = await tokenValidator.validateAccessToken(request, {
+      requireSession: false, // Light validation for middleware
+      checkBinding: false,   // Skip binding check for performance
+    })
+
+    if (validation.valid && validation.userId) {
+      return {
+        authenticated: true,
+        user: {
+          id: validation.userId,
+          permissions: validation.permissions,
+        },
+        shouldRefresh: validation.shouldRefresh,
+      }
+    }
+
+    return { authenticated: false }
+  } catch (error) {
+    console.warn('Token auth check failed:', error)
+    
+    // Log token validation failure
+    await logSecurityEvent('auth_token_expired', {
+      request,
+      message: 'Token validation failed',
+      metadata: {
+        error: error instanceof Error ? error.message : 'Unknown error',
+        tokenSource: 'cookie',
+      },
+    })
+    
+    return { authenticated: false }
+  }
+}
+
+/**
+ * Check session authentication (legacy)
+ */
+async function checkSessionAuth(request: NextRequest): Promise<{
+  authenticated: boolean;
+  user?: { id: string };
+}> {
+  try {
+    // Check if user has a WorkOS session cookie
+    const workosSession = request.cookies.get('wos-session')
+    
+    if (!workosSession) {
+      return { authenticated: false }
+    }
+
+    // Basic validation - parse session data
+    try {
+      const sessionData = JSON.parse(workosSession.value)
+      
+      // Check if session has required fields and is not expired
+      if (sessionData.userId && sessionData.sessionExpiry) {
+        const now = Date.now()
+        if (now < sessionData.sessionExpiry) {
+          return {
+            authenticated: true,
+            user: { id: sessionData.userId },
+          }
+        } else {
+          // Log session expiry
+          await logSecurityEvent('auth_session_expired', {
+            request,
+            userId: sessionData.userId,
+            message: 'Session expired during validation',
+            metadata: {
+              sessionExpiry: sessionData.sessionExpiry,
+              currentTime: now,
+            },
+          })
+        }
+      }
+    } catch (parseError) {
+      // Log invalid session data
+      await logSecurityEvent('session_fixation_attempt', {
+        request,
+        message: 'Invalid session data detected',
+        metadata: {
+          error: parseError instanceof Error ? parseError.message : 'Parse error',
+          sessionCookie: workosSession.value.substring(0, 50), // Log partial cookie for analysis
+        },
+      })
+      
+      return { authenticated: false }
+    }
+
+    return { authenticated: false }
+  } catch (error) {
+    console.warn('Session auth check failed:', error)
+    
+    // Log session validation error
+    await logSecurityEvent('auth_session_expired', {
+      request,
+      message: 'Session validation error',
+      metadata: {
+        error: error instanceof Error ? error.message : 'Unknown error',
+      },
+    })
+    
+    return { authenticated: false }
+  }
+}
+
+export const config = {
+  matcher: [
+    /*
+     * Match all request paths except for the ones starting with:
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     * - Static assets
+     * Feel free to modify this pattern to include more paths.
+     */
+    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+  ],
+}
