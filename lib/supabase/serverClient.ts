@@ -21,10 +21,10 @@ export const createServerSupabaseClient = async () => {
 
   return createServerClient(supabaseUrl, supabaseAnonKey, {
     cookies: {
-      getAll() {
-        return cookieStore.getAll()
+      async getAll() {
+        return await cookieStore.getAll()
       },
-      setAll(cookiesToSet) {
+      async setAll(cookiesToSet) {
         try {
           // Filter out large cookies to prevent header overflow
           const filteredCookies = cookiesToSet.filter(({ name, value }) => {
@@ -36,7 +36,7 @@ export const createServerSupabaseClient = async () => {
             return true
           })
 
-          filteredCookies.forEach(({ name, value, options }) => {
+          for (const { name, value, options } of filteredCookies) {
             // Set secure cookie options to prevent issues
             const secureOptions = {
               ...options,
@@ -46,8 +46,8 @@ export const createServerSupabaseClient = async () => {
               path: '/',
               maxAge: options?.maxAge || 60 * 60 * 24 * 7 // 7 days default
             }
-            cookieStore.set(name, value, secureOptions)
-          })
+            await cookieStore.set(name, value, secureOptions)
+          }
         } catch {
           // The `setAll` method was called from a Server Component.
           // This can be ignored if you have middleware refreshing
