@@ -1,11 +1,13 @@
 # Zignal - Advanced Trading Signals & Analytics Platform
 
-Zignal is a comprehensive crypto trading platform built with [Next.js 15.5.2](https://nextjs.org) that transforms professional trading signals into actionable insights. This application provides a complete trading ecosystem with advanced analytics, real-time data, and modern user experience.
+Zignal is a comprehensive crypto trading platform built with [Next.js 15.5.3](https://nextjs.org) that transforms professional trading signals into actionable insights. This application provides a complete trading ecosystem with advanced analytics, real-time data, and modern user experience.
 
 ## 🚀 Features
 
 ### Core Platform
-- 🔐 **Advanced Authentication**: Streamlined Google OAuth and email-based authentication with Supabase
+- 🔐 **Enterprise Authentication**: WorkOS AuthKit integration for enterprise-grade security and compliance
+- 🎬 **Enhanced Landing Page**: Fully separated landing page with 3D particle animations, shader effects, floating elements, and interactive background animations
+- 🌟 **Advanced Hero Section**: Professional hero section with WebGL particle systems, animated grids, wave animations, and mouse-responsive floating orbs
 - 📊 **Trading Dashboard**: Complete trading interface with real-time charts and analytics
 - 📈 **Signal Management**: Professional trading signals with copy trading capabilities
 - 🎯 **ZIG TRADES Workflow**: Comprehensive trading workflow with signals, history, and active trading management
@@ -17,21 +19,32 @@ Zignal is a comprehensive crypto trading platform built with [Next.js 15.5.2](ht
 - 🏷️ **Enhanced Profile Section**: Comprehensive sidebar profile component with avatar, user info, admin badges, and quick actions
 
 ### Technical Features
-- 🎨 **Modern UI**: Built with Tailwind CSS and complete shadcn/ui component library
+- 🎨 **Modern UI**: Built with Tailwind CSS and complete shadcn/ui component library with consistent Zignal dark theme
+- 🎬 **Advanced Animations**: Framer Motion animations, 3D WebGL particle systems, shader materials, and interactive background effects
+- 🌟 **3D Graphics**: React Three Fiber integration with custom shader materials, floating particles, and real-time rendering
+- 🎭 **Interactive Elements**: Mouse-responsive animations, animated grids, wave effects, and glowing orbs
+- 🌙 **Consistent Dark Theme**: Fixed dark theme implementation without light/dark mode switching
 - 👤 **Enhanced Profile System**: Modern user profile dropdown with comprehensive account management
 - 🏷️ **ProfileSection Component**: Comprehensive sidebar profile component with loading states, error handling, and accessibility
 - 🧠 **Memory Management**: Optimized memory usage with proper object URL cleanup
 - ✅ **Type Safety**: Full TypeScript implementation with strict type checking
 - 📱 **Responsive Design**: Mobile-first approach with full responsiveness
 - ⚡ **Performance**: Optimized with Next.js 15.5.2 and React 19
-- 🔒 **Security**: Supabase-powered authentication with Row Level Security
+- 🔒 **Security**: WorkOS AuthKit for enterprise authentication + Supabase for trading data
 - 🏗️ **Architecture**: Clean separation with protected route groups
-- 📸 **File Upload**: Dual-path photo upload system (Supabase Storage + Base64 fallback)
+- 📸 **Advanced File Upload**: Robust photo upload system with multiple improvements
+  - Dedicated API routes for better performance and larger file support (up to 10MB)
+  - Supabase Storage integration with `public_image` bucket and proper RLS policies
+  - Automatic cleanup of old avatars to prevent storage bloat
+  - Base64 fallback system when storage is unavailable
+  - Comprehensive file validation (type, size, format) with HEIC/HEIF support
 - 🔄 **Real-time Updates**: Live avatar and profile updates across the application
 - 🔐 **OAuth Optimization**: Streamlined Google OAuth implementation with proper redirect handling
 - 🛡️ **Enhanced Validation**: Robust file upload validation with HEIC/HEIF support and security improvements
 - 🎯 **Better UX**: Improved error messages and user feedback for authentication and file operations
 - ♿ **Accessibility**: Full ARIA support and screen reader compatibility
+- 🎨 **Theme Management**: Fixed dashboard readability with proper CSS variable formatting and light theme enforcement
+- 🔧 **Authentication Security**: Enhanced WorkOS integration with secure password generation and improved username handling
 
 ### ZIG TRADES Workflow
 - 🎯 **Trading Signals**: Multiple signal offers (ZIGNALS OFFER 1, 2, 3) with different profit rates and durations
@@ -63,6 +76,35 @@ Zignal is a comprehensive crypto trading platform built with [Next.js 15.5.2](ht
 - 🌐 **Online Status**: Real-time online/offline status indicator
 - 🎨 **Modern Design**: Consistent with application theme and branding
 
+## 🔐 WorkOS Authentication
+
+Zignal now uses **WorkOS AuthKit** for enterprise-grade authentication, providing:
+
+### Enterprise Features
+- 🏢 **Professional Authentication**: Enterprise-grade security and compliance
+- 🔒 **SOC 2 Type II**: Certified security standards for financial services
+- 🎯 **B2B Ready**: Built for trading firms, hedge funds, and institutions
+- 📊 **Advanced SSO**: SAML, OIDC, Google Workspace, Microsoft 365 integration
+- 🔍 **Audit Trails**: Comprehensive authentication and user activity logs
+- 🛡️ **Session Management**: Advanced session controls and policies
+
+### Recent Improvements (v2.8.2)
+- ✅ **Fixed Authentication Flow**: Resolved 401 Unauthorized errors with proper endpoint routing
+- 🎨 **Enhanced UI**: Complete visual redesign with modern enterprise-grade styling
+- ⚡ **Smooth Animations**: Added sophisticated Framer Motion animations and micro-interactions
+- 🔄 **Improved Reliability**: Enhanced error handling and fallback authentication mechanisms
+- 🚀 **Better Performance**: Fixed hydration issues and optimized animation performance
+
+### Architecture
+- **Authentication**: WorkOS AuthKit handles all user authentication
+- **Database**: Supabase for trading data and real-time features
+- **Session Management**: Encrypted cookies with automatic refresh
+- **Security**: Bank-grade security infrastructure with 99.99% uptime
+- **UI/UX**: Modern, accessible interface with professional animations and interactions
+
+### Setup
+See [WORKOS_SETUP.md](./WORKOS_SETUP.md) for detailed configuration instructions.
+
 ## Getting Started
 
 ### Prerequisites
@@ -91,10 +133,49 @@ bun install
 ```
 
 3. Set up environment variables:
-Create a `.env.local` file in the root directory and add your Supabase credentials:
+Create a `.env.local` file in the root directory. You can use the provided template:
+
 ```bash
+# Check current environment configuration
+npm run check-env
+
+# Generate required secrets (32+ character random strings)
+npm run generate-secrets
+
+# Copy the template (use env-template.txt as reference)
+cp env-template.txt .env.local
+```
+
+Then edit `.env.local` with your actual credentials:
+```bash
+# Vercel Serverless Configuration
+NEXT_PUBLIC_SITE_URL=https://zignals.org
+AUTH_SERVICE_MODE=serverless
+EDGE_COMPATIBLE=true
+SERVERLESS_FUNCTIONS_URL=https://zignals.org/api
+AUTH_MICROSERVICE_URL=https://zignals.org/api/auth
+
+# Vercel Project Information
+VERCEL_PROJECT_ID=your_vercel_project_id
+VERCEL_TEAM_ID=your_vercel_team_id
+VERCEL_ORG_ID=your_vercel_org_id
+
+# Database Configuration
 NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
+
+# WorkOS Configuration
+WORKOS_API_KEY=your_workos_api_key
+WORKOS_CLIENT_ID=your_workos_client_id
+WORKOS_WEBHOOK_SECRET=your_workos_webhook_secret
+
+# For local development, use:
+# AUTH_SERVICE_MODE=local
+# EDGE_COMPATIBLE=false
+# SERVERLESS_FUNCTIONS_URL=http://localhost:3000/api
+# AUTH_MICROSERVICE_URL=http://localhost:3000/api/auth
+# NEXT_PUBLIC_SITE_URL=http://localhost:3000
 ```
 
 4. Run the development server:
@@ -109,6 +190,58 @@ bun dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+
+## 🧪 Testing & Development
+
+### Setting Up Test Accounts
+
+To test the ProfileSection, ProfileDropdown, and authentication functionality, you need to create test users in your Supabase project:
+
+#### Prerequisites
+1. Add your Supabase Service Role Key to `.env.local`:
+```bash
+SUPABASE_SERVICE_ROLE_KEY=your_service_role_key_here
+```
+> ⚠️ **Important**: Get this key from your Supabase project dashboard → Settings → API → service_role key
+
+#### Create Test Users
+Run the setup script to create test accounts:
+```bash
+node scripts/setup-test-users.js
+```
+
+This creates two test accounts:
+
+#### Regular User Account
+- **Email**: `member@zignal.dev`
+- **Password**: `ZignalMember2024!`
+- **Role**: Standard user
+- **Features**: Dashboard access, wallet management, trading signals
+- **Profile**: Shows standard user interface without admin privileges
+
+#### Admin Account
+- **Email**: `admin@zignal.dev`
+- **Password**: `ZignalAdmin2024!`
+- **Role**: Administrator
+- **Features**: Full dashboard access + admin panel
+- **Profile**: Shows admin badge, special styling, and admin panel access button
+
+#### Testing Workflow
+1. Run the setup script: `node scripts/setup-test-users.js`
+2. Start development server: `npm run dev`
+3. Navigate to `http://localhost:3000`
+4. Login with either test account
+5. Verify ProfileSection (sidebar) and ProfileDropdown (header) functionality
+6. Test logout functionality with both accounts
+7. Confirm admin features work correctly for admin account
+
+#### Testing Notes
+- Both accounts are created in Supabase Auth and `user_profiles` table
+- Admin account displays crown badges and admin-specific UI elements
+- Test logout functionality with both accounts to verify proper state clearing
+- ProfileSection in sidebar and ProfileDropdown in header should both work correctly
+- Online/offline status indicators update in real-time
+- Script handles existing users gracefully (won't create duplicates)
 
 ### Project Structure
 
@@ -151,7 +284,7 @@ zignal-login/
 
 ## 🛣️ Routing Structure
 
-- **Landing Page**: `/` - Original login/landing page (preserved)
+- **Landing Page**: `/` - Interactive slideshow landing page with platform features, security info, mission, and vision
 - **Authentication**: `/auth/*` - Login system with OAuth support
 - **Dashboard**: `/dashboard` - Main trading dashboard with analytics
 - **Wallet**: `/wallet` - Complete wallet management with deposits and withdrawals
@@ -181,6 +314,57 @@ To learn more about Next.js, take a look at the following resources:
 - [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
 You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+
+## 🚀 Serverless Deployment
+
+Zignal is deployed as a serverless application on Vercel with edge-compatible functions for optimal performance.
+
+### Deployment Information
+- **Production URL**: https://zignals.org
+- **Vercel URL**: https://zignals.vercel.app
+- **Project ID**: prj_r2FP75z7nZCQ5GYTvkCFhNBPW8QR
+- **Team**: TriGo (team_AhO7EohVDcoArC9gHpRNylja)
+- **Framework**: Next.js 15.5.2 with serverless functions
+- **Runtime**: Edge Runtime compatible
+
+### Serverless API Endpoints
+
+#### Authentication Microservice
+- `https://zignals.org/api/auth/session` - Session management
+- `https://zignals.org/api/auth/workos/login` - WorkOS authentication
+- `https://zignals.org/api/auth/workos/callback` - OAuth callbacks
+- `https://zignals.org/api/auth/workos/logout` - Secure logout
+- `https://zignals.org/api/auth/supabase/me` - User profile data
+
+#### Trading Functions
+- `https://zignals.org/api/crypto/prices` - Real-time crypto prices
+- `https://zignals.org/api/signals` - Trading signals
+- `https://zignals.org/api/trades` - Trade management
+- `https://zignals.org/api/deposits` - Deposit operations
+- `https://zignals.org/api/withdrawals` - Withdrawal operations
+
+#### Admin Functions
+- `https://zignals.org/api/admin/users` - User management
+- `https://zignals.org/api/admin/signals` - Signal administration
+- `https://zignals.org/api/admin/security/alerts` - Security monitoring
+
+### Environment Configuration
+```bash
+# Production Environment Variables
+AUTH_SERVICE_MODE=serverless
+EDGE_COMPATIBLE=true
+SERVERLESS_FUNCTIONS_URL=https://zignals.org/api
+AUTH_MICROSERVICE_URL=https://zignals.org/api/auth
+VERCEL_ENV=production
+NODE_ENV=production
+```
+
+### Deployment Features
+- ⚡ **Edge Runtime**: Ultra-fast serverless functions
+- 🔄 **Auto-scaling**: Handles traffic spikes automatically
+- 🌍 **Global CDN**: Distributed across Vercel's edge network
+- 🔒 **Secure**: Enterprise-grade security with WorkOS
+- 📊 **Monitoring**: Built-in analytics and performance tracking
 
 ## Deploy on Vercel
 

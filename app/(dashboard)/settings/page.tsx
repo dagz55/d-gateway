@@ -7,14 +7,32 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Bell, Globe, Lock, Palette, Shield } from 'lucide-react';
+import { useWorkOSAuth } from '@/contexts/WorkOSAuthContext';
 
 export default function SettingsPage() {
-  // Mock profile data to avoid API calls
-  const profile = {
-    username: 'user123',
-    fullName: 'John Doe',
-    avatarUrl: undefined,
+  // Get real profile data from WorkOS auth context
+  const { profile, user, loading } = useWorkOSAuth();
+  
+  // Use real profile data or fallback
+  const profileData = {
+    username: profile?.username || user?.firstName?.toLowerCase() || 'user',
+    fullName: profile?.full_name || `${user?.firstName || ''} ${user?.lastName || ''}`.trim() || 'User',
+    avatarUrl: profile?.avatar_url || profile?.profile_picture_url || user?.profilePictureUrl,
   };
+
+  // Debug log to see what data we have
+  console.log('Settings Page Profile Data:', { profile, user, profileData });
+
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Settings</h1>
+          <p className="text-muted-foreground">Loading your settings...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -38,7 +56,7 @@ export default function SettingsPage() {
           <CardContent className="space-y-6">
             <div className="grid gap-6 md:grid-cols-2">
               <ChangePhotoForm />
-              <ChangeUsernameForm currentUsername={profile?.username || ''} />
+              <ChangeUsernameForm currentUsername={profileData.username} />
             </div>
             <ChangePasswordForm />
           </CardContent>

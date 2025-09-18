@@ -8,25 +8,16 @@ import { Label } from '@/components/ui/label';
 import { Upload, User, Trash2 } from 'lucide-react';
 import { useRef, useState, useEffect } from 'react';
 import { toast } from 'sonner';
-import { createClient } from '@/lib/supabase/client';
-import { uploadAvatar, uploadAvatarBase64, removeAvatar } from '@/lib/actions';
+import { useWorkOSAuth } from '@/contexts/WorkOSAuthContext';
+// Removed Server Action imports - now using API routes
 import { validateImageFile, ACCEPT_FILE_TYPES, ACCEPT_FILE_EXTENSIONS, ALLOWED_IMAGE_EXTENSIONS } from '@/lib/validation';
 
-interface User {
-  id: string;
-  email?: string;
-  user_metadata?: {
-    full_name?: string;
-    avatar_url?: string;
-  };
-}
-
 export default function ChangePhotoForm() {
+  const { user, profile } = useWorkOSAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [currentAvatarUrl, setCurrentAvatarUrl] = useState<string | null>(null);
-  const [user, setUser] = useState<User | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const objectUrlRef = useRef<string | null>(null);
 
@@ -41,32 +32,10 @@ export default function ChangePhotoForm() {
   }, []);
 
   useEffect(() => {
-    const supabase = createClient();
-    
-    const getUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        setUser(user);
-        setCurrentAvatarUrl(user.user_metadata?.avatar_url || null);
-      }
-    };
-    
-    getUser();
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (event === 'SIGNED_OUT') {
-        setUser(null);
-        setCurrentAvatarUrl(null);
-      } else if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
-        // Use getUser() for secure user data instead of session.user
-        const { data: { user } } = await supabase.auth.getUser();
-        setUser(user);
-        setCurrentAvatarUrl(user?.user_metadata?.avatar_url || null);
-      }
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
+    // Use profile data first, then fallback to user data
+    const avatarUrl = profile?.avatar_url || profile?.profile_picture_url || user?.profilePictureUrl;
+    setCurrentAvatarUrl(avatarUrl || null);
+  }, [profile?.avatar_url, profile?.profile_picture_url, user?.profilePictureUrl]);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -128,23 +97,21 @@ export default function ChangePhotoForm() {
       // Convert to base64 for fallback
       const base64Data = await fileToBase64(selectedFile);
       
-      // Try storage first
+      // Create form data for API route
       const formData = new FormData();
       formData.append('file', selectedFile);
       formData.append('base64', base64Data);
 
-      let result = await uploadAvatar(formData);
+      // Use API route instead of Server Action
+      const response = await fetch('/api/upload/avatar', {
+        method: 'POST',
+        body: formData,
+      });
 
-      // If storage fails, try base64 only
-      if (!result.success && result.error?.includes('Storage')) {
-        if (process.env.NODE_ENV === 'development') {
-          console.log('Storage failed, trying base64 only...');
-        }
-        result = await uploadAvatarBase64(base64Data);
-      }
+      const result = await response.json();
 
       if (result.success) {
-        setCurrentAvatarUrl(result.avatarUrl!);
+        setCurrentAvatarUrl(result.avatarUrl);
         toast.success('Profile photo updated successfully!');
         
         // Clear preview first, then revoke object URL
@@ -175,7 +142,12 @@ export default function ChangePhotoForm() {
 
     setIsSubmitting(true);
     try {
-      const result = await removeAvatar();
+      // Use API route instead of Server Action
+      const response = await fetch('/api/upload/avatar', {
+        method: 'DELETE',
+      });
+
+      const result = await response.json();
 
       if (result.success) {
         setCurrentAvatarUrl(null);

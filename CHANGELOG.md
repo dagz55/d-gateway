@@ -1,386 +1,522 @@
 # Changelog
 
-All notable changes to the Zignal Trading Platform will be documented in this file.
+All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [2.4.3] - 2025-01-15
-
-### UI/UX Improvements and Validation Enhancements
-
-#### **🎨 UI/UX Fixes**
-- **HTML Entity Cleanup**: Fixed HTML entities (`&quot;`) in PrivacyModal and TermsModal components, replaced with proper double-quote characters
-- **Better Error Messages**: Improved ChangePhotoForm validation with separate user authentication and file selection error messages
-- **Enhanced Button States**: Fixed Upload button disabled state to properly check for both user authentication and file selection
-
-#### **🛡️ File Upload Security & Validation**
-- **HEIC/HEIF Support**: Added support for HEIC and HEIF image formats in file upload validation
-- **Single Source of Truth**: Created centralized file extension management in validation.ts to prevent duplication
-- **MIME Type Security**: Fixed MIME type validation to prevent spoofed files from bypassing security checks
-- **Improved Accept Attribute**: Fixed file input accept attribute to properly handle multiple file types without duplicates
-
-#### **🔧 Component Reliability**
-- **Mount State Management**: Fixed isMountedRef initialization in DepositComponent to accurately reflect component mount state
-- **Memory Leak Prevention**: Added proper mount guards to prevent state updates after component unmount
-- **Error Recovery**: Enhanced error handling in file upload operations with better user feedback
-
-#### **📝 Code Quality**
-- **TypeScript Improvements**: Enhanced type safety across file upload and validation components
-- **Linting Compliance**: All modified files pass linting checks without errors
-- **Performance Optimization**: Improved memory management and reduced potential memory leaks
-
-## [2.4.2] - 2025-01-15
-
-### Bug Fixes and Performance Improvements
-
-#### **🐛 Memory Management Fixes**
-- **Memory Leak Prevention**: Fixed memory leaks in ChangePhotoForm.tsx by properly revoking object URLs before clearing state
-- **Blob URL Management**: Added proper cleanup of blob URLs to prevent memory accumulation during file preview operations
-
-#### **🔧 Validation Improvements**
-- **Accurate Error Messages**: Fixed file size validation to use Math.floor instead of Math.round for precise error messaging
-- **File Size Limits**: Ensured error messages accurately reflect the actual file size limits (5MB)
-
-#### **⚡ TypeScript Compilation Fixes**
-- **Server Client Error**: Resolved TypeScript compilation error in serverClient.ts with cookies().getAll() method
-- **Build Stability**: Fixed build failures and improved overall compilation stability
-
-#### **📝 Code Quality**
-- **Linting**: All files now pass linting checks without errors
-- **Type Safety**: Improved TypeScript type safety across the application
-- **Performance**: Enhanced memory management and reduced potential memory leaks
-
-## [2.4.1] - 2025-01-15
-
-### Critical Fix: REQUEST_HEADER_TOO_LARGE Error Resolution
-
-#### **🚨 Critical Bug Fix**
-- **REQUEST_HEADER_TOO_LARGE Error**: Fixed Error Code 494 that was causing application crashes on Vercel
-- **OAuth State Issues**: Resolved invalid OAuth state errors that were accumulating in headers
-- **Cookie Size Management**: Implemented automatic filtering of large cookies (>4KB) to prevent header overflow
-- **Session Cleanup**: Added automatic session cleanup when headers become too large
-
-#### **🔧 Technical Improvements**
-- **Header Size Monitoring**: Added middleware checks for header size (30KB threshold with 2KB buffer)
-- **Cookie Filtering**: Automatic filtering of oversized cookies in both middleware and Supabase client
-- **Secure Cookie Configuration**: Enhanced cookie security with proper flags and expiration
-- **Error Recovery Flow**: Implemented `/auth/clean-session` route for graceful error recovery
-
-#### **🛡️ Security Enhancements**
-- **Cookie Security**: Added httpOnly, secure, and sameSite flags to all cookies
-- **Path Restrictions**: Limited cookies to appropriate paths
-- **Expiration Management**: Set reasonable 7-day default expiration for session cookies
-- **Header Validation**: Added comprehensive header size validation
-
-#### **📊 Monitoring & Logging**
-- **Warning System**: Added console warnings for oversized cookies and headers
-- **Error Tracking**: Enhanced logging for OAuth state errors and header overflow
-- **Recovery Metrics**: Track session cleanup and recovery operations
-
-#### **🔄 Error Recovery**
-- **Automatic Detection**: Middleware automatically detects large headers and redirects to cleanup
-- **Complete Session Reset**: Clean session route clears all cookies, localStorage, and sessionStorage
-- **Graceful Fallback**: Users are automatically redirected to home page after cleanup
-- **OAuth Error Handling**: Specific handling for OAuth state errors with automatic recovery
-
-## [2.4.0] - 2025-01-15
-
-### Wallet System Implementation
-
-#### **🏦 New Wallet System**
-- **Complete Wallet Page**: Dedicated `/wallet` route with tabbed interface for all wallet operations
-- **Deposit Management**: Comprehensive deposit system with amount, reference number, and screenshot verification
-- **Deposit History**: Full transaction history with date/time, amount, MOP type, and wallet details
-- **Withdrawal System**: Portfolio value display with complete withdrawal forms including bank/ewallet details
-- **Withdrawal History**: Detailed withdrawal tracking with date/time, amount, MOP type, and wallet details
-
-#### **💰 Dual Wallet Architecture**
-- **Trading Wallet**: Separate wallet for trading operations with independent balance tracking
-- **Income Wallet**: Dedicated wallet for profit withdrawals and income management
-- **Balance Overview**: Real-time portfolio value display with separate wallet balances
-- **Transfer Management**: Seamless wallet-to-wallet operations
-
-#### **🔍 Advanced Features**
-- **Multiple Payment Methods**: Support for Bank Transfer, Credit Card, PayPal, Cryptocurrency, and E-Wallet
-- **Screenshot Verification**: Upload and preview system for deposit verification screenshots
-- **Advanced Filtering**: Filter transactions by status, payment method, wallet type, and date ranges
-- **Search Functionality**: Search transactions by reference number, transaction ID, or notes
-- **Transaction Receipts**: Download receipts for all deposit and withdrawal transactions
-
-#### **🎨 UI/UX Enhancements**
-- **Tabbed Interface**: Organized wallet operations with Deposit, Deposit History, Withdraw, and Withdrawal History tabs
-- **Interactive Forms**: Real-time form validation with balance checking and amount verification
-- **Status Indicators**: Color-coded status badges for completed, pending, processing, and failed transactions
-- **Responsive Design**: Mobile-first approach with full responsiveness across all wallet components
-
-#### **📊 Analytics & Reporting**
-- **Transaction Statistics**: Total deposits, withdrawals, pending amounts, and transaction counts
-- **Performance Tracking**: Win rates, success rates, and transaction volume analytics
-- **Real-time Updates**: Live balance updates and transaction status monitoring
-
-#### **🔧 Technical Implementation**
-- **Component Architecture**: Modular wallet components with reusable form elements and data tables
-- **TypeScript Integration**: Full type safety with comprehensive interfaces for wallet operations
-- **State Management**: Client-side state management for forms, filters, and transaction data
-- **File Upload System**: Secure screenshot upload with preview functionality
-- **Mock Data Integration**: Comprehensive mock data for development and demonstration
-
-#### **📋 Navigation Updates**
-- **Sidebar Consolidation**: Consolidated individual wallet items into single "Wallet" navigation entry
-- **Route Optimization**: Dedicated wallet route with clean URL structure
-- **Navigation Flow**: Seamless navigation between dashboard and wallet operations
-
-## [2.3.0] - 2025-01-15
-
-### ZIG TRADES Workflow Implementation
-
-#### **🎯 New Features**
-- **ZIG TRADES Workflow**: Complete trading workflow system integrated into main dashboard
-- **Trading Signals Component**: Multiple signal offers (ZIGNALS OFFER 1, 2, 3) with different profit rates and durations
-- **Copy Trading Functionality**: One-click copy trading with real-time execution and visual feedback
-- **Trading History Component**: Comprehensive history tracking with date, time, amount, and profit/loss details
-- **Active Trading Component**: Real-time active trade management with progress tracking and profit monitoring
-
-#### **📊 Enhanced Analytics**
-- **Performance Metrics**: Win rate calculation, total profit tracking, and trade statistics
-- **Advanced Filtering**: Filter trades by status (completed, pending, failed) and action type (BUY, SELL)
-- **Real-time Updates**: Live profit/loss tracking for active trades
-- **Progress Tracking**: Visual progress bars for trade duration and completion status
-
-#### **🎨 UI/UX Improvements**
-- **Tabbed Interface**: Organized workflow with Trading Signals, Trading History, and Active Trading tabs
-- **Interactive Components**: Expandable trade details with action buttons (Close Trade, Modify)
-- **Visual Indicators**: Color-coded profit/loss indicators and status badges
-- **Responsive Design**: Mobile-first approach with full responsiveness across all screen sizes
-
-#### **🔧 Technical Implementation**
-- **Component Architecture**: Modular design with separate components for each workflow section
-- **TypeScript Integration**: Full type safety with comprehensive interfaces for trading data
-- **State Management**: Client-side state management for filters, selections, and interactions
-- **Mock Data**: Comprehensive mock data for demonstration and development
-
-#### **📋 Dashboard Integration**
-- **Full Width Layout**: ZIG TRADES workflow prominently displayed on main dashboard
-- **Seamless Integration**: Maintains existing dashboard functionality while adding new workflow
-- **Performance Optimized**: Efficient rendering with proper component lifecycle management
-
-## [2.2.1] - 2025-01-14
-
-### Google OAuth Cleanup & Optimization
-
-#### **🔧 Technical Improvements**
-- **Simplified OAuth Implementation**: Removed custom redirect paths to let Supabase handle OAuth callbacks internally
-- **Environment Configuration**: Added `NEXT_PUBLIC_SITE_URL` for proper OAuth redirect handling
-- **Code Cleanup**: Removed unnecessary custom `redirectTo` parameters from Google OAuth calls
-- **Documentation Cleanup**: Removed conflicting OAuth documentation files and consolidated into single source of truth
-- **Callback Route Optimization**: Simplified auth callback route to handle only email confirmations and password resets
-
-#### **✅ Testing & Validation**
-- **OAuth Flow Testing**: Comprehensive testing of Google OAuth URL generation and redirect flow
-- **Configuration Validation**: Verified Supabase integration and Google OAuth configuration
-- **Environment Variables**: Confirmed all required environment variables are properly set
-- **Redirect URI Validation**: Verified correct Supabase callback URL format
-
-#### **📋 Configuration Updates**
-- **Google Cloud Console**: Updated redirect URIs to use base URLs only for localhost development
-- **Supabase Dashboard**: Configured proper site URL and redirect URLs
-- **Environment Variables**: Added `NEXT_PUBLIC_SITE_URL=http://localhost:3000`
-
-#### **🎯 Results**
-- ✅ **OAuth Flow**: Seamless Google OAuth sign-in without redirect URI mismatch errors
-- ✅ **Port Robustness**: OAuth works on any development port (3000, 3001, 3002, etc.)
-- ✅ **Code Simplicity**: Cleaner, more maintainable OAuth implementation
-- ✅ **Documentation**: Single, accurate source of truth for OAuth configuration
-
-## [2.2.0] - 2025-01-13
-
-### Profile Management & User Experience Enhancement
-
-#### **🆕 New Features**
-- **Complete Profile Photo Upload System**: Full-featured photo upload with dual-path reliability
-  - Supabase Storage integration with automatic bucket creation
-  - Base64 fallback for maximum reliability
-  - 5MB file size limit with support for JPG, PNG, GIF, WebP
-  - Real-time preview and avatar updates
-  - Automatic cleanup of old photos
-- **Enhanced Profile Dropdown**: Interactive user menu in dashboard header
-  - Current avatar display with fallback to user initials
-  - Active subscription status indicator
-  - Real-time online/offline status detection
-  - Quick access to profile settings and logout
-- **Comprehensive Profile Page**: Complete user profile management interface
-  - Account information display
-  - Profile photo upload section
-  - Username and password change forms
-  - Organized sections with proper navigation
-
-#### **🔧 Technical Improvements**
-- **Robust Error Handling**: Comprehensive error management for upload operations
-- **Client-Server Architecture**: Proper separation of browser and server-side operations
-- **Fallback Systems**: Multiple upload paths ensure reliability
-- **Real-time Updates**: Avatar changes immediately reflect across the application
-- **Security Enhancements**: Server-side validation and secure file handling
-
-#### **🐛 Bug Fixes**
-- **Module Resolution**: Fixed webpack chunk errors causing dashboard loading issues
-- **FileReader Server Errors**: Moved browser API usage to client-side only
-- **Storage Bucket Issues**: Added automatic bucket creation and error handling
-- **Build Cache**: Resolved Next.js build cache corruption issues
-
-#### **📱 User Interface**
-- **Responsive Design**: All new components work seamlessly on mobile and desktop
-- **Theme Integration**: Profile components follow existing dark/light theme system
-- **Loading States**: Proper loading indicators during upload operations
-- **Toast Notifications**: Clear success/error feedback for all operations
-
-#### **🔒 Security & Performance**
-- **File Validation**: Comprehensive client and server-side file validation
-- **Size Optimization**: Smart handling of large files with multiple storage options
-- **Clean Architecture**: Separation of concerns between upload methods
-- **Error Recovery**: Graceful degradation when storage services are unavailable
-
-## [3.0.0] - 2024-12-13
-
-### MAJOR INTEGRATION RELEASE
-- **Complete Dashboard Integration**: Successfully merged comprehensive trading dashboard with original authentication system
-- **Repository Integration**: Merged into https://github.com/dagz55/zignal-login.git with integrate-dashboard branch
-- **Next.js 15.5.2**: Upgraded to latest Next.js with React 19 support
-- **Production Ready**: Full build success with optimized bundle and code splitting
-
-### Added
-- **Complete Trading Dashboard**: Full-featured trading interface with real-time charts
-- **Advanced Analytics**: Portfolio distribution, profit/loss tracking, and performance metrics
-- **Signal Management**: Professional trading signals with copy trading capabilities
-- **Financial Operations**: Deposit and withdrawal management with history tracking
-- **News Integration**: Real-time cryptocurrency news feed
-- **Modern UI Components**: Complete shadcn/ui component library (26 components)
-- **Theme System**: Dark/light mode with persistence and smooth transitions
-- **State Management**: TanStack Query for data fetching and Zustand for state
-- **API Infrastructure**: Complete trading API routes for all operations
-- **Database Ready**: Supabase migrations included for production deployment
-- **Responsive Design**: Mobile-first approach with full responsiveness
-
-### Architecture
-- **Protected Route Groups**: Clean separation with `(dashboard)` route group
-- **Middleware Protection**: Secure authentication flow with automatic redirects
-- **Component Organization**: Well-structured components with dashboard, layout, and UI separation
-- **Type Safety**: Complete TypeScript definitions and type safety
-- **Performance**: Optimized bundle with proper code splitting and lazy loading
-
-### Technical Improvements
-- **Next.js 15.5.2**: Latest framework with App Router and React 19
-- **Supabase Integration**: Complete authentication and database setup
-- **Build Optimization**: Fixed TypeScript errors and Tailwind configuration
-- **Dependency Management**: Updated all dependencies to latest compatible versions
-
-### Routing Structure
-- **Landing Page**: `/` - Original login/landing (preserved)
-- **Authentication**: `/auth/*` - Login system with OAuth (preserved)
-- **Dashboard**: `/dashboard` - Main trading dashboard
-- **Profile**: `/profile` - User profile management
-- **Settings**: `/settings` - User preferences
-- **Admin**: `/admin` - Admin panel (preserved)
-
-### Breaking Changes
-- **Supabase Migration**: Complete migration from NextAuth to Supabase Auth
-- **Route Structure**: New protected route group structure
-- **Component Architecture**: New component organization and structure
-
-## [2.1.0] - 2024-12-13
-
-### Added
-- Modern password visibility toggle component with smooth animations
-- Password strength indicator with real-time feedback
-- Animated eye icon transitions (300ms rotation/scale effects)
-- Color-coded strength bars (red → orange → yellow → green)
-- Password complexity validation (length, mixed case, numbers, special chars)
-- Accessible password inputs with ARIA labels and keyboard navigation
-
-### Changed
-- Enhanced LoginForm with modern password input component
-- Updated SignupForm with password strength indicator
-- Improved ChangePasswordForm with visual strength feedback
-- Modernized ResetPasswordConfirm with animated password fields
-- Better UX with focus state highlighting and hover effects
-
-### UI Improvements
-- Smooth icon transitions between Eye/EyeOff states
-- Real-time password strength feedback
-- Descriptive strength text (Very Weak, Weak, Fair, Good, Strong)
-- Consistent 200ms-300ms animation durations
-- Fully responsive password inputs
-
-## [2.0.0] - 2024-12-13
-
-### BREAKING CHANGES
-- Migrated authentication system from NextAuth to Supabase Auth
-- Removed all NextAuth dependencies and configuration
-- Changed authentication API endpoints structure
-- Updated session management to use Supabase SSR
-
-### Added
-- Supabase Auth Provider with React Context (`src/providers/supabase-auth-provider.tsx`)
-- Comprehensive auth test page at `/auth-test` for validation
-- Compatibility `useSession` hook for easier migration
-- Session persistence with SSR cookies
-- Detailed Supabase auth implementation report
-- Support for Google OAuth (ready for configuration)
-- Middleware-based route protection for `/dashboard`, `/settings`, `/profile`
-
-### Changed
-- All API routes now use async/await with Supabase client
-- Database references updated from `user_profiles` to `profiles` table
-- Authentication flow uses Supabase's latest SSR patterns for Next.js 15
-- Updated all components to use new auth provider
-- Enhanced security with proper cookie-based session management
+## [2.9.0] - 2025-01-27
 
 ### Fixed
-- Critical async/await bug in `createClient()` calls across all API routes
-- TypeScript errors with Supabase client Promise handling
-- Database schema misalignment issues
-- Build errors related to mixed auth systems
-- Session persistence across page refreshes
-- Protected route redirects
+- **Photo Upload System**: Completely resolved photo upload and removal functionality
+  - Fixed Next.js 1MB body size limit error by increasing limit to 10MB
+  - Replaced Server Actions with dedicated API routes for better file handling
+  - Fixed Supabase storage bucket mismatch (`avatars` → `public_image`)
+  - Resolved useEffect dependency array warnings in photo components
+  - Added proper error handling and fallback mechanisms
+- **Settings Page Integration**: Fixed profile settings not saving
+  - Updated ChangePhotoForm to use WorkOS authentication context
+  - Connected settings page to real profile data instead of mock data
+  - Fixed avatar URL display from multiple data sources (profile, user)
+- **Database Schema Issues**: Resolved multiple database constraint errors
+  - Fixed RLS policy violations and infinite recursion issues
+  - Resolved foreign key constraint conflicts during column type changes
+  - Added proper admin user setup and permissions
+  - Fixed username uniqueness and NOT NULL constraint violations
 
-### Removed
-- NextAuth configuration (`src/lib/auth.ts`)
-- NextAuth API route (`src/app/api/auth/[...nextauth]/route.ts`)
-- NextAuth TypeScript definitions (`src/types/next-auth.d.ts`)
-- NextAuth dependencies from package.json
-
-### Security
-- Implemented Row Level Security (RLS) ready architecture
-- Added CSRF protection via SameSite cookies
-- Secured API routes with proper authentication checks
-- Protected sensitive operations with middleware
-
-### Known Issues
-- Profile updates temporarily return mock data (pending type generation)
-- Dashboard RPC functions using demo data (pending database setup)
-- Email verification requires SMTP configuration in Supabase
-
-## [1.0.0] - 2024-12-11
+### Enhanced
+- **Photo Upload Performance**: Improved file upload handling
+  - Created dedicated `/api/upload/avatar` API route for better performance
+  - Added support for larger files (up to 10MB) with proper streaming
+  - Implemented automatic cleanup of old avatar files
+  - Added comprehensive file validation (type, size, format)
+  - Enhanced error messages and user feedback
+- **Storage Integration**: Robust Supabase storage configuration
+  - Proper `public_image` bucket setup with correct policies
+  - Fallback to base64 storage when Supabase storage unavailable
+  - Secure file access with authenticated upload/update/delete
+  - Public read access for avatar images
+- **Authentication System**: Strengthened WorkOS integration
+  - Fixed admin detection and permissions system
+  - Added proper environment variable configuration
+  - Enhanced security logging for all avatar operations
 
 ### Added
-- Initial release of Zignal Trading Platform
-- Dashboard with real-time trading statistics
-- Trading history and signals management
-- Deposit and withdrawal functionality
-- Cryptocurrency news feed
-- Portfolio distribution charts
-- User profile management
-- Dark/Light theme support
-- Responsive design for mobile and desktop
+- **API Routes**: New dedicated endpoints for file operations
+  - `POST /api/upload/avatar` - Handle photo uploads with validation
+  - `DELETE /api/upload/avatar` - Handle photo removal with cleanup
+  - Proper authentication checks and error handling
+  - Security event logging for all operations
+- **Storage Policies**: Comprehensive Supabase storage security
+  - Fine-grained RLS policies for authenticated operations
+  - File type validation at the database level
+  - Proper bucket configuration with size and MIME type limits
 
-### Features
-- Real-time Bitcoin price chart
-- Trading activity visualization
-- Profit/Loss tracking
-- Copy trading signals
-- Account settings management
-- Avatar upload functionality
+## [2.8.2] - 2025-01-27
+
+### Fixed
+- **WorkOS Authentication Flow**: Resolved critical authentication issues
+  - Fixed 401 Unauthorized error by updating AuthContext to use correct WorkOS endpoint
+  - Added fallback authentication flow for backward compatibility
+  - Implemented proper WorkOS authentication endpoint routing
+- **Hydration Mismatch**: Fixed React hydration errors in background animations
+  - Moved Math.random() calls to useEffect to avoid server/client mismatch
+  - Added client-side initialization for FloatingParticle and ParticleField components
+  - Eliminated hydration warnings in floating particle animations
+
+### Enhanced
+- **WorkOS Authentication UI**: Complete visual redesign with modern enterprise-grade styling
+  - Added sophisticated animations using Framer Motion
+  - Implemented gradient backgrounds with animated elements
+  - Enhanced button interactions with hover and tap animations
+  - Improved visual hierarchy with better spacing and typography
+  - Added professional loading states with animated indicators
+  - Created modern form inputs with focus states and micro-interactions
+  - Enhanced features section with interactive hover effects
+  - Updated footer with animated links and better accessibility
+- **User Experience**: Significantly improved authentication interface
+  - Added staggered animations for smooth component entrance
+  - Implemented professional color scheme matching enterprise standards
+  - Enhanced accessibility with better contrast and focus indicators
+  - Added visual feedback for all interactive elements
+
+### Added
+- **WorkOS Domain Configuration**: Complete WorkOS domain setup implementation
+  - Implemented proper domain configuration based on WorkOS admin panel settings
+  - Added comprehensive WorkOS authentication service with domain support
+  - Created WorkOS configuration documentation and environment templates
+  - Added health checks and service validation for WorkOS integration
+- **Enhanced Authentication Service**: New WorkOS authentication service architecture
+  - Comprehensive domain configuration support (email, admin portal, auth API, AuthKit)
+  - State validation and security features for OAuth flow
+  - Proper error handling and logging integration
+  - Health check endpoints for service monitoring
+
+### Fixed
+- **WorkOS Authentication Errors**: Resolved critical authentication configuration issues
+  - Fixed import errors in WorkOS callback route
+  - Added environment variable validation and debugging tools
+  - Created environment configuration checker script (`npm run check-env`)
+  - Provided comprehensive environment template for easy setup
+- **Next.js Configuration**: Fixed workspace root detection warning
+  - Updated outputFileTracingRoot to use path.resolve for better cross-platform compatibility
+  - Resolved "multiple lockfiles detected" warning
+
+### Technical Improvements
+- **Authentication Architecture**: Improved authentication flow reliability
+  - Enhanced error handling in AuthContext to properly handle 401 responses
+  - Fixed 401 "Unauthorized" errors being treated as system errors instead of normal unauthenticated state
+  - Added proper fallback mechanisms for authentication methods
+  - Improved session management and user profile fetching
+  - Integrated security logging for authentication events
+- **Development Tools**: Enhanced developer experience
+  - Added environment variable validation script
+  - Created comprehensive environment template
+  - Improved error debugging and configuration validation
+- **WorkOS Integration**: Complete overhaul of WorkOS authentication system
+  - Updated API endpoints to use new WorkOS authentication service
+  - Proper domain configuration and environment-specific settings
+  - Enhanced security with state validation and CSRF protection
+  - Improved error categorization and user-friendly error messages
+- **Animation Performance**: Optimized background animations for better performance
+  - Fixed hydration issues that could cause layout shifts
+  - Improved animation consistency across different devices
+  - Reduced unnecessary re-renders in particle components
+
+## [2.8.1] - 2025-01-27
+
+### Added
+- **Serverless Configuration**: Complete serverless deployment configuration and environment setup
+  - Added AUTH_SERVICE_MODE, EDGE_COMPATIBLE, SERVERLESS_FUNCTIONS_URL, and AUTH_MICROSERVICE_URL environment variables
+  - Updated .env.local template with Vercel deployment URLs and configuration
+  - Added comprehensive serverless API endpoint documentation
+  - Configured edge-compatible runtime for optimal performance
+
+### Enhanced
+- **Environment Management**: Improved environment variable organization
+  - Added Vercel project and team identification variables
+  - Separated production and development configurations
+  - Enhanced security with proper environment variable isolation
+- **Documentation**: Updated README.md with serverless deployment information
+  - Added complete serverless API endpoint documentation
+  - Included deployment information and project details
+  - Added environment configuration examples
+- **Git Management**: Enhanced .gitignore for better security and deployment
+  - Added comprehensive environment file exclusions
+  - Included serverless function and deployment artifact exclusions
+  - Added IDE, OS, and temporary file exclusions
+
+### Fixed
+- **Next.js Workspace Warning**: Resolved lockfile detection conflicts
+  - Fixed `outputFileTracingRoot` configuration in next.config.ts
+  - Removed conflicting package-lock.json (project uses bun.lockb)
+  - Added path import for cross-platform compatibility
+  - Eliminated "multiple lockfiles detected" warning
+
+### Technical Improvements
+- **Deployment Architecture**: Configured for Vercel serverless functions
+  - Edge Runtime compatibility for ultra-fast performance
+  - Auto-scaling serverless functions
+  - Global CDN distribution
+- **Security**: Enhanced environment variable security
+  - Protected sensitive configuration files
+  - Improved deployment artifact security
+- **Performance**: Optimized for serverless execution
+  - Edge-compatible functions for reduced latency
+  - Efficient memory and execution time optimization
+- **Build Configuration**: Improved Next.js configuration
+  - Fixed workspace root detection for proper file tracing
+  - Resolved lockfile conflicts for cleaner builds
+
+### Files Modified
+- `.gitignore` - Enhanced with comprehensive exclusions for security and deployment
+- `package.json` - Version bumped to 2.8.1
+- `README.md` - Added serverless deployment documentation and API endpoints
+- `CHANGELOG.md` - Added version 2.8.1 release notes
+- `next.config.ts` - Fixed outputFileTracingRoot and added path import
+
+### Files Removed
+- `package-lock.json` - Removed conflicting lockfile (project uses bun.lockb)
+
+### Deployment Information
+- **Production URL**: https://zignals.org
+- **Vercel Project ID**: prj_r2FP75z7nZCQ5GYTvkCFhNBPW8QR
+- **Team**: TriGo (team_AhO7EohVDcoArC9gHpRNylja)
+- **Latest Deployment**: dpl_HzbTid353NV6njkKGi2eWX1h8X7C
+- **Status**: ✅ READY (Serverless Functions)
+- **Region**: IAD1 (US East)
+
+## [2.8.0] - 2025-01-27
+
+### Added
+- **Enhanced Landing Page**: Completely redesigned landing page separated from login functionality
+  - Created dedicated landing page with professional navigation header and footer
+  - Integrated 3D particle animations using React Three Fiber and WebGL shaders
+  - Added custom shader materials for dynamic particle effects and noise patterns
+  - Implemented mouse-responsive floating elements and gradient overlays
+
+- **Advanced Hero Section**: Professional hero section with cutting-edge animations
+  - WebGL particle systems with custom vertex and fragment shaders
+  - Real-time animated grids with pulsing signal lines
+  - Interactive background effects responding to mouse movement
+  - Live cryptocurrency price tickers with animated updates
+  - Feature cards with hover animations and gradient effects
+  - Promotional banner carousel with smooth transitions
+
+- **Background Animation System**: Comprehensive animation framework
+  - Floating particle fields with customizable colors and behaviors
+  - Animated grid patterns with pulse effects
+  - Wave animations with gradient fills
+  - Glowing orbs with scale and opacity animations
+  - Matrix rain effect for subtle background texture
+  - Combined animation system for layered effects
+
+- **Enhanced Components**: Professional landing page sections
+  - Security section with numbered feature list and animations
+  - Mission and Vision cards with interactive hover effects
+  - Enhanced typography with gradient text effects
+  - Smooth scroll animations triggered by viewport intersection
+
+### Technical Improvements
+- **3D Graphics**: Added React Three Fiber for WebGL rendering
+- **Animation Library**: Integrated Framer Motion for smooth animations
+- **Performance**: Optimized particle systems with proper cleanup and device pixel ratio scaling
+- **Responsive Design**: Enhanced mobile-first responsive design for all new components
+- **TypeScript**: Full type safety for all new components and shader materials
+
+### Dependencies
+- Added `framer-motion` for advanced animations
+- Added `@react-three/fiber` and `@react-three/drei` for 3D graphics
+- Added `three` for WebGL rendering and shader materials
+
+## [2.7.2] - 2025-01-27
+
+### Fixed
+- **Theme Management Issues**: Resolved hardcoded dark theme conflicts
+  - Removed hardcoded `className="dark"` from root HTML element in app/layout.tsx
+  - Fixed ThemeProvider configuration to properly control theme switching
+  - Ensured ThemeProvider wraps app root with `attribute="class"` and `defaultTheme="light"`
+  - Theme switching now works correctly without conflicts
+
+- **WorkOS Authentication Security**: Enhanced password generation and username handling
+  - Replaced `randomUUID()` with cryptographically secure password generator using `crypto.randomBytes`
+  - Improved password complexity with upper/lower case, digits, and symbols (24 characters)
+  - Enhanced username generation with better collision handling and validation
+  - Replaced domain-based username suffixes with numeric zero-padded suffixes for clarity
+  - Improved username fallback with timestamp + random component to reduce collision probability
+  - Added comprehensive email validation to handle empty local parts safely
+  - Replaced PostgREST-specific error checks with database-agnostic uniqueness validation
+  - Added supabaseClient parameter validation to prevent runtime errors
+  - Increased max attempts for username generation and improved error handling
+
+### Technical Improvements
+- **Security**: Enhanced cryptographic password generation for SSO accounts
+- **Error Handling**: Improved database-agnostic error detection for uniqueness constraints
+- **Validation**: Added comprehensive parameter validation and fallback mechanisms
+- **Username Generation**: More predictable and collision-resistant username creation
+- **Code Quality**: Better error handling and logging without exposing sensitive data
+
+### Files Modified
+- `app/layout.tsx` - Removed hardcoded dark theme className
+- `app/api/auth/workos/callback/route.ts` - Enhanced security and username generation
+- `CHANGELOG.md` - Added version 2.7.2 release notes
+
+## [2.7.1] - 2025-09-16
+
+### Fixed
+- **Dashboard Readability Issues**: Resolved severe contrast and readability problems
+  - Fixed CSS variable format conflicts between globals.css and enterprise.css
+  - Converted CSS variables from hex/rgba to HSL format for proper Tailwind integration
+  - Removed conflicting enterprise.css import that was overriding theme colors
+  - Forced light mode by default to prevent dark theme readability issues
+  - Improved glass morphism effects with higher opacity for better contrast
+  - Enhanced dashboard background gradient for better text visibility
+  - Restored proper foreground/background color contrast ratios
+
+### Technical Improvements
+- **CSS Architecture**: Fixed Tailwind CSS variable compatibility
+  - All CSS variables now use HSL format (e.g., `220 39% 11%` instead of `#0a0f1f`)
+  - Removed enterprise.css conflicts that were causing theme override issues
+  - Improved glass utility classes for better card visibility
+- **Theme Management**: Enforced consistent light theme application
+  - Added `className="light"` to HTML element to prevent dark mode issues
+  - Enhanced color contrast for accessibility compliance
+  - Optimized dashboard background gradients for readability
+
+### Files Modified
+- `app/globals.css` - Fixed CSS variable formats and glass effects
+- `app/layout.tsx` - Removed conflicting enterprise.css import and enforced light theme
+- `CHANGELOG.md` - Added version 2.7.1 release notes
+
+## [2.7.0] - 2025-09-16
+
+### Added
+- **Interactive Landing Page Slideshow**: Dynamic slideshow system for the landing page left pane
+  - Auto-advancing slideshow with 8-second intervals between slides
+  - Manual navigation controls with previous/next buttons and slide indicators
+  - 6 comprehensive slides covering platform features:
+    - Slide 1: Cryptocurrency trading made simple with risk-free trading promotion
+    - Slide 2: Flexible package pricing based on duration
+    - Slide 3: Expert guidance and advisor support
+    - Slide 4: Comprehensive site security measures (5-point security overview)
+    - Slide 5: Company mission statement
+    - Slide 6: Company vision statement
+  - Responsive design with mobile-first approach
+  - Smooth transitions and animations between slides
+  - Auto-play pause/resume functionality
+  - Different styling themes for different slide types (promo, security, mission, vision)
+  - Accessibility features with proper ARIA labels and keyboard navigation
+- **HeroSlideshow Component**: New reusable slideshow component with TypeScript support
+  - Configurable slide content with different display types
+  - Glass-morphism design with backdrop blur effects
+  - Gradient backgrounds matching the platform's design language
+  - Loading states and smooth transitions
+  - Touch-friendly controls for mobile devices
+
+### Enhanced
+- **HeroSection Component**: Updated to integrate the new slideshow system
+  - Retained animated background canvas with grid and signal lines
+  - Improved background opacity for better slideshow visibility
+  - Maintained responsive design and gradient overlays
+- **Landing Page Experience**: Significantly improved user engagement
+  - Professional presentation of platform features and security
+  - Clear value proposition communication
+  - Enhanced visual appeal with modern UI components
+
+### Fixed
+- **Text Readability Issues**: Resolved white background sections that made text unreadable
+  - Fixed Mission section card backgrounds from white to dark with proper text contrast
+  - Updated CTA section card backgrounds for better readability
+  - Changed all text colors from dark to light (`text-[#EAF2FF]`) in affected sections
+  - Improved border and accent colors for better visual hierarchy
+  - Enhanced trust indicators and stats sections with proper color contrast
+- **Theme System Cleanup**: Completely removed light/dark mode theme switching system
+  - Removed ThemeProvider and next-themes dependency
+  - Deleted theme-provider.tsx and ThemeContext.tsx components
+  - Cleaned up globals.css to use single dark theme configuration
+  - Updated all Card, Button, and Badge components to use Zignal's consistent dark theme
+  - Fixed all remaining gray color references to use proper Zignal colors
+  - Removed all `dark:` class modifiers and neutral color references
+  - Established consistent color palette throughout the application
+
+### Technical Improvements
+- **Component Architecture**: Clean separation of concerns between background animation and content
+- **TypeScript Support**: Full type safety for slide configurations and component props
+- **Performance**: Optimized rendering and memory usage for smooth animations
+- **Responsive Design**: Mobile-first approach with proper breakpoints
+- **Accessibility**: ARIA labels, keyboard navigation, and screen reader support
+- **Color Contrast**: Improved accessibility with proper text-to-background contrast ratios
+
+### Files Added
+- `components/HeroSlideshow.tsx` - New slideshow component with comprehensive slide management
+
+### Files Modified
+- `components/HeroSection.tsx` - Updated to integrate slideshow functionality
+- `components/landing/FunctionalLanding.tsx` - Fixed text readability issues in Mission and CTA sections
+- `app/globals.css` - Cleaned up theme system, removed light/dark mode switching
+- `app/providers.tsx` - Removed ThemeProvider dependency
+- `components/enterprise/Card.tsx` - Updated to use consistent Zignal dark theme colors
+- `components/enterprise/Button.tsx` - Updated button variants with Zignal color palette
+- `components/enterprise/Badge.tsx` - Updated badge variants with consistent dark theme
+- `components/ui/button.tsx` - Removed dark mode classes and neutral colors
+- `components/ui/animated-stats.tsx` - Fixed trend colors and progress bar backgrounds
+- `components/layout/ProfileDropdown.tsx` - Updated gray color references to Zignal colors
+- `components/layout/ProfileSection.tsx` - Fixed status indicator colors
+- `components/WorkOSAuthCard.tsx` - Updated all gray text colors to proper contrast colors
+- `app/page.tsx` - Fixed navigation button colors and right panel background
+- `package.json` - Removed next-themes dependency, version bumped to 2.7.0
+- `README.md` - Updated with new landing page features
+- `CHANGELOG.md` - Added version 2.7.0 release notes
+
+### Files Deleted
+- `components/theme-provider.tsx` - Removed theme provider component
+- `contexts/ThemeContext.tsx` - Removed theme context
+
+## [2.6.0] - 2025-09-15
+
+### Added
+- **WorkOS AuthKit + Supabase Integration**: Enterprise-grade authentication with database integration
+  - WorkOS AuthKit as Supabase third-party auth provider
+  - WorkOS access tokens authenticate with Supabase APIs
+  - Encrypted session management with automatic refresh
+  - Enterprise SSO capabilities (SAML, OIDC, Google Workspace, Microsoft 365)
+  - SOC 2 Type II compliance for financial services
+  - Advanced audit trails and session controls
+  - Professional authentication UI components
+  - JWT template configuration for Supabase RLS policies
+- **WorkOS Configuration**: Complete setup and configuration system
+  - Environment variable validation and setup
+  - API endpoints for login, callback, logout, and user management
+  - Authentication middleware for protected routes
+  - WorkOS context provider for React components
+- **Testing & Validation**: Comprehensive testing suite
+  - WorkOS authentication test script
+  - Environment variable validation
+  - API endpoint testing
+  - Configuration validation
+- **Documentation**: Complete setup and usage documentation
+  - WORKOS_SETUP.md with detailed configuration instructions
+  - Updated README.md with WorkOS authentication features
+  - Architecture documentation for hybrid auth/database setup
+
+### Changed
+- **Authentication System**: Migrated to WorkOS AuthKit + Supabase integration
+  - WorkOS handles authentication, Supabase provides database
+  - Updated middleware to use WorkOS session validation
+  - WorkOS access tokens authenticate with Supabase APIs
+  - Maintained Supabase for trading data and real-time features
+  - RLS policies work with WorkOS JWT tokens
+- **UI Components**: Updated authentication interface
+  - WorkOSAuthCard component with enterprise branding
+  - Professional authentication flow and user experience
+  - Enhanced security messaging and compliance indicators
+
+### Technical Details
+- **Architecture**: WorkOS + Supabase third-party auth integration
+  - WorkOS handles all user authentication and session management
+  - Supabase provides database with RLS policies using WorkOS tokens
+  - WorkOS access tokens authenticate with Supabase APIs
+  - Clean separation of concerns between auth and data layers
+- **Security**: Enhanced security measures
+  - Encrypted session cookies with 32-character passwords
+  - Automatic session refresh and validation
+  - Enterprise-grade security infrastructure
+  - Professional audit trails and compliance reporting
+  - JWT template configuration for Supabase RLS compatibility
+
+## [2.5.0] - 2025-09-15
+
+### Added
+- **ProfileSection Component**: Comprehensive sidebar profile component with enhanced user experience
+  - Avatar display with fallback initials and proper loading states
+  - User information display (name, email, online/offline status)
+  - Admin badge with crown icon for administrator accounts
+  - Quick action buttons for common tasks:
+    - Edit Profile - Navigate to profile editing page
+    - Account Settings - Access account preferences
+    - Notifications - Manage notification preferences
+    - Security - Security and privacy settings
+    - Billing - Subscription and billing management
+    - Help & Support - Customer support access
+    - Admin Panel - Administrative functions (admin users only)
+    - Sign Out - Secure logout with loading states
+- **Loading States**: Skeleton animations during data fetching for smooth UX
+- **Error Handling**: Graceful error displays with retry mechanisms and user feedback
+- **Accessibility Features**: Full ARIA support and screen reader compatibility
+  - Descriptive labels for all interactive elements
+  - Proper focus management and keyboard navigation
+  - Screen reader announcements for status changes
+  - High contrast design with readable text sizes
+- **Responsive Design**: Mobile-first approach that adapts to all screen sizes
+  - Touch-friendly button sizes on mobile devices
+  - Proper spacing and layout optimization
+  - Smooth transitions and animations
+- **Real-time Updates**: Online/offline status detection and display
+- **Interactive Demo**: Comprehensive demo page at `/demo/profile-section`
+  - Showcases all component states (normal, admin, loading, error)
+  - Desktop and mobile view previews
+  - Feature overview and documentation
+
+### Enhanced
+- **Sidebar Component**: Integrated new ProfileSection replacing previous implementation
+- **User Experience**: Improved profile management with centralized quick actions
+- **Documentation**: Added comprehensive component and user documentation
+- **README.md**: Updated with ProfileSection features and capabilities
+
+### Technical Improvements
+- **Type Safety**: Full TypeScript implementation with strict typing
+- **Performance**: Optimized memory usage and proper cleanup
+- **Code Quality**: Clean, maintainable code following best practices
+- **Testing**: Comprehensive build and lint testing passed
+
+### Documentation
+- Added detailed component documentation in `docs/components/ProfileSection.md`
+- Created comprehensive user guide in `docs/user-guides/profile-section-guide.md`
+- Updated README.md with ProfileSection features
+- Added interactive demo showcasing all component states
+
+### Files Added
+- `components/layout/ProfileSection.tsx` - Main ProfileSection component
+- `app/demo/profile-section/page.tsx` - Interactive demonstration page
+- `docs/components/ProfileSection.md` - Technical component documentation
+- `docs/user-guides/profile-section-guide.md` - User guide and troubleshooting
+
+### Files Modified
+- `components/layout/Sidebar.tsx` - Integrated ProfileSection component
+- `README.md` - Updated with new features and documentation
+- `package.json` - Version bumped to 2.5.0
+
+### Version Information
+- **Version**: 2.5.0 (Minor release - new features, backward compatible)
+- **Commit**: fbdf022 - feat: implement comprehensive ProfileSection component
+- **Tag**: v2.5.0
+- **Date**: September 15, 2025
+
+### Migration Guide
+No breaking changes in this release. The ProfileSection automatically replaces the previous sidebar profile implementation while maintaining all existing functionality.
+
+To use the new interactive demo:
+```bash
+# Navigate to the demo page
+http://localhost:3001/demo/profile-section
+```
+
+### Browser Compatibility
+- Chrome/Chromium 88+
+- Firefox 85+
+- Safari 14+
+- Edge 88+
+
+### Performance Metrics
+- Build: ✅ Successful compilation
+- Bundle Size: Optimized and reasonable
+- Type Checking: ✅ All types validated
+- Linting: ✅ Clean code standards
 
 ---
 
-For more details on upgrading from v1.0.0 to v2.0.0, see the [Migration Guide](./MIGRATION_GUIDE.md).
+## Previous Versions
+
+### [2.4.3] - Previous Release
+- Previous version features and improvements
+- ...
