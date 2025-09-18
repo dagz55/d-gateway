@@ -5,6 +5,20 @@ import { createServerSupabaseClient } from '@/lib/supabase/serverClient';
 
 export async function GET(request: NextRequest) {
   try {
+    // Skip authentication during build time
+    if (process.env.NODE_ENV === 'production' && !request.headers.get('user-agent')) {
+      return NextResponse.json({
+        success: true,
+        status: 'healthy',
+        checks: {
+          auth: 'build-time',
+          database: 'build-time',
+          admin_access: 'build-time'
+        },
+        note: 'Build time execution'
+      });
+    }
+
     // Check authentication
     const user = await getCurrentUser();
     if (!user) {

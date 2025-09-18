@@ -4,7 +4,12 @@ import { createServerSupabaseClient } from '@/lib/supabase/serverClient'
 import { createAdminClient } from '@/lib/supabase/adminClient'
 import { Database } from '@/lib/supabase/types'
 
-async function assertAdmin() {
+async function assertAdmin(request?: NextRequest) {
+  // Skip authentication during build time
+  if (process.env.NODE_ENV === 'production' && request && !request.headers.get('user-agent')) {
+    return { user: null, isAdmin: false, buildTime: true }
+  }
+
   const user = await getCurrentUser()
   if (!user) return { user: null, isAdmin: false }
   
@@ -15,7 +20,17 @@ async function assertAdmin() {
 
 export async function GET(request: NextRequest) {
   try {
-    const { user, isAdmin } = await assertAdmin()
+    const adminCheck = await assertAdmin(request)
+    if (adminCheck.buildTime) {
+      return NextResponse.json({
+        success: true,
+        data: [],
+        pagination: { limit: 50, offset: 0, count: 0 },
+        note: 'Build time execution - no data available'
+      })
+    }
+    
+    const { user, isAdmin } = adminCheck
     if (!user || !isAdmin) {
       return NextResponse.json({ success: false, message: 'Forbidden' }, { status: 403 })
     }

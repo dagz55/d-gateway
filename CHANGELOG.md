@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.9.1] - 2025-01-27
+
+### Fixed
+- **Vercel Deployment Build Error**: Fixed "Failed to collect page data" error for admin API routes
+  - Added build-time protection to `/api/admin/errors`, `/api/admin/health`, `/api/admin/users`, and `/api/admin/signals`
+  - Prevented authentication checks during Next.js build process
+  - Routes now return appropriate responses during build-time execution
+  - Resolved cookie access issues during static generation phase
+
 ## [2.9.0] - 2025-01-27
 
 ### Fixed

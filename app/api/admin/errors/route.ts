@@ -15,6 +15,11 @@ interface ErrorLog {
 
 export async function POST(request: NextRequest) {
   try {
+    // Skip authentication during build time
+    if (process.env.NODE_ENV === 'production' && !request.headers.get('user-agent')) {
+      return NextResponse.json({ error: 'Build time execution' }, { status: 503 });
+    }
+
     // Verify authentication
     const user = await getCurrentUser();
     if (!user) {
@@ -127,6 +132,16 @@ async function notifyAdminError(errorData: ErrorLog, user: any) {
 // GET endpoint to retrieve admin error logs
 export async function GET(request: NextRequest) {
   try {
+    // Skip authentication during build time
+    if (process.env.NODE_ENV === 'production' && !request.headers.get('user-agent')) {
+      return NextResponse.json({ 
+        success: true,
+        data: [],
+        pagination: { limit: 50, offset: 0, count: 0 },
+        note: 'Build time execution - no data available'
+      });
+    }
+
     // Verify authentication and admin status
     const user = await getCurrentUser();
     if (!user) {
