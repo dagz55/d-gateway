@@ -1,6 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   // Simplified config for Vercel compatibility
+  productionBrowserSourceMaps: process.env.NODE_ENV === "production",
   reactStrictMode: true,
   typescript: {
     ignoreBuildErrors: true,
