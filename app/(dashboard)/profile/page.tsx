@@ -6,7 +6,7 @@ import ChangeUsernameForm from '@/components/settings/ChangeUsernameForm';
 import ChangePasswordForm from '@/components/settings/ChangePasswordForm';
 import ProfileForm from '@/components/settings/ProfileForm';
 import ChangePhotoForm from '@/components/settings/ChangePhotoForm';
-import { getCurrentUser } from '@/lib/auth-middleware';
+import { getCurrentUser } from '@/lib/clerk-auth';
 import { getUserProfile } from '@/lib/actions';
 import { redirect } from 'next/navigation';
 

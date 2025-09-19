@@ -1,5 +1,6 @@
 'use client';
 
+import { useUser } from '@clerk/nextjs';
 import ChangePasswordForm from '@/components/settings/ChangePasswordForm';
 import ChangePhotoForm from '@/components/settings/ChangePhotoForm';
 import ChangeUsernameForm from '@/components/settings/ChangeUsernameForm';
@@ -7,58 +8,76 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Bell, Globe, Lock, Palette, Shield } from 'lucide-react';
-import { useWorkOSAuth } from '@/contexts/WorkOSAuthContext';
 
 export default function SettingsPage() {
-  // Get real profile data from WorkOS auth context
-  const { profile, user, loading } = useWorkOSAuth();
-  
-  // Use real profile data or fallback
-  const profileData = {
-    username: profile?.username || user?.firstName?.toLowerCase() || 'user',
-    fullName: profile?.full_name || `${user?.firstName || ''} ${user?.lastName || ''}`.trim() || 'User',
-    avatarUrl: profile?.avatar_url || profile?.profile_picture_url || user?.profilePictureUrl,
-  };
+  const { user, isLoaded } = useUser();
 
-  // Debug log to see what data we have
-  console.log('Settings Page Profile Data:', { profile, user, profileData });
-
-  if (loading) {
+  if (!isLoaded) {
     return (
-      <div className="space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Settings</h1>
-          <p className="text-muted-foreground">Loading your settings...</p>
-        </div>
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
       </div>
     );
   }
 
+  if (!user) {
+    return null;
+  }
+
+  // Use Clerk user data
+  const profileData = {
+    username: user.username || user.firstName?.toLowerCase() || 'user',
+    fullName: `${user.firstName || ''} ${user.lastName || ''}`.trim() || 'User',
+    avatarUrl: user.imageUrl,
+    email: user.emailAddresses[0]?.emailAddress || '',
+  };
+
   return (
-    <div className="space-y-6">
+    <div className="container max-w-4xl mx-auto py-8 space-y-8">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Settings</h1>
-        <p className="text-muted-foreground">
-          Manage your account settings, preferences, and security options.
+        <h1 className="text-3xl font-bold gradient-text">Account Settings</h1>
+        <p className="text-muted-foreground mt-2">
+          Manage your account preferences and security settings
         </p>
       </div>
 
       <div className="grid gap-6">
-        {/* Account Settings */}
+        {/* Profile Settings */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Shield className="h-5 w-5" />
+              Profile Information
+            </CardTitle>
+            <CardDescription>
+              Update your profile picture, username, and other personal information
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <ChangePhotoForm
+              currentAvatarUrl={profileData.avatarUrl}
+              userName={profileData.fullName}
+            />
+            <ChangeUsernameForm
+              currentUsername={profileData.username}
+              userEmail={profileData.email}
+            />
+          </CardContent>
+        </Card>
+
+        {/* Security Settings */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Lock className="h-5 w-5" />
-              Account Settings
+              Security & Privacy
             </CardTitle>
-            <CardDescription>Manage your account credentials and basic information</CardDescription>
+            <CardDescription>
+              Manage your password and security preferences
+            </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="grid gap-6 md:grid-cols-2">
-              <ChangePhotoForm />
-              <ChangeUsernameForm currentUsername={profileData.username} />
-            </div>
-            <ChangePasswordForm />
+          <CardContent>
+            <ChangePasswordForm userEmail={profileData.email} />
           </CardContent>
         </Card>
 
@@ -69,146 +88,117 @@ export default function SettingsPage() {
               <Bell className="h-5 w-5" />
               Notifications
             </CardTitle>
-            <CardDescription>Configure how you receive notifications</CardDescription>
+            <CardDescription>
+              Configure how you receive notifications
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
                 <Label htmlFor="email-notifications">Email Notifications</Label>
-                <div className="text-sm text-muted-foreground">
-                  Receive notifications via email
-                </div>
+                <p className="text-sm text-muted-foreground">
+                  Receive email notifications for trading signals
+                </p>
               </div>
               <Switch id="email-notifications" defaultChecked />
             </div>
+
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
-                <Label htmlFor="trading-alerts">Trading Alerts</Label>
-                <div className="text-sm text-muted-foreground">
-                  Get notified about trading opportunities
-                </div>
+                <Label htmlFor="push-notifications">Push Notifications</Label>
+                <p className="text-sm text-muted-foreground">
+                  Receive push notifications for urgent market alerts
+                </p>
               </div>
-              <Switch id="trading-alerts" defaultChecked />
+              <Switch id="push-notifications" defaultChecked />
             </div>
+
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
-                <Label htmlFor="price-alerts">Price Alerts</Label>
-                <div className="text-sm text-muted-foreground">
-                  Receive price movement notifications
-                </div>
+                <Label htmlFor="sms-notifications">SMS Notifications</Label>
+                <p className="text-sm text-muted-foreground">
+                  Receive SMS for critical trading alerts
+                </p>
               </div>
-              <Switch id="price-alerts" />
+              <Switch id="sms-notifications" />
             </div>
           </CardContent>
         </Card>
 
-        {/* Privacy & Security */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Shield className="h-5 w-5" />
-              Privacy & Security
-            </CardTitle>
-            <CardDescription>Control your privacy and security settings</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="space-y-0.5">
-                <Label htmlFor="two-factor">Two-Factor Authentication</Label>
-                <div className="text-sm text-muted-foreground">
-                  Add an extra layer of security to your account
-                </div>
-              </div>
-              <Switch id="two-factor" />
-            </div>
-            <div className="flex items-center justify-between">
-              <div className="space-y-0.5">
-                <Label htmlFor="login-alerts">Login Alerts</Label>
-                <div className="text-sm text-muted-foreground">
-                  Get notified of new login attempts
-                </div>
-              </div>
-              <Switch id="login-alerts" defaultChecked />
-            </div>
-            <div className="flex items-center justify-between">
-              <div className="space-y-0.5">
-                <Label htmlFor="data-sharing">Data Sharing</Label>
-                <div className="text-sm text-muted-foreground">
-                  Allow data sharing for analytics and improvements
-                </div>
-              </div>
-              <Switch id="data-sharing" />
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Appearance */}
+        {/* Appearance Settings */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Palette className="h-5 w-5" />
               Appearance
             </CardTitle>
-            <CardDescription>Customize the look and feel of your dashboard</CardDescription>
+            <CardDescription>
+              Customize the look and feel of your dashboard
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
                 <Label htmlFor="dark-mode">Dark Mode</Label>
-                <div className="text-sm text-muted-foreground">
-                  Switch between light and dark themes
-                </div>
+                <p className="text-sm text-muted-foreground">
+                  Use dark theme for better visibility in low light
+                </p>
               </div>
-              <Switch id="dark-mode" />
+              <Switch id="dark-mode" defaultChecked />
             </div>
+
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
                 <Label htmlFor="compact-view">Compact View</Label>
-                <div className="text-sm text-muted-foreground">
-                  Use a more compact layout for better space utilization
-                </div>
+                <p className="text-sm text-muted-foreground">
+                  Show more information in a condensed layout
+                </p>
               </div>
               <Switch id="compact-view" />
             </div>
           </CardContent>
         </Card>
 
-        {/* Trading Preferences */}
+        {/* Language & Region */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Globe className="h-5 w-5" />
-              Trading Preferences
+              Language & Region
             </CardTitle>
-            <CardDescription>Configure your trading environment and preferences</CardDescription>
+            <CardDescription>
+              Set your preferred language and timezone
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="space-y-0.5">
-                <Label htmlFor="auto-trading">Auto Trading</Label>
-                <div className="text-sm text-muted-foreground">
-                  Enable automated trading based on signals
-                </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="language">Language</Label>
+                <select
+                  id="language"
+                  className="w-full px-3 py-2 border border-border rounded-md bg-background"
+                  defaultValue="en"
+                >
+                  <option value="en">English</option>
+                  <option value="es">Spanish</option>
+                  <option value="fr">French</option>
+                  <option value="de">German</option>
+                </select>
               </div>
-              <Switch id="auto-trading" />
-            </div>
-            <div className="flex items-center justify-between">
-              <div className="space-y-0.5">
-                <Label htmlFor="risk-management">Risk Management</Label>
-                <div className="text-sm text-muted-foreground">
-                  Enable automatic risk management features
-                </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="timezone">Timezone</Label>
+                <select
+                  id="timezone"
+                  className="w-full px-3 py-2 border border-border rounded-md bg-background"
+                  defaultValue="utc"
+                >
+                  <option value="utc">UTC</option>
+                  <option value="est">Eastern Time</option>
+                  <option value="pst">Pacific Time</option>
+                  <option value="cet">Central European Time</option>
+                </select>
               </div>
-              <Switch id="risk-management" defaultChecked />
-            </div>
-            <div className="flex items-center justify-between">
-              <div className="space-y-0.5">
-                <Label htmlFor="sound-effects">Sound Effects</Label>
-                <div className="text-sm text-muted-foreground">
-                  Play sounds for trading notifications
-                </div>
-              </div>
-              <Switch id="sound-effects" />
             </div>
           </CardContent>
         </Card>

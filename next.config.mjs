@@ -1,8 +1,6 @@
-import path from "path";
-
+/** @type {import('next').NextConfig} */
 const nextConfig = {
-  distDir: "dist",
-  productionBrowserSourceMaps: process.env.NODE_ENV === "production",
+  // Simplified config for Vercel compatibility
   reactStrictMode: true,
   typescript: {
     ignoreBuildErrors: true,

@@ -1,7 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Wallet, ArrowUpRight, ArrowDownLeft, History } from 'lucide-react';
-import { getCurrentUser } from '@/lib/auth-middleware';
+import { getCurrentUser } from '@/lib/clerk-auth';
 import { redirect } from 'next/navigation';
 import DepositComponent from '@/components/wallet/DepositComponent';
 import DepositHistory from '@/components/wallet/DepositHistory';

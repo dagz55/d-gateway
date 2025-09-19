@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getCurrentUser } from '@/lib/auth-middleware';
+import { currentUser } from '@clerk/nextjs/server';
 import { createClient } from '@/lib/supabase/client';
 import { validateImageFile } from '@/lib/validation';
-// import { logSecurityEvent } from '@/lib/security-logger';
 
 // Configure route to handle larger files
 export const runtime = 'nodejs';
@@ -11,7 +10,7 @@ export const maxDuration = 30; // 30 seconds timeout
 export async function POST(request: NextRequest) {
   try {
     // Check authentication
-    const user = await getCurrentUser();
+    const user = await currentUser();
     if (!user) {
       return NextResponse.json(
         { success: false, error: 'User not authenticated' },
@@ -76,7 +75,7 @@ export async function POST(request: NextRequest) {
         const { data: profile } = await supabase
           .from('user_profiles')
           .select('avatar_url')
-          .eq('workos_user_id', user.id)
+          .eq('clerk_user_id', user.id)
           .single();
 
         if ((profile as any)?.avatar_url && (profile as any).avatar_url.includes('supabase')) {
@@ -158,7 +157,7 @@ export async function DELETE() {
     const { data: profile } = await supabase
       .from('user_profiles')
       .select('avatar_url')
-      .eq('workos_user_id', user.id)
+      .eq('clerk_user_id', user.id)
       .single();
 
     // Delete from storage if it's a storage URL

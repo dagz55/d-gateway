@@ -39,8 +39,8 @@ export default function SupportModal({ children }: SupportModalProps) {
               <div className="flex items-center gap-3 p-4 bg-primary/5 border border-primary/10 rounded-lg">
                 <Mail className="h-8 w-8 text-primary" />
                 <div className="flex-1">
-                  <h3 className="font-semibold text-base">Email Support</h3>
-                  <p className="text-sm text-muted-foreground mb-2">
+                  <h3 className="font-semibold text-base text-white">Email Support</h3>
+                  <p className="text-sm text-white/80 mb-2">
                     Get personalized help from our support team
                   </p>
                   <a 
@@ -54,10 +54,10 @@ export default function SupportModal({ children }: SupportModalProps) {
               </div>
 
               <div className="flex items-center gap-3 p-4 bg-muted/50 border rounded-lg">
-                <Clock className="h-6 w-6 text-muted-foreground" />
+                <Clock className="h-6 w-6 text-white/80" />
                 <div>
-                  <h4 className="font-medium">Response Time</h4>
-                  <p className="text-sm text-muted-foreground">
+                  <h4 className="font-medium text-white">Response Time</h4>
+                  <p className="text-sm text-white/80">
                     We typically respond within 24 hours during business days
                   </p>
                 </div>
@@ -66,7 +66,7 @@ export default function SupportModal({ children }: SupportModalProps) {
 
             {/* FAQ Section */}
             <section>
-              <h3 className="font-semibold text-base mb-4 flex items-center gap-2">
+              <h3 className="font-semibold text-base mb-4 flex items-center gap-2 text-[#33E1DA]">
                 <MessageSquare className="h-4 w-4" />
                 Frequently Asked Questions
               </h3>
@@ -78,7 +78,7 @@ export default function SupportModal({ children }: SupportModalProps) {
                       ↓
                     </span>
                   </summary>
-                  <div className="px-4 pb-4 text-sm text-muted-foreground">
+                  <div className="px-4 pb-4 text-sm text-white/80">
                     <p>
                       Click the "Forgot password?" link on the login page, enter your email address, 
                       and follow the instructions in the reset email. If you don't receive the email, 
@@ -94,7 +94,7 @@ export default function SupportModal({ children }: SupportModalProps) {
                       ↓
                     </span>
                   </summary>
-                  <div className="px-4 pb-4 text-sm text-muted-foreground">
+                  <div className="px-4 pb-4 text-sm text-white/80">
                     <p>
                       Trading signals are recommendations based on technical and fundamental analysis. 
                       Each signal includes entry points, stop-loss levels, and take-profit targets. 
@@ -110,7 +110,7 @@ export default function SupportModal({ children }: SupportModalProps) {
                       ↓
                     </span>
                   </summary>
-                  <div className="px-4 pb-4 text-sm text-muted-foreground">
+                  <div className="px-4 pb-4 text-sm text-white/80">
                     <p>
                       Go to Settings from the main menu, then select "Profile" to update your 
                       personal information, change your username, or upload a profile picture.
@@ -125,7 +125,7 @@ export default function SupportModal({ children }: SupportModalProps) {
                       ↓
                     </span>
                   </summary>
-                  <div className="px-4 pb-4 text-sm text-muted-foreground">
+                  <div className="px-4 pb-4 text-sm text-white/80">
                     <p>
                       Yes, we use industry-standard encryption and security measures to protect your data. 
                       We never store sensitive financial information and all data is encrypted both in 
@@ -141,7 +141,7 @@ export default function SupportModal({ children }: SupportModalProps) {
                       ↓
                     </span>
                   </summary>
-                  <div className="px-4 pb-4 text-sm text-muted-foreground">
+                  <div className="px-4 pb-4 text-sm text-white/80">
                     <p>
                       Yes, you can request account deletion by contacting our support team at 
                       admin@zignals.org. We'll permanently delete your account and personal data 
@@ -154,8 +154,8 @@ export default function SupportModal({ children }: SupportModalProps) {
 
             {/* When to Contact Support */}
             <section>
-              <h3 className="font-semibold text-base mb-3">When to Contact Support</h3>
-              <ul className="space-y-2 text-sm text-muted-foreground">
+              <h3 className="font-semibold text-base mb-3 text-[#33E1DA]">When to Contact Support</h3>
+              <ul className="space-y-2 text-sm text-white/80">
                 <li className="flex items-start gap-2">
                   <span className="text-primary">•</span>
                   <span>Technical issues or bugs with the platform</span>
@@ -182,7 +182,7 @@ export default function SupportModal({ children }: SupportModalProps) {
             {/* Contact Form */}
             <section className="border-t pt-6">
               <div className="text-center">
-                <p className="text-sm text-muted-foreground mb-4">
+                <p className="text-sm text-white/80 mb-4">
                   For immediate assistance, click the button below to send us an email:
                 </p>
                 <Button asChild>

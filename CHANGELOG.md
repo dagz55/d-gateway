@@ -5,7 +5,180 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [2.9.1] - 2025-01-27
+## [2.10.7] - 2025-09-19
+
+### Fixed
+- **Profile Route Access**: Fixed missing `/profile` route access for authenticated users
+  - Updated middleware to properly handle `/profile` routes as universal dashboard routes
+  - Profile routes now accessible to all authenticated users (both admin and member)
+  - Fixed routing structure to prevent redirect loops
+  - Updated documentation to reflect universal profile access
+
+### Technical Improvements
+- **Middleware Routing**: Enhanced route handling for dashboard routes
+  - Added `isDashboardRoute` matcher for universal routes (`/profile`, `/settings`, `/wallet`)
+  - Improved route protection and access control
+  - Better logging for route access debugging
+
+## [2.10.6] - 2025-09-19
+
+### Added
+- **Live Market Data Feature**: Comprehensive cryptocurrency market tracking with real-time data
+  - Added "Market" navigation item to sidebar with TrendingUp icon
+  - Created comprehensive `/market` page with live CoinGecko API integration
+  - Real-time price updates every 30 seconds with auto-refresh functionality
+  - Market overview cards showing total market cap, 24h volume, gainers/losers count
+  - Interactive favorites system for tracking preferred cryptocurrencies
+  - Advanced filtering and sorting by market cap, 24h change, and volume
+  - Mini sparkline charts for 7-day price trends visualization
+  - Professional market data table with comprehensive crypto information
+  - Mobile-responsive design matching dashboard styling
+
+### Enhanced
+- **Sidebar Navigation**: Improved mobile and desktop experience
+  - Added Market navigation item positioned after Dashboard
+  - Enhanced route handling for market page active states
+  - Improved mobile close button functionality in sidebar header
+  - Better navigation organization with market data access
+
+### Technical Improvements
+- **Market Data Architecture**: Robust real-time data fetching system
+  - Created `useMarketData` hook for efficient data management
+  - Implemented proper error handling and loading states
+  - Added utility functions for price, market cap, and volume formatting
+  - Auto-refresh mechanism with 30-second intervals
+  - Graceful error recovery with retry functionality
+  - TypeScript interfaces for complete type safety
+
+## [2.10.5] - 2025-09-19
+
+### Fixed
+- **Admin Authentication Data Access Issue**: Resolved infinite loop caused by inconsistent admin detection methods
+  - Updated `lib/admin.ts` to use `auth()` instead of `currentUser()` for session claims access
+  - Fixed mismatch where middleware used `sessionClaims.o.rol` but AdminLayout couldn't access organization data
+  - Both systems now use identical session claims checking logic
+  - Resolved issue where `currentUser()` didn't include organization membership data
+  - Enhanced debugging to show session claims vs user object differences
+
+- **Development Environment Cleanup**: Fixed minor development issues
+  - Made Vercel Analytics conditional for production only to prevent 404 errors in development
+  - Cleaned up development console noise from missing analytics script
+
+### Technical Improvements
+- **Unified Authentication Architecture**: Consistent admin detection across all application layers
+  - Both middleware and server components now use same `auth()` function for session access
+  - Eliminated dependency on `currentUser()` organization data that wasn't consistently available
+  - Enhanced debugging output to track session claims vs user object data
+  - Improved error handling for authentication state inconsistencies
+
+## [2.10.4] - 2025-09-19
+
+### Fixed
+- **Login System Failure**: Resolved critical build corruption preventing all user authentication
+  - Fixed missing Clerk module errors (`Cannot find module './vendor-chunks/@clerk.js'`)
+  - Cleaned corrupted Next.js build cache and routes manifest
+  - Fixed React Server Components bundler errors preventing sign-in page rendering
+  - Updated cookie-parser dependency to valid version (^1.4.6)
+  - Resolved "Cannot read properties of undefined (reading 'call')" errors
+
+### Technical Improvements
+- **Build System Stability**: Enhanced build reliability and dependency management
+  - Implemented proper build cache cleaning procedures
+  - Fixed dependency version conflicts preventing installation
+  - Resolved Next.js devtools bundler issues
+  - Enhanced error recovery for corrupted builds
+  - Improved development server startup reliability
+
+## [2.10.3] - 2025-09-19
+
+### Fixed
+- **Admin Authentication Infinite Loop**: Resolved critical infinite loop in admin authentication flow
+  - Fixed mismatch between middleware admin detection and AdminLayout admin checking
+  - Updated `lib/admin.ts` to use same organization-based role detection as middleware
+  - Added comprehensive Clerk organization membership checking in `isAdmin()` and `getAdminUser()`
+  - Enhanced debugging logs to track admin detection across both systems
+  - Resolved conflict where middleware detected admin via `organizationRole` but AdminLayout only checked `publicMetadata`
+
+### Technical Improvements
+- **Admin Authentication Consistency**: Unified admin detection logic across the application
+  - Both middleware and AdminLayout now use consistent organization-based role checking
+  - Added support for Clerk organization membership role detection
+  - Enhanced error handling and fallback mechanisms for Supabase database issues
+  - Improved debugging output for admin authentication troubleshooting
+
+## [2.10.2] - 2025-09-19
+
+### Fixed
+- **Routing Loop Issue**: Fixed critical routing loop that caused non-admin users to get stuck
+  - Removed root path ("/") from public routes to prevent middleware conflicts
+  - Added redirect loop prevention logic to avoid infinite redirects
+  - Enhanced middleware debugging to track routing decisions
+  - Fixed issue where non-admin users were incorrectly routed to admin dashboard
+
+- **React Hooks Error**: Resolved "Rendered more hooks than during the previous render" error
+  - Simplified Clerk provider configuration to use fixed dark theme
+  - Removed problematic `useTheme` hook usage that caused hooks inconsistency
+  - Fixed theme provider wrapping issues during route transitions
+  - Stabilized component rendering during authentication redirects
+
+### Technical Improvements
+- **Middleware Enhancement**: Improved route handling and debugging
+  - Added comprehensive logging for all routing decisions
+  - Implemented redirect loop protection mechanisms
+  - Enhanced path-specific debugging information
+  - Fixed TypeScript issues in middleware logic
+
+- **Provider Stability**: Improved React provider architecture
+  - Simplified ClerkProvider configuration to prevent hooks issues
+  - Fixed theme-related rendering inconsistencies
+  - Removed unused imports and cleaned up provider code
+  - Enhanced provider stability during route changes
+
+## [2.10.1] - 2025-09-19
+
+### Fixed
+- **Admin Role Detection**: Fixed critical admin role detection issue in middleware
+  - Added support for Clerk organization-based role detection (`sessionClaims.o.rol`)
+  - Updated middleware to check organization role in addition to metadata roles
+  - Fixed TypeScript errors in role detection logic
+  - Enhanced debug logging to include organization role information
+  - Resolved issue where users with "admin" role in organization were not being detected as admins
+
+### Technical Improvements
+- **Middleware Enhancement**: Improved role detection robustness
+  - Added comprehensive role checking across multiple claim locations
+  - Fixed TypeScript type safety issues in sessionClaims handling
+  - Enhanced debugging output for better troubleshooting
+  - Maintained backward compatibility with existing role detection methods
+
+## [2.10.0] - 2025-09-19
+
+### Added
+- **Role-Based Dashboard Routing**: Implemented separate dashboards for members and administrators
+  - Created `/member/dashboard` for regular users with trading portfolio overview
+  - Created `/member/profile`, `/member/settings`, and `/member/wallet` pages
+  - Restructured admin routing with `/admin/dashboard` as main admin interface
+  - Added smart middleware-level routing based on user roles
+  - Automatic redirects: admins to admin panel, members to member dashboard
+  - Legacy `/dashboard` routes now redirect to appropriate role-based dashboards
+  - Updated authentication flow to redirect based on user role after login
+
+### Changed
+- **Authentication Flow**: Updated login redirects to use role-based routing
+  - Sign-in/sign-up pages now redirect to appropriate dashboard based on user role
+  - Root path (`/`) automatically routes users to their designated dashboard
+  - Auth callback updated to redirect to root for middleware handling
+- **Admin Interface**: Moved main admin dashboard content to `/admin/dashboard`
+  - Admin root (`/admin`) now redirects to `/admin/dashboard`
+  - Updated admin navigation and links to reflect new structure
+
+### Security
+- **Access Control**: Enhanced middleware with role-based access protection
+  - Prevents admins from accessing member routes and vice versa
+  - Automatic role detection using Clerk metadata
+  - Secure routing with proper authentication checks
+
+## [2.9.1] - 2025-09-18
 
 ### Fixed
 - **Vercel Deployment Build Error**: Fixed "Failed to collect page data" error for admin API routes
@@ -14,7 +187,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Routes now return appropriate responses during build-time execution
   - Resolved cookie access issues during static generation phase
 
-## [2.9.0] - 2025-01-27
+## [2.9.0] - 2025-09-18
 
 ### Fixed
 - **Photo Upload System**: Completely resolved photo upload and removal functionality
@@ -61,7 +234,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - File type validation at the database level
   - Proper bucket configuration with size and MIME type limits
 
-## [2.8.2] - 2025-01-27
+## [2.8.2] - 2025-09-18
 
 ### Fixed
 - **WorkOS Authentication Flow**: Resolved critical authentication issues
@@ -132,7 +305,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Improved animation consistency across different devices
   - Reduced unnecessary re-renders in particle components
 
-## [2.8.1] - 2025-01-27
+## [2.8.1] - 2025-09-18
 
 ### Added
 - **Serverless Configuration**: Complete serverless deployment configuration and environment setup
@@ -195,7 +368,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Status**: ✅ READY (Serverless Functions)
 - **Region**: IAD1 (US East)
 
-## [2.8.0] - 2025-01-27
+## [2.8.0] - 2025-09-18
 
 ### Added
 - **Enhanced Landing Page**: Completely redesigned landing page separated from login functionality
@@ -238,7 +411,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added `@react-three/fiber` and `@react-three/drei` for 3D graphics
 - Added `three` for WebGL rendering and shader materials
 
-## [2.7.2] - 2025-01-27
+## [2.7.2] - 2025-09-17
 
 ### Fixed
 - **Theme Management Issues**: Resolved hardcoded dark theme conflicts

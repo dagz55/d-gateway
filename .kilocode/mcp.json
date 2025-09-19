@@ -14,7 +14,9 @@
         "mcp-server-git",
         "--repository",
         "/Users/robertsuarez/zignals/zignal-login"
-      ]
+      ],
+      "disabled": true,
+      "alwaysAllow": []
     },
     "tavily": {
       "command": "npx",
@@ -28,7 +30,9 @@
     },
     "figma-dev-mode": {
       "type": "sse",
-      "url": "http://127.0.0.1:3845/sse"
+      "url": "http://127.0.0.1:3845/sse",
+      "disabled": true,
+      "alwaysAllow": []
     },
     "playwright": {
       "command": "npx",

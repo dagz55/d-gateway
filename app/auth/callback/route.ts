@@ -7,7 +7,7 @@ export async function GET(request: NextRequest) {
   const error = searchParams.get("error")
   const errorDescription = searchParams.get("error_description")
   const state = searchParams.get("state")
-  const next = searchParams.get("next") ?? "/dashboard"
+  const next = searchParams.get("next") ?? "/"
 
   // Handle errors gracefully
   if (error) {

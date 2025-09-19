@@ -172,20 +172,20 @@ const MissionSection = () => {
             </Card>
           </div>
 
-          {/* Mission Stats */}
+          {/* Mission Stats - TODO: Replace with real metrics from API */}
           <div className="pt-8 border-t border-[#EAF2FF]/20 w-full max-w-2xl">
             <Flex gap="xl" justify="center" className="text-sm text-[#EAF2FF]/80">
               <Flex gap="xs" align="center">
                 <CheckCircle className="w-5 h-5 text-[#EAF2FF]" />
-                <span className="font-medium">95% Success Rate</span>
+                <span className="font-medium">High Success Rate</span>
               </Flex>
               <Flex gap="xs" align="center">
                 <Users className="w-5 h-5 text-[#EAF2FF]" />
-                <span className="font-medium">25,000+ Traders</span>
+                <span className="font-medium">Active Traders</span>
               </Flex>
               <Flex gap="xs" align="center">
                 <Globe className="w-5 h-5 text-[#EAF2FF]" />
-                <span className="font-medium">120+ Countries</span>
+                <span className="font-medium">Global Community</span>
               </Flex>
             </Flex>
           </div>
@@ -354,34 +354,10 @@ const CryptoSection = () => {
   )
 }
 
-// Testimonials Section
+// Testimonials Section - TODO: Replace with real testimonials from API
 const TestimonialsSection = () => {
-  const testimonials = [
-    {
-      content: "Zignal has completely transformed my trading approach. The signal accuracy is incredible and I've seen consistent profits.",
-      author: "Sarah Chen",
-      role: "Portfolio Manager",
-      rating: 5,
-      image: "SC",
-      company: "Crypto Capital"
-    },
-    {
-      content: "The professional-grade research and analysis gives me confidence to make informed decisions. Highly recommended!",
-      author: "Marcus Rodriguez",
-      role: "Crypto Fund Manager",
-      rating: 5,
-      image: "MR",
-      company: "Digital Assets Fund"
-    },
-    {
-      content: "Outstanding platform with excellent community support. The educational resources are invaluable for learning.",
-      author: "Elena Kowalski",
-      role: "Independent Trader",
-      rating: 5,
-      image: "EK",
-      company: "Self-Trader"
-    }
-  ]
+  // TODO: Fetch real testimonials from API/database
+  // For now, showing placeholder structure
 
   return (
     <Section size="xl" className="bg-[#0A0F1F] relative overflow-hidden">
@@ -400,51 +376,20 @@ const TestimonialsSection = () => {
               What Our Traders Say
             </h2>
             <p className="text-xl text-[#EAF2FF]/70 max-w-3xl mx-auto">
-              Join thousands of successful traders who trust Zignal for their cryptocurrency trading decisions
+              Join successful traders who trust Zignal for their cryptocurrency trading decisions
             </p>
           </div>
 
-          <Grid cols={3} gap="xl">
-            {testimonials.map((testimonial, index) => (
-              <Card key={index} variant="elevated" padding="xl" className="h-full bg-gradient-to-br from-[#1E2A44]/90 to-[#0A0F1F]/80 border border-[#33E1DA]/30 hover:shadow-2xl hover:shadow-[#33E1DA]/20 hover:border-[#33E1DA]/50 transition-all duration-500 hover:scale-105">
-                <Stack spacing="lg">
-                  {/* Rating */}
-                  <div className="flex justify-center">
-                    <div className="flex gap-1">
-                      {[1,2,3,4,5].map(i => (
-                        <Star key={i} className="w-5 h-5 text-[#F7931A] fill-current" />
-                      ))}
-                    </div>
-                  </div>
+          {/* Placeholder for testimonials - TODO: Replace with real testimonials */}
+          <Card variant="elevated" padding="xl" className="bg-gradient-to-br from-[#1E2A44]/90 to-[#0A0F1F]/80 border border-[#33E1DA]/30">
+            <div className="text-center text-[#EAF2FF]/70">
+              <Users className="w-16 h-16 mx-auto mb-4 text-[#33E1DA]" />
+              <h3 className="text-xl font-semibold text-[#EAF2FF] mb-2">Real Testimonials Coming Soon</h3>
+              <p>We're gathering verified testimonials from our community members</p>
+            </div>
+          </Card>
 
-                  {/* Quote */}
-                  <blockquote className="text-[#EAF2FF]/90 leading-relaxed italic text-lg text-center">
-                    "{testimonial.content}"
-                  </blockquote>
-
-                  {/* Author Info */}
-                  <Flex gap="lg" align="center" className="pt-4 border-t border-[#33E1DA]/20">
-                    <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#33E1DA] to-[#1A7FB3] flex items-center justify-center text-[#0A0F1F] font-bold text-lg">
-                      {testimonial.image}
-                    </div>
-                    <div className="flex-1">
-                      <div className="font-semibold text-[#EAF2FF] text-lg">
-                        {testimonial.author}
-                      </div>
-                      <div className="text-sm text-[#EAF2FF]/70">
-                        {testimonial.role}
-                      </div>
-                      <div className="text-xs text-[#33E1DA] font-medium">
-                        {testimonial.company}
-                      </div>
-                    </div>
-                  </Flex>
-                </Stack>
-              </Card>
-            ))}
-          </Grid>
-
-          {/* Trust Indicators */}
+          {/* Trust Indicators - TODO: Replace with real metrics */}
           <div className="text-center pt-8">
             <Flex gap="xl" justify="center" className="text-sm text-[#EAF2FF]/60 flex-wrap">
               <Flex gap="xs" align="center">
@@ -453,11 +398,11 @@ const TestimonialsSection = () => {
               </Flex>
               <Flex gap="xs" align="center">
                 <Users className="w-5 h-5 text-[#1A7FB3]" />
-                <span className="font-medium">25,000+ Happy Traders</span>
+                <span className="font-medium">Growing Community</span>
               </Flex>
               <Flex gap="xs" align="center">
                 <Star className="w-5 h-5 text-[#F7931A]" />
-                <span className="font-medium">4.9/5 Average Rating</span>
+                <span className="font-medium">Rated Platform</span>
               </Flex>
             </Flex>
           </div>
@@ -532,7 +477,7 @@ const CTASection = () => {
             </div>
           </Card>
 
-          {/* Final Trust Indicators */}
+          {/* Final Trust Indicators - TODO: Replace with real metrics */}
           <div className="pt-8 border-t border-[#EAF2FF]/20 w-full max-w-3xl">
             <Flex gap="xl" justify="center" className="text-sm text-[#EAF2FF]/70 flex-wrap">
               <Flex gap="xs" align="center">
@@ -541,15 +486,15 @@ const CTASection = () => {
               </Flex>
               <Flex gap="xs" align="center">
                 <Users className="w-5 h-5 text-[#EAF2FF]" />
-                <span className="font-medium">25,000+ Traders</span>
+                <span className="font-medium">Active Traders</span>
               </Flex>
               <Flex gap="xs" align="center">
                 <Globe className="w-5 h-5 text-[#EAF2FF]" />
-                <span className="font-medium">120+ Countries</span>
+                <span className="font-medium">Global Community</span>
               </Flex>
               <Flex gap="xs" align="center">
                 <Star className="w-5 h-5 text-[#EAF2FF]" />
-                <span className="font-medium">4.9/5 Rating</span>
+                <span className="font-medium">Professional Platform</span>
               </Flex>
             </Flex>
           </div>

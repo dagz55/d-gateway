@@ -8,6 +8,7 @@
 
 # testing
 /coverage
+test-*
 
 # next.js
 /.next/
@@ -114,3 +115,12 @@ jspm_packages/
 # Temporary folders
 tmp/
 temp/
+
+# Project-specific files
+"docs/✅ Clerk Configuration Status.md"
+package.json.backup
+reports/
+.agent-os/
+.cursor/
+.env.example
+.kilocodemodes

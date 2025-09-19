@@ -1,5 +1,5 @@
 import { createServerSupabaseClient } from '@/lib/supabase/serverClient';
-import { getCurrentUser } from '@/lib/auth-middleware';
+import { currentUser, auth } from '@clerk/nextjs/server';
 import { redirect } from 'next/navigation';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -14,22 +14,44 @@ export interface AdminUser {
 }
 
 /**
- * Check if the current user is an admin
+ * Check if the current user is an admin using session claims (matching middleware logic)
  */
 export async function isAdmin(): Promise<boolean> {
   try {
-    // Get WorkOS authenticated user
-    const workosUser = await getCurrentUser();
-    if (!workosUser) return false;
-    
-    const supabase = await createServerSupabaseClient();
-    const { data: profile } = await supabase
-      .from('user_profiles')
-      .select('is_admin, role')
-      .eq('workos_user_id', workosUser.id)
-      .single();
-      
-    return profile?.is_admin === true || profile?.role === 'admin';
+    // Use auth() to get session claims (same as middleware)
+    const { userId, sessionClaims } = await auth();
+    if (!userId) return false;
+
+    // Check multiple possible locations for admin role (matching middleware logic exactly)
+    const isClerkAdmin = 
+      // Check publicMetadata
+      (sessionClaims as any)?.publicMetadata?.role === 'admin' ||
+      // Check metadata
+      (sessionClaims as any)?.metadata?.role === 'admin' ||
+      // Check nested publicMetadata
+      (sessionClaims?.publicMetadata as any)?.role === 'admin' ||
+      // Check if there's a direct role property
+      (sessionClaims as any)?.role === 'admin' ||
+      // Check organization role (Clerk organization structure) - MAIN METHOD
+      (sessionClaims as any)?.o?.rol === 'admin';
+
+    if (isClerkAdmin) return true;
+
+    // Fallback to Supabase profile check (if database is available)
+    try {
+      const supabase = await createServerSupabaseClient();
+      const { data: profile } = await supabase
+        .from('user_profiles')
+        .select('is_admin, role')
+        .eq('clerk_user_id', userId)
+        .single();
+
+      return profile?.is_admin === true || profile?.role === 'admin';
+    } catch (supabaseError) {
+      // If Supabase check fails, rely on Clerk metadata only
+      console.log('Supabase admin check failed, using Clerk session claims only');
+      return false;
+    }
   } catch (error) {
     console.error('Error checking admin status:', error);
     return false;
@@ -41,41 +63,80 @@ export async function isAdmin(): Promise<boolean> {
  */
 export async function getAdminUser(): Promise<AdminUser | null> {
   try {
-    // Get WorkOS authenticated user
-    const workosUser = await getCurrentUser();
-    if (!workosUser) {
-      console.log('getAdminUser: No WorkOS user found');
+    // Use auth() to get session claims (same as middleware) and get user data
+    const { userId, sessionClaims } = await auth();
+    const user = await currentUser();
+    
+    if (!userId || !user) {
+      console.log('getAdminUser: No Clerk user found');
       return null;
     }
     
-    console.log(`getAdminUser: Checking admin status for WorkOS user ${workosUser.email} (ID: ${workosUser.id})`);
+    console.log(`getAdminUser: Checking admin status for Clerk user ${user.emailAddresses[0]?.emailAddress} (ID: ${userId})`);
     
+    // Check multiple possible locations for admin role (matching middleware logic exactly)
+    const isClerkAdmin = 
+      // Check publicMetadata
+      (sessionClaims as any)?.publicMetadata?.role === 'admin' ||
+      // Check metadata
+      (sessionClaims as any)?.metadata?.role === 'admin' ||
+      // Check nested publicMetadata
+      (sessionClaims?.publicMetadata as any)?.role === 'admin' ||
+      // Check if there's a direct role property
+      (sessionClaims as any)?.role === 'admin' ||
+      // Check organization role (Clerk organization structure) - MAIN METHOD
+      (sessionClaims as any)?.o?.rol === 'admin';
+      
+    const clerkPermissions = (sessionClaims as any)?.publicMetadata?.admin_permissions as string[] || 
+                            user.publicMetadata?.admin_permissions as string[] || [];
+    
+    console.log('getAdminUser: Clerk admin check details:', {
+      publicMetadataRole: (sessionClaims as any)?.publicMetadata?.role,
+      metadataRole: (sessionClaims as any)?.metadata?.role,
+      directRole: (sessionClaims as any)?.role,
+      organizationRole: (sessionClaims as any)?.o?.rol,
+      userPublicMetadataRole: user.publicMetadata?.role,
+      sessionClaimsKeys: Object.keys(sessionClaims || {}),
+      isClerkAdmin
+    });
+    
+    if (isClerkAdmin) {
+      console.log(`getAdminUser: Admin user found via Clerk session claims: ${user.emailAddresses[0]?.emailAddress}`);
+      
+      return {
+        id: userId,
+        email: user.emailAddresses[0]?.emailAddress || '',
+        full_name: `${user.firstName || ''} ${user.lastName || ''}`.trim() || 'Admin User',
+        display_name: user.firstName || 'Admin',
+        role: 'admin',
+        is_admin: true,
+        admin_permissions: clerkPermissions.length > 0 ? clerkPermissions : ['users', 'signals', 'finances', 'payments', 'system']
+      };
+    }
+    
+    // Fallback to Supabase profile check
+    console.log('getAdminUser: Checking Supabase profile...');
     const supabase = await createServerSupabaseClient();
     const { data: profile, error } = await supabase
       .from('user_profiles')
       .select('*')
-      .eq('workos_user_id', workosUser.id)
+      .eq('clerk_user_id', userId)
       .single();
       
     console.log(`getAdminUser: Profile query result:`, { profile, error });
     
-    if (!profile) {
-      console.log('getAdminUser: No profile found');
+    if (!profile || !profile.is_admin) {
+      console.log(`getAdminUser: User is not admin - Clerk: ${isClerkAdmin}, Supabase: ${profile?.is_admin || false}`);
       return null;
     }
     
-    if (!profile.is_admin) {
-      console.log(`getAdminUser: User ${profile.email} is not marked as admin (is_admin: ${profile.is_admin})`);
-      return null;
-    }
-    
-    console.log(`getAdminUser: Admin user found: ${profile.email}`);
+    console.log(`getAdminUser: Admin user found via Supabase: ${profile.email}`);
     
     return {
-      id: profile.workos_user_id || workosUser.id,
+      id: profile.clerk_user_id || userId,
       email: profile.email,
       full_name: profile.full_name,
-      display_name: profile.full_name || `${workosUser.firstName || ''} ${workosUser.lastName || ''}`.trim() || 'Unknown User',
+      display_name: profile.full_name || `${user.firstName || ''} ${user.lastName || ''}`.trim() || 'Unknown User',
       role: profile.role,
       is_admin: profile.is_admin,
       admin_permissions: profile.admin_permissions || []
@@ -163,20 +224,20 @@ export async function adminMiddleware(request: NextRequest) {
   }
   
   try {
-    // Check WorkOS authentication first
-    const workosUser = await getCurrentUser();
-    if (!workosUser) {
+    // Check Clerk authentication first
+    const user = await currentUser();
+    if (!user) {
       const url = new URL('/', request.url);
       return NextResponse.redirect(url);
     }
-    
+
     // Then check admin status
     const adminUser = await getAdminUser();
     if (!adminUser) {
       const url = new URL('/', request.url);
       return NextResponse.redirect(url);
     }
-    
+
     return NextResponse.next();
   } catch (error) {
     console.error('Admin middleware error:', error);

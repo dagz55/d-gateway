@@ -225,6 +225,76 @@ export interface Database {
           created_at?: string
         }
       }
+      packages: {
+        Row: {
+          id: string
+          name: string
+          description: string
+          price: number
+          duration_days: number
+          features: string[]
+          active: boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          name: string
+          description: string
+          price: number
+          duration_days: number
+          features?: string[]
+          active?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          name?: string
+          description?: string
+          price?: number
+          duration_days?: number
+          features?: string[]
+          active?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      user_packages: {
+        Row: {
+          id: string
+          user_id: string
+          package_id: string
+          status: 'active' | 'inactive' | 'cancelled' | 'expired'
+          start_date: string
+          end_date: string
+          auto_renew: boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          package_id: string
+          status?: 'active' | 'inactive' | 'cancelled' | 'expired'
+          start_date?: string
+          end_date: string
+          auto_renew?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          package_id?: string
+          status?: 'active' | 'inactive' | 'cancelled' | 'expired'
+          start_date?: string
+          end_date?: string
+          auto_renew?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+      }
     }
     Views: {
       [_ in never]: never

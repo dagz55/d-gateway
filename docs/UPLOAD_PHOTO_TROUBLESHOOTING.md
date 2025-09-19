@@ -199,8 +199,7 @@ await updateSession();
 await refetchProfile();
 ```
 
-#### Check NextAuth Configuration
-Verify NextAuth is configured to update session:
+
 ```tsx
 // In src/lib/auth.ts
 callbacks: {

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getCurrentUser } from '@/lib/auth-middleware'
+import { getCurrentUser } from '@/lib/clerk-auth'
 import { createServerSupabaseClient } from '@/lib/supabase/serverClient'
 import { createAdminClient } from '@/lib/supabase/adminClient'
 import { Database } from '@/lib/supabase/types'

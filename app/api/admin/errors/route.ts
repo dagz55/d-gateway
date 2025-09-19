@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerSupabaseClient } from '@/lib/supabase/serverClient';
 import { createAdminClient } from '@/lib/supabase/adminClient';
-import { getCurrentUser } from '@/lib/auth-middleware';
+import { getCurrentUser } from '@/lib/clerk-auth';
 
 interface ErrorLog {
   message: string;
@@ -168,25 +168,17 @@ export async function GET(request: NextRequest) {
     const severity = searchParams.get('severity');
     const status = searchParams.get('status');
 
-    // Return mock data for now since error_logs table may not exist
-    const mockErrorLogs = [
-      {
-        id: '1',
-        user_id: user.id,
-        error_data: { message: 'Sample admin error log' },
-        created_at: new Date().toISOString()
-      }
-    ];
-
+    // TODO: Implement real error_logs table and query
+    // For now, return empty array since error_logs table doesn't exist yet
     return NextResponse.json({
       success: true,
-      data: mockErrorLogs,
+      data: [],
       pagination: {
         limit,
         offset,
-        count: 1
+        count: 0
       },
-      note: 'Mock data - error_logs table not yet implemented'
+      note: 'Error logs table not yet implemented - no data available'
     });
 
   } catch (error) {

@@ -3,21 +3,19 @@ import Spark from '@/components/charts/Spark';
 import OpenPositions from '@/components/Tables/OpenPositions';
 import StatusDot from '@/components/ui/StatusDot';
 import ZigTradesWorkflow from '@/components/dashboard/ZigTradesWorkflow';
-import { getCurrentUser } from '@/lib/auth-middleware';
+import { currentUser } from '@clerk/nextjs/server';
 import { redirect } from 'next/navigation';
 
 export const dynamic = 'force-dynamic';
 
-
 export default async function DashboardPage() {
-  try {
-    const user = await getCurrentUser();
-    
-    if (!user) {
-      redirect('/');
-    }
+  const user = await currentUser();
 
-    const firstName = user.firstName || 'Trader';
+  if (!user) {
+    redirect('/sign-in');
+  }
+
+  const firstName = user.firstName || 'Trader';
 
   return (
     <div className="space-y-8">
@@ -53,154 +51,199 @@ export default async function DashboardPage() {
         </div>
       </div>
 
-      {/* Stats Overview */}
-      <div className="grid gap-6 lg:grid-cols-4 md:grid-cols-2 grid-cols-1">
-        {/* Portfolio Value */}
-        <Card className="glass glass-hover card-glow-hover border-border/50">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Portfolio Value</CardTitle>
+      {/* ZigTrades Workflow Section */}
+      <ZigTradesWorkflow />
+
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Portfolio Value</CardTitle>
+            <StatusDot status="success" />
           </CardHeader>
           <CardContent>
-            <div className="space-y-2">
-              <div className="text-3xl font-bold text-foreground">$0.00</div>
-              <div className="flex items-center gap-2">
-                <span className="text-muted-foreground text-sm font-medium">No data available</span>
-              </div>
+            <div className="text-2xl font-bold">$45,238.90</div>
+            <p className="text-xs text-muted-foreground mt-1">+20.1% from last month</p>
+            <div className="h-20 mt-3">
+              <Spark
+                data={[
+                  { value: 35000 },
+                  { value: 38000 },
+                  { value: 36000 },
+                  { value: 40000 },
+                  { value: 42000 },
+                  { value: 41000 },
+                  { value: 45238.90 },
+                ]}
+                type="portfolio"
+              />
             </div>
           </CardContent>
         </Card>
 
-        {/* Live Signals Performance */}
-        <Card className="glass glass-hover card-glow-hover border-border/50">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Signals Performance</CardTitle>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Today's Profit</CardTitle>
+            <StatusDot status="success" />
           </CardHeader>
           <CardContent>
-            <div className="space-y-2">
-              <div className="text-3xl font-bold text-foreground">--</div>
-              <div className="text-sm text-muted-foreground">No signals yet</div>
+            <div className="text-2xl font-bold">+$2,489.32</div>
+            <p className="text-xs text-muted-foreground mt-1">+5.8% gain</p>
+            <div className="h-20 mt-3">
+              <Spark
+                data={[
+                  { value: -200 },
+                  { value: 400 },
+                  { value: 800 },
+                  { value: 600 },
+                  { value: 1200 },
+                  { value: 1800 },
+                  { value: 2489.32 },
+                ]}
+                type="profit"
+              />
             </div>
           </CardContent>
         </Card>
 
-        {/* Active Positions */}
-        <Card className="glass glass-hover card-glow-hover border-border/50">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Active Positions</CardTitle>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Win Rate</CardTitle>
+            <StatusDot status="success" />
           </CardHeader>
           <CardContent>
-            <div className="space-y-2">
-              <div className="text-3xl font-bold text-foreground">0</div>
-              <div className="text-sm text-muted-foreground">No positions</div>
+            <div className="text-2xl font-bold">72.4%</div>
+            <p className="text-xs text-muted-foreground mt-1">29 of 40 trades</p>
+            <div className="h-20 mt-3">
+              <Spark
+                data={[
+                  { value: 65 },
+                  { value: 68 },
+                  { value: 70 },
+                  { value: 69 },
+                  { value: 71 },
+                  { value: 70 },
+                  { value: 72.4 },
+                ]}
+                type="winrate"
+              />
             </div>
           </CardContent>
         </Card>
 
-        {/* Today's P&L */}
-        <Card className="glass glass-hover card-glow-hover border-border/50">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Today's P&L</CardTitle>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Active Signals</CardTitle>
+            <StatusDot status="success" />
           </CardHeader>
           <CardContent>
-            <div className="space-y-2">
-              <div className="text-3xl font-bold text-foreground">$0.00</div>
-              <div className="text-sm text-muted-foreground">No data available</div>
+            <div className="text-2xl font-bold">8</div>
+            <p className="text-xs text-muted-foreground mt-1">3 pending execution</p>
+            <div className="h-20 mt-3">
+              <Spark
+                data={[
+                  { value: 5 },
+                  { value: 6 },
+                  { value: 7 },
+                  { value: 6 },
+                  { value: 8 },
+                  { value: 9 },
+                  { value: 8 },
+                ]}
+                type="signals"
+              />
             </div>
           </CardContent>
         </Card>
       </div>
 
       {/* Main Content Grid */}
-      <div className="grid gap-6 lg:grid-cols-3 md:grid-cols-2 grid-cols-1">
-        {/* Signals Card */}
-        <Card className="glass glass-hover card-glow-hover border-border/50">
-          <CardHeader>
-            <CardTitle className="flex items-center justify-between">
-              <span className="text-foreground">Live Signals</span>
-              <div className="flex items-center space-x-2">
-                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                <span className="text-sm text-green-400">Active</span>
+      <div className="grid grid-cols-12 gap-6">
+        {/* Open Positions - Left Side */}
+        <div className="col-span-12 lg:col-span-7">
+          <Card>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <CardTitle>Open Positions</CardTitle>
+                <StatusDot status="success" />
               </div>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-center py-8">
-              <div className="w-2 h-2 bg-gray-400 rounded-full mx-auto mb-4"></div>
-              <p className="text-muted-foreground">No signals available</p>
-              <p className="text-sm text-muted-foreground mt-2">Live trading signals will appear here when available.</p>
-            </div>
-          </CardContent>
-        </Card>
+            </CardHeader>
+            <CardContent>
+              <OpenPositions />
+            </CardContent>
+          </Card>
+        </div>
 
-        {/* Portfolio Chart */}
-        <Card className="glass glass-hover card-glow-hover border-border/50">
-          <CardHeader>
-            <CardTitle className="text-foreground">Portfolio Growth</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-center py-8">
-              <p className="text-muted-foreground">No portfolio data</p>
-              <p className="text-sm text-muted-foreground mt-2">Portfolio growth will be tracked here once you start trading.</p>
-            </div>
-          </CardContent>
-        </Card>
+        {/* Right Side - Trading Info */}
+        <div className="col-span-12 lg:col-span-5 space-y-6">
+          {/* Top Performer */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">Top Performer</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-r from-green-500 to-emerald-500 flex items-center justify-center text-white font-bold">
+                    E
+                  </div>
+                  <div>
+                    <p className="font-semibold">ETH/USDT</p>
+                    <p className="text-sm text-muted-foreground">Ethereum</p>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <p className="font-bold text-green-500">+18.4%</p>
+                  <p className="text-sm text-muted-foreground">$492.85</p>
+                </div>
+              </div>
+              <div className="h-32">
+                <Spark
+                  data={[
+                    { value: 2400 },
+                    { value: 2450 },
+                    { value: 2480 },
+                    { value: 2600 },
+                    { value: 2750 },
+                    { value: 2820 },
+                    { value: 2842 },
+                  ]}
+                  type="price"
+                />
+              </div>
+            </CardContent>
+          </Card>
 
-        {/* Alerts Card */}
-        <Card className="glass glass-hover card-glow-hover border-border/50">
-          <CardHeader>
-            <CardTitle className="text-foreground">Market Alerts</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-center py-8">
-              <p className="text-muted-foreground">No alerts</p>
-              <p className="text-sm text-muted-foreground mt-2">Market alerts and notifications will appear here.</p>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Open Positions - Full Width */}
-      <div className="w-full">
-        <OpenPositions />
-      </div>
-
-      {/* ZIG TRADES Workflow - Full Width */}
-      <div className="w-full">
-        <ZigTradesWorkflow />
-      </div>
-
-      {/* Bottom Grid */}
-      <div className="grid gap-6 lg:grid-cols-3 md:grid-cols-2 grid-cols-1">
-        {/* Watchlist */}
-        <Card className="lg:col-span-2 glass glass-hover card-glow-hover border-border/50">
-          <CardHeader>
-            <CardTitle className="text-foreground">Market Watchlist</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-center py-8">
-              <p className="text-muted-foreground">No watchlist items</p>
-              <p className="text-sm text-muted-foreground mt-2">Add cryptocurrencies to your watchlist to track their performance.</p>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Recent Activity */}
-        <Card className="glass glass-hover card-glow-hover border-border/50">
-          <CardHeader>
-            <CardTitle className="text-foreground">Recent Activity</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-center py-8">
-              <p className="text-muted-foreground">No recent activity</p>
-              <p className="text-sm text-muted-foreground mt-2">Your trading activity will appear here.</p>
-            </div>
-          </CardContent>
-        </Card>
+          {/* Recent Signals */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">Recent Signals</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {[
+                { pair: 'BTC/USDT', action: 'BUY', price: '67,432', time: '2 min ago' },
+                { pair: 'SOL/USDT', action: 'SELL', price: '142.85', time: '15 min ago' },
+                { pair: 'AVAX/USDT', action: 'BUY', price: '38.92', time: '1 hour ago' },
+              ].map((signal, i) => (
+                <div key={i} className="flex items-center justify-between p-3 rounded-lg bg-card border border-border">
+                  <div className="flex items-center space-x-3">
+                    <div className={`px-2 py-1 rounded text-xs font-semibold ${
+                      signal.action === 'BUY' ? 'bg-green-500/20 text-green-500' : 'bg-red-500/20 text-red-500'
+                    }`}>
+                      {signal.action}
+                    </div>
+                    <div>
+                      <p className="font-semibold text-sm">{signal.pair}</p>
+                      <p className="text-xs text-muted-foreground">{signal.time}</p>
+                    </div>
+                  </div>
+                  <p className="text-sm font-mono">${signal.price}</p>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
   );
-  } catch (error) {
-    console.warn('WorkOS auth error in dashboard page:', error);
-    redirect('/');
-  }
 }

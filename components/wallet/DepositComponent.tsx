@@ -20,7 +20,8 @@ interface DepositFormData {
   notes: string;
 }
 
-const mockPaymentMethods = [
+// TODO: Replace with real payment methods from API/configuration
+const paymentMethods = [
   { value: 'bank_transfer', label: 'Bank Transfer', icon: '🏦' },
   { value: 'credit_card', label: 'Credit Card', icon: '💳' },
   { value: 'paypal', label: 'PayPal', icon: '🔵' },
@@ -196,7 +197,7 @@ export default function DepositComponent() {
                 <SelectValue placeholder="Select payment method" />
               </SelectTrigger>
               <SelectContent>
-                {mockPaymentMethods.map((method) => (
+                {paymentMethods.map((method) => (
                   <SelectItem key={method.value} value={method.value}>
                     <div className="flex items-center gap-2">
                       <span>{method.icon}</span>

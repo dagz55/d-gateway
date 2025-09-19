@@ -19,7 +19,7 @@ interface WithdrawFormData {
   notes: string;
 }
 
-const mockWithdrawalMethods = [
+const withdrawalMethods = [
   { value: 'bank_transfer', label: 'Bank Transfer', icon: '🏦' },
   { value: 'credit_card', label: 'Credit Card', icon: '💳' },
   { value: 'paypal', label: 'PayPal', icon: '🔵' },
@@ -39,10 +39,10 @@ export default function WithdrawComponent() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Mock portfolio values
+  // TODO: Fetch real portfolio values from API
   const portfolioValues = {
-    'Trading Wallet': 11400.00,
-    'Income Wallet': 2850.00
+    'Trading Wallet': 0.00,
+    'Income Wallet': 0.00
   };
 
   const handleInputChange = (field: keyof WithdrawFormData, value: string) => {
@@ -247,7 +247,7 @@ export default function WithdrawComponent() {
                   <SelectValue placeholder="Select withdrawal method" />
                 </SelectTrigger>
                 <SelectContent>
-                  {mockWithdrawalMethods.map((method) => (
+                  {withdrawalMethods.map((method) => (
                     <SelectItem key={method.value} value={method.value}>
                       <div className="flex items-center gap-2">
                         <span>{method.icon}</span>

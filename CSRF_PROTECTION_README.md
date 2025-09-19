@@ -251,7 +251,7 @@ COOKIE_DOMAIN=yourdomain.com
 CSRF_DEV_BYPASS_TOKEN=your-dev-token
 
 # Required: HTTPS URL in production
-NEXTAUTH_URL=https://yourdomain.com
+
 ```
 
 ### Content Security Policy

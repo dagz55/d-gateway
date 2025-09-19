@@ -8,12 +8,17 @@ import { Label } from '@/components/ui/label';
 import { Upload, User, Trash2 } from 'lucide-react';
 import { useRef, useState, useEffect } from 'react';
 import { toast } from 'sonner';
-import { useWorkOSAuth } from '@/contexts/WorkOSAuthContext';
+import { useUser } from '@clerk/nextjs';
 // Removed Server Action imports - now using API routes
 import { validateImageFile, ACCEPT_FILE_TYPES, ACCEPT_FILE_EXTENSIONS, ALLOWED_IMAGE_EXTENSIONS } from '@/lib/validation';
 
-export default function ChangePhotoForm() {
-  const { user, profile } = useWorkOSAuth();
+interface ChangePhotoFormProps {
+  currentAvatarUrl?: string;
+  userName?: string;
+}
+
+export default function ChangePhotoForm({ currentAvatarUrl: propAvatarUrl, userName }: ChangePhotoFormProps) {
+  const { user, isLoaded } = useUser();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -32,10 +37,10 @@ export default function ChangePhotoForm() {
   }, []);
 
   useEffect(() => {
-    // Use profile data first, then fallback to user data
-    const avatarUrl = profile?.avatar_url || profile?.profile_picture_url || user?.profilePictureUrl;
+    // Use Clerk user data or props
+    const avatarUrl = propAvatarUrl || user?.imageUrl;
     setCurrentAvatarUrl(avatarUrl || null);
-  }, [profile?.avatar_url, profile?.profile_picture_url, user?.profilePictureUrl]);
+  }, [propAvatarUrl, user?.imageUrl]);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];

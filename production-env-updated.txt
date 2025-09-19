@@ -11,11 +11,11 @@ CSRF_DEV_BYPASS_TOKEN=
 NEXT_PUBLIC_BASE_URL=https://zignals.org
 NEXT_PUBLIC_APP_URL=https://zignals.org
 NEXT_PUBLIC_SITE_URL=https://zignals.org
-NEXTAUTH_URL=https://zignals.org
+
 
 # ---- Auth secrets ----
 # Generate with: openssl rand -hex 32
-NEXTAUTH_SECRET=REPLACE_ME_LONG_RANDOM
+
 JWT_SECRET=REPLACE_ME_LONG_RANDOM
 
 # ---- Admins & CORS ----

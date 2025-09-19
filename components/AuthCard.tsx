@@ -77,7 +77,7 @@ export function AuthCard() {
           email: formData.email,
           password: formData.password,
           options: {
-            emailRedirectTo: `${window.location.origin}/dashboard`,
+            emailRedirectTo: `${window.location.origin}/`,
           },
         })
 
@@ -97,8 +97,8 @@ export function AuthCard() {
           console.error("[v0] Sign in error:", error)
           setError(error.message)
         } else if (data.session) {
-          // Redirect to dashboard on successful sign in
-          window.location.href = "/dashboard"
+          // Redirect to root - middleware will handle role-based routing
+          window.location.href = "/"
         }
       }
     } catch (error) {

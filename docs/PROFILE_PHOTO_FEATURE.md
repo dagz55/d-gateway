@@ -252,7 +252,7 @@ This validates:
 
 3. **Session not updating**
    - Ensure `updateSession()` is called after upload
-   - Check NextAuth configuration includes avatarUrl
+   
 
 ## Future Enhancements
 

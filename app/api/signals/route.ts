@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getCurrentUser } from '@/lib/auth-middleware'
+import { getCurrentUser } from '@/lib/clerk-auth'
 import { createServerSupabaseClient } from '@/lib/supabase/serverClient'
 
 export async function GET(request: NextRequest) {

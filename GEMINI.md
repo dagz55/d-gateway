@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-This project is a production-ready Next.js member dashboard for a cryptocurrency trading platform. It includes features for user authentication, a dashboard with real-time stats and charts, trading history, signals, deposits/withdrawals, and a news feed. The application is built with Next.js 14, TypeScript, and Tailwind CSS, and it uses NextAuth.js for authentication and a mock database for development.
+This project is a production-ready Next.js member dashboard for a cryptocurrency trading platform. It includes features for user authentication, a dashboard with real-time stats and charts, trading history, signals, deposits/withdrawals, and a news feed. The application is built with Next.js 14, TypeScript, and Tailwind CSS, and it uses Clerk for authentication and Supabase for the database.
 
 The project is well-structured, with a clear separation of concerns between the frontend and backend. The frontend is built with React and uses `shadcn/ui` for UI components, `Recharts` for charts, and `Zustand` and `React Query` for state management. The backend consists of API routes built with Next.js API routes, and it uses a mock in-memory database for data storage.
 
@@ -57,8 +57,8 @@ The project is well-structured, with a clear separation of concerns between the 
 
 ## Development Conventions
 
-*   **Authentication:** The application uses NextAuth.js with a credentials provider for authentication. For development, it uses a mock database, but for production, it should be configured with an OAuth provider and a proper database.
-*   **Database:** The application uses an in-memory mock database (`src/server/mock-db.ts`) for development. This should be replaced with a proper database solution for production.
+*   **Authentication:** The application uses Clerk for authentication. For development, it uses a mock database, but for production, it should be configured with an OAuth provider and a proper database.
+*   **Database:** The application uses Supabase for its database. For production, it should be configured with an OAuth provider and a proper database.
 *   **API:** All API routes are currently mocked. For production, these should be connected to real trading APIs and a database.
 *   **Styling:** The project uses Tailwind CSS for styling and `shadcn/ui` for UI components.
 *   **State Management:** The project uses `Zustand` and `React Query` for state management.

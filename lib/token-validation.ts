@@ -1,7 +1,7 @@
 import { NextRequest } from 'next/server';
 import { tokenManager, TokenValidationResult, AccessToken, RefreshToken } from './token-manager';
 import { refreshTokenStore } from './refresh-token-store';
-import { getClientIP } from './auth-middleware';
+import { getClientIP } from './clerk-auth';
 
 // Validation options interface
 export interface TokenValidationOptions {

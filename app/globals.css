@@ -173,6 +173,244 @@
   }
 }
 
+@keyframes drift-slow {
+  0%, 100% {
+    transform: translate(0px, 0px) scale(1);
+  }
+  33% {
+    transform: translate(30px, -30px) scale(1.1);
+  }
+  66% {
+    transform: translate(-20px, 20px) scale(0.9);
+  }
+}
+
+@keyframes drift-reverse {
+  0%, 100% {
+    transform: translate(0px, 0px) scale(1);
+  }
+  33% {
+    transform: translate(-25px, 25px) scale(0.95);
+  }
+  66% {
+    transform: translate(35px, -15px) scale(1.05);
+  }
+}
+
+@keyframes drift-fast {
+  0%, 100% {
+    transform: translate(0px, 0px) scale(1);
+  }
+  25% {
+    transform: translate(20px, -20px) scale(1.1);
+  }
+  50% {
+    transform: translate(-30px, 10px) scale(0.9);
+  }
+  75% {
+    transform: translate(15px, 25px) scale(1.05);
+  }
+}
+
+@keyframes draw {
+  0% {
+    stroke-dasharray: 0 1000;
+  }
+  100% {
+    stroke-dasharray: 1000 0;
+  }
+}
+
+@keyframes bullet-move {
+  0% {
+    transform: translate(0, 100vh) scale(0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+    transform: translate(0, 90vh) scale(1);
+  }
+  90% {
+    opacity: 1;
+    transform: translate(0, -10vh) scale(1);
+  }
+  100% {
+    transform: translate(0, -20vh) scale(0);
+    opacity: 0;
+  }
+}
+
+@keyframes bullet-diagonal {
+  0% {
+    transform: translate(100vw, 100vh) scale(0) rotate(45deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+    transform: translate(90vw, 90vh) scale(1) rotate(45deg);
+  }
+  90% {
+    opacity: 1;
+    transform: translate(-10vw, -10vh) scale(1) rotate(45deg);
+  }
+  100% {
+    transform: translate(-20vw, -20vh) scale(0) rotate(45deg);
+    opacity: 0;
+  }
+}
+
+@keyframes bullet-fast {
+  0% {
+    transform: translate(-50px, 100vh) scale(0) rotate(-10deg);
+    opacity: 0;
+  }
+  5% {
+    opacity: 1;
+    transform: translate(-40px, 95vh) scale(1) rotate(-10deg);
+  }
+  95% {
+    opacity: 1;
+    transform: translate(50px, -5vh) scale(1) rotate(-10deg);
+  }
+  100% {
+    transform: translate(60px, -10vh) scale(0) rotate(-10deg);
+    opacity: 0;
+  }
+}
+
+/* Crypto-specific animations */
+@keyframes crypto-float {
+  0%, 100% {
+    transform: translate(0, 0) rotate(0deg) scale(1);
+    opacity: 0.2;
+  }
+  25% {
+    transform: translate(20px, -30px) rotate(5deg) scale(1.1);
+    opacity: 0.4;
+  }
+  50% {
+    transform: translate(-10px, -60px) rotate(-3deg) scale(0.9);
+    opacity: 0.6;
+  }
+  75% {
+    transform: translate(30px, -40px) rotate(8deg) scale(1.05);
+    opacity: 0.3;
+  }
+}
+
+@keyframes price-drift {
+  0% {
+    transform: translateY(0px) translateX(0px);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.6;
+  }
+  90% {
+    opacity: 0.4;
+  }
+  100% {
+    transform: translateY(-80px) translateX(30px);
+    opacity: 0;
+  }
+}
+
+@keyframes candle-pulse {
+  0%, 100% {
+    opacity: 0.4;
+    transform: scaleY(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scaleY(1.1);
+  }
+}
+
+@keyframes data-stream {
+  0% {
+    transform: translateY(100vh) scaleY(0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.8;
+    transform: translateY(90vh) scaleY(1);
+  }
+  90% {
+    opacity: 0.3;
+    transform: translateY(-10vh) scaleY(1);
+  }
+  100% {
+    transform: translateY(-20vh) scaleY(0);
+    opacity: 0;
+  }
+}
+
+@keyframes volume-pulse {
+  0%, 100% {
+    transform: scaleY(0.3);
+    opacity: 0.3;
+  }
+  50% {
+    transform: scaleY(1);
+    opacity: 0.8;
+  }
+}
+
+@keyframes chart-draw {
+  0% {
+    stroke-dasharray: 0 2000;
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  100% {
+    stroke-dasharray: 2000 0;
+    opacity: 0.8;
+  }
+}
+
+@keyframes crypto-glow {
+  0%, 100% {
+    transform: scale(1) translate(0, 0);
+    opacity: 0.1;
+  }
+  33% {
+    transform: scale(1.2) translate(20px, -10px);
+    opacity: 0.2;
+  }
+  66% {
+    transform: scale(0.8) translate(-15px, 15px);
+    opacity: 0.15;
+  }
+}
+
+@keyframes crypto-glow-delayed {
+  0%, 100% {
+    transform: scale(1) translate(0, 0);
+    opacity: 0.08;
+  }
+  40% {
+    transform: scale(1.3) translate(-25px, 20px);
+    opacity: 0.18;
+  }
+  80% {
+    transform: scale(0.9) translate(30px, -15px);
+    opacity: 0.12;
+  }
+}
+
+@keyframes crypto-pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.15;
+  }
+  50% {
+    transform: scale(1.4);
+    opacity: 0.25;
+  }
+}
+
 .animate-grid-pulse {
   animation: grid-pulse 3s ease-in-out infinite;
 }
@@ -199,6 +437,71 @@
 
 .animate-parallax-float {
   animation: parallax-float 8s ease-in-out infinite;
+}
+
+.animate-drift-slow {
+  animation: drift-slow 8s ease-in-out infinite;
+}
+
+.animate-drift-reverse {
+  animation: drift-reverse 10s ease-in-out infinite;
+}
+
+.animate-drift-fast {
+  animation: drift-fast 6s ease-in-out infinite;
+}
+
+.animate-draw {
+  animation: draw 3s ease-in-out infinite;
+}
+
+.animate-bullet-move {
+  animation: bullet-move 4s linear infinite;
+}
+
+.animate-bullet-diagonal {
+  animation: bullet-diagonal 5s linear infinite;
+}
+
+.animate-bullet-fast {
+  animation: bullet-fast 2s linear infinite;
+}
+
+/* Crypto animation classes */
+.animate-crypto-float {
+  animation: crypto-float 15s ease-in-out infinite;
+}
+
+.animate-price-drift {
+  animation: price-drift 10s ease-out infinite;
+}
+
+.animate-candle-pulse {
+  animation: candle-pulse 4s ease-in-out infinite;
+}
+
+.animate-data-stream {
+  animation: data-stream 6s linear infinite;
+}
+
+.animate-volume-pulse {
+  animation: volume-pulse 3s ease-in-out infinite;
+}
+
+.animate-chart-draw {
+  animation: chart-draw 8s ease-in-out infinite;
+}
+
+.animate-crypto-glow {
+  animation: crypto-glow 12s ease-in-out infinite;
+}
+
+.animate-crypto-glow-delayed {
+  animation: crypto-glow-delayed 15s ease-in-out infinite;
+}
+
+.animate-crypto-pulse {
+  animation: crypto-pulse 6s ease-in-out infinite;
 }
 
 /* Enhanced glassmorphism and dashboard utilities */
@@ -241,6 +544,10 @@
   -webkit-text-fill-color: transparent;
 }
 
+.bg-gradient-radial {
+  background: radial-gradient(circle, var(--tw-gradient-stops));
+}
+
 @utility card-glow {
   box-shadow: 0 0 20px rgba(51, 225, 218, 0.1);
 }
@@ -262,11 +569,27 @@
 .animate-float,
 .animate-spin-slow,
 .animate-reverse-spin,
-.animate-parallax-float {
+.animate-parallax-float,
+.animate-bullet-move,
+.animate-bullet-diagonal,
+.animate-bullet-fast {
   /* Force GPU acceleration for smooth animations */
   transform: translate3d(0, 0, 0);
-  will-change: transform;
+  will-change: transform, opacity;
   backface-visibility: hidden;
+}
+
+/* Add glow effects for bullet animations */
+.animate-bullet-move {
+  box-shadow: 0 0 8px rgba(51, 225, 218, 0.6);
+}
+
+.animate-bullet-diagonal {
+  box-shadow: 0 0 6px rgba(26, 127, 179, 0.5);
+}
+
+.animate-bullet-fast {
+  box-shadow: 0 0 10px rgba(34, 197, 94, 0.7);
 }
 
 /* Optimize transitions for performance */
@@ -347,6 +670,458 @@ a:focus-visible {
   outline: 2px solid #33E1DA;
   outline-offset: 2px;
   border-radius: 4px;
+}
+
+/* Stock Exchange Style Promotional Banner Animations */
+@keyframes stock-ticker {
+  0% {
+    transform: translateX(0px);
+  }
+  25% {
+    transform: translateX(2px);
+  }
+  50% {
+    transform: translateX(0px);
+  }
+  75% {
+    transform: translateX(-2px);
+  }
+  100% {
+    transform: translateX(0px);
+  }
+}
+
+@keyframes stock-flash {
+  0%, 90%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.05);
+  }
+}
+
+@keyframes blink-cta {
+  0%, 70%, 100% {
+    opacity: 1;
+  }
+  85% {
+    opacity: 0.7;
+  }
+}
+
+@keyframes live-pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.1);
+  }
+}
+
+@keyframes ticker-scroll {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes border-sweep {
+  0% {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 10px rgba(51, 225, 218, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(51, 225, 218, 0.6);
+  }
+}
+
+@keyframes fade-in-delayed {
+  0% {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes indicator-active {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 0.8;
+  }
+}
+
+@keyframes arrow-pulse {
+  0%, 100% {
+    transform: translateX(0px);
+    opacity: 0.8;
+  }
+  50% {
+    transform: translateX(3px);
+    opacity: 1;
+  }
+}
+
+/* Stock Exchange Animation Classes */
+.animate-stock-ticker {
+  animation: stock-ticker 3s ease-in-out infinite;
+}
+
+.animate-stock-flash {
+  animation: stock-flash 2s ease-in-out infinite;
+}
+
+.animate-blink-cta {
+  animation: blink-cta 4s ease-in-out infinite;
+}
+
+.animate-live-pulse {
+  animation: live-pulse 1.5s ease-in-out infinite;
+}
+
+.animate-ticker-scroll {
+  animation: ticker-scroll 2s linear infinite;
+}
+
+.animate-border-sweep {
+  animation: border-sweep 3s ease-in-out infinite;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+.animate-fade-in-delayed {
+  animation: fade-in-delayed 0.6s ease-out 0.3s both;
+}
+
+.animate-indicator-active {
+  animation: indicator-active 1s ease-in-out infinite;
+}
+
+.animate-arrow-pulse {
+  animation: arrow-pulse 2s ease-in-out infinite;
+}
+
+/* Enhanced Crypto Banner Animations */
+@keyframes crypto-float-intense {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg) scale(1);
+    opacity: 0.1;
+  }
+  25% {
+    transform: translateY(-15px) rotate(5deg) scale(1.1);
+    opacity: 0.2;
+  }
+  50% {
+    transform: translateY(-25px) rotate(-5deg) scale(1.2);
+    opacity: 0.15;
+  }
+  75% {
+    transform: translateY(-10px) rotate(3deg) scale(1.05);
+    opacity: 0.25;
+  }
+}
+
+@keyframes price-flash-intense {
+  0%, 70%, 100% {
+    opacity: 0.3;
+    transform: scaleX(0);
+  }
+  35% {
+    opacity: 1;
+    transform: scaleX(1);
+  }
+}
+
+@keyframes border-glow-intense {
+  0%, 100% {
+    opacity: 0.5;
+    box-shadow: 0 0 20px rgba(247, 147, 26, 0.3);
+  }
+  50% {
+    opacity: 1;
+    box-shadow: 0 0 40px rgba(247, 147, 26, 0.8), 0 0 60px rgba(51, 225, 218, 0.4);
+  }
+}
+
+@keyframes crypto-mega-glow {
+  0%, 100% {
+    box-shadow:
+      0 0 20px rgba(247, 147, 26, 0.4),
+      0 0 40px rgba(51, 225, 218, 0.3),
+      inset 0 0 20px rgba(255, 255, 255, 0.1);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow:
+      0 0 40px rgba(247, 147, 26, 0.8),
+      0 0 80px rgba(51, 225, 218, 0.6),
+      inset 0 0 30px rgba(255, 255, 255, 0.2);
+    transform: scale(1.05);
+  }
+}
+
+@keyframes crypto-icon-intense {
+  0%, 100% {
+    transform: rotate(0deg) scale(1);
+    filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.3));
+  }
+  25% {
+    transform: rotate(-5deg) scale(1.1);
+    filter: drop-shadow(0 0 15px rgba(247, 147, 26, 0.8));
+  }
+  50% {
+    transform: rotate(5deg) scale(1.2);
+    filter: drop-shadow(0 0 20px rgba(51, 225, 218, 0.8));
+  }
+  75% {
+    transform: rotate(-3deg) scale(1.05);
+    filter: drop-shadow(0 0 10px rgba(34, 197, 94, 0.6));
+  }
+}
+
+@keyframes live-pulse-intense {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+    box-shadow: 0 0 10px rgba(34, 197, 94, 0.5);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.4);
+    box-shadow: 0 0 25px rgba(34, 197, 94, 1);
+  }
+}
+
+@keyframes crypto-symbol-bounce {
+  0%, 100% {
+    transform: translateY(0) scale(1);
+    text-shadow: 0 0 10px rgba(247, 147, 26, 0.5);
+  }
+  50% {
+    transform: translateY(-5px) scale(1.1);
+    text-shadow: 0 0 20px rgba(247, 147, 26, 1);
+  }
+}
+
+@keyframes crypto-title-glow {
+  0%, 100% {
+    text-shadow:
+      0 0 10px rgba(255, 255, 255, 0.3),
+      0 0 20px rgba(51, 225, 218, 0.3);
+    transform: scale(1);
+  }
+  50% {
+    text-shadow:
+      0 0 20px rgba(255, 255, 255, 0.6),
+      0 0 40px rgba(51, 225, 218, 0.6),
+      0 0 60px rgba(247, 147, 26, 0.4);
+    transform: scale(1.02);
+  }
+}
+
+@keyframes crypto-subtitle-flash {
+  0%, 80%, 100% {
+    opacity: 1;
+    text-shadow: 0 0 10px rgba(51, 225, 218, 0.5);
+  }
+  90% {
+    opacity: 0.8;
+    text-shadow: 0 0 30px rgba(51, 225, 218, 1);
+  }
+}
+
+@keyframes crypto-cta-intense {
+  0%, 100% {
+    transform: scale(1);
+    text-shadow:
+      0 0 15px rgba(247, 147, 26, 0.8),
+      0 0 30px rgba(247, 147, 26, 0.4);
+  }
+  25% {
+    transform: scale(1.02);
+    text-shadow:
+      0 0 25px rgba(247, 147, 26, 1),
+      0 0 50px rgba(247, 147, 26, 0.6);
+  }
+  50% {
+    transform: scale(1.05);
+    text-shadow:
+      0 0 35px rgba(247, 147, 26, 1),
+      0 0 70px rgba(247, 147, 26, 0.8);
+  }
+  75% {
+    transform: scale(1.02);
+    text-shadow:
+      0 0 25px rgba(247, 147, 26, 1),
+      0 0 50px rgba(247, 147, 26, 0.6);
+  }
+}
+
+@keyframes crypto-live-text {
+  0%, 100% {
+    opacity: 1;
+    text-shadow: 0 0 10px rgba(34, 197, 94, 0.5);
+  }
+  50% {
+    opacity: 0.8;
+    text-shadow: 0 0 20px rgba(34, 197, 94, 1);
+  }
+}
+
+@keyframes crypto-data-scroll {
+  0% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  50% {
+    transform: translateX(3px);
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes price-ticker {
+  0%, 100% {
+    transform: scale(1);
+    text-shadow: 0 0 10px rgba(34, 197, 94, 0.5);
+  }
+  50% {
+    transform: scale(1.1);
+    text-shadow: 0 0 20px rgba(34, 197, 94, 1);
+  }
+}
+
+@keyframes crypto-indicator-active {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+    box-shadow: 0 0 10px rgba(247, 147, 26, 0.5);
+  }
+  50% {
+    transform: scale(1.3);
+    opacity: 0.8;
+    box-shadow: 0 0 20px rgba(247, 147, 26, 1);
+  }
+}
+
+@keyframes crypto-arrow-intense {
+  0%, 100% {
+    transform: translateX(0) scale(1);
+    filter: drop-shadow(0 0 5px rgba(247, 147, 26, 0.5));
+  }
+  50% {
+    transform: translateX(5px) scale(1.1);
+    filter: drop-shadow(0 0 15px rgba(247, 147, 26, 1));
+  }
+}
+
+/* Enhanced Crypto Animation Classes */
+.animate-crypto-float-intense {
+  animation: crypto-float-intense 12s ease-in-out infinite;
+}
+
+.animate-price-flash-intense {
+  animation: price-flash-intense 2s ease-in-out infinite;
+}
+
+.animate-border-glow-intense {
+  animation: border-glow-intense 3s ease-in-out infinite;
+}
+
+.animate-crypto-mega-glow {
+  animation: crypto-mega-glow 2s ease-in-out infinite;
+}
+
+.animate-crypto-icon-intense {
+  animation: crypto-icon-intense 3s ease-in-out infinite;
+}
+
+.animate-live-pulse-intense {
+  animation: live-pulse-intense 1s ease-in-out infinite;
+}
+
+.animate-crypto-symbol-bounce {
+  animation: crypto-symbol-bounce 2s ease-in-out infinite;
+}
+
+.animate-crypto-title-glow {
+  animation: crypto-title-glow 4s ease-in-out infinite;
+}
+
+.animate-crypto-subtitle-flash {
+  animation: crypto-subtitle-flash 3s ease-in-out infinite;
+}
+
+.animate-crypto-cta-intense {
+  animation: crypto-cta-intense 2s ease-in-out infinite;
+}
+
+.animate-crypto-live-text {
+  animation: crypto-live-text 2s ease-in-out infinite;
+}
+
+.animate-crypto-data-scroll {
+  animation: crypto-data-scroll 4s ease-in-out infinite;
+}
+
+.animate-price-ticker {
+  animation: price-ticker 1.5s ease-in-out infinite;
+}
+
+.animate-crypto-indicator-active {
+  animation: crypto-indicator-active 1.5s ease-in-out infinite;
+}
+
+.animate-crypto-arrow-intense {
+  animation: crypto-arrow-intense 2s ease-in-out infinite;
+}
+
+/* Drop shadow utilities */
+.drop-shadow-glow {
+  filter: drop-shadow(0 0 10px rgba(247, 147, 26, 0.6));
+}
+
+/* Right-to-left scrolling animation */
+@keyframes scroll-right-to-left {
+  0% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+.animate-scroll-right-to-left {
+  animation: scroll-right-to-left 60s linear infinite;
 }
 
 /* Preload critical animations */

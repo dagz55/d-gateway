@@ -1,5 +1,5 @@
+import { auth } from '@clerk/nextjs/server';
 import { redirect } from 'next/navigation';
-import { getCurrentUser } from '@/lib/auth-middleware';
 import AppLayout from '@/components/layout/AppLayout';
 
 export const dynamic = 'force-dynamic';
@@ -9,16 +9,11 @@ export default async function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  try {
-    const user = await getCurrentUser();
-    
-    if (!user) {
-      redirect('/');
-    }
+  const { userId } = auth();
 
-    return <AppLayout>{children}</AppLayout>;
-  } catch (error) {
-    console.warn('WorkOS auth error in dashboard layout:', error);
-    redirect('/');
+  if (!userId) {
+    redirect('/sign-in');
   }
+
+  return <AppLayout>{children}</AppLayout>;
 }

@@ -5,15 +5,25 @@ Zignal is a comprehensive crypto trading platform built with [Next.js 15.5.3](ht
 ## 🚀 Features
 
 ### Core Platform
-- 🔐 **Enterprise Authentication**: WorkOS AuthKit integration for enterprise-grade security and compliance
+- 🔐 **Enterprise Authentication**: Clerk authentication with role-based access control
 - 🎬 **Enhanced Landing Page**: Fully separated landing page with 3D particle animations, shader effects, floating elements, and interactive background animations
 - 🌟 **Advanced Hero Section**: Professional hero section with WebGL particle systems, animated grids, wave animations, and mouse-responsive floating orbs
-- 📊 **Trading Dashboard**: Complete trading interface with real-time charts and analytics
-- 📈 **Signal Management**: Professional trading signals with copy trading capabilities
+- 📊 **Role-Based Dashboards**: Separate dashboards for members (`/member/dashboard`) and administrators (`/admin/dashboard`)
+- 🔑 **Smart Routing**: Automatic routing based on user roles - admins to admin panel, members to member dashboard
+- 👤 **Profile Routes**: Universal profile access at `/profile` for all authenticated users with role-based content
+- 📈 **Live Market Data**: Real-time cryptocurrency market tracking with CoinGecko API integration
+- 📊 **Signal Management**: Professional trading signals with copy trading capabilities
 - 🎯 **ZIG TRADES Workflow**: Comprehensive trading workflow with signals, history, and active trading management
 - 💰 **Portfolio Management**: Track profits, losses, and portfolio distribution
 - 🏦 **Wallet System**: Complete wallet management with deposits, withdrawals, and transaction history
 - 📰 **News Integration**: Real-time cryptocurrency news feed
+- 📊 **Market Analytics**: 
+  - Live cryptocurrency prices from CoinGecko API
+  - Real-time market statistics (total market cap, 24h volume, gainers/losers)
+  - Interactive favorites system for tracking preferred coins
+  - 7-day price sparkline charts for trend visualization
+  - Advanced sorting and filtering capabilities
+  - Auto-refresh every 30 seconds with manual refresh option
 - 👤 **Profile Management**: Complete user profile system with photo uploads and settings
 - 🎨 **Profile Dropdown**: Interactive user menu with subscription status and quick access
 - 🏷️ **Enhanced Profile Section**: Comprehensive sidebar profile component with avatar, user info, admin badges, and quick actions
@@ -97,11 +107,39 @@ Zignal now uses **WorkOS AuthKit** for enterprise-grade authentication, providin
 - 🚀 **Better Performance**: Fixed hydration issues and optimized animation performance
 
 ### Architecture
-- **Authentication**: WorkOS AuthKit handles all user authentication
+- **Authentication**: Clerk handles all user authentication with role-based access control
 - **Database**: Supabase for trading data and real-time features
-- **Session Management**: Encrypted cookies with automatic refresh
+- **Routing**: Smart role-based routing with middleware-level protection
+- **Session Management**: Clerk session management with automatic refresh
 - **Security**: Bank-grade security infrastructure with 99.99% uptime
 - **UI/UX**: Modern, accessible interface with professional animations and interactions
+
+### Routing Structure
+The application uses role-based routing to provide different experiences for different user types:
+
+#### Universal Routes (Accessible to all authenticated users)
+- `/profile` - User profile management (works for both admin and member users)
+- `/settings` - Account settings and preferences  
+- `/wallet` - Wallet management and transactions
+
+#### Member Routes (`/member/*`)
+- `/member/dashboard` - Member trading dashboard with portfolio overview
+- `/member/profile` - Alternative member-specific profile route
+- `/member/settings` - Member-specific settings
+- `/member/wallet` - Member-specific wallet management
+
+#### Admin Routes (`/admin/*`)
+- `/admin/dashboard` - Administrative dashboard with system overview
+- `/admin/users` - User management and permissions
+- `/admin/signals` - Trading signals management
+- `/admin/test-errors` - Development error testing (dev only)
+
+#### Smart Redirects
+- **Root (`/`)**: Automatically redirects based on user role
+  - Admins → `/admin/dashboard`
+  - Members → `/member/dashboard`
+- **Legacy (`/dashboard`)**: Redirects to appropriate role-based dashboard
+- **Authentication**: Sign-in/sign-up pages redirect to role-appropriate dashboard after login
 
 ### Setup
 See [WORKOS_SETUP.md](./WORKOS_SETUP.md) for detailed configuration instructions.

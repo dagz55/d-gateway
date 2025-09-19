@@ -97,7 +97,7 @@ In Supabase Dashboard > Authentication > Settings:
 4. Created database schema and tables
 5. Set up Row Level Security policies
 6. Created auth context and hooks
-7. Replaced NextAuth with Supabase Auth
+7. Replaced other authentication providers with Clerk
 8. Migrated authentication API routes
 9. Updated dashboard stats to use Supabase
 

@@ -53,21 +53,27 @@ export default function AdminMemberActions({ member }: AdminMemberActionsProps) 
   const handleToggleStatus = async () => {
     setIsLoading(true);
     try {
-      // TODO: Implement API call to toggle user status
-      const newStatus = member.last_sign_in_at ? 'suspended' : 'active';
-      
-      // Placeholder API call
-      // await fetch(`/api/admin/members/${member.user_id}/status`, {
-      //   method: 'PUT',
-      //   body: JSON.stringify({ status: newStatus })
-      // });
-      
-      toast.success(`Member ${newStatus === 'active' ? 'activated' : 'suspended'} successfully`);
-      
+      const action = member.last_sign_in_at ? 'suspend' : 'activate';
+
+      const response = await fetch(`/api/admin/members/${member.user_id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ action })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update member status');
+      }
+
+      toast.success(`Member ${action === 'activate' ? 'activated' : 'suspended'} successfully`);
+
       // Refresh the page to show updated data
       window.location.reload();
     } catch (error) {
       toast.error('Failed to update member status');
+      console.error('Error updating member status:', error);
     } finally {
       setIsLoading(false);
     }
@@ -76,20 +82,25 @@ export default function AdminMemberActions({ member }: AdminMemberActionsProps) 
   const handlePromoteToAdmin = async () => {
     setIsLoading(true);
     try {
-      // TODO: Implement API call to promote user to admin
-      
-      // Placeholder API call
-      // await fetch(`/api/admin/members/${member.user_id}/promote`, {
-      //   method: 'PUT',
-      //   body: JSON.stringify({ role: 'admin' })
-      // });
-      
+      const response = await fetch(`/api/admin/members/${member.user_id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ action: 'promote' })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to promote member to admin');
+      }
+
       toast.success('Member promoted to admin successfully');
-      
+
       // Refresh the page to show updated data
       window.location.reload();
     } catch (error) {
       toast.error('Failed to promote member to admin');
+      console.error('Error promoting member:', error);
     } finally {
       setIsLoading(false);
     }
@@ -102,19 +113,21 @@ export default function AdminMemberActions({ member }: AdminMemberActionsProps) 
 
     setIsLoading(true);
     try {
-      // TODO: Implement API call to delete user
-      
-      // Placeholder API call
-      // await fetch(`/api/admin/members/${member.user_id}`, {
-      //   method: 'DELETE'
-      // });
-      
+      const response = await fetch(`/api/admin/members/${member.user_id}`, {
+        method: 'DELETE'
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to delete member');
+      }
+
       toast.success('Member deleted successfully');
-      
+
       // Refresh the page to show updated data
       window.location.reload();
     } catch (error) {
       toast.error('Failed to delete member');
+      console.error('Error deleting member:', error);
     } finally {
       setIsLoading(false);
     }

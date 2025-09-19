@@ -14,7 +14,7 @@ zignal/
 │   │   ├── profile/       # User profile management
 │   │   └── wallet/        # Wallet management
 │   ├── admin/             # Admin panel with security controls
-│   ├── auth/              # Authentication pages (WorkOS + Supabase)
+│   ├── auth/              # Authentication pages (Clerk)
 │   ├── api/               # API routes for data and auth
 │   │   ├── auth/workos/   # WorkOS authentication endpoints
 │   │   └── admin/         # Admin API endpoints

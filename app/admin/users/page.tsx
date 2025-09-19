@@ -10,6 +10,7 @@ import {
   Shield
 } from 'lucide-react';
 import { createServerSupabaseClient } from '@/lib/supabase/serverClient';
+import { getAllClerkUsers } from '@/lib/clerk-users';
 import AdminMemberActions from '@/components/admin/AdminMemberActions';
 import AdminMemberSearch from '@/components/admin/AdminMemberSearch';
 
@@ -32,32 +33,35 @@ interface MemberData {
 async function getMembers(): Promise<MemberData[]> {
   try {
     const supabase = await createServerSupabaseClient();
-    
-    // Get all user profiles with auth data
-    const { data: profiles } = await supabase
-      .from('user_profiles')
-      .select(`
-        user_id,
-        email,
-        full_name,
-        display_name,
-        avatar_url,
-        role,
-        is_admin,
-        created_at,
-        last_sign_in_at
-      `)
-      .order('created_at', { ascending: false });
 
-    if (!profiles) return [];
+    // Get all users from Clerk
+    const clerkUsers = await getAllClerkUsers();
 
-    // For each profile, get additional data like active trades count
-    // This would be replaced with actual queries to trading tables when available
-    const membersWithStats = profiles.map(profile => ({
-      ...profile,
-      active_trades: Math.floor(Math.random() * 5), // Placeholder
-      email_confirmed_at: profile.created_at // Placeholder
-    }));
+    // For each user, get active trades count from Supabase
+    const membersWithStats = await Promise.all(
+      clerkUsers.map(async (user) => {
+        // Get active trades count from Supabase
+        const { count: activeTrades } = await supabase
+          .from('trades')
+          .select('*', { count: 'exact', head: true })
+          .eq('user_id', user.id)
+          .eq('status', 'OPEN');
+
+        return {
+          user_id: user.id,
+          email: user.email,
+          full_name: user.fullName,
+          display_name: user.firstName || user.fullName,
+          avatar_url: user.imageUrl,
+          role: user.isAdmin ? 'admin' : 'member',
+          is_admin: user.isAdmin,
+          created_at: user.createdAt.toISOString(),
+          last_sign_in_at: user.lastSignInAt?.toISOString(),
+          email_confirmed_at: user.createdAt.toISOString(),
+          active_trades: activeTrades || 0
+        };
+      })
+    );
 
     return membersWithStats;
   } catch (error) {

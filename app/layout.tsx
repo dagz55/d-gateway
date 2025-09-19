@@ -30,7 +30,7 @@ export default function RootLayout({
         <Providers>
           <Suspense fallback={null}>{children}</Suspense>
         </Providers>
-        <Analytics />
+        {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>
     </html>
   )

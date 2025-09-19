@@ -166,7 +166,7 @@ The system logs 25+ different security event types:
 ### Production Configuration
 ```bash
 # Required environment variables
-NEXTAUTH_URL=https://yourdomain.com
+
 COOKIE_DOMAIN=yourdomain.com
 
 # Optional security enhancements

@@ -1,12 +1,52 @@
 "use client";
 
-import React, { useRef, useEffect, useState } from 'react';
-import { motion, useAnimation } from 'framer-motion';
+import React, { useRef, useEffect, useState, useMemo, useCallback } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Canvas, useFrame, extend } from '@react-three/fiber';
 import { shaderMaterial } from '@react-three/drei';
 import * as THREE from 'three';
 import { TrendingUp, Zap, Shield, BarChart3, X, ArrowRight, Users, Target } from 'lucide-react';
 import Link from 'next/link';
+
+const currencyFormatter = new Intl.NumberFormat('en-US', {
+  style: 'currency',
+  currency: 'USD',
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+});
+
+const percentageFormatter = new Intl.NumberFormat('en-US', {
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+});
+
+interface CryptoPrice {
+  id: string;
+  symbol: string;
+  name: string;
+  price: number;
+  changePercentage24h: number;
+  isPositive: boolean;
+  sparkline: number[];
+  marketCapRank?: number;
+  lastUpdatedAt?: string;
+}
+
+interface CoinGeckoMarketResponse {
+  id: string;
+  symbol: string;
+  name: string;
+  current_price: number;
+  price_change_percentage_24h: number;
+  sparkline_in_7d?: {
+    price: number[];
+  };
+  market_cap_rank?: number;
+  last_updated?: string;
+}
+
+const COINGECKO_MARKET_URL = 'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=bitcoin,ethereum,cardano,solana&price_change_percentage=24h&sparkline=true';
+const LIVE_PRICE_REFRESH_INTERVAL = 60_000;
 
 const vertexShader = `
   varying vec2 vUv;
@@ -128,33 +168,185 @@ function FeatureCard({ icon, title, description, delay }: FeatureCardProps) {
   );
 }
 
-interface PriceTickerProps {
-  symbol: string;
-  price: string;
-  change: string;
+interface SparklineChartProps {
+  id: string;
+  data: number[];
   isPositive: boolean;
-  delay: number;
+  className?: string;
 }
 
-function PriceTicker({ symbol, price, change, isPositive, delay }: PriceTickerProps) {
+function SparklineChart({ id, data, isPositive, className }: SparklineChartProps) {
+  const gradientId = useMemo(() => `${id}-gradient`, [id]);
+
+  const pathData = useMemo(() => {
+    const effectiveData = data && data.length >= 2 ? data : [0, 1];
+    const min = Math.min(...effectiveData);
+    const max = Math.max(...effectiveData);
+    const range = max - min || 1;
+    const yMin = 8;
+    const yMax = 32;
+    const yRange = yMax - yMin;
+
+    const points = effectiveData.map((value, index) => {
+      const x = (index / (effectiveData.length - 1)) * 100;
+      const normalized = (value - min) / range;
+      const y = yMax - normalized * yRange;
+      return {
+        command: index === 0 ? 'M' : 'L',
+        x: Number(x.toFixed(2)),
+        y: Number(y.toFixed(2)),
+      };
+    });
+
+    if (!points.length) {
+      return null;
+    }
+
+    const line = points.map((point) => `${point.command} ${point.x} ${point.y}`).join(' ');
+    const area = `${line} L 100 ${yMax} L 0 ${yMax} Z`;
+
+    return { line, area };
+  }, [data]);
+
+  const strokeColor = isPositive ? '#34d399' : '#f87171';
+
+  if (!pathData) {
+    return (
+      <svg
+        viewBox="0 0 100 40"
+        preserveAspectRatio="none"
+        className={`w-24 h-14 md:w-28 md:h-16 ${className ?? ''}`}
+      >
+        <line
+          x1="0"
+          y1="20"
+          x2="100"
+          y2="20"
+          stroke={strokeColor}
+          strokeWidth="2"
+          strokeDasharray="4 4"
+          opacity={0.4}
+        />
+      </svg>
+    );
+  }
+
+  return (
+    <svg
+      viewBox="0 0 100 40"
+      preserveAspectRatio="none"
+      className={`w-24 h-14 md:w-28 md:h-16 ${className ?? ''}`}
+    >
+      <defs>
+        <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor={strokeColor} stopOpacity={0.35} />
+          <stop offset="100%" stopColor={strokeColor} stopOpacity={0.05} />
+        </linearGradient>
+      </defs>
+      <motion.path
+        d={pathData.area}
+        fill={`url(#${gradientId})`}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 0.3 }}
+        transition={{ duration: 0.6, ease: 'easeOut' }}
+      />
+      <motion.path
+        d={pathData.line}
+        fill="transparent"
+        stroke={strokeColor}
+        strokeWidth="2.4"
+        strokeLinecap="round"
+        initial={{ pathLength: 0 }}
+        animate={{ pathLength: 1 }}
+        transition={{ duration: 0.8, ease: 'easeOut' }}
+      />
+    </svg>
+  );
+}
+
+interface PriceTickerProps {
+  symbol: string;
+  name: string;
+  price: number;
+  changePercentage24h: number;
+  isPositive: boolean;
+  sparkline: number[];
+  delay: number;
+  marketCapRank?: number;
+}
+
+function PriceTicker({
+  symbol,
+  name,
+  price,
+  changePercentage24h,
+  isPositive,
+  sparkline,
+  delay,
+  marketCapRank,
+}: PriceTickerProps) {
+  const initials = useMemo(() => symbol.slice(0, 3).toUpperCase(), [symbol]);
+  const formattedPrice = useMemo(() => currencyFormatter.format(price), [price]);
+  const formattedChange = useMemo(() => {
+    const prefix = isPositive ? '+' : '';
+    return `${prefix}${percentageFormatter.format(changePercentage24h)}%`;
+  }, [changePercentage24h, isPositive]);
+  const sparklineId = useMemo(() => {
+    const lastPoint = sparkline.length ? sparkline[sparkline.length - 1] : 'sparkline';
+    return `${symbol.toLowerCase()}-${lastPoint}`;
+  }, [sparkline, symbol]);
+
   return (
     <motion.div
       initial={{ opacity: 0, x: -20 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.5, delay }}
-      className="flex items-center justify-between bg-[#0A0F1F]/30 backdrop-blur-sm border border-[#33E1DA]/20 rounded-lg p-3 hover:border-[#33E1DA]/40 transition-all duration-300"
+      className="flex items-center justify-between gap-4 bg-[#0A0F1F]/30 backdrop-blur-sm border border-[#33E1DA]/20 rounded-lg p-3 hover:border-[#33E1DA]/40 transition-all duration-300"
     >
       <div className="flex items-center gap-3">
-        <div className="w-8 h-8 bg-gradient-to-r from-[#33E1DA] to-[#1A7FB3] rounded-full flex items-center justify-center text-[#0A0F1F] text-xs font-bold">
-          {symbol.slice(0, 2)}
+        <div className="w-9 h-9 bg-gradient-to-r from-[#33E1DA] to-[#1A7FB3] rounded-full flex items-center justify-center text-[#0A0F1F] text-xs font-bold shadow-lg shadow-[#33E1DA]/20">
+          {initials}
         </div>
-        <div>
-          <div className="text-[#EAF2FF] font-medium text-sm">{symbol}</div>
-          <div className="text-[#EAF2FF]/60 text-xs">{price}</div>
+        <div className="space-y-0.5">
+          <div className="flex items-center gap-2 text-[#EAF2FF] font-semibold text-sm md:text-base">
+            {symbol.toUpperCase()}
+            {typeof marketCapRank === 'number' && marketCapRank > 0 && (
+              <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#33E1DA]/10 text-[#33E1DA]">
+                #{marketCapRank}
+              </span>
+            )}
+          </div>
+          <div className="text-[#EAF2FF]/60 text-[11px] md:text-xs tracking-wide uppercase">
+            {name}
+          </div>
         </div>
       </div>
-      <div className={`text-sm font-medium ${isPositive ? 'text-green-400' : 'text-red-400'}`}>
-        {isPositive ? '+' : ''}{change}%
+      <div className="flex items-center gap-4">
+        <div className="text-right min-w-[84px] md:min-w-[96px]">
+          <AnimatePresence mode="wait" initial={false}>
+            <motion.div
+              key={formattedPrice}
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -6 }}
+              transition={{ duration: 0.25, ease: 'easeOut' }}
+              className="text-[#EAF2FF] font-semibold text-sm md:text-base"
+            >
+              {formattedPrice}
+            </motion.div>
+          </AnimatePresence>
+          <motion.div
+            key={formattedChange}
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.25, ease: 'easeOut', delay: 0.05 }}
+            className={`text-xs font-semibold flex items-center justify-end gap-1 ${isPositive ? 'text-green-400' : 'text-red-400'}`}
+          >
+            <TrendingUp size={12} className={isPositive ? '' : 'rotate-180'} />
+            {formattedChange}
+          </motion.div>
+        </div>
+        <SparklineChart id={sparklineId} data={sparkline} isPositive={isPositive} />
       </div>
     </motion.div>
   );
@@ -334,9 +526,156 @@ function MissionVisionSection() {
   );
 }
 
+const createFallbackSparkline = (base: number, amplitude: number) =>
+  Array.from({ length: 36 }, (_, index) => {
+    const wave = Math.sin(index / 3.5) * amplitude;
+    const drift = (index / 35 - 0.5) * amplitude * 0.4;
+    return Number((base + wave + drift).toFixed(2));
+  });
+
+// TODO: Remove fallback data and show loading state when API is unavailable
+const fallbackCryptoPrices: CryptoPrice[] = [
+  {
+    id: 'bitcoin',
+    symbol: 'BTC',
+    name: 'Bitcoin',
+    price: 0,
+    changePercentage24h: 0,
+    isPositive: true,
+    sparkline: createFallbackSparkline(0, 0),
+    marketCapRank: 1,
+  },
+  {
+    id: 'ethereum',
+    symbol: 'ETH',
+    name: 'Ethereum',
+    price: 0,
+    changePercentage24h: 0,
+    isPositive: true,
+    sparkline: createFallbackSparkline(0, 0),
+    marketCapRank: 2,
+  },
+  {
+    id: 'cardano',
+    symbol: 'ADA',
+    name: 'Cardano',
+    price: 0,
+    changePercentage24h: 0,
+    isPositive: false,
+    sparkline: createFallbackSparkline(0, 0),
+    marketCapRank: 8,
+  },
+  {
+    id: 'solana',
+    symbol: 'SOL',
+    name: 'Solana',
+    price: 0,
+    changePercentage24h: 0,
+    isPositive: true,
+    sparkline: createFallbackSparkline(0, 0),
+    marketCapRank: 5,
+  },
+];
+
+const downsampleSparkline = (data: number[], maxPoints = 60) => {
+  if (!Array.isArray(data) || data.length === 0) {
+    return [] as number[];
+  }
+
+  if (data.length <= maxPoints) {
+    return data;
+  }
+
+  const step = Math.ceil(data.length / maxPoints);
+  const sampled: number[] = [];
+
+  for (let i = 0; i < data.length; i += step) {
+    sampled.push(Number(data[i].toFixed(6)));
+  }
+
+  return sampled;
+};
+
+const formatRelativeTime = (date: Date) => {
+  const deltaMs = Date.now() - date.getTime();
+
+  if (deltaMs < 15_000) {
+    return 'just now';
+  }
+
+  const seconds = Math.floor(deltaMs / 1000);
+  if (seconds < 60) {
+    return `${seconds}s ago`;
+  }
+
+  const minutes = Math.floor(seconds / 60);
+  if (minutes < 60) {
+    return `${minutes}m ago`;
+  }
+
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) {
+    return `${hours}h ago`;
+  }
+
+  return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+};
+
 export function EnhancedHeroSection() {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-  const controls = useAnimation();
+  const [livePrices, setLivePrices] = useState<CryptoPrice[]>(fallbackCryptoPrices);
+  const [isLoadingPrices, setIsLoadingPrices] = useState(false);
+  const [lastUpdatedAt, setLastUpdatedAt] = useState<Date | null>(null);
+  const [fetchError, setFetchError] = useState<string | null>(null);
+
+  const fetchCryptoPrices = useCallback(async (signal?: AbortSignal) => {
+    const response = await fetch(COINGECKO_MARKET_URL, {
+      signal,
+      cache: 'no-store',
+      headers: {
+        accept: 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`CoinGecko request failed with status ${response.status}`);
+    }
+
+    const payload = (await response.json()) as CoinGeckoMarketResponse[];
+
+    if (!Array.isArray(payload)) {
+      throw new Error('Unexpected response format from CoinGecko.');
+    }
+
+    const parsedPrices = payload
+      .filter((item) => item && item.id && typeof item.current_price === 'number')
+      .map<CryptoPrice>((item) => {
+        const change = typeof item.price_change_percentage_24h === 'number'
+          ? item.price_change_percentage_24h
+          : 0;
+
+        const sparkline = downsampleSparkline(item.sparkline_in_7d?.price ?? []);
+
+        return {
+          id: item.id,
+          symbol: (item.symbol || item.id).toUpperCase(),
+          name: item.name || item.id,
+          price: item.current_price,
+          changePercentage24h: change,
+          isPositive: change >= 0,
+          sparkline,
+          marketCapRank: item.market_cap_rank,
+          lastUpdatedAt: item.last_updated,
+        };
+      });
+
+    return parsedPrices.length
+      ? parsedPrices
+      : fallbackCryptoPrices.map((price) => ({
+          ...price,
+          sparkline: [...price.sparkline],
+        }));
+  }, []);
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -349,6 +688,67 @@ export function EnhancedHeroSection() {
     window.addEventListener('mousemove', handleMouseMove);
     return () => window.removeEventListener('mousemove', handleMouseMove);
   }, []);
+
+  useEffect(() => {
+    let isMounted = true;
+    let controller: AbortController | null = null;
+    let isFetching = false;
+
+    const loadPrices = async () => {
+      if (isFetching) {
+        return;
+      }
+
+      isFetching = true;
+
+      if (controller) {
+        controller.abort();
+      }
+
+      controller = new AbortController();
+
+      if (isMounted) {
+        setIsLoadingPrices(true);
+      }
+
+      try {
+        const prices = await fetchCryptoPrices(controller.signal);
+        if (!isMounted) return;
+        setLivePrices(prices);
+        setFetchError(null);
+        setLastUpdatedAt(new Date());
+      } catch (error) {
+        if (!isMounted) {
+          return;
+        }
+
+        if ((error as Error).name === 'AbortError') {
+          return;
+        }
+
+        console.error('Failed to fetch live crypto prices', error);
+        setFetchError('Unable to refresh live prices right now. Showing recent data.');
+      } finally {
+        if (isMounted) {
+          setIsLoadingPrices(false);
+        }
+        isFetching = false;
+      }
+    };
+
+    void loadPrices();
+    const interval = setInterval(() => {
+      void loadPrices();
+    }, LIVE_PRICE_REFRESH_INTERVAL);
+
+    return () => {
+      isMounted = false;
+      if (controller) {
+        controller.abort();
+      }
+      clearInterval(interval);
+    };
+  }, [fetchCryptoPrices]);
 
   const features = [
     {
@@ -371,13 +771,6 @@ export function EnhancedHeroSection() {
       title: "Portfolio Management",
       description: "Comprehensive portfolio tracking with automated rebalancing strategies."
     }
-  ];
-
-  const cryptoPrices = [
-    { symbol: "BTC", price: "$67,234", change: "2.45", isPositive: true },
-    { symbol: "ETH", price: "$3,456", change: "1.23", isPositive: true },
-    { symbol: "ADA", price: "$0.89", change: "-0.56", isPositive: false },
-    { symbol: "SOL", price: "$156", change: "4.12", isPositive: true }
   ];
 
   return (
@@ -485,21 +878,71 @@ export function EnhancedHeroSection() {
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6, delay: 0.4 }}
-              className="bg-[#0A0F1F]/20 backdrop-blur-sm border border-[#33E1DA]/20 rounded-2xl p-6"
+              className="relative overflow-hidden bg-[#0A0F1F]/20 backdrop-blur-sm border border-[#33E1DA]/20 rounded-2xl p-6"
             >
-              <h3 className="text-lg font-semibold text-[#EAF2FF] mb-4 flex items-center gap-2">
-                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-                Live Prices
-              </h3>
-              <div className="space-y-3">
-                {cryptoPrices.map((crypto, index) => (
+              <div className="flex flex-wrap items-start justify-between gap-4 mb-4">
+                <div className="flex items-start gap-3">
+                  <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse mt-2" />
+                  <div className="space-y-1">
+                    <h3 className="text-lg font-semibold text-[#EAF2FF] flex items-center gap-2">
+                      Live Prices
+                      <span className="text-[10px] uppercase tracking-wide text-[#33E1DA] bg-[#33E1DA]/10 border border-[#33E1DA]/30 rounded-full px-2 py-0.5">
+                        Powered by CoinGecko
+                      </span>
+                    </h3>
+                    <p className="text-xs text-[#EAF2FF]/50">
+                      Auto-refreshing every minute with live market data
+                    </p>
+                  </div>
+                </div>
+                <div className="flex flex-col items-end gap-1 text-right text-xs min-w-[120px]">
+                  {isLoadingPrices ? (
+                    <motion.span
+                      className="flex items-center gap-2 text-[#33E1DA]"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ duration: 0.3 }}
+                    >
+                      <span className="relative flex h-2 w-2">
+                        <span className="absolute inline-flex h-full w-full rounded-full bg-[#33E1DA]/40 animate-ping" />
+                        <span className="relative inline-flex rounded-full h-2 w-2 bg-[#33E1DA]" />
+                      </span>
+                      Refreshing...
+                    </motion.span>
+                  ) : lastUpdatedAt ? (
+                    <span className="text-[#EAF2FF]/60">Updated {formatRelativeTime(lastUpdatedAt)}</span>
+                  ) : (
+                    <span className="text-[#EAF2FF]/60">Fetching latest data...</span>
+                  )}
+                  {fetchError && (
+                    <span className="text-[11px] text-red-400 bg-red-500/10 border border-red-500/30 rounded-md px-2 py-0.5">
+                      {fetchError}
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              <div className={`space-y-3 transition-opacity duration-300 ${isLoadingPrices ? 'opacity-80' : 'opacity-100'}`}>
+                {livePrices.map((crypto, index) => (
                   <PriceTicker
-                    key={crypto.symbol}
-                    {...crypto}
+                    key={`${crypto.id}-${crypto.symbol}`}
+                    symbol={crypto.symbol}
+                    name={crypto.name}
+                    price={crypto.price}
+                    changePercentage24h={crypto.changePercentage24h}
+                    isPositive={crypto.isPositive}
+                    sparkline={crypto.sparkline}
+                    marketCapRank={crypto.marketCapRank}
                     delay={0.6 + index * 0.1}
                   />
                 ))}
               </div>
+
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: isLoadingPrices ? 0.08 : 0 }}
+                className="pointer-events-none absolute inset-0 bg-gradient-to-b from-[#33E1DA]/10 via-transparent to-transparent"
+              />
             </motion.div>
 
             {/* Features Grid */}

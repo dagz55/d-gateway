@@ -1,4 +1,4 @@
-import { getCurrentUser } from '@/lib/auth-middleware'
+import { getCurrentUser } from '@/lib/clerk-auth'
 import { redirect } from 'next/navigation'
 import AdminSignalsManager from '@/components/admin/AdminSignalsManager'
 

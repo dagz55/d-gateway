@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS public.profiles (
 
 -- Create trades table
 CREATE TABLE IF NOT EXISTS public.trades (
-    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     user_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE NOT NULL,
     pair TEXT NOT NULL,
     side TEXT CHECK (side IN ('BUY', 'SELL')) NOT NULL,
@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS public.trades (
 
 -- Create signals table
 CREATE TABLE IF NOT EXISTS public.signals (
-    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     user_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE NOT NULL,
     pair TEXT NOT NULL,
     action TEXT CHECK (action IN ('BUY', 'SELL', 'HOLD')) NOT NULL,
@@ -43,7 +43,7 @@ CREATE TABLE IF NOT EXISTS public.signals (
 
 -- Create transactions table
 CREATE TABLE IF NOT EXISTS public.transactions (
-    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     user_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE NOT NULL,
     type TEXT CHECK (type IN ('DEPOSIT', 'WITHDRAWAL')) NOT NULL,
     amount DECIMAL(20,8) NOT NULL CHECK (amount > 0),
@@ -58,7 +58,7 @@ CREATE TABLE IF NOT EXISTS public.transactions (
 
 -- Create crypto_prices table
 CREATE TABLE IF NOT EXISTS public.crypto_prices (
-    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     symbol TEXT UNIQUE NOT NULL,
     price DECIMAL(20,8) NOT NULL CHECK (price > 0),
     change_24h DECIMAL(10,4) NOT NULL,
@@ -69,7 +69,7 @@ CREATE TABLE IF NOT EXISTS public.crypto_prices (
 
 -- Create news table
 CREATE TABLE IF NOT EXISTS public.news (
-    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     title TEXT NOT NULL,
     summary TEXT,
     source TEXT NOT NULL,
