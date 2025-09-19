@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
+import { useRouter } from 'next/navigation';
 
 interface MemberData {
   user_id: string;
@@ -39,6 +40,7 @@ interface AdminMemberActionsProps {
 
 export default function AdminMemberActions({ member }: AdminMemberActionsProps) {
   const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
   const handleViewMember = () => {
     // Navigate to member details page
@@ -70,7 +72,7 @@ export default function AdminMemberActions({ member }: AdminMemberActionsProps) 
       toast.success(`Member ${action === 'activate' ? 'activated' : 'suspended'} successfully`);
 
       // Refresh the page to show updated data
-      window.location.reload();
+      router.refresh();
     } catch (error) {
       toast.error('Failed to update member status');
       console.error('Error updating member status:', error);
@@ -97,7 +99,7 @@ export default function AdminMemberActions({ member }: AdminMemberActionsProps) 
       toast.success('Member promoted to admin successfully');
 
       // Refresh the page to show updated data
-      window.location.reload();
+      router.refresh();
     } catch (error) {
       toast.error('Failed to promote member to admin');
       console.error('Error promoting member:', error);
@@ -124,7 +126,7 @@ export default function AdminMemberActions({ member }: AdminMemberActionsProps) 
       toast.success('Member deleted successfully');
 
       // Refresh the page to show updated data
-      window.location.reload();
+      router.refresh();
     } catch (error) {
       toast.error('Failed to delete member');
       console.error('Error deleting member:', error);

@@ -77,7 +77,39 @@ export default function MemberEditForm({ member }: MemberEditFormProps) {
     }));
   };
 
+  const validateForm = (): string | null => {
+    if (!formData.firstName.trim()) {
+      return 'First name is required';
+    }
+    if (formData.firstName.length > 50) {
+      return 'First name must be 50 characters or less';
+    }
+    if (!formData.lastName.trim()) {
+      return 'Last name is required';
+    }
+    if (formData.lastName.length > 50) {
+      return 'Last name must be 50 characters or less';
+    }
+    if (!formData.username.trim()) {
+      return 'Username is required';
+    }
+    if (formData.username.length > 30) {
+      return 'Username must be 30 characters or less';
+    }
+    if (!/^[a-zA-Z0-9_-]+$/.test(formData.username)) {
+      return 'Username can only contain letters, numbers, underscores, and hyphens';
+    }
+    return null;
+  };
+
   const handleSave = async () => {
+    // Validate form before submission
+    const validationError = validateForm();
+    if (validationError) {
+      toast.error(validationError);
+      return;
+    }
+
     setIsLoading(true);
     try {
       const response = await fetch(`/api/admin/members/${member.user_id}`, {
@@ -87,9 +119,9 @@ export default function MemberEditForm({ member }: MemberEditFormProps) {
         },
         body: JSON.stringify({
           action: 'update',
-          firstName: formData.firstName,
-          lastName: formData.lastName,
-          username: formData.username,
+          firstName: formData.firstName.trim(),
+          lastName: formData.lastName.trim(),
+          username: formData.username.trim(),
         }),
       });
 

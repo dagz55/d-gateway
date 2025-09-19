@@ -33,20 +33,50 @@ export default async function AdminDashboardPage() {
   const supabase = await createServerSupabaseClient();
   const userStats = await getClerkUserStats();
 
-  // Fetch real stats from database
+  // Fetch real stats from database with error handling
   const [
-    { count: activeSignals },
-    { data: transactions },
-    { data: openTrades },
-    { data: allWalletTransactions },
-    { data: allTrades }
-  ] = await Promise.all([
+    signalsResult,
+    transactionsResult,
+    tradesResult,
+    walletTransactionsResult,
+    allTradesResult,
+    packagesResult
+  ] = await Promise.allSettled([
     supabase.from('signals').select('*', { count: 'exact', head: true }).eq('status', 'ACTIVE'),
     supabase.from('transactions').select('amount, type, status').eq('status', 'COMPLETED'),
     supabase.from('trades').select('*', { count: 'exact', head: true }).eq('status', 'OPEN'),
     supabase.from('transactions').select('*'),
-    supabase.from('trades').select('*')
+    supabase.from('trades').select('*'),
+    supabase.from('packages').select('*', { count: 'exact', head: true }).eq('active', true)
   ]);
+
+  // Extract data with fallbacks
+  const activeSignals = signalsResult.status === 'fulfilled' ? (signalsResult.value.count || 0) : 0;
+  const transactions = transactionsResult.status === 'fulfilled' ? (transactionsResult.value.data || []) : [];
+  const openTrades = tradesResult.status === 'fulfilled' ? (tradesResult.value.count || 0) : 0;
+  const allWalletTransactions = walletTransactionsResult.status === 'fulfilled' ? (walletTransactionsResult.value.data || []) : [];
+  const allTrades = allTradesResult.status === 'fulfilled' ? (allTradesResult.value.data || []) : [];
+  const activePackages = packagesResult.status === 'fulfilled' ? (packagesResult.value.count || 0) : 0;
+
+  // Log any errors for debugging
+  if (signalsResult.status === 'rejected') {
+    console.error('Error fetching signals:', signalsResult.reason);
+  }
+  if (transactionsResult.status === 'rejected') {
+    console.error('Error fetching transactions:', transactionsResult.reason);
+  }
+  if (tradesResult.status === 'rejected') {
+    console.error('Error fetching trades:', tradesResult.reason);
+  }
+  if (walletTransactionsResult.status === 'rejected') {
+    console.error('Error fetching wallet transactions:', walletTransactionsResult.reason);
+  }
+  if (allTradesResult.status === 'rejected') {
+    console.error('Error fetching all trades:', allTradesResult.reason);
+  }
+  if (packagesResult.status === 'rejected') {
+    console.error('Error fetching packages:', packagesResult.reason);
+  }
 
   // Calculate revenue from completed transactions
   const totalRevenue = transactions?.reduce((sum, transaction) => {
@@ -304,7 +334,7 @@ export default async function AdminDashboardPage() {
             <div className="space-y-3">
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">Active Packages</span>
-                <span className="text-foreground font-medium">0</span>
+                <span className="text-foreground font-medium">{activePackages}</span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">Total Subscribers</span>

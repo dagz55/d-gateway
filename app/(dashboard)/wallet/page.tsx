@@ -1,24 +1,104 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Wallet, ArrowUpRight, ArrowDownLeft, History } from 'lucide-react';
-import { getCurrentUser } from '@/lib/clerk-auth';
 import { redirect } from 'next/navigation';
+import { getCurrentUser } from '@/lib/clerk-auth';
+import { requireAuth } from '@/lib/require-auth';
 import DepositComponent from '@/components/wallet/DepositComponent';
 import DepositHistory from '@/components/wallet/DepositHistory';
 import WithdrawComponent from '@/components/wallet/WithdrawComponent';
 import WithdrawalHistory from '@/components/wallet/WithdrawalHistory';
+import { createServerSupabaseClient } from '@/lib/supabase/serverClient';
 
 export const dynamic = 'force-dynamic';
 
+async function getWalletData(userId: string) {
+  try {
+    const supabase = await createServerSupabaseClient();
+    
+    // Fetch user's transactions
+    const { data: transactions, error } = await supabase
+      .from('transactions')
+      .select('*')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('Error fetching wallet data:', error);
+      return {
+        tradingBalance: 0,
+        incomeBalance: 0,
+        totalPortfolio: 0,
+        tradingChange: 0,
+        tradingChangePercent: 0,
+        incomeChange: 0,
+        incomeChangePercent: 0,
+        totalChange: 0,
+        totalChangePercent: 0,
+      };
+    }
+
+    // Calculate balances and changes
+    const tradingTransactions = transactions?.filter(t => t.type === 'DEPOSIT' && t.status === 'COMPLETED') || [];
+    const withdrawalTransactions = transactions?.filter(t => t.type === 'WITHDRAWAL' && t.status === 'COMPLETED') || [];
+    
+    const tradingBalance = tradingTransactions.reduce((sum, t) => sum + t.amount, 0) - 
+                          withdrawalTransactions.reduce((sum, t) => sum + t.amount, 0);
+    
+    // Mock income balance calculation (replace with real logic)
+    const incomeBalance = tradingBalance * 0.25; // 25% of trading balance as income
+    
+    const totalPortfolio = tradingBalance + incomeBalance;
+    
+    // Calculate changes (mock data for now - replace with real historical data)
+    const tradingChange = tradingBalance * 0.14; // 14% gain
+    const tradingChangePercent = 14.0;
+    
+    const incomeChange = incomeBalance * 0.187; // 18.7% gain
+    const incomeChangePercent = 18.7;
+    
+    const totalChange = tradingChange + incomeChange;
+    const totalChangePercent = 14.9;
+
+    return {
+      tradingBalance,
+      incomeBalance,
+      totalPortfolio,
+      tradingChange,
+      tradingChangePercent,
+      incomeChange,
+      incomeChangePercent,
+      totalChange,
+      totalChangePercent,
+    };
+  } catch (error) {
+    console.error('Error calculating wallet data:', error);
+    return {
+      tradingBalance: 0,
+      incomeBalance: 0,
+      totalPortfolio: 0,
+      tradingChange: 0,
+      tradingChangePercent: 0,
+      incomeChange: 0,
+      incomeChangePercent: 0,
+      totalChange: 0,
+      totalChangePercent: 0,
+    };
+  }
+}
+
 export default async function WalletPage() {
   try {
+    // Use requireAuth helper for cleaner auth flow
+    const userId = await requireAuth();
     const user = await getCurrentUser();
     
     if (!user) {
-      redirect('/');
+      throw new Error('User not found after authentication');
     }
 
     const firstName = user.firstName || 'Trader';
+    const walletData = await getWalletData(userId);
 
     return (
       <div className="space-y-8">
@@ -47,10 +127,16 @@ export default async function WalletPage() {
             </CardHeader>
             <CardContent>
               <div className="space-y-2">
-                <div className="text-3xl font-bold text-foreground">$11,400.00</div>
+                <div className="text-3xl font-bold text-foreground">
+                  ${walletData.tradingBalance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-green-400 text-sm font-medium">+$1,400</span>
-                  <span className="text-muted-foreground text-sm">(+14.0%)</span>
+                  <span className="text-green-400 text-sm font-medium">
+                    +${walletData.tradingChange.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+                  </span>
+                  <span className="text-muted-foreground text-sm">
+                    (+{walletData.tradingChangePercent}%)
+                  </span>
                 </div>
               </div>
             </CardContent>
@@ -62,10 +148,16 @@ export default async function WalletPage() {
             </CardHeader>
             <CardContent>
               <div className="space-y-2">
-                <div className="text-3xl font-bold text-foreground">$2,850.00</div>
+                <div className="text-3xl font-bold text-foreground">
+                  ${walletData.incomeBalance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-green-400 text-sm font-medium">+$450</span>
-                  <span className="text-muted-foreground text-sm">(+18.7%)</span>
+                  <span className="text-green-400 text-sm font-medium">
+                    +${walletData.incomeChange.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+                  </span>
+                  <span className="text-muted-foreground text-sm">
+                    (+{walletData.incomeChangePercent}%)
+                  </span>
                 </div>
               </div>
             </CardContent>
@@ -77,10 +169,16 @@ export default async function WalletPage() {
             </CardHeader>
             <CardContent>
               <div className="space-y-2">
-                <div className="text-3xl font-bold text-foreground">$14,250.00</div>
+                <div className="text-3xl font-bold text-foreground">
+                  ${walletData.totalPortfolio.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-green-400 text-sm font-medium">+$1,850</span>
-                  <span className="text-muted-foreground text-sm">(+14.9%)</span>
+                  <span className="text-green-400 text-sm font-medium">
+                    +${walletData.totalChange.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+                  </span>
+                  <span className="text-muted-foreground text-sm">
+                    (+{walletData.totalChangePercent}%)
+                  </span>
                 </div>
               </div>
             </CardContent>
@@ -128,7 +226,12 @@ export default async function WalletPage() {
               </TabsContent>
 
               <TabsContent value="withdraw" className="mt-0">
-                <WithdrawComponent />
+                <WithdrawComponent 
+                  portfolioData={{
+                    tradingBalance: walletData.tradingBalance,
+                    incomeBalance: walletData.incomeBalance
+                  }}
+                />
               </TabsContent>
 
               <TabsContent value="withdrawal-history" className="mt-0">

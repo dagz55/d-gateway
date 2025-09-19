@@ -161,7 +161,7 @@ updated_at    TIMESTAMPTZ DEFAULT NOW()
 id          UUID PRIMARY KEY
 user_id     UUID REFERENCES auth.users(id)
 package_id  UUID REFERENCES packages(id)
-status      TEXT CHECK (IN 'active','inactive','cancelled','expired')
+status      TEXT CHECK (status IN ('active','inactive','cancelled','expired'))
 start_date  TIMESTAMPTZ DEFAULT NOW()
 end_date    TIMESTAMPTZ NOT NULL
 auto_renew  BOOLEAN DEFAULT true

@@ -1,7 +1,7 @@
 "use client"
 
 import { Badge } from '@/components/ui/badge'
-import { TrendingUp, BarChart3 } from 'lucide-react'
+import { TrendingUp } from 'lucide-react'
 
 interface LiveSignalsChartProps {
   percentChange?: string;
@@ -13,11 +13,11 @@ export function LiveSignalsChart({ percentChange = "+24.7%" }: LiveSignalsChartP
       {/* Chart Icon */}
       <div className="relative">
         <div className="flex items-end gap-1">
-          <div className="w-3 h-8 bg-[#33E1DA] rounded-sm animate-pulse" />
-          <div className="w-3 h-12 bg-[#33E1DA] rounded-sm animate-pulse" style={{ animationDelay: '0.2s' }} />
-          <div className="w-3 h-6 bg-[#33E1DA] rounded-sm animate-pulse" style={{ animationDelay: '0.4s' }} />
-          <div className="w-3 h-16 bg-[#33E1DA] rounded-sm animate-pulse" style={{ animationDelay: '0.6s' }} />
-          <div className="w-3 h-10 bg-[#33E1DA] rounded-sm animate-pulse" style={{ animationDelay: '0.8s' }} />
+          <div className="w-3 h-8 rounded-sm animate-pulse" style={{ backgroundColor: 'var(--zignal-accent)' }} />
+          <div className="w-3 h-12 rounded-sm animate-pulse" style={{ backgroundColor: 'var(--zignal-accent)', animationDelay: '0.2s' }} />
+          <div className="w-3 h-6 rounded-sm animate-pulse" style={{ backgroundColor: 'var(--zignal-accent)', animationDelay: '0.4s' }} />
+          <div className="w-3 h-16 rounded-sm animate-pulse" style={{ backgroundColor: 'var(--zignal-accent)', animationDelay: '0.6s' }} />
+          <div className="w-3 h-10 rounded-sm animate-pulse" style={{ backgroundColor: 'var(--zignal-accent)', animationDelay: '0.8s' }} />
         </div>
       </div>
 

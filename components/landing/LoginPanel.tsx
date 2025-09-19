@@ -13,11 +13,7 @@ import SupportModal from '@/components/modals/SupportModal'
 export function LoginPanel() {
   const router = useRouter();
 
-  const handleGoogleLogin = () => {
-    router.push('/sign-in');
-  };
-
-  const handleEmailLogin = () => {
+  const handleLogin = () => {
     router.push('/sign-in');
   };
 
@@ -34,7 +30,7 @@ export function LoginPanel() {
         <Button
           className="w-full bg-white text-black hover:bg-gray-100 font-medium py-3 h-auto"
           size="lg"
-          onClick={handleGoogleLogin}
+          onClick={handleLogin}
         >
           <svg className="w-5 h-5 mr-3" viewBox="0 0 24 24">
             <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -56,7 +52,7 @@ export function LoginPanel() {
           variant="outline"
           className="w-full border-[#33E1DA]/30 text-[#33E1DA] hover:bg-[#33E1DA]/10 font-medium py-3 h-auto"
           size="lg"
-          onClick={handleEmailLogin}
+          onClick={handleLogin}
         >
           Use email instead
         </Button>

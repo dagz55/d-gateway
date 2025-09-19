@@ -27,32 +27,48 @@ export async function GET(
     const supabase = await createServerSupabaseClient();
 
     // Get user's trades
-    const { data: trades } = await supabase
+    const { data: trades, error: tradesError } = await supabase
       .from('trades')
       .select('*')
       .eq('user_id', userId)
       .order('created_at', { ascending: false });
 
+    if (tradesError) {
+      console.warn('Error fetching trades:', tradesError.message);
+    }
+
     // Get user's transactions
-    const { data: transactions } = await supabase
+    const { data: transactions, error: transactionsError } = await supabase
       .from('transactions')
       .select('*')
       .eq('user_id', userId)
       .order('created_at', { ascending: false });
 
+    if (transactionsError) {
+      console.warn('Error fetching transactions:', transactionsError.message);
+    }
+
     // Get user's signals
-    const { data: signals } = await supabase
+    const { data: signals, error: signalsError } = await supabase
       .from('signals')
       .select('*')
       .eq('user_id', userId)
       .order('created_at', { ascending: false });
 
+    if (signalsError) {
+      console.warn('Error fetching signals:', signalsError.message);
+    }
+
     // Get profile from Supabase if exists
-    const { data: profile } = await supabase
+    const { data: profile, error: profileError } = await supabase
       .from('profiles')
       .select('*')
       .eq('id', userId)
       .single();
+
+    if (profileError && profileError.code !== 'PGRST116') {
+      console.warn('Error fetching profile:', profileError.message);
+    }
 
     const memberData = {
       user_id: clerkUser.id,
@@ -110,9 +126,11 @@ export async function PUT(
     switch (action) {
       case 'suspend':
         // Suspend user in Clerk
+        const currentUser = await clerkClient.users.getUser(userId);
+        const currentMetadata = currentUser.publicMetadata || {};
         await clerkClient.users.updateUser(userId, {
           publicMetadata: {
-            ...((await clerkClient.users.getUser(userId)).publicMetadata),
+            ...currentMetadata,
             suspended: true,
             suspendedAt: new Date().toISOString(),
             suspendedBy: 'admin'
@@ -126,9 +144,11 @@ export async function PUT(
 
       case 'activate':
         // Activate user in Clerk
+        const currentUserActivate = await clerkClient.users.getUser(userId);
+        const currentMetadataActivate = currentUserActivate.publicMetadata || {};
         await clerkClient.users.updateUser(userId, {
           publicMetadata: {
-            ...((await clerkClient.users.getUser(userId)).publicMetadata),
+            ...currentMetadataActivate,
             suspended: false,
             activatedAt: new Date().toISOString(),
             activatedBy: 'admin'
@@ -142,9 +162,11 @@ export async function PUT(
 
       case 'promote':
         // Promote user to admin in Clerk
+        const currentUserPromote = await clerkClient.users.getUser(userId);
+        const currentMetadataPromote = currentUserPromote.publicMetadata || {};
         await clerkClient.users.updateUser(userId, {
           publicMetadata: {
-            ...((await clerkClient.users.getUser(userId)).publicMetadata),
+            ...currentMetadataPromote,
             isAdmin: true,
             role: 'admin',
             promotedAt: new Date().toISOString(),
@@ -169,9 +191,11 @@ export async function PUT(
 
       case 'demote':
         // Demote admin to member in Clerk
+        const currentUserDemote = await clerkClient.users.getUser(userId);
+        const currentMetadataDemote = currentUserDemote.publicMetadata || {};
         await clerkClient.users.updateUser(userId, {
           publicMetadata: {
-            ...((await clerkClient.users.getUser(userId)).publicMetadata),
+            ...currentMetadataDemote,
             isAdmin: false,
             role: 'member',
             demotedAt: new Date().toISOString(),

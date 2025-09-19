@@ -9,7 +9,7 @@ VALUES (
 ) ON CONFLICT (id) DO NOTHING;
 
 -- Enable RLS on storage.objects
-ALTER TABLE storage.objects ENABLE ROW LEVEL SECURITY;
+-- ALTER TABLE storage.objects ENABLE ROW LEVEL SECURITY;
 
 -- Policy: Allow authenticated users to upload images to their own folder
 DROP POLICY IF EXISTS "Users can upload to their own folder" ON storage.objects;

@@ -25,7 +25,7 @@ import { getClerkUserStats, getAllClerkUsers } from '@/lib/clerk-users';
 
 export default async function MemberActivityPage() {
   // Require admin authentication
-  const adminUser = await requireAdmin();
+  await requireAdmin();
 
   // Create Supabase client and get user stats
   const supabase = await createServerSupabaseClient();

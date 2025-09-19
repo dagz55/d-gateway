@@ -28,7 +28,7 @@ export default async function MemberProfilePage() {
           <CardTitle>Profile Information</CardTitle>
         </CardHeader>
         <CardContent>
-          <ProfileSection />
+          <ProfileSection isCollapsed={false} />
         </CardContent>
       </Card>
     </div>

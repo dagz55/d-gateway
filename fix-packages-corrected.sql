@@ -39,7 +39,7 @@ CREATE TABLE IF NOT EXISTS public.user_packages (
     updated_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
     
     -- Ensure one active subscription per user per package
-    UNIQUE(user_id, package_id, status) DEFERRABLE INITIALLY DEFERRED
+    UNIQUE(user_id, package_id) DEFERRABLE INITIALLY DEFERRED
 );
 
 -- =====================================================

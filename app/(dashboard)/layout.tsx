@@ -9,11 +9,12 @@ export default async function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { userId } = auth();
+  const { userId } = await auth();
 
   if (!userId) {
     redirect('/sign-in');
   }
 
-  return <AppLayout>{children}</AppLayout>;
+  // Pass userId to avoid duplicate auth calls in child components
+  return <AppLayout userId={userId}>{children}</AppLayout>;
 }

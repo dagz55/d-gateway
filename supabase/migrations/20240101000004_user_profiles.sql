@@ -28,19 +28,19 @@ ALTER TABLE public.user_profiles ENABLE ROW LEVEL SECURITY;
 -- RLS Policies
 -- Users can view their own profile
 CREATE POLICY "Users can view own profile" ON public.user_profiles
-    FOR SELECT USING (auth.uid() = user_id);
+    FOR SELECT USING (auth.uid()::text = user_id::text);
 
 -- Users can update their own profile
 CREATE POLICY "Users can update own profile" ON public.user_profiles
-    FOR UPDATE USING (auth.uid() = user_id);
+    FOR UPDATE USING (auth.uid()::text = user_id::text);
 
 -- Users can insert their own profile
 CREATE POLICY "Users can insert own profile" ON public.user_profiles
-    FOR INSERT WITH CHECK (auth.uid() = user_id);
+    FOR INSERT WITH CHECK (auth.uid()::text = user_id::text);
 
 -- Users can delete their own profile
 CREATE POLICY "Users can delete own profile" ON public.user_profiles
-    FOR DELETE USING (auth.uid() = user_id);
+    FOR DELETE USING (auth.uid()::text = user_id::text);
 
 -- Function to automatically create user profile on signup
 CREATE OR REPLACE FUNCTION public.handle_new_user()

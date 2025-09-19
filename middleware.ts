@@ -45,11 +45,13 @@ export default clerkMiddleware(async (auth, req) => {
 
   if (userId) {
     // Debug current path and user
-    console.log('🔍 Middleware Debug - Request Info:', {
-      userId,
-      pathname: req.nextUrl.pathname,
-      url: req.url
-    });
+    if (process.env.NODE_ENV === 'development') {
+      console.log('🔍 Middleware Debug - Request Info:', {
+        userId,
+        pathname: req.nextUrl.pathname,
+        url: req.url
+      });
+    }
     
     // Check multiple possible locations for admin role
     const publicMetadataRole = (sessionClaims as any)?.publicMetadata?.role;
@@ -64,18 +66,22 @@ export default clerkMiddleware(async (auth, req) => {
       directRole === "admin" ||
       organizationRole === "admin";
     
-    console.log('🔍 Middleware Debug - Admin Check Result:', {
-      isUserAdmin,
-      publicMetadataRole,
-      metadataRole,
-      directRole,
-      organizationRole,
-      currentPath: req.nextUrl.pathname
-    });
+    if (process.env.NODE_ENV === 'development') {
+      console.log('🔍 Middleware Debug - Admin Check Result:', {
+        isUserAdmin,
+        publicMetadataRole,
+        metadataRole,
+        directRole,
+        organizationRole,
+        currentPath: req.nextUrl.pathname
+      });
+    }
 
     // Handle legacy dashboard route redirects
     if (isLegacyDashboardRoute(req)) {
-      console.log('🔄 Legacy Dashboard Redirect:', { isUserAdmin, currentPath: req.nextUrl.pathname });
+      if (process.env.NODE_ENV === 'development') {
+        console.log('🔄 Legacy Dashboard Redirect:', { isUserAdmin, currentPath: req.nextUrl.pathname });
+      }
       if (isUserAdmin) {
         return NextResponse.redirect(new URL("/admin/dashboard", req.url));
       } else {
@@ -85,18 +91,24 @@ export default clerkMiddleware(async (auth, req) => {
 
     // Handle dashboard routes - these are accessible to all authenticated users
     if (isDashboardRoute(req)) {
-      console.log('🏠 Dashboard Route Access:', { isUserAdmin, currentPath: req.nextUrl.pathname });
+      if (process.env.NODE_ENV === 'development') {
+        console.log('🏠 Dashboard Route Access:', { isUserAdmin, currentPath: req.nextUrl.pathname });
+      }
       // Dashboard routes are accessible to all authenticated users
       return NextResponse.next();
     }
 
     // Check admin access for admin routes
     if (isAdminRoute(req)) {
-      console.log('🔐 Admin Route Check:', { isUserAdmin, currentPath: req.nextUrl.pathname });
+      if (process.env.NODE_ENV === 'development') {
+        console.log('🔐 Admin Route Check:', { isUserAdmin, currentPath: req.nextUrl.pathname });
+      }
       if (!isUserAdmin) {
         // Prevent redirect loop - only redirect if not already on member dashboard
         if (req.nextUrl.pathname !== "/member/dashboard") {
-          console.log('🚫 Non-admin accessing admin route, redirecting to member dashboard');
+          if (process.env.NODE_ENV === 'development') {
+            console.log('🚫 Non-admin accessing admin route, redirecting to member dashboard');
+          }
           return NextResponse.redirect(new URL("/member/dashboard", req.url));
         }
       }
@@ -108,7 +120,9 @@ export default clerkMiddleware(async (auth, req) => {
 
     // Check member access for member routes (prevent admins from accessing member routes)
     if (isMemberRoute(req) && isUserAdmin) {
-      console.log('🔄 Admin accessing member route, redirecting to admin dashboard');
+      if (process.env.NODE_ENV === 'development') {
+        console.log('🔄 Admin accessing member route, redirecting to admin dashboard');
+      }
       // Prevent redirect loop - only redirect if not already on admin dashboard
       if (req.nextUrl.pathname !== "/admin/dashboard") {
         return NextResponse.redirect(new URL("/admin/dashboard", req.url));
@@ -117,7 +131,9 @@ export default clerkMiddleware(async (auth, req) => {
 
     // Redirect authenticated users from sign-in/sign-up pages based on role
     if (req.nextUrl.pathname === "/sign-in" || req.nextUrl.pathname === "/sign-up") {
-      console.log('🔄 Auth page redirect:', { isUserAdmin });
+      if (process.env.NODE_ENV === 'development') {
+        console.log('🔄 Auth page redirect:', { isUserAdmin });
+      }
       if (isUserAdmin) {
         return NextResponse.redirect(new URL("/admin/dashboard", req.url));
       } else {
@@ -127,7 +143,9 @@ export default clerkMiddleware(async (auth, req) => {
 
     // Redirect root path based on user role
     if (req.nextUrl.pathname === "/") {
-      console.log('🏠 Root path redirect:', { isUserAdmin });
+      if (process.env.NODE_ENV === 'development') {
+        console.log('🏠 Root path redirect:', { isUserAdmin });
+      }
       if (isUserAdmin) {
         return NextResponse.redirect(new URL("/admin/dashboard", req.url));
       } else {

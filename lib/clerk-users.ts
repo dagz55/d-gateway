@@ -1,4 +1,3 @@
-import { clerkClient } from '@clerk/nextjs/server';
 import { createClerkClient } from '@clerk/backend';
 
 export interface ClerkUserData {

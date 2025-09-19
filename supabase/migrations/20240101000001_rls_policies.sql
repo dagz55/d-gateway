@@ -8,43 +8,43 @@ ALTER TABLE public.news ENABLE ROW LEVEL SECURITY;
 
 -- Profiles policies
 CREATE POLICY "Users can view their own profile" ON public.profiles
-    FOR SELECT USING (auth.uid() = id);
+    FOR SELECT USING (auth.uid()::text = id::text);
 
 CREATE POLICY "Users can update their own profile" ON public.profiles
-    FOR UPDATE USING (auth.uid() = id);
+    FOR UPDATE USING (auth.uid()::text = id::text);
 
 CREATE POLICY "Users can insert their own profile" ON public.profiles
-    FOR INSERT WITH CHECK (auth.uid() = id);
+    FOR INSERT WITH CHECK (auth.uid()::text = id::text);
 
 -- Trades policies
 CREATE POLICY "Users can view their own trades" ON public.trades
-    FOR SELECT USING (auth.uid() = user_id);
+    FOR SELECT USING (auth.uid()::text = user_id::text);
 
 CREATE POLICY "Users can insert their own trades" ON public.trades
-    FOR INSERT WITH CHECK (auth.uid() = user_id);
+    FOR INSERT WITH CHECK (auth.uid()::text = user_id::text);
 
 CREATE POLICY "Users can update their own trades" ON public.trades
-    FOR UPDATE USING (auth.uid() = user_id);
+    FOR UPDATE USING (auth.uid()::text = user_id::text);
 
 -- Signals policies
 CREATE POLICY "Users can view their own signals" ON public.signals
-    FOR SELECT USING (auth.uid() = user_id);
+    FOR SELECT USING (auth.uid()::text = user_id::text);
 
 CREATE POLICY "Users can insert their own signals" ON public.signals
-    FOR INSERT WITH CHECK (auth.uid() = user_id);
+    FOR INSERT WITH CHECK (auth.uid()::text = user_id::text);
 
 CREATE POLICY "Users can update their own signals" ON public.signals
-    FOR UPDATE USING (auth.uid() = user_id);
+    FOR UPDATE USING (auth.uid()::text = user_id::text);
 
 -- Transactions policies
 CREATE POLICY "Users can view their own transactions" ON public.transactions
-    FOR SELECT USING (auth.uid() = user_id);
+    FOR SELECT USING (auth.uid()::text = user_id::text);
 
 CREATE POLICY "Users can insert their own transactions" ON public.transactions
-    FOR INSERT WITH CHECK (auth.uid() = user_id);
+    FOR INSERT WITH CHECK (auth.uid()::text = user_id::text);
 
 CREATE POLICY "Users can update their own transactions" ON public.transactions
-    FOR UPDATE USING (auth.uid() = user_id);
+    FOR UPDATE USING (auth.uid()::text = user_id::text);
 
 -- Crypto prices policies (read-only for all authenticated users)
 CREATE POLICY "Authenticated users can view crypto prices" ON public.crypto_prices

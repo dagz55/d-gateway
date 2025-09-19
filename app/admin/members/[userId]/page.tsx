@@ -4,6 +4,57 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { formatDate, formatCurrency } from '@/lib/utils/formatting';
+import { createServerSupabaseClient } from '@/lib/supabase/serverClient';
+
+// Type definitions
+interface Trade {
+  id: string;
+  pair: string;
+  action: string;
+  side: string;
+  entry: number;
+  sl: number;
+  tp: number[];
+  amount: number;
+  price: number;
+  time: string;
+  issuedAt: string;
+  status: string;
+  pnl?: number;
+}
+
+interface Transaction {
+  id: string;
+  type: string;
+  amount: number;
+  currency: string;
+  status: string;
+  created_at: string;
+}
+
+interface Signal {
+  id: string;
+  pair: string;
+  action: string;
+  entry: number;
+  sl: number;
+  tp: number[];
+  issuedAt: string;
+  issued_at: string;
+  target_price: number;
+  status: string;
+}
+
+interface UserProfile {
+  id: string;
+  user_id: string;
+  username: string;
+  avatar_url?: string;
+  created_at: string;
+  updated_at: string;
+}
+
 import {
   ArrowLeft,
   Users,
@@ -37,10 +88,10 @@ interface MemberDetailsData {
   phone?: string;
   banned: boolean;
   locked: boolean;
-  trades: any[];
-  transactions: any[];
-  signals: any[];
-  profile: any;
+  trades: Trade[];
+  transactions: Transaction[];
+  signals: Signal[];
+  profile: UserProfile;
   stats: {
     total_trades: number;
     active_trades: number;
@@ -55,15 +106,61 @@ interface MemberDetailsData {
 
 async function getMemberDetails(userId: string): Promise<MemberDetailsData | null> {
   try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/admin/members/${userId}`, {
-      cache: 'no-store'
-    });
+    const supabase = await createServerSupabaseClient();
+    
+    // Get user profile
+    const { data: profile, error: profileError } = await supabase
+      .from('user_profiles')
+      .select('*')
+      .eq('user_id', userId)
+      .single();
 
-    if (!response.ok) {
+    if (profileError) {
+      console.error('Error fetching user profile:', profileError);
       return null;
     }
 
-    return await response.json();
+    // Get user stats (mock data for now - replace with real queries)
+    const stats = {
+      total_trades: 0,
+      active_trades: 0,
+      total_volume: 0,
+      total_pnl: 0,
+      total_transactions: 0,
+      total_deposits: 0,
+      total_withdrawals: 0,
+      signals_received: 0
+    };
+
+    // Get trades (mock data for now - replace with real queries)
+    const trades: Trade[] = [];
+
+    // Get transactions (mock data for now - replace with real queries)
+    const transactions: Transaction[] = [];
+
+    // Get signals (mock data for now - replace with real queries)
+    const signals: Signal[] = [];
+
+    return {
+      user_id: userId,
+      email: profile.email || '',
+      full_name: `${profile.first_name || ''} ${profile.last_name || ''}`.trim(),
+      display_name: profile.username || profile.first_name || profile.email || '',
+      avatar_url: profile.avatar_url || '',
+      role: profile.role || 'user',
+      is_admin: profile.is_admin || false,
+      created_at: profile.created_at || '',
+      last_sign_in_at: profile.last_sign_in_at,
+      email_verified: profile.email_verified || false,
+      phone: profile.phone,
+      banned: profile.banned || false,
+      locked: profile.locked || false,
+      trades,
+      transactions,
+      signals,
+      profile,
+      stats
+    };
   } catch (error) {
     console.error('Error fetching member details:', error);
     return null;
@@ -84,22 +181,6 @@ export default async function MemberDetailsPage({
     notFound();
   }
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  };
-
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD'
-    }).format(amount);
-  };
 
   const getStatusBadge = () => {
     if (member.banned) {
@@ -126,7 +207,7 @@ export default async function MemberDetailsPage({
       <div className="space-y-4">
         <div className="flex items-center gap-4">
           <Button variant="ghost" size="sm" asChild>
-            <Link href="/admin/users">
+            <Link href="/admin/members">
               <ArrowLeft className="h-4 w-4 mr-2" />
               Back to Members
             </Link>
@@ -356,7 +437,7 @@ export default async function MemberDetailsPage({
                 </div>
               ) : (
                 <div className="space-y-4">
-                  {member.trades.slice(0, 10).map((trade: any) => (
+                  {member.trades.slice(0, 10).map((trade: Trade) => (
                     <div key={trade.id} className="flex items-center justify-between p-4 rounded-lg bg-card/30">
                       <div className="flex items-center gap-4">
                         <Badge className={trade.side === 'BUY' ? 'bg-green-500/10 text-green-400' : 'bg-red-500/10 text-red-400'}>
@@ -371,8 +452,8 @@ export default async function MemberDetailsPage({
                         <div className="font-medium">{formatCurrency(trade.amount * trade.price)}</div>
                         <div className="text-sm text-muted-foreground">{trade.amount} @ {formatCurrency(trade.price)}</div>
                       </div>
-                      <Badge className={trade.pnl >= 0 ? 'bg-green-500/10 text-green-400' : 'bg-red-500/10 text-red-400'}>
-                        {trade.pnl >= 0 ? '+' : ''}{formatCurrency(trade.pnl || 0)}
+                      <Badge className={(trade.pnl ?? 0) >= 0 ? 'bg-green-500/10 text-green-400' : 'bg-red-500/10 text-red-400'}>
+                        {(trade.pnl ?? 0) >= 0 ? '+' : ''}{formatCurrency(trade.pnl ?? 0)}
                       </Badge>
                     </div>
                   ))}
@@ -396,7 +477,7 @@ export default async function MemberDetailsPage({
                 </div>
               ) : (
                 <div className="space-y-4">
-                  {member.transactions.slice(0, 10).map((transaction: any) => (
+                  {member.transactions.slice(0, 10).map((transaction: Transaction) => (
                     <div key={transaction.id} className="flex items-center justify-between p-4 rounded-lg bg-card/30">
                       <div className="flex items-center gap-4">
                         <Badge className={transaction.type === 'DEPOSIT' ? 'bg-green-500/10 text-green-400' : 'bg-red-500/10 text-red-400'}>
@@ -435,7 +516,7 @@ export default async function MemberDetailsPage({
                 </div>
               ) : (
                 <div className="space-y-4">
-                  {member.signals.slice(0, 10).map((signal: any) => (
+                  {member.signals.slice(0, 10).map((signal: Signal) => (
                     <div key={signal.id} className="flex items-center justify-between p-4 rounded-lg bg-card/30">
                       <div className="flex items-center gap-4">
                         <Badge className={signal.action === 'BUY' ? 'bg-green-500/10 text-green-400' : signal.action === 'SELL' ? 'bg-red-500/10 text-red-400' : 'bg-yellow-500/10 text-yellow-400'}>

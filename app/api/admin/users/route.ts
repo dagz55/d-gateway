@@ -12,8 +12,8 @@ async function assertAdmin(request?: NextRequest) {
   const user = await getCurrentUser()
   if (!user) return { user: null, isAdmin: false }
   
-  // For now, we'll check if the user's email contains 'admin' or is a specific admin email
-  const isAdminUser = user.email?.includes('admin') || user.email === 'admin@zignals.org'
+  // Check admin status using Clerk's publicMetadata instead of email patterns
+  const isAdminUser = user.publicMetadata?.isAdmin === true || user.publicMetadata?.role === 'admin'
   return { user, isAdmin: isAdminUser }
 }
 

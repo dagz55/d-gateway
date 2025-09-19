@@ -3,6 +3,17 @@ import { currentUser } from '@clerk/nextjs/server';
 import { createClient } from '@/lib/supabase/client';
 import { validateImageFile } from '@/lib/validation';
 
+// Type definitions
+interface UserProfile {
+  id: string;
+  user_id: string;
+  username: string;
+  email: string;
+  avatar_url?: string;
+  created_at: string;
+  updated_at: string;
+}
+
 // Configure route to handle larger files
 export const runtime = 'nodejs';
 export const maxDuration = 30; // 30 seconds timeout
@@ -10,7 +21,17 @@ export const maxDuration = 30; // 30 seconds timeout
 export async function POST(request: NextRequest) {
   try {
     // Check authentication
-    const user = await currentUser();
+    let user;
+    try {
+      user = await currentUser();
+    } catch (authError) {
+      console.error('Authentication error:', authError);
+      return NextResponse.json(
+        { success: false, error: 'Authentication failed' },
+        { status: 401 }
+      );
+    }
+    
     if (!user) {
       return NextResponse.json(
         { success: false, error: 'User not authenticated' },
@@ -78,8 +99,8 @@ export async function POST(request: NextRequest) {
           .eq('clerk_user_id', user.id)
           .single();
 
-        if ((profile as any)?.avatar_url && (profile as any).avatar_url.includes('supabase')) {
-          const oldFileName = (profile as any).avatar_url.split('/').pop();
+        if (profile?.avatar_url && profile.avatar_url.includes('supabase')) {
+          const oldFileName = profile.avatar_url.split('/').pop();
           if (oldFileName) {
             await supabase.storage
               .from('public_image')
@@ -108,7 +129,7 @@ export async function POST(request: NextRequest) {
 
     // Update user profile
     const { error: updateError } = await (supabase
-      .from('user_profiles') as any)
+      .from('user_profiles'))
       .update({
         avatar_url: avatarUrl,
         updated_at: new Date().toISOString(),
@@ -161,8 +182,8 @@ export async function DELETE() {
       .single();
 
     // Delete from storage if it's a storage URL
-    if ((profile as any)?.avatar_url && (profile as any).avatar_url.includes('supabase')) {
-      const oldFileName = (profile as any).avatar_url.split('/').pop();
+    if (profile?.avatar_url && profile.avatar_url.includes('supabase')) {
+      const oldFileName = profile.avatar_url.split('/').pop();
       if (oldFileName) {
         await supabase.storage
           .from('public_image')
@@ -172,7 +193,7 @@ export async function DELETE() {
 
     // Remove avatar URL from profile
     const { error: updateError } = await (supabase
-      .from('user_profiles') as any)
+      .from('user_profiles'))
       .update({
         avatar_url: null,
         updated_at: new Date().toISOString(),

@@ -8,13 +8,11 @@ import {
   DollarSign,
   Users,
   Calendar,
-  Settings,
-  Trash2,
-  Edit,
-  Eye
+  Settings
 } from 'lucide-react';
 import Link from 'next/link';
 import { createServerSupabaseClient } from '@/lib/supabase/serverClient';
+import { PackageActions } from '@/components/admin/PackageActions';
 
 interface PackageData {
   id: string;
@@ -45,22 +43,43 @@ async function getPackages(): Promise<PackageData[]> {
     }
 
     // Get subscriber count for each package (from user_packages table)
-    const packagesWithCounts = await Promise.all(
+    const packagesWithCounts = await Promise.allSettled(
       (packages || []).map(async (pkg) => {
-        const { count } = await supabase
-          .from('user_packages')
-          .select('*', { count: 'exact', head: true })
-          .eq('package_id', pkg.id)
-          .eq('status', 'active');
+        try {
+          const { count, error: countError } = await supabase
+            .from('user_packages')
+            .select('*', { count: 'exact', head: true })
+            .eq('package_id', pkg.id)
+            .eq('status', 'active');
 
-        return {
-          ...pkg,
-          subscriber_count: count || 0
-        };
+          if (countError) {
+            console.warn(`Error fetching subscriber count for package ${pkg.id}:`, countError.message);
+            return {
+              ...pkg,
+              subscriber_count: 0
+            };
+          }
+
+          return {
+            ...pkg,
+            subscriber_count: count || 0
+          };
+        } catch (error) {
+          console.error(`Error processing package ${pkg.id}:`, error);
+          return {
+            ...pkg,
+            subscriber_count: 0
+          };
+        }
       })
     );
 
-    return packagesWithCounts;
+    // Filter out rejected promises and extract successful results
+    const successfulPackages = packagesWithCounts
+      .filter((result): result is PromiseFulfilledResult<PackageData> => result.status === 'fulfilled')
+      .map(result => result.value);
+
+    return successfulPackages;
   } catch (error) {
     console.error('Error fetching packages:', error);
     return [];
@@ -263,17 +282,7 @@ export default async function AdminPackagesPage() {
                     </div>
 
                     {/* Actions */}
-                    <div className="flex items-center gap-2 ml-4">
-                      <Button variant="ghost" size="sm">
-                        <Eye className="h-4 w-4" />
-                      </Button>
-                      <Button variant="ghost" size="sm">
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                      <Button variant="ghost" size="sm" className="text-red-400 hover:text-red-300">
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
+                    <PackageActions packageId={pkg.id} packageName={pkg.name} />
                   </div>
                 </div>
               ))}

@@ -17,7 +17,7 @@ Zignal is a comprehensive crypto trading platform built with [Next.js 15.5.3](ht
 - 💰 **Portfolio Management**: Track profits, losses, and portfolio distribution
 - 🏦 **Wallet System**: Complete wallet management with deposits, withdrawals, and transaction history
 - 📰 **News Integration**: Real-time cryptocurrency news feed
-- 📊 **Market Analytics**: 
+- 📊 **Market Analytics**:
   - Live cryptocurrency prices from CoinGecko API
   - Real-time market statistics (total market cap, 24h volume, gainers/losers)
   - Interactive favorites system for tracking preferred coins
@@ -119,7 +119,7 @@ The application uses role-based routing to provide different experiences for dif
 
 #### Universal Routes (Accessible to all authenticated users)
 - `/profile` - User profile management (works for both admin and member users)
-- `/settings` - Account settings and preferences  
+- `/settings` - Account settings and preferences
 - `/wallet` - Wallet management and transactions
 
 #### Member Routes (`/member/*`)

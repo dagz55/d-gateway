@@ -47,6 +47,20 @@
             font-size: 1.1rem;
         }
 
+        .status-display {
+            margin-top: 18px;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 16px;
+            background: rgba(15, 15, 35, 0.6);
+            border-radius: 999px;
+            border: 1px solid rgba(51, 225, 218, 0.2);
+            color: #cbd5f5;
+            font-size: 0.95rem;
+            box-shadow: inset 0 0 10px rgba(51, 225, 218, 0.08);
+        }
+
         .grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -180,6 +194,52 @@
             background: #ef4444;
         }
 
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 18px;
+        }
+
+        .btn-secondary {
+            background: rgba(51, 225, 218, 0.12);
+            border: 1px solid rgba(51, 225, 218, 0.3);
+            color: #33e1da;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(51, 225, 218, 0.2);
+        }
+
+        .history-actions {
+            margin-top: 12px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .history-pill-btn {
+            background: rgba(51, 225, 218, 0.08);
+            border: 1px solid rgba(51, 225, 218, 0.25);
+            color: #33e1da;
+            padding: 6px 12px;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .history-pill-btn:hover {
+            background: rgba(51, 225, 218, 0.15);
+        }
+
         .command-history {
             grid-column: 1 / -1;
         }
@@ -198,6 +258,12 @@
             color: #6b7280;
             font-size: 0.8rem;
             float: right;
+        }
+
+        .helper-text {
+            color: #64748b;
+            font-size: 0.85rem;
+            margin-bottom: 12px;
         }
 
         .loading {
@@ -258,6 +324,10 @@
         <div class="header">
             <h1>🚀 Git Helper</h1>
             <p>Quick git commands with visual feedback</p>
+            <div class="status-display" id="statusDisplay">
+                <span id="statusIndicator" class="status-indicator status-changes"></span>
+                <span id="statusText">Local changes detected</span>
+            </div>
         </div>
 
         <div class="grid">
@@ -291,6 +361,24 @@
                 </button>
                 <button class="btn btn-danger" onclick="runGitReset()">
                     Reset Changes
+                </button>
+            </div>
+
+            <!-- Custom Command Section -->
+            <div class="section">
+                <h2>
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <path d="M12 4c-4.41 0-8 3.59-8 8s3.59 8 8 8c1.85 0 3.55-.63 4.9-1.69l1.04 1.04c.39.39 1.02.39 1.41 0l.01-.01c.39-.39.39-1.02 0-1.41l-1.04-1.04C19.37 15.55 20 13.85 20 12c0-4.41-3.59-8-8-8zm0 2c3.31 0 6 2.69 6 6 0 1.29-.41 2.49-1.11 3.47l-1.36-1.36c.3-.64.47-1.36.47-2.11 0-2.48-2.02-4.5-4.5-4.5S7.5 9.52 7.5 12s2.02 4.5 4.5 4.5c.75 0 1.47-.17 2.11-.47l1.36 1.36C14.49 17.59 13.29 18 12 18c-3.31 0-6-2.69-6-6s2.69-6 6-6zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3z"/>
+                    </svg>
+                    Custom Command
+                </h2>
+                <div class="input-group">
+                    <label for="customCommand">Run any git command:</label>
+                    <input type="text" id="customCommand" placeholder="e.g., git fetch --all">
+                </div>
+                <div class="helper-text">Commands run in simulation mode. Use this to rehearse your CLI workflow.</div>
+                <button class="btn" onclick="runCustomCommand()">
+                    Run Command
                 </button>
             </div>
 
@@ -343,58 +431,257 @@
 
             <!-- Command History -->
             <div class="section command-history">
-                <h2>
-                    <svg class="icon" viewBox="0 0 24 24">
-                        <path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/>
-                    </svg>
-                    Command Output
-                </h2>
+                <div class="history-header">
+                    <h2>
+                        <svg class="icon" viewBox="0 0 24 24">
+                            <path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/>
+                        </svg>
+                        Command Output
+                    </h2>
+                    <button class="btn-secondary" onclick="clearHistory()">Clear History</button>
+                </div>
                 <div id="commandOutput" class="output">Ready to run git commands...</div>
             </div>
         </div>
     </div>
 
-    <script>
+        <script>
+        const MAX_HISTORY_LENGTH = 12;
+        const HISTORY_STORAGE_KEY = 'gitHelperHistory';
+        const STATUS_STORAGE_KEY = 'gitHelperStatus';
+
+        const STORAGE_AVAILABLE = (() => {
+            try {
+                const testKey = '__git_helper_storage_test__';
+                window.localStorage.setItem(testKey, testKey);
+                window.localStorage.removeItem(testKey);
+                return true;
+            } catch (error) {
+                return false;
+            }
+        })();
+
         let commandHistory = [];
+        let statusInfo = { state: 'changes', message: 'Local changes detected', branch: 'main' };
+        let repoState = { branch: 'main', workingTree: 'changes' };
+
+        function getDefaultStatusMessage(state) {
+            switch (state) {
+                case 'clean':
+                    return 'Working tree clean';
+                case 'staged':
+                    return 'Staged changes ready to commit';
+                case 'error':
+                    return 'Action required';
+                default:
+                    return 'Local changes detected';
+            }
+        }
+
+        function loadPersistentState() {
+            if (!STORAGE_AVAILABLE) {
+                return;
+            }
+
+            try {
+                const storedHistory = window.localStorage.getItem(HISTORY_STORAGE_KEY);
+                if (storedHistory) {
+                    const parsedHistory = JSON.parse(storedHistory);
+                    if (Array.isArray(parsedHistory)) {
+                        commandHistory = parsedHistory;
+                    }
+                }
+            } catch (error) {
+                console.warn('Unable to load command history from storage', error);
+            }
+
+            try {
+                const storedStatus = window.localStorage.getItem(STATUS_STORAGE_KEY);
+                if (storedStatus) {
+                    const parsedStatus = JSON.parse(storedStatus);
+                    if (parsedStatus && parsedStatus.state) {
+                        statusInfo = {
+                            state: parsedStatus.state,
+                            message: parsedStatus.message || getDefaultStatusMessage(parsedStatus.state),
+                            branch: parsedStatus.branch || 'main'
+                        };
+                        repoState.branch = statusInfo.branch;
+                        if (['clean', 'staged', 'changes'].includes(statusInfo.state)) {
+                            repoState.workingTree = statusInfo.state;
+                        }
+                    }
+                }
+            } catch (error) {
+                console.warn('Unable to load status information from storage', error);
+            }
+        }
+
+        function saveHistory() {
+            if (!STORAGE_AVAILABLE) {
+                return;
+            }
+
+            try {
+                window.localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(commandHistory));
+            } catch (error) {
+                console.warn('Unable to persist command history', error);
+            }
+        }
+
+        function saveStatus() {
+            if (!STORAGE_AVAILABLE) {
+                return;
+            }
+
+            try {
+                window.localStorage.setItem(STATUS_STORAGE_KEY, JSON.stringify(statusInfo));
+            } catch (error) {
+                console.warn('Unable to persist status information', error);
+            }
+        }
+
+        function escapeHtml(value) {
+            if (typeof value !== 'string') {
+                return value;
+            }
+
+            return value
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        function formatTimestamp() {
+            return new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        }
 
         function addToHistory(command, output, success = true) {
-            const timestamp = new Date().toLocaleTimeString();
             const historyItem = {
                 command,
                 output,
-                timestamp,
+                timestamp: formatTimestamp(),
                 success
             };
-            
+
             commandHistory.unshift(historyItem);
-            if (commandHistory.length > 10) {
-                commandHistory.pop();
+            if (commandHistory.length > MAX_HISTORY_LENGTH) {
+                commandHistory = commandHistory.slice(0, MAX_HISTORY_LENGTH);
             }
-            
+
+            saveHistory();
             updateCommandOutput();
         }
 
         function updateCommandOutput() {
             const outputDiv = document.getElementById('commandOutput');
+            if (!outputDiv) {
+                return;
+            }
+
             if (commandHistory.length === 0) {
                 outputDiv.innerHTML = 'Ready to run git commands...';
                 return;
             }
 
-            outputDiv.innerHTML = commandHistory.map(item => `
-                <div class="history-item">
-                    <span class="timestamp">${item.timestamp}</span>
-                    <div style="color: ${item.success ? '#33e1da' : '#ef4444'}; font-weight: bold;">
-                        $ ${item.command}
+            const historyMarkup = commandHistory.map((item, index) => {
+                const safeCommand = escapeHtml(item.command);
+                const outputText = item.output || (item.success ? 'Command completed successfully' : 'Command failed');
+                const safeOutput = escapeHtml(outputText).replace(/\n/g, '<br>');
+                const commandColor = item.success ? '#33e1da' : '#ef4444';
+                const outputColor = item.success ? '#94a3b8' : '#fca5a5';
+
+                return `
+                    <div class="history-item">
+                        <span class="timestamp">${item.timestamp}</span>
+                        <div style="color: ${commandColor}; font-weight: bold;">$ ${safeCommand}</div>
+                        <div style="margin-top: 5px; color: ${outputColor};">${safeOutput}</div>
+                        <div class="history-actions">
+                            <button class="history-pill-btn" data-action="copy-command" data-index="${index}">Copy command</button>
+                            <button class="history-pill-btn" data-action="copy-output" data-index="${index}">Copy output</button>
+                        </div>
                     </div>
-                    <div style="margin-top: 5px; color: ${item.success ? '#94a3b8' : '#fca5a5'};">
-                        ${item.output || 'Command completed successfully'}
-                    </div>
-                </div>
-            `).join('');
+                `;
+            }).join('');
+
+            outputDiv.innerHTML = historyMarkup;
+            attachHistoryEventHandlers();
+        }
+
+        function attachHistoryEventHandlers() {
+            const outputDiv = document.getElementById('commandOutput');
+            if (!outputDiv) {
+                return;
+            }
+
+            const buttons = outputDiv.querySelectorAll('button[data-action]');
+            buttons.forEach(button => {
+                button.onclick = () => {
+                    const index = Number(button.getAttribute('data-index'));
+                    const action = button.getAttribute('data-action');
+                    const historyItem = commandHistory[index];
+
+                    if (!historyItem) {
+                        return;
+                    }
+
+                    const valueToCopy = action === 'copy-command'
+                        ? historyItem.command
+                        : (historyItem.output || 'Command completed successfully');
+
+                    copyToClipboard(valueToCopy, button);
+                };
+            });
+        }
+
+        async function copyToClipboard(text, button) {
+            if (!text) {
+                return;
+            }
+
+            try {
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    await navigator.clipboard.writeText(text);
+                } else {
+                    const tempArea = document.createElement('textarea');
+                    tempArea.value = text;
+                    tempArea.setAttribute('readonly', '');
+                    tempArea.style.position = 'absolute';
+                    tempArea.style.left = '-9999px';
+                    document.body.appendChild(tempArea);
+                    tempArea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(tempArea);
+                }
+
+                showTemporaryButtonMessage(button, 'Copied!');
+            } catch (error) {
+                console.error('Copy failed', error);
+                showTemporaryButtonMessage(button, 'Copy failed');
+            }
+        }
+
+        function showTemporaryButtonMessage(button, message) {
+            if (!button) {
+                return;
+            }
+
+            const originalText = button.textContent;
+            button.textContent = message;
+            button.disabled = true;
+
+            setTimeout(() => {
+                button.textContent = originalText;
+                button.disabled = false;
+            }, 1500);
         }
 
         function showLoading(button) {
+            if (!button) {
+                return null;
+            }
+
             const originalText = button.innerHTML;
             button.innerHTML = '<span class="loading"></span> Running...';
             button.disabled = true;
@@ -402,130 +689,331 @@
         }
 
         function hideLoading(button, originalText) {
+            if (!button || originalText === null) {
+                return;
+            }
+
             button.innerHTML = originalText;
             button.disabled = false;
         }
 
-        async function simulateGitCommand(command) {
-            // Since we can't actually run git commands in a browser,
-            // we'll simulate the responses for demonstration
-            const responses = {
-                'git status': `On branch main
-Your branch is up to date with 'origin/main'.
+        function updateStatusIndicator(state, message, persist = true) {
+            const indicator = document.getElementById('statusIndicator');
+            const statusText = document.getElementById('statusText');
+            if (!indicator || !statusText) {
+                return;
+            }
+
+            const classMap = {
+                clean: 'status-clean',
+                staged: 'status-changes',
+                changes: 'status-changes',
+                error: 'status-error'
+            };
+
+            indicator.classList.remove('status-clean', 'status-changes', 'status-error');
+            indicator.classList.add(classMap[state] || 'status-changes');
+
+            statusInfo.state = state;
+            statusInfo.message = message || getDefaultStatusMessage(state);
+            statusInfo.branch = repoState.branch;
+            if (['clean', 'staged', 'changes'].includes(state)) {
+                repoState.workingTree = state;
+            }
+            statusText.textContent = statusInfo.message;
+
+            if (persist) {
+                saveStatus();
+            }
+        }
+
+        function deriveStateFromStatus(output) {
+            if (!output) {
+                return 'clean';
+            }
+
+            if (/nothing to commit/i.test(output)) {
+                return 'clean';
+            }
+
+            if (/Changes to be committed/i.test(output)) {
+                return 'staged';
+            }
+
+            if (/Changes not staged/i.test(output) || /Untracked files/i.test(output)) {
+                return 'changes';
+            }
+
+            return 'clean';
+        }
+
+        function updateIndicatorFromCommand(command, output) {
+            const trimmed = command.trim();
+
+            if (trimmed.startsWith('git status')) {
+                const derivedState = deriveStateFromStatus(output);
+                updateStatusIndicator(derivedState);
+            } else if (trimmed.startsWith('git add')) {
+                updateStatusIndicator('staged', 'Changes staged for commit');
+            } else if (trimmed.startsWith('git commit')) {
+                updateStatusIndicator('clean', 'Commit created locally');
+            } else if (trimmed.startsWith('git push')) {
+                updateStatusIndicator('clean', `Remote branch up to date (${repoState.branch})`);
+            } else if (trimmed.startsWith('git reset')) {
+                updateStatusIndicator('clean', 'Repository reset to HEAD');
+            }
+        }
+
+        function extractBranchFromCommand(command) {
+            const match = command.match(/git\s+(?:checkout|switch)\s+(?:-b\s+)?([^\s]+)/);
+            if (!match) {
+                return null;
+            }
+
+            return match[1].replace(/^origin\//, '');
+        }
+
+        function extractCommitMessage(command) {
+            const doubleQuoted = command.match(/-m\s+"([^"]+)"/);
+            if (doubleQuoted) {
+                return doubleQuoted[1];
+            }
+
+            const singleQuoted = command.match(/-m\s+'([^']+)'/);
+            if (singleQuoted) {
+                return singleQuoted[1];
+            }
+
+            return null;
+        }
+
+        function generateCommitHash() {
+            return Math.random().toString(16).slice(2, 9);
+        }
+
+        function buildStatusOutput() {
+            const branch = repoState.branch || 'main';
+
+            if (repoState.workingTree === 'clean') {
+                return `On branch ${branch}
+Your branch is up to date with 'origin/${branch}'.
+
+nothing to commit, working tree clean`;
+            }
+
+            if (repoState.workingTree === 'staged') {
+                return `On branch ${branch}
+Your branch is up to date with 'origin/${branch}'.
+
+Changes to be committed:
+  (use "git restore --staged <file>..." to unstage)
+
+        modified:   components/AdminDashboard.tsx
+        new file:   hooks/useNewHook.ts`;
+            }
+
+            return `On branch ${branch}
+Your branch is up to date with 'origin/${branch}'.
 
 Changes not staged for commit:
   (use "git add <file>..." to update what will be committed)
-  (use "git checkout -- <file>..." to discard changes in working directory)
+  (use "git restore <file>..." to discard changes in working directory)
 
-        modified:   src/components/AuthCard.tsx
+        modified:   components/layout/Header.tsx
         modified:   README.md
 
 Untracked files:
   (use "git add <file>..." to include in what will be committed)
 
-        git-helper.html
+        git-helper.html`;
+        }
 
-no changes added to commit (use "git add ." or git commit -a)`,
-                
-                'git add .': 'Files added to staging area successfully',
-                
-                'git commit': 'Commit created successfully',
-                
-                'git push': 'Changes pushed to remote repository successfully',
-                
-                'git reset --hard HEAD': 'HEAD is now at 1234567 Latest commit'
-            };
+        async function simulateGitCommand(command, context = {}) {
+            const normalized = command.trim();
+            await new Promise(resolve => setTimeout(resolve, 600 + Math.random() * 800));
 
-            // Simulate network delay
-            await new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 1000));
-            
-            return responses[command] || `Command '${command}' executed successfully`;
+            if (!normalized.startsWith('git')) {
+                return `Command '${normalized}' executed successfully (simulation)`;
+            }
+
+            if (normalized.startsWith('git status')) {
+                return buildStatusOutput();
+            }
+
+            if (normalized.startsWith('git add')) {
+                repoState.workingTree = 'staged';
+                return 'Files added to staging area successfully';
+            }
+
+            if (normalized.startsWith('git commit')) {
+                repoState.workingTree = 'clean';
+                const commitMessage = context.message || extractCommitMessage(normalized) || 'Commit created successfully';
+                return `[${repoState.branch} ${generateCommitHash()}] ${commitMessage}
+ 3 files changed, 21 insertions(+), 2 deletions(-)
+ create mode 100644 components/NewComponent.tsx`;
+            }
+
+            if (normalized.startsWith('git push')) {
+                let branch = context.branch;
+                if (!branch) {
+                    const branchMatch = normalized.match(/git\s+push(?:\s+origin)?\s+([^\s]+)/);
+                    branch = branchMatch ? branchMatch[1] : repoState.branch;
+                }
+
+                repoState.branch = branch || repoState.branch;
+
+                return `Enumerating objects: 7, done.
+Counting objects: 100% (7/7), done.
+Delta compression using up to 8 threads
+Compressing objects: 100% (3/3), done.
+Writing objects: 100% (3/3), done.
+To origin/${repoState.branch}
+   abc1234..${generateCommitHash()}  ${repoState.branch} -> ${repoState.branch}`;
+            }
+
+            if (normalized.startsWith('git pull')) {
+                return `From origin/${repoState.branch}
+ * branch            ${repoState.branch}     -> FETCH_HEAD
+Already up to date.`;
+            }
+
+            if (normalized.startsWith('git reset --hard')) {
+                repoState.workingTree = 'clean';
+                return `HEAD is now at ${generateCommitHash()} Latest commit`;
+            }
+
+            if (normalized.startsWith('git stash')) {
+                repoState.workingTree = 'clean';
+                return `Saved working directory and index state WIP on ${repoState.branch}: ${generateCommitHash()}`;
+            }
+
+            if (normalized.startsWith('git checkout') || normalized.startsWith('git switch')) {
+                const branch = extractBranchFromCommand(normalized) || repoState.branch;
+                repoState.branch = branch;
+                const branchInput = document.getElementById('branchName');
+                if (branchInput) {
+                    branchInput.value = branch;
+                }
+                return `Switched to branch '${branch}' (simulation)`;
+            }
+
+            if (normalized.startsWith('git branch')) {
+                return `* ${repoState.branch}
+  develop
+  release/v1.0.0`;
+            }
+
+            return `Command '${normalized}' executed successfully (simulation)`;
         }
 
         async function runGitStatus() {
-            const button = event.target;
+            const button = (typeof event !== 'undefined' && event) ? (event.currentTarget || event.target) : null;
             const originalText = showLoading(button);
             const statusOutput = document.getElementById('statusOutput');
-            
+
             try {
                 const output = await simulateGitCommand('git status');
-                statusOutput.textContent = output;
-                statusOutput.style.display = 'block';
+                if (statusOutput) {
+                    statusOutput.textContent = output;
+                    statusOutput.style.display = 'block';
+                }
                 addToHistory('git status', output);
+                updateIndicatorFromCommand('git status', output);
             } catch (error) {
                 addToHistory('git status', error.message, false);
+                updateStatusIndicator('error', 'Unable to retrieve status');
             } finally {
                 hideLoading(button, originalText);
             }
         }
 
         async function runGitAdd() {
-            const button = event.target;
+            const button = (typeof event !== 'undefined' && event) ? (event.currentTarget || event.target) : null;
             const originalText = showLoading(button);
-            
+
             try {
-                const output = await simulateGitCommand('git add .');
-                addToHistory('git add .', output);
+                const command = 'git add .';
+                const output = await simulateGitCommand(command);
+                addToHistory(command, output);
+                updateIndicatorFromCommand(command, output);
             } catch (error) {
                 addToHistory('git add .', error.message, false);
+                updateStatusIndicator('error', 'Unable to stage changes');
             } finally {
                 hideLoading(button, originalText);
             }
         }
 
         async function runGitCommit() {
-            const button = event.target;
+            const button = (typeof event !== 'undefined' && event) ? (event.currentTarget || event.target) : null;
             const originalText = showLoading(button);
-            const message = document.getElementById('commitMessage').value.trim();
-            
+            const messageField = document.getElementById('commitMessage');
+            const message = messageField ? messageField.value.trim() : '';
+
             if (!message) {
                 addToHistory('git commit', 'Error: Commit message is required', false);
+                updateStatusIndicator('error', 'Commit message required');
                 hideLoading(button, originalText);
                 return;
             }
-            
+
             try {
                 const command = `git commit -m "${message}"`;
-                const output = await simulateGitCommand('git commit');
+                const output = await simulateGitCommand(command, { message });
                 addToHistory(command, output);
-                document.getElementById('commitMessage').value = '';
+                updateIndicatorFromCommand(command, output);
+                if (messageField) {
+                    messageField.value = '';
+                }
             } catch (error) {
                 addToHistory('git commit', error.message, false);
+                updateStatusIndicator('error', 'Commit failed');
             } finally {
                 hideLoading(button, originalText);
             }
         }
 
         async function runGitPush() {
-            const button = event.target;
+            const button = (typeof event !== 'undefined' && event) ? (event.currentTarget || event.target) : null;
             const originalText = showLoading(button);
-            const branch = document.getElementById('branchName').value.trim() || 'main';
-            
+            const branchInput = document.getElementById('branchName');
+            const branch = branchInput ? (branchInput.value.trim() || repoState.branch || 'main') : repoState.branch || 'main';
+            repoState.branch = branch;
+            if (branchInput) {
+                branchInput.value = branch;
+            }
+
             try {
                 const command = `git push origin ${branch}`;
-                const output = await simulateGitCommand('git push');
+                const output = await simulateGitCommand(command, { branch });
                 addToHistory(command, output);
+                updateIndicatorFromCommand(command, output);
             } catch (error) {
                 addToHistory(`git push origin ${branch}`, error.message, false);
+                updateStatusIndicator('error', 'Push failed');
             } finally {
                 hideLoading(button, originalText);
             }
         }
 
         async function runGitReset() {
-            const button = event.target;
+            const button = (typeof event !== 'undefined' && event) ? (event.currentTarget || event.target) : null;
             const originalText = showLoading(button);
-            
-            if (!confirm('Are you sure you want to reset all changes? This cannot be undone.')) {
+
+            const confirmed = window.confirm('Are you sure you want to reset all changes? This cannot be undone.');
+            if (!confirmed) {
                 hideLoading(button, originalText);
                 return;
             }
-            
+
             try {
-                const output = await simulateGitCommand('git reset --hard HEAD');
-                addToHistory('git reset --hard HEAD', output);
+                const command = 'git reset --hard HEAD';
+                const output = await simulateGitCommand(command);
+                addToHistory(command, output);
+                updateIndicatorFromCommand(command, output);
             } catch (error) {
                 addToHistory('git reset --hard HEAD', error.message, false);
+                updateStatusIndicator('error', 'Reset failed');
             } finally {
                 hideLoading(button, originalText);
             }
@@ -534,40 +1022,110 @@ no changes added to commit (use "git add ." or git commit -a)`,
         async function runAddCommitPush() {
             const button = document.getElementById('quickPushBtn');
             const originalText = showLoading(button);
-            const message = document.getElementById('commitMessage').value.trim();
-            
+            const messageField = document.getElementById('commitMessage');
+            const message = messageField ? messageField.value.trim() : '';
+
             if (!message) {
                 addToHistory('Add + Commit + Push', 'Error: Commit message is required', false);
+                updateStatusIndicator('error', 'Commit message required');
                 hideLoading(button, originalText);
                 return;
             }
-            
+
             try {
-                // Run commands sequentially
-                await simulateGitCommand('git add .');
-                addToHistory('git add .', 'Files added to staging area');
-                
-                await simulateGitCommand('git commit');
-                addToHistory(`git commit -m "${message}"`, 'Commit created successfully');
-                
-                const branch = document.getElementById('branchName').value.trim() || 'main';
-                await simulateGitCommand('git push');
-                addToHistory(`git push origin ${branch}`, 'Changes pushed successfully');
-                
-                document.getElementById('commitMessage').value = '';
+                const addCommand = 'git add .';
+                const addOutput = await simulateGitCommand(addCommand);
+                addToHistory(addCommand, addOutput);
+                updateIndicatorFromCommand(addCommand, addOutput);
+
+                const commitCommand = `git commit -m "${message}"`;
+                const commitOutput = await simulateGitCommand(commitCommand, { message });
+                addToHistory(commitCommand, commitOutput);
+                updateIndicatorFromCommand(commitCommand, commitOutput);
+
+                const branchInput = document.getElementById('branchName');
+                const branch = branchInput ? (branchInput.value.trim() || repoState.branch || 'main') : repoState.branch || 'main';
+                repoState.branch = branch;
+                if (branchInput) {
+                    branchInput.value = branch;
+                }
+
+                const pushCommand = `git push origin ${branch}`;
+                const pushOutput = await simulateGitCommand(pushCommand, { branch });
+                addToHistory(pushCommand, pushOutput);
+                updateIndicatorFromCommand(pushCommand, pushOutput);
+
+                if (messageField) {
+                    messageField.value = '';
+                }
             } catch (error) {
                 addToHistory('Add + Commit + Push', error.message, false);
+                updateStatusIndicator('error', 'Workflow interrupted');
+            } finally {
+                hideLoading(button, originalText);
+            }
+        }
+
+        async function runCustomCommand() {
+            const button = (typeof event !== 'undefined' && event) ? (event.currentTarget || event.target) : null;
+            const originalText = showLoading(button);
+            const customCommandInput = document.getElementById('customCommand');
+            const command = customCommandInput ? customCommandInput.value.trim() : '';
+
+            if (!command) {
+                addToHistory('Custom Command', 'Please enter a command to run', false);
+                hideLoading(button, originalText);
+                return;
+            }
+
+            try {
+                const output = await simulateGitCommand(command);
+                addToHistory(command, output);
+                updateIndicatorFromCommand(command, output);
+                const branch = extractBranchFromCommand(command);
+                if (branch) {
+                    repoState.branch = branch;
+                    const branchInput = document.getElementById('branchName');
+                    if (branchInput) {
+                        branchInput.value = branch;
+                    }
+                }
+            } catch (error) {
+                addToHistory(command, error.message, false);
+                updateStatusIndicator('error', 'Command failed');
             } finally {
                 hideLoading(button, originalText);
             }
         }
 
         function setCommitMessage(message) {
-            document.getElementById('commitMessage').value = message;
+            const messageField = document.getElementById('commitMessage');
+            if (messageField) {
+                messageField.value = message;
+            }
         }
 
-        // Initialize the interface
-        updateCommandOutput();
+        function clearHistory() {
+            commandHistory = [];
+            saveHistory();
+            updateCommandOutput();
+        }
+
+        function initializeBranchInput() {
+            const branchInput = document.getElementById('branchName');
+            if (branchInput) {
+                branchInput.value = repoState.branch;
+            }
+        }
+
+        function initializeInterface() {
+            loadPersistentState();
+            initializeBranchInput();
+            updateCommandOutput();
+            updateStatusIndicator(statusInfo.state, statusInfo.message, false);
+        }
+
+        initializeInterface();
     </script>
 </body>
 </html>

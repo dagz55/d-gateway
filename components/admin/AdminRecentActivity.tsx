@@ -1,203 +1,180 @@
+'use client';
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { 
-  Activity, 
-  Users, 
-  UserPlus, 
-  Settings, 
-  Shield,
+import { Button } from '@/components/ui/button';
+import {
+  Activity,
+  User,
+  Package,
   DollarSign,
   TrendingUp,
-  Edit
+  TrendingDown,
+  Clock,
+  Eye,
 } from 'lucide-react';
-import { createServerSupabaseClient } from '@/lib/supabase/serverClient';
+import Link from 'next/link';
 
-interface AdminActivity {
+interface RecentActivityItem {
   id: string;
-  admin_user_id: string;
-  action: string;
-  target_type?: string;
-  target_id?: string;
-  details?: any;
-  created_at: string;
-  admin_name?: string;
-  admin_email?: string;
+  type: 'user' | 'transaction' | 'trade' | 'package';
+  title: string;
+  description: string;
+  timestamp: string;
+  status?: string;
+  amount?: number;
+  change?: number;
 }
 
-async function getAdminActivity(): Promise<AdminActivity[]> {
-  try {
-    const supabase = await createServerSupabaseClient();
-    
-    // Get recent admin activity
-    const { data: activities } = await supabase
-      .from('admin_activity_log')
-      .select(`
-        *,
-        admin_profile:user_profiles!admin_user_id (
-          full_name,
-          email,
-          display_name
-        )
-      `)
-      .order('created_at', { ascending: false })
-      .limit(10);
-    
-    if (!activities) return [];
-    
-    return activities.map(activity => ({
-      ...activity,
-      admin_name: activity.admin_profile?.display_name || activity.admin_profile?.full_name,
-      admin_email: activity.admin_profile?.email
-    }));
-  } catch (error) {
-    console.error('Error fetching admin activity:', error);
-    
-    // Return placeholder data for development
-    return [
-      {
-        id: '1',
-        admin_user_id: 'admin-1',
-        action: 'User Login',
-        target_type: 'user',
-        target_id: 'user-123',
-        created_at: new Date(Date.now() - 5 * 60 * 1000).toISOString(),
-        admin_name: 'Admin',
-        admin_email: 'admin@zignals.org'
-      },
-      {
-        id: '2',
-        admin_user_id: 'admin-1',
-        action: 'Created Trading Signal',
-        target_type: 'signal',
-        target_id: 'signal-456',
-        created_at: new Date(Date.now() - 15 * 60 * 1000).toISOString(),
-        admin_name: 'Admin',
-        admin_email: 'admin@zignals.org'
-      },
-      {
-        id: '3',
-        admin_user_id: 'admin-1',
-        action: 'Member Registered',
-        target_type: 'user',
-        target_id: 'user-789',
-        created_at: new Date(Date.now() - 30 * 60 * 1000).toISOString(),
-        admin_name: 'Admin',
-        admin_email: 'admin@zignals.org'
-      }
-    ];
-  }
+interface AdminRecentActivityProps {
+  recentActivity: RecentActivityItem[];
 }
 
-export default async function AdminRecentActivity() {
-  const activities = await getAdminActivity();
-  
-  const getActivityIcon = (action: string, targetType?: string) => {
-    if (action.toLowerCase().includes('login')) return Users;
-    if (action.toLowerCase().includes('register')) return UserPlus;
-    if (action.toLowerCase().includes('signal')) return TrendingUp;
-    if (action.toLowerCase().includes('deposit') || action.toLowerCase().includes('withdrawal')) return DollarSign;
-    if (action.toLowerCase().includes('edit') || action.toLowerCase().includes('update')) return Edit;
-    if (action.toLowerCase().includes('admin') || action.toLowerCase().includes('promote')) return Shield;
-    if (action.toLowerCase().includes('settings')) return Settings;
-    return Activity;
+export function AdminRecentActivity({ recentActivity }: AdminRecentActivityProps) {
+  const getActivityIcon = (type: string) => {
+    switch (type) {
+      case 'user':
+        return User;
+      case 'transaction':
+        return DollarSign;
+      case 'trade':
+        return TrendingUp;
+      case 'package':
+        return Package;
+      default:
+        return Activity;
+    }
   };
 
-  const getActivityColor = (action: string) => {
-    if (action.toLowerCase().includes('login')) return 'text-green-400';
-    if (action.toLowerCase().includes('register')) return 'text-blue-400';
-    if (action.toLowerCase().includes('signal')) return 'text-purple-400';
-    if (action.toLowerCase().includes('deposit')) return 'text-emerald-400';
-    if (action.toLowerCase().includes('withdrawal')) return 'text-orange-400';
-    if (action.toLowerCase().includes('edit')) return 'text-yellow-400';
-    if (action.toLowerCase().includes('delete')) return 'text-red-400';
-    if (action.toLowerCase().includes('admin')) return 'text-red-400';
-    return 'text-accent';
+  const getActivityColor = (type: string) => {
+    switch (type) {
+      case 'user':
+        return 'text-blue-500';
+      case 'transaction':
+        return 'text-green-500';
+      case 'trade':
+        return 'text-orange-500';
+      case 'package':
+        return 'text-purple-500';
+      default:
+        return 'text-gray-500';
+    }
   };
 
-  const formatTimeAgo = (dateString: string) => {
-    const date = new Date(dateString);
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+    }).format(amount);
+  };
+
+  const formatTimeAgo = (timestamp: string) => {
+    const date = new Date(timestamp);
     const now = new Date();
     const diffInMinutes = Math.floor((now.getTime() - date.getTime()) / (1000 * 60));
     
     if (diffInMinutes < 1) return 'Just now';
     if (diffInMinutes < 60) return `${diffInMinutes}m ago`;
-    
-    const diffInHours = Math.floor(diffInMinutes / 60);
-    if (diffInHours < 24) return `${diffInHours}h ago`;
-    
-    const diffInDays = Math.floor(diffInHours / 24);
-    return `${diffInDays}d ago`;
+    if (diffInMinutes < 1440) return `${Math.floor(diffInMinutes / 60)}h ago`;
+    return `${Math.floor(diffInMinutes / 1440)}d ago`;
   };
 
   return (
-    <Card className="glass glass-hover card-glow-hover border-border/50">
+    <Card className="glass border-border/50">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Activity className="h-5 w-5 text-accent" />
           Recent Activity
         </CardTitle>
         <CardDescription>
-          Latest admin actions and system events
+          Latest platform activity and events
         </CardDescription>
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
-          
-          {activities.length === 0 ? (
-            <div className="text-center py-8">
-              <Activity className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-              <p className="text-muted-foreground">No recent activity</p>
-              <p className="text-sm text-muted-foreground mt-2">Admin activities will appear here</p>
+          {recentActivity.length === 0 ? (
+            <div className="text-center py-8 text-muted-foreground">
+              <Activity className="h-12 w-12 mx-auto mb-4 opacity-50" />
+              <p>No recent activity</p>
+              <p className="text-sm">Activity will appear here as users interact with the platform</p>
             </div>
           ) : (
-            activities.map((activity) => {
-              const IconComponent = getActivityIcon(activity.action, activity.target_type);
-              const colorClass = getActivityColor(activity.action);
+            recentActivity.slice(0, 10).map((activity) => {
+              const Icon = getActivityIcon(activity.type);
+              const iconColor = getActivityColor(activity.type);
               
               return (
                 <div
                   key={activity.id}
-                  className="flex items-center gap-4 p-3 rounded-lg bg-card/30 hover:bg-card/50 transition-all duration-200"
+                  className="flex items-start gap-3 p-3 rounded-lg bg-card/50 border border-border/30 hover:bg-card/70 transition-colors"
                 >
-                  <div className={`p-2 rounded-full bg-card/50 ${colorClass}`}>
-                    <IconComponent className="h-4 w-4" />
+                  <div className={`p-2 rounded-full bg-background ${iconColor}`}>
+                    <Icon className="h-4 w-4" />
                   </div>
                   
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                      <p className="text-sm font-medium text-foreground">
-                        {activity.action}
-                      </p>
-                      {activity.target_type && (
-                        <Badge variant="outline" className="text-xs">
-                          {activity.target_type}
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium text-sm truncate">
+                          {activity.title}
+                        </p>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          {activity.description}
+                        </p>
+                      </div>
+                      
+                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                        <Clock className="h-3 w-3" />
+                        {formatTimeAgo(activity.timestamp)}
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center gap-2 mt-2">
+                      {activity.status && (
+                        <Badge 
+                          variant="outline" 
+                          className="text-xs"
+                        >
+                          {activity.status}
                         </Badge>
                       )}
+                      
+                      {activity.amount && (
+                        <span className="text-xs font-medium text-green-600">
+                          {formatCurrency(activity.amount)}
+                        </span>
+                      )}
+                      
+                      {activity.change !== undefined && (
+                        <span className={`text-xs font-medium flex items-center gap-1 ${
+                          activity.change >= 0 ? 'text-green-600' : 'text-red-600'
+                        }`}>
+                          {activity.change >= 0 ? (
+                            <TrendingUp className="h-3 w-3" />
+                          ) : (
+                            <TrendingDown className="h-3 w-3" />
+                          )}
+                          {Math.abs(activity.change)}%
+                        </span>
+                      )}
                     </div>
-                    <div className="flex items-center gap-2 mt-1">
-                      <p className="text-xs text-muted-foreground">
-                        by {activity.admin_name || 'Unknown Admin'}
-                      </p>
-                      <span className="text-xs text-muted-foreground">•</span>
-                      <p className="text-xs text-muted-foreground">
-                        {formatTimeAgo(activity.created_at)}
-                      </p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex-shrink-0">
-                    <Avatar className="h-8 w-8">
-                      <AvatarFallback className="bg-accent/10 text-accent text-xs">
-                        {(activity.admin_name || activity.admin_email || 'A').charAt(0).toUpperCase()}
-                      </AvatarFallback>
-                    </Avatar>
                   </div>
                 </div>
               );
             })
           )}
         </div>
+        
+        {recentActivity.length > 0 && (
+          <div className="mt-4 pt-4 border-t border-border/30">
+            <Button variant="outline" size="sm" className="w-full" asChild>
+              <Link href="/admin/member-activity">
+                <Eye className="h-4 w-4 mr-2" />
+                View All Activity
+              </Link>
+            </Button>
+          </div>
+        )}
       </CardContent>
     </Card>
   );

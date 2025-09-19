@@ -1,4 +1,5 @@
 import { requireAdmin } from '@/lib/admin';
+import packageJson from '@/package.json';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -310,7 +311,7 @@ export default async function AdminSettingsPage() {
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">Version</span>
-                <span className="text-foreground font-medium">v2.9.1</span>
+                <span className="text-foreground font-medium">v{packageJson.version}</span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">Deployment</span>

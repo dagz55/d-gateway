@@ -68,8 +68,38 @@ export default function CreatePackageForm() {
     }));
   };
 
+  const validateForm = (): string | null => {
+    if (!formData.name.trim()) {
+      return 'Package name is required';
+    }
+    if (formData.name.length > 100) {
+      return 'Package name must be 100 characters or less';
+    }
+    if (!formData.description.trim()) {
+      return 'Package description is required';
+    }
+    if (formData.description.length > 500) {
+      return 'Package description must be 500 characters or less';
+    }
+    if (formData.price < 0) {
+      return 'Price must be 0 or greater';
+    }
+    if (formData.duration_days <= 0) {
+      return 'Duration must be greater than 0 days';
+    }
+    return null;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Validate form before submission
+    const validationError = validateForm();
+    if (validationError) {
+      toast.error(validationError);
+      return;
+    }
+    
     setIsSubmitting(true);
 
     try {
@@ -79,10 +109,10 @@ export default function CreatePackageForm() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          name: formData.name,
-          description: formData.description,
-          price: formData.price,
-          duration_days: formData.duration_days,
+          name: formData.name.trim(),
+          description: formData.description.trim(),
+          price: Number(formData.price),
+          duration_days: Number(formData.duration_days),
           features: formData.features,
           active: formData.active
         }),
@@ -96,7 +126,7 @@ export default function CreatePackageForm() {
 
       toast.success('Package created successfully!');
       router.push('/admin/packages');
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error creating package:', error);
       toast.error(error.message || 'Failed to create package');
     } finally {

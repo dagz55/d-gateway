@@ -42,7 +42,9 @@ export default async function MemberSettingsPage() {
               <div>
                 <label className="text-sm font-medium">Email</label>
                 <p className="text-sm text-muted-foreground">
-                  {user.emailAddresses[0]?.emailAddress}
+                  {Array.isArray(user.emailAddresses) && user.emailAddresses.length > 0 
+                    ? user.emailAddresses[0]?.emailAddress 
+                    : 'No email available'}
                 </p>
               </div>
               <div>

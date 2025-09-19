@@ -25,6 +25,7 @@ import { usePathname, useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 import ProfileSection from './ProfileSection';
 import { useUser } from '@clerk/nextjs';
+import { checkAdminStatus } from '@/lib/admin-utils';
 
 const navigation = [
   {
@@ -80,7 +81,7 @@ export default function Sidebar({ className }: SidebarProps) {
   const searchParams = useSearchParams();
   const { user } = useUser();
   
-  const isAdmin = user?.publicMetadata?.role === 'admin';
+  const { isAdmin } = checkAdminStatus(user);
 
   // Add admin navigation if user is admin
   const adminNavigation = isAdmin ? [

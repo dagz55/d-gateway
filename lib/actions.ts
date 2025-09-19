@@ -161,7 +161,9 @@ export async function uploadAvatar(formData: FormData) {
           }
         }
 
-        console.log(`Avatar uploaded: ${fileName} for user ${user.id}`)
+        if (process.env.NODE_ENV === 'development') {
+          console.log(`Avatar uploaded: ${fileName} for user ${user.id}`)
+        }
 
       } catch (storageError) {
         // Don't log MIME type errors as they're expected and handled gracefully
@@ -264,7 +266,9 @@ export async function removeAvatar() {
       }
     }
 
-    console.log(`Avatar removed for user ${user.id}`)
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`Avatar removed for user ${user.id}`)
+    }
 
     revalidatePath('/profile')
     return { success: true }
@@ -340,7 +344,9 @@ export async function updateProfile(data: {
       throw new Error(`Profile update failed: ${profileError.message}`)
     }
 
-    console.log(`Profile updated for user ${user.id}:`, Object.keys(sanitizedData))
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`Profile updated for user ${user.id}:`, Object.keys(sanitizedData))
+    }
 
     revalidatePath('/profile')
     return { success: true }
@@ -395,7 +401,9 @@ export async function updateUsername(newUsername: string) {
       throw new Error(`Username update failed: ${profileError.message}`)
     }
 
-    console.log(`Username updated for user ${user.id}: ${sanitizedUsername}`)
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`Username updated for user ${user.id}: ${sanitizedUsername}`)
+    }
 
     revalidatePath('/profile')
     return { success: true }
@@ -418,7 +426,9 @@ export async function updatePassword(currentPassword: string, newPassword: strin
 
     // Clerk handles password management through their dashboard
     // Password changes should be handled through Clerk's user profile
-    console.log(`Password change attempted for user ${user.id}`);
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`Password change attempted for user ${user.id}`);
+    }
 
     return {
       success: false,

@@ -1,117 +1,86 @@
+'use client';
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { 
-  UserPlus, 
-  TrendingUp, 
-  DollarSign, 
+import {
+  Users,
+  Package,
   Settings,
-  Database,
-  FileText,
+  Eye,
+  Wallet,
+  Plus,
   Shield,
-  Bell
+  Activity,
 } from 'lucide-react';
 import Link from 'next/link';
 
-export default function AdminQuickActions() {
+export function AdminQuickActions() {
   const quickActions = [
     {
-      title: 'Create Trading Signal',
-      description: 'Add a new trading signal',
-      icon: TrendingUp,
-      href: '/admin/signals/create',
-      color: 'text-green-400',
-      bgColor: 'bg-green-400/10'
+      title: 'Manage Users',
+      description: 'View and manage user accounts',
+      icon: Users,
+      href: '/admin/users',
+      color: 'text-blue-500',
     },
     {
-      title: 'Invite New Member',
-      description: 'Send invitation to join',
-      icon: UserPlus,
-      href: '/admin/members/invite',
-      color: 'text-blue-400',
-      bgColor: 'bg-blue-400/10'
+      title: 'Member Activity',
+      description: 'Monitor user activity and engagement',
+      icon: Activity,
+      href: '/admin/member-activity',
+      color: 'text-green-500',
     },
     {
-      title: 'Process Withdrawals',
-      description: 'Review pending requests',
-      icon: DollarSign,
-      href: '/admin/finances/withdrawals',
-      color: 'text-yellow-400',
-      bgColor: 'bg-yellow-400/10'
+      title: 'Package Management',
+      description: 'Create and manage subscription packages',
+      icon: Package,
+      href: '/admin/packages',
+      color: 'text-purple-500',
+    },
+    {
+      title: 'Member Wallets',
+      description: 'Monitor wallet transactions and balances',
+      icon: Wallet,
+      href: '/admin/member-wallets',
+      color: 'text-orange-500',
     },
     {
       title: 'System Settings',
-      description: 'Configure platform',
+      description: 'Configure platform settings',
       icon: Settings,
       href: '/admin/settings',
-      color: 'text-purple-400',
-      bgColor: 'bg-purple-400/10'
+      color: 'text-gray-500',
     },
-    {
-      title: 'Database Backup',
-      description: 'Create data backup',
-      icon: Database,
-      href: '/admin/database/backup',
-      color: 'text-cyan-400',
-      bgColor: 'bg-cyan-400/10'
-    },
-    {
-      title: 'Generate Report',
-      description: 'Export analytics data',
-      icon: FileText,
-      href: '/admin/reports',
-      color: 'text-orange-400',
-      bgColor: 'bg-orange-400/10'
-    },
-    {
-      title: 'Manage Admins',
-      description: 'Admin permissions',
-      icon: Shield,
-      href: '/admin/admins',
-      color: 'text-red-400',
-      bgColor: 'bg-red-400/10'
-    },
-    {
-      title: 'Send Notification',
-      description: 'Broadcast to all users',
-      icon: Bell,
-      href: '/admin/notifications/create',
-      color: 'text-indigo-400',
-      bgColor: 'bg-indigo-400/10'
-    }
   ];
 
   return (
-    <Card className="glass glass-hover card-glow-hover border-border/50">
+    <Card className="glass border-border/50">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <Settings className="h-5 w-5 text-accent" />
+          <Shield className="h-5 w-5 text-accent" />
           Quick Actions
         </CardTitle>
         <CardDescription>
-          Frequently used admin tasks and shortcuts
+          Common administrative tasks and shortcuts
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {quickActions.map((action, index) => {
-            const IconComponent = action.icon;
-            
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {quickActions.map((action) => {
+            const Icon = action.icon;
             return (
-              <Link key={index} href={action.href}>
+              <Link key={action.href} href={action.href}>
                 <Button
-                  variant="ghost"
-                  className="h-auto p-4 flex flex-col items-center gap-3 hover:bg-card/50 transition-all duration-200 group"
+                  variant="outline"
+                  className="w-full h-auto p-4 flex flex-col items-start gap-3 hover:bg-accent/5 hover:border-accent/30 transition-all"
                 >
-                  <div className={`p-3 rounded-xl ${action.bgColor} ${action.color} group-hover:scale-110 transition-transform duration-200`}>
-                    <IconComponent className="h-6 w-6" />
-                  </div>
-                  
-                  <div className="text-center space-y-1">
-                    <div className="font-medium text-foreground text-sm group-hover:text-accent transition-colors">
-                      {action.title}
-                    </div>
-                    <div className="text-xs text-muted-foreground">
-                      {action.description}
+                  <div className="flex items-center gap-3">
+                    <Icon className={`h-5 w-5 ${action.color}`} />
+                    <div className="text-left">
+                      <div className="font-medium">{action.title}</div>
+                      <div className="text-sm text-muted-foreground">
+                        {action.description}
+                      </div>
                     </div>
                   </div>
                 </Button>

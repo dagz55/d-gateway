@@ -5,15 +5,47 @@ import StatusDot from '@/components/ui/StatusDot';
 import ZigTradesWorkflow from '@/components/dashboard/ZigTradesWorkflow';
 import { currentUser } from '@clerk/nextjs/server';
 import { redirect } from 'next/navigation';
+import { createServerSupabaseClient } from '@/lib/supabase/serverClient';
+import { Signal } from '@/types';
 
 export const dynamic = 'force-dynamic';
 
+async function getRecentSignals(limit: number = 3): Promise<Signal[]> {
+  try {
+    const supabase = await createServerSupabaseClient();
+    
+    const { data, error } = await supabase
+      .from('signals')
+      .select('*')
+      .order('issued_at', { ascending: false })
+      .limit(limit);
+
+    if (error) {
+      console.error('Error fetching signals:', error);
+      return [];
+    }
+
+    return (data || []).map((row) => ({
+      id: row.id,
+      pair: row.pair,
+      action: row.action === 'HOLD' ? 'BUY' : row.action,
+      entry: row.target_price,
+      sl: row.stop_loss ?? 0,
+      tp: (row as any).take_profits ?? [],
+      issuedAt: row.issued_at,
+      status: row.status,
+    }));
+  } catch (error) {
+    console.error('Error fetching recent signals:', error);
+    return [];
+  }
+}
+
 export default async function DashboardPage() {
+  // Note: Auth is already checked in the layout, so we can proceed directly
   const user = await currentUser();
 
-  if (!user) {
-    redirect('/sign-in');
-  }
+  const recentSignals = await getRecentSignals(3);
 
   const firstName = user.firstName || 'Trader';
 
@@ -220,12 +252,8 @@ export default async function DashboardPage() {
               <CardTitle className="text-lg">Recent Signals</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
-              {[
-                { pair: 'BTC/USDT', action: 'BUY', price: '67,432', time: '2 min ago' },
-                { pair: 'SOL/USDT', action: 'SELL', price: '142.85', time: '15 min ago' },
-                { pair: 'AVAX/USDT', action: 'BUY', price: '38.92', time: '1 hour ago' },
-              ].map((signal, i) => (
-                <div key={i} className="flex items-center justify-between p-3 rounded-lg bg-card border border-border">
+              {recentSignals.length > 0 ? recentSignals.map((signal) => (
+                <div key={signal.id} className="flex items-center justify-between p-3 rounded-lg bg-card border border-border">
                   <div className="flex items-center space-x-3">
                     <div className={`px-2 py-1 rounded text-xs font-semibold ${
                       signal.action === 'BUY' ? 'bg-green-500/20 text-green-500' : 'bg-red-500/20 text-red-500'
@@ -234,12 +262,19 @@ export default async function DashboardPage() {
                     </div>
                     <div>
                       <p className="font-semibold text-sm">{signal.pair}</p>
-                      <p className="text-xs text-muted-foreground">{signal.time}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {new Date(signal.issuedAt).toLocaleDateString()}
+                      </p>
                     </div>
                   </div>
-                  <p className="text-sm font-mono">${signal.price}</p>
+                  <p className="text-sm font-mono">${signal.entry.toLocaleString()}</p>
                 </div>
-              ))}
+              )) : (
+                <div className="text-center py-8 text-muted-foreground">
+                  <p>No recent signals available</p>
+                  <p className="text-xs mt-1">Signals will appear here once they are generated</p>
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>

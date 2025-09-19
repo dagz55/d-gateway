@@ -1,15 +1,15 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { TrendingUp, Package, Users, ChevronRight, Bitcoin, BarChart3, DollarSign, Zap } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 
+// Using config file for banners - fallback to demo data if config fails
 const promoBanners = [
   {
     id: 1,
     title: "🚀 CRYPTO SIGNALS LIVE NOW!",
     subtitle: "₿ BTC/ETH Signals • 95% Win Rate • Real-Time Alerts ₿",
     cta: "⚡ GET PREMIUM SIGNALS NOW - LIMITED TIME! ⚡",
-    icon: Bitcoin,
+    icon: "Bitcoin",
     gradient: "from-[#f7931a] via-[#33E1DA] to-[#22c55e]",
     accent: "#f7931a",
     cryptoSymbol: "₿",
@@ -21,7 +21,7 @@ const promoBanners = [
     title: "💎 EXCLUSIVE TRADING PACKAGES",
     subtitle: "🔥 Choose Your Duration: Daily • Weekly • Monthly 🔥",
     cta: "💰 SAVE 40% ON YEARLY PLANS - ACT NOW! 💰",
-    icon: Package,
+    icon: "Package",
     gradient: "from-[#22c55e] via-[#33E1DA] to-[#8b5cf6]",
     accent: "#22c55e",
     cryptoSymbol: "⟠",
@@ -33,7 +33,7 @@ const promoBanners = [
     title: "🎯 MASTER CRYPTO TRADING",
     subtitle: "📈 Expert Advisors • 24/7 Support • Proven Strategies 📈",
     cta: "🔥 BOOK FREE CONSULTATION - 50 SPOTS LEFT! 🔥",
-    icon: BarChart3,
+    icon: "BarChart3",
     gradient: "from-[#1A7FB3] via-[#33E1DA] to-[#f7931a]",
     accent: "#1A7FB3",
     cryptoSymbol: "◊",

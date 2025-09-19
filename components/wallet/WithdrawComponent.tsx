@@ -19,6 +19,15 @@ interface WithdrawFormData {
   notes: string;
 }
 
+interface PortfolioData {
+  tradingBalance: number;
+  incomeBalance: number;
+}
+
+interface WithdrawComponentProps {
+  portfolioData?: PortfolioData;
+}
+
 const withdrawalMethods = [
   { value: 'bank_transfer', label: 'Bank Transfer', icon: '🏦' },
   { value: 'credit_card', label: 'Credit Card', icon: '💳' },
@@ -27,7 +36,7 @@ const withdrawalMethods = [
   { value: 'ewallet', label: 'E-Wallet', icon: '📱' },
 ];
 
-export default function WithdrawComponent() {
+export default function WithdrawComponent({ portfolioData }: WithdrawComponentProps) {
   const [formData, setFormData] = useState<WithdrawFormData>({
     completeName: '',
     username: '',
@@ -39,10 +48,10 @@ export default function WithdrawComponent() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // TODO: Fetch real portfolio values from API
+  // Use real portfolio data or fallback to 0
   const portfolioValues = {
-    'Trading Wallet': 0.00,
-    'Income Wallet': 0.00
+    'Trading Wallet': portfolioData?.tradingBalance || 0,
+    'Income Wallet': portfolioData?.incomeBalance || 0
   };
 
   const handleInputChange = (field: keyof WithdrawFormData, value: string) => {

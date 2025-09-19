@@ -59,9 +59,26 @@ export default function MarketPage() {
     const min = Math.min(...data);
     const range = max - min;
 
+    // Handle flat data (all values are the same)
+    if (range === 0) {
+      return (
+        <svg width="60" height="20" className="overflow-visible">
+          <line
+            x1="0"
+            y1="10"
+            x2="60"
+            y2="10"
+            stroke={isPositive ? "#10b981" : "#ef4444"}
+            strokeWidth="1.5"
+            vectorEffect="non-scaling-stroke"
+          />
+        </svg>
+      );
+    }
+
     const points = data.map((price, index) => {
       const x = (index / (data.length - 1)) * 100;
-      const y = range === 0 ? 50 : ((max - price) / range) * 100;
+      const y = ((max - price) / range) * 100;
       return `${x},${y}`;
     }).join(' ');
 
@@ -228,7 +245,15 @@ export default function MarketPage() {
                       <div key={crypto.id} className="p-4 rounded-lg bg-white/5 border border-white/10">
                         <div className="flex items-center justify-between mb-2">
                           <div className="flex items-center gap-2">
-                            <img src={crypto.image} alt={crypto.name} className="w-6 h-6" />
+                            <img 
+                              src={crypto.image} 
+                              alt={crypto.name} 
+                              className="w-6 h-6 rounded-full"
+                              onError={(e) => {
+                                e.currentTarget.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiByeD0iMTIiIGZpbGw9IiMzM0UxREEiLz4KPHN2ZyB3aWR0aD0iMTIiIGhlaWdodD0iMTIiIHZpZXdCb3g9IjAgMCAxMiAxMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4PSI2IiB5PSI2Ij4KPHBhdGggZD0iTTYgMEMyLjY4NjMgMCAwIDIuNjg2MyAwIDZDMCA5LjMxMzcgMi42ODYzIDEyIDYgMTJDOS4zMTM3IDEyIDEyIDkuMzEzNyAxMiA2QzEyIDIuNjg2MyA5LjMxMzcgMCA2IDBaIiBmaWxsPSIjMDAwMDAwIi8+CjxwYXRoIGQ9Ik02IDNDNC4zNDMxNSAzIDMgNC4zNDMxNSAzIDZDNy42NTY4NSA2IDkgNC4zNDMxNSA5IDZDNi4zNDMxNSA2IDYgNy42NTY4NSA2IDlDNiA2LjM0MzE1IDcuNjU2ODUgNSA5IDVDNi4zNDMxNSA1IDUgNi4zNDMxNSA1IDhDNSA5LjY1Njg1IDYuMzQzMTUgMTEgOCAxMUM5LjY1Njg1IDExIDExIDkuNjU2ODUgMTEgOEMxMSA2LjM0MzE1IDkuNjU2ODUgNSA4IDVaIiBmaWxsPSIjMzNFMURBIi8+Cjwvc3ZnPgo8L3N2Zz4K';
+                              }}
+                              loading="lazy"
+                            />
                             <span className="font-semibold text-white">{crypto.symbol.toUpperCase()}</span>
                           </div>
                           <div className="text-right">
@@ -300,7 +325,9 @@ export default function MarketPage() {
                           className="border-b border-white/5 hover:bg-white/5 transition-colors"
                         >
                           <td className="py-4 px-2">
-                            <span className="text-white/60 text-sm font-medium">#{index + 1}</span>
+                            <span className="text-white/60 text-sm font-medium">
+                              #{crypto.market_cap_rank || index + 1}
+                            </span>
                           </td>
                           
                           <td className="py-4 px-2">

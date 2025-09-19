@@ -4,7 +4,7 @@
 1. Add Clerk API keys to .env.local:
 ```bash
 CLERK_SECRET_KEY=sk_test_your_key_here
-CLERK_PUBLISHABLE_KEY=pk_test_your_key_here
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_your_key_here
 ```
 
 2. Install dependencies:

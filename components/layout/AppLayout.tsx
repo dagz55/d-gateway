@@ -6,9 +6,10 @@ import Sidebar from './Sidebar';
 
 interface AppLayoutProps {
   children: ReactNode;
+  userId?: string;
 }
 
-export default function AppLayout({ children }: AppLayoutProps) {
+export default function AppLayout({ children, userId }: AppLayoutProps) {
   return (
     <div className="min-h-screen dashboard-bg">
       <Suspense fallback={<div className="fixed left-0 top-0 h-full w-64 glass border-r border-border" />}>

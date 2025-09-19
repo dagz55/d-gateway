@@ -3,7 +3,7 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 -- Create profiles table (extends auth.users)
 CREATE TABLE IF NOT EXISTS public.profiles (
-    id UUID REFERENCES auth.users(id) ON DELETE CASCADE PRIMARY KEY,
+    id bigint PRIMARY KEY,
     username TEXT UNIQUE NOT NULL,
     full_name TEXT NOT NULL,
     avatar_url TEXT,
@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS public.profiles (
 -- Create trades table
 CREATE TABLE IF NOT EXISTS public.trades (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-    user_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE NOT NULL,
+    user_id bigint REFERENCES public.profiles(id) ON DELETE CASCADE,
     pair TEXT NOT NULL,
     side TEXT CHECK (side IN ('BUY', 'SELL')) NOT NULL,
     amount DECIMAL(20,8) NOT NULL CHECK (amount > 0),
@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS public.trades (
 -- Create signals table
 CREATE TABLE IF NOT EXISTS public.signals (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-    user_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE NOT NULL,
+    user_id bigint REFERENCES public.profiles(id) ON DELETE CASCADE,
     pair TEXT NOT NULL,
     action TEXT CHECK (action IN ('BUY', 'SELL', 'HOLD')) NOT NULL,
     target_price DECIMAL(20,8) NOT NULL CHECK (target_price > 0),
@@ -44,7 +44,7 @@ CREATE TABLE IF NOT EXISTS public.signals (
 -- Create transactions table
 CREATE TABLE IF NOT EXISTS public.transactions (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-    user_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE NOT NULL,
+    user_id bigint REFERENCES public.profiles(id) ON DELETE CASCADE,
     type TEXT CHECK (type IN ('DEPOSIT', 'WITHDRAWAL')) NOT NULL,
     amount DECIMAL(20,8) NOT NULL CHECK (amount > 0),
     currency TEXT CHECK (currency IN ('USD', 'USDT', 'PHP')) NOT NULL,
@@ -94,7 +94,7 @@ CREATE INDEX IF NOT EXISTS idx_transactions_status ON public.transactions(status
 CREATE INDEX IF NOT EXISTS idx_transactions_created_at ON public.transactions(created_at DESC);
 
 CREATE INDEX IF NOT EXISTS idx_crypto_prices_symbol ON public.crypto_prices(symbol);
-CREATE INDEX IF NOT EXISTS idx_crypto_prices_updated_at ON public.crypto_prices(updated_at DESC);
+-- CREATE INDEX IF NOT EXISTS idx_crypto_prices_updated_at ON public.crypto_prices(updated_at DESC);
 
 CREATE INDEX IF NOT EXISTS idx_news_published_at ON public.news(published_at DESC);
 CREATE INDEX IF NOT EXISTS idx_news_source ON public.news(source);

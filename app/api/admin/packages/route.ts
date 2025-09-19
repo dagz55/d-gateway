@@ -73,25 +73,60 @@ export async function POST(request: NextRequest) {
       active = true
     } = body;
 
-    // Validate required fields
-    if (!name || !description || !price || !duration_days) {
+    // Validate required fields with detailed error messages
+    const requiredFields = [
+      { field: 'name', value: name, message: 'Package name is required' },
+      { field: 'description', value: description, message: 'Package description is required' },
+      { field: 'price', value: price, message: 'Package price is required' },
+      { field: 'duration_days', value: duration_days, message: 'Package duration is required' }
+    ];
+
+    for (const { field, value, message } of requiredFields) {
+      if (value === undefined || value === null || value === '') {
+        return NextResponse.json(
+          { error: message },
+          { status: 400 }
+        );
+      }
+    }
+
+    // Validate data types and ranges
+    const priceNum = parseFloat(price);
+    const durationNum = parseInt(duration_days);
+
+    if (isNaN(priceNum) || priceNum < 0) {
       return NextResponse.json(
-        { error: 'Missing required fields: name, description, price, duration_days' },
+        { error: 'Price must be a valid number greater than or equal to 0' },
         { status: 400 }
       );
     }
 
-    // Validate price and duration
-    if (price < 0) {
+    if (isNaN(durationNum) || durationNum <= 0) {
       return NextResponse.json(
-        { error: 'Price must be greater than or equal to 0' },
+        { error: 'Duration must be a valid number greater than 0 days' },
         { status: 400 }
       );
     }
 
-    if (duration_days <= 0) {
+    // Validate features array if provided
+    if (features && !Array.isArray(features)) {
       return NextResponse.json(
-        { error: 'Duration must be greater than 0 days' },
+        { error: 'Features must be an array' },
+        { status: 400 }
+      );
+    }
+
+    // Validate string lengths
+    if (name.length > 100) {
+      return NextResponse.json(
+        { error: 'Package name must be 100 characters or less' },
+        { status: 400 }
+      );
+    }
+
+    if (description.length > 500) {
+      return NextResponse.json(
+        { error: 'Package description must be 500 characters or less' },
         { status: 400 }
       );
     }
@@ -99,17 +134,16 @@ export async function POST(request: NextRequest) {
     const supabase = await createServerSupabaseClient();
 
     // Create the package with admin client (bypasses RLS)
+    // Let database handle timestamps automatically
     const { data: newPackage, error } = await supabase
       .from('packages')
       .insert([{
         name,
         description,
-        price: parseFloat(price),
-        duration_days: parseInt(duration_days),
+        price: priceNum,
+        duration_days: durationNum,
         features: features || [],
-        active,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
+        active
       }])
       .select()
       .single();
@@ -125,10 +159,11 @@ export async function POST(request: NextRequest) {
       package: newPackage
     });
 
-  } catch (error: any) {
+  } catch (error) {
     console.error('Error creating package:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Failed to create package';
     return NextResponse.json(
-      { error: error.message || 'Failed to create package' },
+      { error: errorMessage },
       { status: 500 }
     );
   }

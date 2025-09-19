@@ -9,6 +9,7 @@ import { Container, Grid, Stack, Flex, Section, Spacer } from '@/components/ente
 import { CryptoIcon } from '@/components/animations/CryptoIcons'
 import { EnhancedHeroSection } from './EnhancedHeroSection'
 import { CombinedBackgroundAnimations } from '@/components/animations/BackgroundAnimations'
+import { LANDING_STRINGS } from '@/lib/constants/landing-strings'
 
 // Enhanced Hero Section - now using the new component
 const HeroSection = () => {
@@ -17,33 +18,10 @@ const HeroSection = () => {
 
 // Security Section
 const SecuritySection = () => {
-  const securityFeatures = [
-    {
-      title: "Secure Payment Processing",
-      description: "All payments are processed through secure gateways to protect your financial information.",
-      icon: Shield
-    },
-    {
-      title: "Data Encryption",
-      description: "Personal details are encrypted and never shared with third parties.",
-      icon: Shield
-    },
-    {
-      title: "Multi-Layer Security",
-      description: "Including strong password encryption and optional 2FA.",
-      icon: Shield
-    },
-    {
-      title: "24/7 Monitoring",
-      description: "Dedicated team regularly monitoring and moderating platform to protect Zignal members from scams or malicious activity.",
-      icon: Shield
-    },
-    {
-      title: "Transparent Trust",
-      description: "Honest results, no hidden tricks because we prioritize building trust within our community.",
-      icon: Shield
-    }
-  ]
+  const securityFeatures = LANDING_STRINGS.SECURITY.FEATURES.map(feature => ({
+    ...feature,
+    icon: Shield
+  }))
 
   return (
     <Section size="xl" className="bg-[#0A0F1F] relative overflow-hidden">

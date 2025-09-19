@@ -34,19 +34,25 @@ const migrations = [
 async function runMigration(filename) {
   const filePath = path.join(__dirname, '..', 'supabase', 'migrations', filename);
   
-  if (!fs.existsSync(filePath)) {
-    console.error(`❌ Migration file not found: ${filename}`);
-    return false;
-  }
-  
-  const sql = fs.readFileSync(filePath, 'utf8');
-  console.log(`🔄 Running migration: ${filename}`);
-  
   try {
-    const { error } = await supabase.rpc('exec_sql', { sql_text: sql });
+    if (!fs.existsSync(filePath)) {
+      console.error(`❌ Migration file not found: ${filename}`);
+      return false;
+    }
+    
+    const sql = fs.readFileSync(filePath, 'utf8');
+    console.log(`🔄 Running migration: ${filename}`);
+    
+    if (!sql.trim()) {
+      console.warn(`⚠️  Migration file is empty: ${filename}`);
+      return true; // Empty migration is not an error
+    }
+    
+    const { data, error } = await supabase.rpc('exec_sql', { sql_text: sql });
     
     if (error) {
       console.error(`❌ Error in ${filename}:`, error.message);
+      console.error(`Error details:`, error);
       return false;
     }
     
@@ -54,6 +60,7 @@ async function runMigration(filename) {
     return true;
   } catch (error) {
     console.error(`❌ Failed to run ${filename}:`, error.message);
+    console.error(`Stack trace:`, error.stack);
     return false;
   }
 }

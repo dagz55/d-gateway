@@ -2,6 +2,7 @@ import { requireAdminPermission, ADMIN_PERMISSIONS } from '@/lib/admin';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { formatDate } from '@/lib/utils/formatting';
 import { 
   Users, 
   Calendar,
@@ -37,31 +38,38 @@ async function getMembers(): Promise<MemberData[]> {
     // Get all users from Clerk
     const clerkUsers = await getAllClerkUsers();
 
-    // For each user, get active trades count from Supabase
-    const membersWithStats = await Promise.all(
-      clerkUsers.map(async (user) => {
-        // Get active trades count from Supabase
-        const { count: activeTrades } = await supabase
-          .from('trades')
-          .select('*', { count: 'exact', head: true })
-          .eq('user_id', user.id)
-          .eq('status', 'OPEN');
+    // Get active trades count for all users in a single query
+    const userIds = clerkUsers.map(user => user.id);
+    const { data: tradesData, error: tradesError } = await supabase
+      .from('trades')
+      .select('user_id')
+      .in('user_id', userIds)
+      .eq('status', 'OPEN');
 
-        return {
-          user_id: user.id,
-          email: user.email,
-          full_name: user.fullName,
-          display_name: user.firstName || user.fullName,
-          avatar_url: user.imageUrl,
-          role: user.isAdmin ? 'admin' : 'member',
-          is_admin: user.isAdmin,
-          created_at: user.createdAt.toISOString(),
-          last_sign_in_at: user.lastSignInAt?.toISOString(),
-          email_confirmed_at: user.createdAt.toISOString(),
-          active_trades: activeTrades || 0
-        };
-      })
-    );
+    if (tradesError) {
+      console.warn('Error fetching trades data:', tradesError.message);
+    }
+
+    // Count active trades per user
+    const tradesCountMap = (tradesData || []).reduce((acc, trade) => {
+      acc[trade.user_id] = (acc[trade.user_id] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+
+    // Build members data with aggregated stats
+    const membersWithStats = clerkUsers.map((user) => ({
+      user_id: user.id,
+      email: user.email,
+      full_name: user.fullName,
+      display_name: user.firstName || user.fullName,
+      avatar_url: user.imageUrl,
+      role: user.isAdmin ? 'admin' : 'member',
+      is_admin: user.isAdmin,
+      created_at: user.createdAt.toISOString(),
+      last_sign_in_at: user.lastSignInAt?.toISOString(),
+      email_confirmed_at: user.createdAt.toISOString(),
+      active_trades: tradesCountMap[user.id] || 0
+    }));
 
     return membersWithStats;
   } catch (error) {
@@ -90,13 +98,6 @@ export default async function AdminUsersPage() {
     return <Badge className="bg-gray-500/10 text-gray-400 border-gray-500/30">Inactive</Badge>;
   };
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    });
-  };
 
   return (
     <div className="space-y-8">

@@ -47,6 +47,16 @@ interface CoinGeckoMarketResponse {
 
 const COINGECKO_MARKET_URL = 'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=bitcoin,ethereum,cardano,solana&price_change_percentage=24h&sparkline=true';
 const LIVE_PRICE_REFRESH_INTERVAL = 60_000;
+const CACHE_DURATION = 30_000; // 30 seconds cache
+
+// Simple in-memory cache to prevent redundant API calls
+let priceCache: {
+  data: CryptoPrice[] | null;
+  timestamp: number;
+} = {
+  data: null,
+  timestamp: 0
+};
 
 const vertexShader = `
   varying vec2 vUv;
@@ -629,6 +639,12 @@ export function EnhancedHeroSection() {
   const [fetchError, setFetchError] = useState<string | null>(null);
 
   const fetchCryptoPrices = useCallback(async (signal?: AbortSignal) => {
+    // Check cache first
+    const now = Date.now();
+    if (priceCache.data && (now - priceCache.timestamp) < CACHE_DURATION) {
+      return priceCache.data;
+    }
+
     const response = await fetch(COINGECKO_MARKET_URL, {
       signal,
       cache: 'no-store',
@@ -669,12 +685,20 @@ export function EnhancedHeroSection() {
         };
       });
 
-    return parsedPrices.length
+    const result = parsedPrices.length
       ? parsedPrices
       : fallbackCryptoPrices.map((price) => ({
           ...price,
           sparkline: [...price.sparkline],
         }));
+
+    // Update cache
+    priceCache = {
+      data: result,
+      timestamp: now
+    };
+
+    return result;
   }, []);
 
   useEffect(() => {
