@@ -47,7 +47,7 @@ SUPABASE_SERVICE_ROLE_KEY=your_service_role_key  # For admin operations
 ```
 components/
 ├── dashboard/          # Trading dashboard components (charts, portfolio, signals)
-├── layout/            # AppLayout, Header, Sidebar, ProfileDropdown for dashboard pages
+├── layout/            # AppLayout, Header, Sidebar, ProfileDropdown, NotificationDropdown for dashboard pages
 ├── ui/                # Complete shadcn/ui component library (26 components)
 └── settings/          # Profile settings, photo upload, and configuration forms
 ```
@@ -70,9 +70,10 @@ components/
 
 #### Dashboard Layout Pattern
 All dashboard pages use the `(dashboard)` route group which provides:
-- Consistent `AppLayout` with Header and Sidebar
+- Consistent `AppLayout` with Header (including NotificationDropdown) and Sidebar
 - Protected authentication via middleware
 - Shared loading and error boundaries
+- Real-time notification system integrated in the header
 
 #### Theme System
 - Uses `next-themes` with persistence
@@ -83,6 +84,14 @@ All dashboard pages use the `(dashboard)` route group which provides:
 - Complete TypeScript setup with strict mode
 - Database types generated from Supabase schema
 - Component props properly typed throughout
+
+#### Notification System
+- **Real-time Notifications**: Uses Supabase real-time subscriptions for instant updates
+- **Component**: `NotificationDropdown` in header with bell icon and unread badge
+- **Database**: `notifications` table with proper RLS policies for user data protection
+- **Features**: Mark as read, mark all as read, categorized icons (trade, success, warning, error, system)
+- **Testing**: `/test-notifications` page and `/api/test-notifications` API for creating sample data
+- **Integration**: Fully integrated with Clerk authentication and existing dashboard layout
 
 ## Development Workflow
 

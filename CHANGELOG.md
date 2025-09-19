@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [2.10.7] - 2025-09-19
 
+## Fixed
+
 ### Fixed
 - **Profile Route Access**: Fixed missing `/profile` route access for authenticated users
   - Updated middleware to properly handle `/profile` routes as universal dashboard routes
@@ -21,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Better logging for route access debugging
 
 ## [2.10.6] - 2025-09-19
+
 
 ### Added
 - **Live Market Data Feature**: Comprehensive cryptocurrency market tracking with real-time data
@@ -52,6 +55,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [2.10.5] - 2025-09-19
 
+
 ### Fixed
 - **Admin Authentication Data Access Issue**: Resolved infinite loop caused by inconsistent admin detection methods
   - Updated `lib/admin.ts` to use `auth()` instead of `currentUser()` for session claims access
@@ -73,6 +77,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [2.10.4] - 2025-09-19
 
+
 ### Fixed
 - **Login System Failure**: Resolved critical build corruption preventing all user authentication
   - Fixed missing Clerk module errors (`Cannot find module './vendor-chunks/@clerk.js'`)
@@ -91,6 +96,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [2.10.3] - 2025-09-19
 
+
 ### Fixed
 - **Admin Authentication Infinite Loop**: Resolved critical infinite loop in admin authentication flow
   - Fixed mismatch between middleware admin detection and AdminLayout admin checking
@@ -107,6 +113,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Improved debugging output for admin authentication troubleshooting
 
 ## [2.10.2] - 2025-09-19
+
 
 ### Fixed
 - **Routing Loop Issue**: Fixed critical routing loop that caused non-admin users to get stuck
@@ -134,7 +141,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Removed unused imports and cleaned up provider code
   - Enhanced provider stability during route changes
 
-## [2.10.1] - 2025-09-19
+## [2.10.1] - 2025-01-28
 
 ### Fixed
 - **Admin Role Detection**: Fixed critical admin role detection issue in middleware
@@ -152,6 +159,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Maintained backward compatibility with existing role detection methods
 
 ## [2.10.0] - 2025-09-19
+
 
 ### Added
 - **Role-Based Dashboard Routing**: Implemented separate dashboards for members and administrators
@@ -178,7 +186,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Automatic role detection using Clerk metadata
   - Secure routing with proper authentication checks
 
-## [2.9.1] - 2025-09-18
+## [2.9.1] - 2025-09-19
 
 ### Fixed
 - **Vercel Deployment Build Error**: Fixed "Failed to collect page data" error for admin API routes
@@ -187,7 +195,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Routes now return appropriate responses during build-time execution
   - Resolved cookie access issues during static generation phase
 
-## [2.9.0] - 2025-09-18
+## [2.9.0] - 2025-09-19
 
 ### Fixed
 - **Photo Upload System**: Completely resolved photo upload and removal functionality
@@ -234,7 +242,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - File type validation at the database level
   - Proper bucket configuration with size and MIME type limits
 
-## [2.8.2] - 2025-09-18
+## [2.8.2] - 2025-09-19
 
 ### Fixed
 - **WorkOS Authentication Flow**: Resolved critical authentication issues
@@ -305,7 +313,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Improved animation consistency across different devices
   - Reduced unnecessary re-renders in particle components
 
-## [2.8.1] - 2025-09-18
+## [2.8.1] - 2025-09-19
 
 ### Added
 - **Serverless Configuration**: Complete serverless deployment configuration and environment setup

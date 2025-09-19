@@ -3,62 +3,13 @@
 import { useEffect, useState } from 'react';
 import Logo from '@/components/ui/Logo';
 import ProfileDropdown from './ProfileDropdown';
-import { TrendingUp, Activity, DollarSign, Users, Signal, Star } from 'lucide-react';
+import NotificationDropdown from './NotificationDropdown';
+import { HEADER_BANNERS } from '@/config/header-banners';
 
 interface HeaderProps {
   className?: string;
 }
 
-const banners = [
-  {
-    id: 1,
-    icon: TrendingUp,
-    text: "BTC/USD: +5.2% | Live Trading Signal Active",
-    color: "text-green-400",
-    bgColor: "bg-green-500/10",
-    borderColor: "border-green-500/20"
-  },
-  {
-    id: 2,
-    icon: Activity,
-    text: "15 Active Trades | Average ROI: +12.8%",
-    color: "text-blue-400",
-    bgColor: "bg-blue-500/10",
-    borderColor: "border-blue-500/20"
-  },
-  {
-    id: 3,
-    icon: DollarSign,
-    text: "Portfolio Value: $24,567 | Daily Gain: +3.4%",
-    color: "text-yellow-400",
-    bgColor: "bg-yellow-500/10",
-    borderColor: "border-yellow-500/20"
-  },
-  {
-    id: 4,
-    icon: Users,
-    text: "1,247 Active Traders | Join Premium Signals",
-    color: "text-purple-400",
-    bgColor: "bg-purple-500/10",
-    borderColor: "border-purple-500/20"
-  },
-  {
-    id: 5,
-    icon: Signal,
-    text: "ETH/USD Signal: Strong Buy | Entry: $3,250",
-    color: "text-emerald-400",
-    bgColor: "bg-emerald-500/10",
-    borderColor: "border-emerald-500/20"
-  },
-  {
-    id: 6,
-    icon: Star,
-    text: "Premium Features: AI Predictions Available",
-    color: "text-orange-400",
-    bgColor: "bg-orange-500/10",
-    borderColor: "border-orange-500/20"
-  }
-];
 
 export default function Header({ className }: HeaderProps) {
   const [currentBanner, setCurrentBanner] = useState(0);
@@ -80,7 +31,7 @@ export default function Header({ className }: HeaderProps) {
 
           setTimeout(() => {
             // Move to next banner and restart cycle
-            setCurrentBanner((prev) => (prev + 1) % banners.length);
+            setCurrentBanner((prev) => (prev + 1) % HEADER_BANNERS.length);
             setAnimationPhase('entering');
           }, 1000);
         }, 5000);
@@ -99,7 +50,7 @@ export default function Header({ className }: HeaderProps) {
     };
   }, []);
 
-  const banner = banners[currentBanner];
+  const banner = HEADER_BANNERS[currentBanner];
   const Icon = banner.icon;
 
   const getAnimationClass = () => {
@@ -187,6 +138,16 @@ export default function Header({ className }: HeaderProps) {
               style={{
                 animationPlayState: isHovered ? 'paused' : 'running'
               }}
+              role="banner"
+              aria-live="polite"
+              aria-label={`Trading update: ${banner.text}`}
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  // Could add action here if needed
+                }
+              }}
             >
               <Icon className={`h-4 w-4 ${banner.color} flex-shrink-0`} />
               <span className={`text-xs sm:text-sm font-medium ${banner.color} whitespace-nowrap truncate max-w-xs sm:max-w-none`}>
@@ -196,8 +157,9 @@ export default function Header({ className }: HeaderProps) {
           </div>
         </div>
 
-        {/* Profile Section */}
-        <div className="flex items-center space-x-4 z-10">
+        {/* Notifications and Profile Section */}
+        <div className="flex items-center space-x-2 z-10">
+          <NotificationDropdown />
           <ProfileDropdown />
         </div>
       </header>
