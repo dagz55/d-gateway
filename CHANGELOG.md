@@ -5,6 +5,30 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.11.1] - 2025-09-20
+
+### Added
+- **🧭 Market Page Navigation**: Added professional navigation header to the market page
+  - Integrated consistent navigation structure matching the landing page design
+  - Added Logo component with gradient text styling for brand consistency
+  - Included navigation links: Home, Market (active state), Features, and About
+  - Added authentication buttons (Sign In, Get Started) with proper styling and hover effects
+  - Maintained responsive design with proper mobile navigation handling
+
+### Fixed
+- **🔧 Code Quality Improvements**: Enhanced code standards and Next.js best practices
+  - Replaced `<a>` tags with Next.js `<Link>` components for proper client-side routing
+  - Fixed ESLint warnings for no-html-link-for-pages violations
+  - Improved TypeScript imports and component organization
+  - Ensured proper accessibility and SEO compliance
+
+### Enhanced
+- **🎨 Design Consistency**: Strengthened visual cohesion across the platform
+  - Applied consistent background styling (`bg-black/20 backdrop-blur-sm border-b border-white/10`)
+  - Maintained Zignal brand color scheme and gradient patterns
+  - Preserved existing market page functionality while adding navigation layer
+  - Enhanced user experience with consistent navigation patterns
+
 ## [2.11.0] - 2025-09-20
 
 ### Fixed

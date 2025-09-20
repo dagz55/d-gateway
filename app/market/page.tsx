@@ -1,14 +1,16 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { 
-  TrendingUp, 
-  TrendingDown, 
-  Search, 
+import Logo from '@/components/ui/Logo';
+import {
+  TrendingUp,
+  TrendingDown,
+  Search,
   Star,
   StarOff,
   RefreshCw,
@@ -96,27 +98,65 @@ export default function MarketPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0A0F1F] via-[#1A1F35] to-[#0A0F1F] p-6">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-white mb-2">Cryptocurrency Market</h1>
-            <p className="text-white/70">
-              Live market data • Updated {lastUpdated ? lastUpdated.toLocaleTimeString() : 'Loading...'}
-            </p>
-          </div>
-          <div className="flex items-center gap-4">
-            <Button
-              onClick={refetch}
-              disabled={loading}
-              className="bg-[#33E1DA] hover:bg-[#33E1DA]/80 text-black"
-            >
-              <RefreshCw className={cn("w-4 h-4 mr-2", loading && "animate-spin")} />
-              Refresh
-            </Button>
+    <div className="min-h-screen bg-gradient-to-br from-[#0A0F1F] via-[#1A1F35] to-[#0A0F1F]">
+      {/* Navigation Header */}
+      <nav className="relative z-20 bg-black/20 backdrop-blur-sm border-b border-white/10">
+        <div className="max-w-7xl mx-auto px-4 py-4">
+          <div className="flex items-center justify-between">
+            {/* Logo */}
+            <div className="flex items-center">
+              <Logo size="lg" textClassName="gradient-text font-semibold" />
+            </div>
+
+            {/* Navigation Links */}
+            <div className="hidden md:flex items-center space-x-8">
+              <Link href="/" className="text-gray-300 hover:text-white transition-colors">Home</Link>
+              <Link href="/market" className="text-white font-medium">Market</Link>
+              <a href="#features" className="text-gray-300 hover:text-white transition-colors">Features</a>
+              <a href="#about" className="text-gray-300 hover:text-white transition-colors">About</a>
+            </div>
+
+            {/* Auth Buttons */}
+            <div className="flex items-center space-x-4">
+              <Link
+                href="/sign-in"
+                className="text-gray-300 hover:text-white font-medium transition-colors"
+              >
+                Sign In
+              </Link>
+              <Link
+                href="/sign-up"
+                className="bg-gradient-to-r from-[#0577DA] to-[#1199FA] hover:from-[#0466c4] hover:to-[#0e8ae6] text-white font-semibold px-6 py-2 rounded-lg transition-all duration-300"
+              >
+                Get Started
+              </Link>
+            </div>
           </div>
         </div>
+      </nav>
+
+      {/* Main Content */}
+      <div className="p-6">
+        <div className="max-w-7xl mx-auto">
+          {/* Page Header */}
+          <div className="flex items-center justify-between mb-8">
+            <div>
+              <h1 className="text-3xl font-bold text-white mb-2">Cryptocurrency Market</h1>
+              <p className="text-white/70">
+                Live market data • Updated {lastUpdated ? lastUpdated.toLocaleTimeString() : 'Loading...'}
+              </p>
+            </div>
+            <div className="flex items-center gap-4">
+              <Button
+                onClick={refetch}
+                disabled={loading}
+                className="bg-[#33E1DA] hover:bg-[#33E1DA]/80 text-black"
+              >
+                <RefreshCw className={cn("w-4 h-4 mr-2", loading && "animate-spin")} />
+                Refresh
+              </Button>
+            </div>
+          </div>
 
         {/* Controls */}
         <div className="flex flex-col sm:flex-row gap-4 mb-6">
@@ -410,12 +450,13 @@ export default function MarketPage() {
           </CardContent>
         </Card>
 
-        {/* Market Stats Footer */}
-        <div className="mt-6 text-center text-white/60 text-sm">
-          <p>Data provided by CoinGecko API • Updates every 30 seconds</p>
-          <p className="mt-1">
-            Showing {filteredData.length} of {cryptoData.length} cryptocurrencies
-          </p>
+          {/* Market Stats Footer */}
+          <div className="mt-6 text-center text-white/60 text-sm">
+            <p>Data provided by CoinGecko API • Updates every 30 seconds</p>
+            <p className="mt-1">
+              Showing {filteredData.length} of {cryptoData.length} cryptocurrencies
+            </p>
+          </div>
         </div>
       </div>
     </div>

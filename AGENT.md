@@ -567,6 +567,26 @@ npm ls @supabase/supabase-js
 - **WorkOS SDK**: Must be used server-side only (Node.js runtime)
 - **Token Rotation**: Requires client-side implementation for refresh
 
+## Recent Updates
+
+### v2.11.1 (2025-09-20)
+- **🧭 Market Page Navigation**: Added professional navigation header to `/market` page
+  - Integrated consistent navigation structure matching landing page design
+  - Added Logo component with gradient text styling for brand consistency
+  - Included navigation links (Home, Market, Features, About) with active states
+  - Added authentication buttons (Sign In, Get Started) with proper styling
+  - Maintained responsive design and mobile navigation handling
+  - Replaced `<a>` tags with Next.js `<Link>` components for proper routing
+  - Fixed ESLint warnings and improved code quality standards
+
+### v2.11.0 (2025-09-20)
+- **🔧 Code Quality & Performance**: Major bug fixes and optimizations
+  - Fixed invalid CSS utility directives and improved styling consistency
+  - Enhanced accessibility with proper ARIA attributes on all interactive elements
+  - Fixed React hydration mismatches and memory leaks in animation components
+  - Improved TypeScript typing and component organization
+  - Made animation counts configurable for better performance scaling
+
 ---
 
 This AGENT.md file provides comprehensive guidance for AI coding agents working on the Zignal project. Keep it updated as the project evolves.
