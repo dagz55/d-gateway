@@ -134,7 +134,7 @@ export async function POST(request: NextRequest) {
         avatar_url: avatarUrl,
         updated_at: new Date().toISOString(),
       })
-      .eq('email', user.email);
+      .eq('clerk_user_id', user.id);
 
     if (updateError) {
       throw new Error(`Failed to update profile: ${updateError.message}`);
@@ -164,7 +164,7 @@ export async function POST(request: NextRequest) {
 export async function DELETE() {
   try {
     // Check authentication
-    const user = await getCurrentUser();
+    const user = await currentUser();
     if (!user) {
       return NextResponse.json(
         { success: false, error: 'User not authenticated' },
@@ -198,7 +198,7 @@ export async function DELETE() {
         avatar_url: null,
         updated_at: new Date().toISOString(),
       })
-      .eq('email', user.email);
+      .eq('clerk_user_id', user.id);
 
     if (updateError) {
       throw new Error(`Failed to update profile: ${updateError.message}`);

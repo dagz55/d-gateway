@@ -1,128 +1,91 @@
 'use client';
 
-import { ChevronRight } from 'lucide-react';
-
-// Using config file for banners - fallback to demo data if config fails
-const promoBanners = [
-  {
-    id: 1,
-    title: "🚀 CRYPTO SIGNALS LIVE NOW!",
-    subtitle: "₿ BTC/ETH Signals • 95% Win Rate • Real-Time Alerts ₿",
-    cta: "⚡ GET PREMIUM SIGNALS NOW - LIMITED TIME! ⚡",
-    icon: "Bitcoin",
-    gradient: "from-[#f7931a] via-[#33E1DA] to-[#22c55e]",
-    accent: "#f7931a",
-    cryptoSymbol: "₿",
-    priceChange: "+12.5%",
-    isPositive: true
-  },
-  {
-    id: 2,
-    title: "💎 EXCLUSIVE TRADING PACKAGES",
-    subtitle: "🔥 Choose Your Duration: Daily • Weekly • Monthly 🔥",
-    cta: "💰 SAVE 40% ON YEARLY PLANS - ACT NOW! 💰",
-    icon: "Package",
-    gradient: "from-[#22c55e] via-[#33E1DA] to-[#8b5cf6]",
-    accent: "#22c55e",
-    cryptoSymbol: "⟠",
-    priceChange: "+8.7%",
-    isPositive: true
-  },
-  {
-    id: 3,
-    title: "🎯 MASTER CRYPTO TRADING",
-    subtitle: "📈 Expert Advisors • 24/7 Support • Proven Strategies 📈",
-    cta: "🔥 BOOK FREE CONSULTATION - 50 SPOTS LEFT! 🔥",
-    icon: "BarChart3",
-    gradient: "from-[#1A7FB3] via-[#33E1DA] to-[#f7931a]",
-    accent: "#1A7FB3",
-    cryptoSymbol: "◊",
-    priceChange: "+15.2%",
-    isPositive: true
-  }
-];
+import { useState, useEffect } from 'react';
 
 export function PromotionalBanner() {
+  const [currentSlide, setCurrentSlide] = useState(0);
+
+  const banners = [
+    {
+      title: "🎉 New User Bonus: $50 in BTC",
+      description: "Sign up today and get $50 worth of Bitcoin when you make your first trade",
+      cta: "Claim Bonus",
+      bgGradient: "from-green-500/20 to-emerald-500/20",
+      borderColor: "border-green-500/30"
+    },
+    {
+      title: "⚡ Zero Trading Fees",
+      description: "Trade Bitcoin, Ethereum, and 400+ cryptos with zero fees for the first 30 days",
+      cta: "Start Trading",
+      bgGradient: "from-blue-500/20 to-cyan-500/20",
+      borderColor: "border-blue-500/30"
+    },
+    {
+      title: "🚀 Advanced Trading Tools",
+      description: "Access professional-grade charts, signals, and automated trading strategies",
+      cta: "Explore Tools",
+      bgGradient: "from-purple-500/20 to-pink-500/20",
+      borderColor: "border-purple-500/30"
+    }
+  ];
+
+  // Auto-rotate banners
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % banners.length);
+    }, 5000);
+
+    return () => clearInterval(timer);
+  }, [banners.length]);
+
+  const currentBanner = banners[currentSlide];
+
   return (
-    <div className="relative w-full bg-gradient-to-r from-[#000000] via-[#0a0f1f] to-[#000000] border-b-2 border-[#f7931a] overflow-hidden shadow-lg">
-      {/* Subtle Background */}
-      <div className="absolute inset-0">
-        {/* Gentle Bitcoin Orange Glow */}
-        <div className="absolute inset-0 bg-gradient-to-r from-[#f7931a]/10 via-transparent to-[#f7931a]/10" />
-
-        {/* Simple Crypto Symbols */}
-        <div className="absolute inset-0 overflow-hidden">
-          {['₿', '⟠', '◊'].map((symbol, i) => (
-            <div
-              key={`bg-crypto-${i}`}
-              className="absolute text-[#f7931a]/5 font-bold text-4xl"
-              style={{
-                left: `${20 + i * 30}%`,
-                top: `${30 + i * 20}%`,
-              }}
-            >
-              {symbol}
+    <div className="relative overflow-hidden">
+      {/* Banner */}
+      <div className={`bg-gradient-to-r ${currentBanner.bgGradient} border-b ${currentBanner.borderColor} transition-all duration-500`}>
+        <div className="max-w-7xl mx-auto px-4 py-3">
+          <div className="flex items-center justify-center space-x-4">
+            <div className="flex-1 text-center">
+              <h3 className="text-white font-semibold text-sm md:text-base">
+                {currentBanner.title}
+              </h3>
+              <p className="text-gray-300 text-xs md:text-sm mt-1">
+                {currentBanner.description}
+              </p>
             </div>
-          ))}
+            <button className="bg-[#0577DA] hover:bg-[#0466c4] text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors flex-shrink-0">
+              {currentBanner.cta}
+            </button>
+          </div>
         </div>
       </div>
 
-      {/* Simple top border */}
-      <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#f7931a] to-[#33E1DA]" />
-
-      {/* Scrolling Banner Content */}
-      <div className="relative py-4">
-        <div className="flex animate-scroll-right-to-left">
-          {/* Repeat the banners to create seamless scrolling */}
-          {[...promoBanners, ...promoBanners].map((banner, index) => {
-            const IconComponent = banner.icon;
-            return (
-              <div key={`banner-${index}`} className="flex items-center min-w-max px-8 space-x-4">
-                {/* Icon */}
-                <div className={`p-2 rounded-lg bg-gradient-to-br ${banner.gradient} shadow-lg`}>
-                  <IconComponent className="w-6 h-6 text-white" />
-                </div>
-
-                {/* Content */}
-                <div className="flex items-center space-x-6">
-                  <div>
-                    <h3 className="text-white font-bold text-lg">
-                      {banner.title}
-                    </h3>
-                    <p className="text-[#33E1DA] text-sm">
-                      {banner.subtitle}
-                    </p>
-                  </div>
-
-                  {/* CTA */}
-                  <div className="text-[#f7931a] font-bold text-sm">
-                    {banner.cta}
-                  </div>
-
-                  {/* Price Display */}
-                  <div className="flex items-center space-x-2">
-                    <span className="text-2xl text-[#f7931a]">
-                      {banner.cryptoSymbol}
-                    </span>
-                    <span className="text-[#22c55e] text-sm font-mono">
-                      {banner.priceChange}
-                    </span>
-                  </div>
-
-                  {/* Live indicator */}
-                  <div className="flex items-center space-x-1">
-                    <div className="w-2 h-2 bg-[#22c55e] rounded-full animate-pulse" />
-                    <span className="text-[#22c55e] text-xs font-mono">LIVE</span>
-                  </div>
-                </div>
-
-                {/* Separator */}
-                <div className="w-px h-8 bg-white/20 mx-4" />
-              </div>
-            );
-          })}
-        </div>
+      {/* Slide indicators */}
+      <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 flex space-x-2 pb-2">
+        {banners.map((_, index) => (
+          <button
+            key={index}
+            onClick={() => setCurrentSlide(index)}
+            className={`w-2 h-2 rounded-full transition-all duration-300 ${
+              index === currentSlide
+                ? 'bg-[#0577DA] w-6'
+                : 'bg-white/30 hover:bg-white/50'
+            }`}
+            aria-label={`Go to slide ${index + 1}`}
+          />
+        ))}
       </div>
+
+      {/* Close button */}
+      <button
+        className="absolute top-2 right-2 text-white/60 hover:text-white transition-colors"
+        aria-label="Close banner"
+      >
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+      </button>
     </div>
   );
 }

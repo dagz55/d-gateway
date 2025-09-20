@@ -41,7 +41,7 @@ const landingSections: LandingSection[] = [
     type: 'hero',
     title: 'Transform Your Crypto Trading',
     subtitle: 'Professional signals made simple',
-    content: 'Experience risk-free trading with our expertly crafted cryptocurrency signals. Join thousands of traders who trust Zignal for profitable decisions.',
+    content: 'Experience risk-free trading with our expertly crafted cryptocurrency signals. Join thousands of traders who trust <img src="/zignal-logo.png" alt="Zignal" className="inline h-6 w-auto" /> for profitable decisions.',
     background: 'interactive'
   },
   {

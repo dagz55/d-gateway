@@ -388,8 +388,24 @@ Zignal is deployed as a serverless application on Vercel with edge-compatible fu
 - `https://zignals.org/api/admin/security/alerts` - Security monitoring
 
 ### Environment Configuration
+
+For production deployment, use the secure environment setup:
+
 ```bash
-# Production Environment Variables
+# 1. Copy the environment template
+cp env.production.example .env.production
+
+# 2. Fill in your actual credentials in .env.production
+# 3. Run the Vercel setup script to configure environment variables
+./vercel-setup.sh
+
+# 4. Verify deployment works with new credentials
+```
+
+**Important**: Never commit actual secrets to version control. Use the provided templates and scripts for secure deployment.
+
+Production Environment Variables:
+```bash
 AUTH_SERVICE_MODE=serverless
 EDGE_COMPATIBLE=true
 SERVERLESS_FUNCTIONS_URL=https://zignals.org/api
