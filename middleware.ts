@@ -12,21 +12,20 @@ const isPublicRoute = createRouteMatcher([
 
 // Define admin routes that require admin role
 const isAdminRoute = createRouteMatcher([
-  "/admin(.*)", // Legacy admin routes
-  "/dashboard/admins(.*)", // New admin dashboard structure
+  "/dashboard/admins(.*)", // Admin dashboard structure
   "/api/admin(.*)",
 ]);
 
 // Define member routes
 const isMemberRoute = createRouteMatcher([
-  "/member(.*)", // Legacy member routes
-  "/dashboard/members(.*)", // New member dashboard structure
+  "/dashboard/members(.*)", // Member dashboard structure
 ]);
 
 // Define legacy dashboard routes that need to be redirected
 const isLegacyDashboardRoute = createRouteMatcher([
   "/dashboard$", // Exact match for /dashboard only
 ]);
+
 
 // Define dashboard routes that are accessible directly
 const isDashboardRoute = createRouteMatcher([
@@ -126,10 +125,6 @@ export default clerkMiddleware(async (auth, req) => {
           }
           return NextResponse.redirect(new URL("/dashboard/members", req.url));
         }
-      }
-      // Redirect from legacy admin routes to new admin dashboard for authenticated admins
-      if ((req.nextUrl.pathname === "/admin" || req.nextUrl.pathname === "/dashboard/admins") && isUserAdmin) {
-        return NextResponse.redirect(new URL("/dashboard/admins", req.url));
       }
     }
 

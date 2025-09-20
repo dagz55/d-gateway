@@ -59,15 +59,13 @@ export default async function MemberDashboardPage() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Portfolio Value</CardTitle>
-            <StatusDot status="success" />
+            <StatusDot status="neutral" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">$45,238.90</div>
-            <p className="text-xs text-muted-foreground mt-1">+20.1% from last month</p>
-            <div className="h-20 mt-3">
-              <Spark
-                data={[35000, 38000, 36000, 40000, 42000, 41000, 45238.90]}
-              />
+            <div className="text-2xl font-bold">$0.00</div>
+            <p className="text-xs text-muted-foreground mt-1">Connect your trading account to view portfolio</p>
+            <div className="h-20 mt-3 flex items-center justify-center">
+              <p className="text-xs text-muted-foreground">No data available</p>
             </div>
           </CardContent>
         </Card>
@@ -75,15 +73,13 @@ export default async function MemberDashboardPage() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Today's Profit</CardTitle>
-            <StatusDot status="success" />
+            <StatusDot status="neutral" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">+$2,489.32</div>
-            <p className="text-xs text-muted-foreground mt-1">+5.8% gain</p>
-            <div className="h-20 mt-3">
-              <Spark
-                data={[-200, 400, 800, 600, 1200, 1800, 2489.32]}
-              />
+            <div className="text-2xl font-bold">$0.00</div>
+            <p className="text-xs text-muted-foreground mt-1">Start trading to track profits</p>
+            <div className="h-20 mt-3 flex items-center justify-center">
+              <p className="text-xs text-muted-foreground">No data available</p>
             </div>
           </CardContent>
         </Card>
@@ -91,15 +87,13 @@ export default async function MemberDashboardPage() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Win Rate</CardTitle>
-            <StatusDot status="success" />
+            <StatusDot status="neutral" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">72.4%</div>
-            <p className="text-xs text-muted-foreground mt-1">29 of 40 trades</p>
-            <div className="h-20 mt-3">
-              <Spark
-                data={[65, 68, 70, 69, 71, 70, 72.4]}
-              />
+            <div className="text-2xl font-bold">--</div>
+            <p className="text-xs text-muted-foreground mt-1">No trades completed yet</p>
+            <div className="h-20 mt-3 flex items-center justify-center">
+              <p className="text-xs text-muted-foreground">No data available</p>
             </div>
           </CardContent>
         </Card>
@@ -107,15 +101,13 @@ export default async function MemberDashboardPage() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Active Signals</CardTitle>
-            <StatusDot status="success" />
+            <StatusDot status="neutral" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">8</div>
-            <p className="text-xs text-muted-foreground mt-1">3 pending execution</p>
-            <div className="h-20 mt-3">
-              <Spark
-                data={[5, 6, 7, 6, 8, 9, 8]}
-              />
+            <div className="text-2xl font-bold">0</div>
+            <p className="text-xs text-muted-foreground mt-1">Subscribe to receive signals</p>
+            <div className="h-20 mt-3 flex items-center justify-center">
+              <p className="text-xs text-muted-foreground">No data available</p>
             </div>
           </CardContent>
         </Card>
@@ -146,25 +138,9 @@ export default async function MemberDashboardPage() {
               <CardTitle className="text-lg">Top Performer</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-r from-green-500 to-emerald-500 flex items-center justify-center text-white font-bold">
-                    E
-                  </div>
-                  <div>
-                    <p className="font-semibold">ETH/USDT</p>
-                    <p className="text-sm text-muted-foreground">Ethereum</p>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <p className="font-bold text-green-500">+18.4%</p>
-                  <p className="text-sm text-muted-foreground">$492.85</p>
-                </div>
-              </div>
-              <div className="h-32">
-                <Spark
-                  data={[2400, 2450, 2480, 2600, 2750, 2820, 2842]}
-                />
+              <div className="text-center py-8">
+                <p className="text-muted-foreground mb-2">No trading data available</p>
+                <p className="text-sm text-muted-foreground">Connect your trading account to view performance</p>
               </div>
             </CardContent>
           </Card>
@@ -175,26 +151,10 @@ export default async function MemberDashboardPage() {
               <CardTitle className="text-lg">Recent Signals</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
-              {[
-                { pair: 'BTC/USDT', action: 'BUY', price: '67,432', time: '2 min ago' },
-                { pair: 'SOL/USDT', action: 'SELL', price: '142.85', time: '15 min ago' },
-                { pair: 'AVAX/USDT', action: 'BUY', price: '38.92', time: '1 hour ago' },
-              ].map((signal, i) => (
-                <div key={i} className="flex items-center justify-between p-3 rounded-lg bg-card border border-border">
-                  <div className="flex items-center space-x-3">
-                    <div className={`px-2 py-1 rounded text-xs font-semibold ${
-                      signal.action === 'BUY' ? 'bg-green-500/20 text-green-500' : 'bg-red-500/20 text-red-500'
-                    }`}>
-                      {signal.action}
-                    </div>
-                    <div>
-                      <p className="font-semibold text-sm">{signal.pair}</p>
-                      <p className="text-xs text-muted-foreground">{signal.time}</p>
-                    </div>
-                  </div>
-                  <p className="text-sm font-mono">${signal.price}</p>
-                </div>
-              ))}
+              <div className="text-center py-8">
+                <p className="text-muted-foreground mb-2">No signals available</p>
+                <p className="text-sm text-muted-foreground">Subscribe to our premium plans to receive trading signals</p>
+              </div>
             </CardContent>
           </Card>
         </div>
