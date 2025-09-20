@@ -17,6 +17,7 @@ export function AuthCard() {
   const [showEmailForm, setShowEmailForm] = useState(false)
   const [isSignUp, setIsSignUp] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [formData, setFormData] = useState({
@@ -261,16 +262,32 @@ export function AuthCard() {
                   <Label htmlFor="confirmPassword" className="text-[#EAF2FF]">
                     Confirm Password
                   </Label>
-                  <Input
-                    id="confirmPassword"
-                    type="password"
-                    placeholder="Confirm your password"
-                    value={formData.confirmPassword}
-                    onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-                    required
-                    disabled={!isSupabaseConfigured}
-                    className="bg-[#1E2A44]/50 border-[#33E1DA]/30 text-[#EAF2FF] placeholder:text-[#EAF2FF]/50 focus:border-[#33E1DA] focus:ring-[#33E1DA] disabled:opacity-50"
-                  />
+                  <div className="relative">
+                    <Input
+                      id="confirmPassword"
+                      type={showConfirmPassword ? "text" : "password"}
+                      placeholder="Confirm your password"
+                      value={formData.confirmPassword}
+                      onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+                      required
+                      disabled={!isSupabaseConfigured}
+                      className="bg-[#1E2A44]/50 border-[#33E1DA]/30 text-[#EAF2FF] placeholder:text-[#EAF2FF]/50 focus:border-[#33E1DA] focus:ring-[#33E1DA] pr-10 disabled:opacity-50"
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      disabled={!isSupabaseConfigured}
+                    >
+                      {showConfirmPassword ? (
+                        <EyeOff className="h-4 w-4 text-[#EAF2FF]/50" />
+                      ) : (
+                        <Eye className="h-4 w-4 text-[#EAF2FF]/50" />
+                      )}
+                    </Button>
+                  </div>
                 </div>
               )}
 

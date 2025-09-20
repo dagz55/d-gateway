@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import Logo from '@/components/ui/Logo';
 import { LiveSignalsChart } from './LiveSignalsChart';
-import { LoginPanel } from './LoginPanel';
 import { PromotionalBanner } from './PromotionalBanner';
 import { PriceConverter } from './PriceConverter';
 import { CryptoPriceCard } from './CryptoPriceCard';
@@ -21,7 +20,43 @@ export function LandingContent() {
 
   return (
     <div className="relative z-10 flex-1 flex flex-col bg-[#061121] min-h-screen">
-      {/* Promotional Banner at the top */}
+      {/* Navigation Header */}
+      <nav className="relative z-20 bg-black/20 backdrop-blur-sm border-b border-white/10">
+        <div className="max-w-7xl mx-auto px-4 py-4">
+          <div className="flex items-center justify-between">
+            {/* Logo */}
+            <div className="flex items-center">
+              <Logo size="lg" textClassName="gradient-text font-semibold" />
+            </div>
+
+            {/* Navigation Links */}
+            <div className="hidden md:flex items-center space-x-8">
+              <a href="#features" className="text-gray-300 hover:text-white transition-colors">Features</a>
+              <a href="#pricing" className="text-gray-300 hover:text-white transition-colors">Pricing</a>
+              <a href="#about" className="text-gray-300 hover:text-white transition-colors">About</a>
+              <a href="#support" className="text-gray-300 hover:text-white transition-colors">Support</a>
+            </div>
+
+            {/* Auth Buttons */}
+            <div className="flex items-center space-x-4">
+              <a
+                href="/sign-in"
+                className="text-gray-300 hover:text-white font-medium transition-colors"
+              >
+                Sign In
+              </a>
+              <a
+                href="/sign-up"
+                className="bg-gradient-to-r from-[#0577DA] to-[#1199FA] hover:from-[#0466c4] hover:to-[#0e8ae6] text-white font-semibold px-6 py-2 rounded-lg transition-all duration-300"
+              >
+                Get Started
+              </a>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      {/* Promotional Banner */}
       <PromotionalBanner />
 
       {/* Hero Section */}
@@ -38,15 +73,13 @@ export function LandingContent() {
               <div className="space-y-8">
                 <div className="text-center lg:text-left">
                   <h1 className="text-5xl lg:text-7xl font-bold text-white mb-6 leading-tight">
-                    <span className="bg-gradient-to-r from-[#0577DA] to-[#1199FA] bg-clip-text text-transparent">
-                      Zignal
-                    </span>
-                    <br />
-                    <span className="text-white">Advanced Trading</span>
+                    <span className="text-white">Professional</span>
                     <br />
                     <span className="bg-gradient-to-r from-[#0577DA] to-[#1199FA] bg-clip-text text-transparent">
-                      Tools
+                      Crypto Trading
                     </span>
+                    <br />
+                    <span className="text-white">Signals</span>
                   </h1>
                   <p className="text-xl text-gray-300 mb-8 leading-relaxed">
                     Access professional-grade charts, signals, and automated trading tools. Trade the future with confidence.
@@ -57,10 +90,66 @@ export function LandingContent() {
                 <FeatureHighlights />
               </div>
 
-              {/* Right side - Login panel */}
+              {/* Right side - Call to Action */}
               <div className="flex justify-center lg:justify-end">
-                <div className="w-full max-w-md">
-                  <LoginPanel />
+                <div className="w-full max-w-md space-y-6">
+                  {/* Trading Dashboard Preview */}
+                  <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10">
+                    <h3 className="text-white font-semibold mb-4">Start Trading Today</h3>
+                    <p className="text-gray-300 text-sm mb-6">
+                      Join thousands of traders using Zignal's professional signals and analytics.
+                    </p>
+
+                    {/* Action Buttons */}
+                    <div className="space-y-3">
+                      <a
+                        href="/sign-up"
+                        className="w-full bg-gradient-to-r from-[#0577DA] to-[#1199FA] hover:from-[#0466c4] hover:to-[#0e8ae6] text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300 flex items-center justify-center group"
+                      >
+                        Get Started Free
+                        <svg className="w-5 h-5 ml-2 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                        </svg>
+                      </a>
+
+                      <a
+                        href="/sign-in"
+                        className="w-full bg-white/10 hover:bg-white/20 text-white font-medium py-3 px-6 rounded-lg transition-all duration-300 flex items-center justify-center border border-white/20"
+                      >
+                        Sign In
+                      </a>
+                    </div>
+
+                    {/* Features List */}
+                    <div className="mt-6 pt-6 border-t border-white/10">
+                      <ul className="space-y-2 text-sm text-gray-300">
+                        <li className="flex items-center">
+                          <svg className="w-4 h-4 text-green-400 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                          </svg>
+                          Real-time trading signals
+                        </li>
+                        <li className="flex items-center">
+                          <svg className="w-4 h-4 text-green-400 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                          </svg>
+                          Advanced charting tools
+                        </li>
+                        <li className="flex items-center">
+                          <svg className="w-4 h-4 text-green-400 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                          </svg>
+                          Portfolio analytics
+                        </li>
+                        <li className="flex items-center">
+                          <svg className="w-4 h-4 text-green-400 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                          </svg>
+                          24/7 market analysis
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -105,9 +194,7 @@ export function LandingContent() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
             {/* Company Info */}
             <div className="lg:col-span-2">
-              <div className="flex items-center mb-4">
-                <Logo size="lg" textClassName="gradient-text font-semibold" />
-              </div>
+              <h3 className="text-white font-semibold mb-4">Zignal</h3>
               <p className="text-gray-400 mb-4">
                 Your gateway to professional cryptocurrency trading signals and market analysis.
               </p>
