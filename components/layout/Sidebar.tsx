@@ -190,6 +190,7 @@ export default function Sidebar({ className }: SidebarProps) {
               <Logo
                 size={isCollapsed ? 'sm' : 'md'}
                 showText={false} // Never show text, logo only
+                asLink={false} // Disable link in sidebar since we're already in dashboard
               />
             </div>
             

@@ -9,7 +9,7 @@ export function ZignalLanding() {
     <div
       className="min-h-screen flex flex-col relative bg-cover bg-center bg-no-repeat"
       style={{
-        backgroundImage: 'url(/login_background_wallpaper_zignals04.png)',
+        backgroundImage: 'url(/zignals_login_wallpaper.png)',
         backgroundBlendMode: 'overlay',
         backgroundColor: 'rgba(0, 0, 0, 0.3)'
       }}

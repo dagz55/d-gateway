@@ -105,7 +105,7 @@ export default function MarketPage() {
           <div className="flex items-center justify-between">
             {/* Logo */}
             <div className="flex items-center">
-              <Logo size="lg" textClassName="gradient-text font-semibold" />
+              <Logo size="lg" textClassName="gradient-text font-semibold" enableAnimations={true} />
             </div>
 
             {/* Navigation Links */}
