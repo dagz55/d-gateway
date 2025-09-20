@@ -8,6 +8,8 @@ interface LogoProps {
   size?: 'sm' | 'md' | 'lg' | 'xl';
   showText?: boolean;
   textClassName?: string;
+  label?: string;
+  variant?: 'default' | 'dark' | 'high-quality';
 }
 
 const sizeMap = {
@@ -24,19 +26,28 @@ const textSizeClasses = {
   xl: 'text-2xl'
 };
 
-export default function Logo({ 
-  className, 
-  size = 'md', 
-  showText = true, 
-  textClassName 
+const logoVariants = {
+  default: '/zignal_logo.png',
+  dark: '/zignal-dark.png',
+  'high-quality': '/zignal-highquality.png',
+};
+
+export default function Logo({
+  className,
+  size = 'md',
+  showText = true,
+  textClassName,
+  label = 'Zignal',
+  variant = 'default',
 }: LogoProps) {
   const { width, height } = sizeMap[size];
+  const logoSrc = logoVariants[variant];
 
   return (
     <div className={cn("flex items-center space-x-2", className)}>
       <div className="relative">
         <Image 
-          src="/zignal_logo.png"
+          src={logoSrc}
           alt="Zignal Logo"
           width={width}
           height={height}
@@ -46,11 +57,11 @@ export default function Logo({
       </div>
       {showText && (
         <h2 className={cn(
-          "font-semibold text-foreground",
+          "font-semibold",
           textSizeClasses[size],
-          textClassName
+          textClassName ?? "text-foreground"
         )}>
-          Zignal
+          {label}
         </h2>
       )}
     </div>

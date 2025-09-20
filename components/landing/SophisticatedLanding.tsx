@@ -39,9 +39,9 @@ const landingSections: LandingSection[] = [
   {
     id: 'hero',
     type: 'hero',
-    title: 'Transform Your Crypto Trading',
-    subtitle: 'Professional signals made simple',
-    content: 'Experience risk-free trading with our expertly crafted cryptocurrency signals. Join thousands of traders who trust <img src="/zignal-logo.png" alt="Zignal" className="inline h-6 w-auto" /> for profitable decisions.',
+    title: 'Zignal - Advanced Trading Signals',
+    subtitle: 'Turn Pro Signals into Clear Actions',
+    content: 'Access professional-grade trading signals, market analysis, and automated trading tools trusted by traders worldwide.',
     background: 'interactive'
   },
   {
@@ -147,10 +147,10 @@ function HeroSection() {
   const prefersReducedMotion = useReducedMotion()
   
   const morphingTexts = [
-    'Professional Trading Signals',
-    'Expert Market Analysis', 
-    'Profitable Crypto Strategies',
-    'Risk-Free Trading Solutions'
+    'Turn Pro Signals into Clear Actions',
+    'Advanced Trading Analytics Platform',
+    'Professional-Grade Market Insights',
+    'Smart Trading Made Simple'
   ]
 
   return (
@@ -182,7 +182,7 @@ function HeroSection() {
           delay={100}
           duration={800}
         >
-          Transform Your Crypto Trading
+          Zignal - Advanced Trading Signals
         </FadeInStagger>
 
         {/* Morphing subtitle */}
@@ -195,32 +195,53 @@ function HeroSection() {
         </div>
 
         {/* Description with typewriter effect */}
-        <div className="mb-12">
+        <div className="mb-8">
           <Typewriter
-            text="Experience risk-free trading with expertly crafted cryptocurrency signals. Join thousands who trust Zignal for profitable decisions."
+            text="Access professional-grade trading signals, market analysis, and automated trading tools trusted by traders worldwide."
             speed={30}
             className="text-xl lg:text-2xl text-white/95 max-w-4xl mx-auto"
             showCursor={false}
           />
         </div>
 
+        {/* Trust indicators */}
+        <SlideIn direction="up" delay={1500} className="mb-12">
+          <div className="flex flex-wrap justify-center items-center gap-8 text-white/70 text-sm">
+            <div className="flex items-center gap-2">
+              <Shield className="w-4 h-4 text-[#33E1DA]" />
+              <span>SEC Regulated</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Star className="w-4 h-4 text-[#F7931A]" />
+              <span>4.9/5 Rating</span>
+            </div>
+          </div>
+        </SlideIn>
+
         {/* CTA buttons */}
         <SlideIn direction="up" delay={2000} className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-          <button className="group relative px-8 py-4 bg-gradient-to-r from-[#33E1DA] to-[#1A7FB3] text-[#0A0F1F] font-semibold text-lg rounded-xl hover:scale-105 transition-all duration-300 overflow-hidden">
+          <button className="group relative px-10 py-5 bg-gradient-to-r from-[#33E1DA] to-[#1A7FB3] text-[#0A0F1F] font-bold text-xl rounded-xl hover:scale-105 transition-all duration-300 overflow-hidden shadow-lg shadow-[#33E1DA]/25">
             <span className="relative z-10 flex items-center gap-2">
-              Start Trading Now
-              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              Get Started Free
+              <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
             </span>
             <div className="absolute inset-0 bg-gradient-to-r from-[#1A7FB3] to-[#33E1DA] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
           </button>
           
-          <button className="px-8 py-4 border-2 border-[#33E1DA] text-[#33E1DA] font-semibold text-lg rounded-xl hover:bg-[#33E1DA] hover:text-[#0A0F1F] transition-all duration-300">
-            View Demo
+          <button className="px-10 py-5 border-2 border-[#33E1DA] text-[#33E1DA] font-bold text-xl rounded-xl hover:bg-[#33E1DA] hover:text-[#0A0F1F] transition-all duration-300 backdrop-blur-sm bg-white/5">
+            Watch Demo
           </button>
         </SlideIn>
 
+        {/* Additional value proposition */}
+        <SlideIn direction="up" delay={2500} className="mt-8">
+          <p className="text-white/60 text-sm">
+            No credit card required • Start with $0 • Cancel anytime
+          </p>
+        </SlideIn>
+
         {/* Scroll indicator */}
-        <SlideIn direction="up" delay={3000} className="absolute bottom-8 left-1/2 transform -translate-x-1/2">
+        <SlideIn direction="up" delay={3500} className="absolute bottom-8 left-1/2 transform -translate-x-1/2">
           <div className="flex flex-col items-center text-[#EAF2FF]/60">
             <span className="text-sm mb-2">Scroll to explore</span>
             <ChevronDown className="w-6 h-6 animate-bounce" />

@@ -3,6 +3,7 @@
 import { useState } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
+import Logo from "@/components/ui/Logo"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -158,7 +159,7 @@ export default function SignUpPage() {
                 transition={{ delay: 0.2, duration: 0.6, ease: "easeOut" }}
               >
                 <div className="w-16 h-16 bg-gradient-to-br from-[#33E1DA] to-[#00B4A6] rounded-full flex items-center justify-center shadow-lg ring-4 ring-[#33E1DA]/20">
-                  <span className="text-2xl font-bold text-white">Z</span>
+                  <Logo size="lg" showText={false} />
                 </div>
               </motion.div>
               

@@ -526,8 +526,8 @@ npm ls @supabase/supabase-js
 ## Additional Notes
 
 ### Logo Assets
-- **SVG**: `public/zignal-logo.svg` - High-quality vector logo
-- **PNG**: `public/zignal-logo.png` - Raster logo for compatibility
+- **Icon**: `public/zignal-icon.svg` - Transparent mark for UI components
+- **Wordmark**: `public/zignal-logo.svg` - High-quality horizontal logo
 - **Favicon**: `public/favicon.ico` - Browser tab icon
 
 ### Brand Colors

@@ -1,6 +1,7 @@
 'use client';
 
 import { FunctionalLanding } from "@/components/landing/FunctionalLanding";
+import Logo from "@/components/ui/Logo"
 import Link from "next/link"
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
@@ -17,9 +18,7 @@ function EnhancedUIShowcase() {
         <div className="container mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-accent to-primary flex items-center justify-center">
-                <span className="text-lg font-bold text-accent-foreground">Z</span>
-              </div>
+              <Logo size="md" showText={false} />
               <h1 className="text-2xl font-bold gradient-text">Zignal</h1>
             </div>
             <nav className="hidden md:flex items-center space-x-6">
@@ -285,9 +284,7 @@ function EnhancedUIShowcase() {
         <div className="container mx-auto px-6">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="flex items-center space-x-3 mb-4 md:mb-0">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-accent to-primary flex items-center justify-center">
-                <span className="text-sm font-bold text-accent-foreground">Z</span>
-              </div>
+              <Logo size="sm" showText={false} />
               <span className="text-lg font-semibold gradient-text">Zignal</span>
             </div>
             <div className="flex items-center space-x-6 text-sm text-tertiary">

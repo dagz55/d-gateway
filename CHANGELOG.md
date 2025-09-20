@@ -21,6 +21,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Updated `SophisticatedLanding.tsx` hero section with logo image
   - Logo properly sized and positioned using CSS classes
   - Maintains professional appearance with gradient Z design and visual elements
+  - Added reusable SVG logo component for consistent branding across the app shell
+  - Updated dashboard header, sidebar, and auth screens to render the new icon
+  - Refreshed metadata icons and enhanced UI showcase footer with the latest logo
 
 ### Components Created
 - **LandingContent.tsx**: Main landing page with crypto.com theme styling

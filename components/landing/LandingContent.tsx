@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Logo from '@/components/ui/Logo';
 import { LiveSignalsChart } from './LiveSignalsChart';
 import { LoginPanel } from './LoginPanel';
 import { PromotionalBanner } from './PromotionalBanner';
@@ -37,19 +38,18 @@ export function LandingContent() {
               <div className="space-y-8">
                 <div className="text-center lg:text-left">
                   <h1 className="text-5xl lg:text-7xl font-bold text-white mb-6 leading-tight">
-                    America's{' '}
                     <span className="bg-gradient-to-r from-[#0577DA] to-[#1199FA] bg-clip-text text-transparent">
-                      Premier
+                      Zignal
                     </span>
                     <br />
-                    <span className="text-white">Crypto Trading</span>
+                    <span className="text-white">Advanced Trading</span>
                     <br />
                     <span className="bg-gradient-to-r from-[#0577DA] to-[#1199FA] bg-clip-text text-transparent">
-                      Platform
+                      Tools
                     </span>
                   </h1>
                   <p className="text-xl text-gray-300 mb-8 leading-relaxed">
-                    Join over 150 million users worldwide who trust our platform for secure, fast, and reliable cryptocurrency trading.
+                    Access professional-grade charts, signals, and automated trading tools. Trade the future with confidence.
                   </p>
                 </div>
 
@@ -106,10 +106,7 @@ export function LandingContent() {
             {/* Company Info */}
             <div className="lg:col-span-2">
               <div className="flex items-center mb-4">
-                <div className="w-8 h-8 bg-[#0577DA] rounded-lg mr-3 flex items-center justify-center">
-                  <span className="text-white font-bold text-sm">Z</span>
-                </div>
-                <img src="/zignal-logo.png" alt="Zignal" className="h-8 w-auto" />
+                <Logo size="lg" textClassName="gradient-text font-semibold" />
               </div>
               <p className="text-gray-400 mb-4">
                 Your gateway to professional cryptocurrency trading signals and market analysis.

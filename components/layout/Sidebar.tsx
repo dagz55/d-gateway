@@ -1,6 +1,7 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
+import Logo from '@/components/ui/Logo';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 import {
@@ -156,13 +157,12 @@ export default function Sidebar({ className }: SidebarProps) {
             "flex h-16 items-center border-b border-border transition-all duration-300",
             isCollapsed ? "justify-center px-2" : "justify-between px-6"
           )}>
-            <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-accent to-primary flex items-center justify-center">
-                <span className="text-sm font-bold text-white">Z</span>
-              </div>
-              {!isCollapsed && (
-                <h1 className="text-xl font-bold gradient-text">Zignal</h1>
-              )}
+            <div className="flex items-center">
+              <Logo
+                size={isCollapsed ? 'sm' : 'md'}
+                showText={!isCollapsed}
+                textClassName="gradient-text font-bold"
+              />
             </div>
             
             {/* Collapse/Expand button - Desktop only */}

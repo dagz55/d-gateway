@@ -119,9 +119,7 @@ export default function Header({ className }: HeaderProps) {
         {/* Logo Section */}
         <div className="flex items-center md:ml-0 ml-16 z-10">
           <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-accent to-primary flex items-center justify-center">
-              <span className="text-sm font-bold text-white">Z</span>
-            </div>
+            <Logo size="md" showText={false} />
             <h1 className="text-xl font-bold gradient-text hidden sm:block">Zignal Dashboard</h1>
           </div>
         </div>

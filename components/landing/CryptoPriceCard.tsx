@@ -12,19 +12,30 @@ interface CryptoPriceCardProps {
 
 export function CryptoPriceCard({ symbol, name, price, change, marketCap }: CryptoPriceCardProps) {
   const [isHovered, setIsHovered] = useState(false);
+  const [chartData, setChartData] = useState<number[]>([]);
+  const [mounted, setMounted] = useState(false);
 
   // Generate a simple mock chart data
-  const generateMockChart = () => {
+  const generateMockChart = (seed: string) => {
     const points = [];
     const baseValue = 50;
+    // Use symbol as seed for consistent data
+    let seedValue = 0;
+    for (let i = 0; i < seed.length; i++) {
+      seedValue += seed.charCodeAt(i);
+    }
+
     for (let i = 0; i < 24; i++) {
-      const variation = Math.sin(i * 0.5) * 10 + Math.random() * 5;
+      const variation = Math.sin((i * 0.5) + (seedValue * 0.1)) * 10 + Math.sin(i + seedValue) * 5;
       points.push(baseValue + variation);
     }
     return points;
   };
 
-  const chartData = generateMockChart();
+  useEffect(() => {
+    setMounted(true);
+    setChartData(generateMockChart(symbol));
+  }, [symbol]);
   const isPositive = !change.startsWith('-');
 
   return (
@@ -55,15 +66,17 @@ export function CryptoPriceCard({ symbol, name, price, change, marketCap }: Cryp
       {/* Mini Chart */}
       <div className="mb-4">
         <svg width="100%" height="60" viewBox="0 0 200 60" className="overflow-visible">
-          <polyline
-            points={chartData.map((point, index) => `${(index / 23) * 200},${60 - point}`).join(' ')}
-            fill="none"
-            stroke={isPositive ? "#10b981" : "#ef4444"}
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="transition-all duration-300"
-          />
+          {mounted && chartData.length > 0 && (
+            <polyline
+              points={chartData.map((point, index) => `${(index / 23) * 200},${60 - point}`).join(' ')}
+              fill="none"
+              stroke={isPositive ? "#10b981" : "#ef4444"}
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="transition-all duration-300"
+            />
+          )}
         </svg>
       </div>
 
