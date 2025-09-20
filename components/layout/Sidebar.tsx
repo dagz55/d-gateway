@@ -167,7 +167,11 @@ export default function Sidebar({ className }: SidebarProps) {
           'fixed left-0 z-40 glass border-r border-border transform transition-all duration-300 ease-in-out md:translate-x-0',
           'top-0 h-full md:top-0 md:h-full', // Desktop: full height from top
           'max-md:top-16 max-md:h-[calc(100vh-4rem)]', // Mobile: start below header (64px/4rem)
-          isCollapsed ? 'w-16' : 'w-64',
+          // Desktop width behavior
+          'md:w-64', // Desktop expanded
+          isCollapsed && 'md:w-16', // Desktop collapsed
+          // Mobile width behavior - always compact/narrow
+          'max-md:w-16', // Mobile always narrow like collapsed state
           isOpen ? 'translate-x-0' : '-translate-x-full',
           className
         )}
@@ -176,12 +180,16 @@ export default function Sidebar({ className }: SidebarProps) {
           {/* Logo */}
           <div className={cn(
             "flex h-16 items-center border-b border-border transition-all duration-300",
-            isCollapsed ? "justify-center px-2" : "justify-between px-6"
+            // Desktop layout
+            "md:px-6",
+            isCollapsed ? "md:justify-center md:px-2" : "md:justify-between",
+            // Mobile layout - always centered and compact
+            "max-md:justify-center max-md:px-2"
           )}>
             <div className="flex items-center">
               <Logo
                 size={isCollapsed ? 'sm' : 'md'}
-                showText={!isCollapsed}
+                showText={!isCollapsed} // Will be hidden on mobile via CSS
                 textClassName="gradient-text font-bold"
               />
             </div>
@@ -200,34 +208,23 @@ export default function Sidebar({ className }: SidebarProps) {
               )}
             </div>
 
-            {/* Mobile buttons */}
-            <div className="md:hidden flex items-center gap-1">
-              {!isCollapsed && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="p-2 h-8 w-8 hover:bg-accent/20"
-                  onClick={() => setIsCollapsed(true)}
-                  title="Minimize sidebar"
-                >
-                  <ChevronLeft className="h-4 w-4" />
-                </Button>
-              )}
+            {/* Mobile buttons - only close button since mobile is always compact */}
+            <div className="md:hidden absolute top-2 right-2">
               <Button
                 variant="ghost"
                 size="sm"
-                className="p-2 h-8 w-8 hover:bg-accent/20"
+                className="p-1 h-6 w-6 hover:bg-accent/20"
                 onClick={() => setIsOpen(false)}
                 title="Close sidebar"
               >
-                <X className="h-4 w-4" />
+                <X className="h-3 w-3" />
               </Button>
             </div>
           </div>
 
-          {/* Expand button when collapsed */}
+          {/* Expand button when collapsed - Desktop only */}
           {isCollapsed && (
-            <div className="px-2 py-2 border-b border-border">
+            <div className="hidden md:block px-2 py-2 border-b border-border">
               <Button
                 variant="ghost"
                 size="sm"
@@ -240,13 +237,13 @@ export default function Sidebar({ className }: SidebarProps) {
           )}
 
           {/* Navigation */}
-          <ScrollArea className="flex-1 px-3 py-4">
-            <nav className="space-y-1">
+          <ScrollArea className="flex-1 px-2 py-4 max-md:px-1">
+            <nav className="space-y-2">
               {allNavigation.map((item) => {
                 const Icon = item.icon;
                 const isActiveLink = isActive(item.href);
                 const isAdminItem = item.isAdmin;
-                
+
                 return (
                   <Link
                     key={item.name}
@@ -254,7 +251,10 @@ export default function Sidebar({ className }: SidebarProps) {
                     onClick={() => setIsOpen(false)}
                     className={cn(
                       'flex items-center text-sm font-medium rounded-xl transition-all duration-300 relative group',
-                      isCollapsed ? 'px-2 py-3 justify-center' : 'px-3 py-3',
+                      // Desktop layout
+                      isCollapsed ? 'md:px-2 md:py-3 md:justify-center' : 'md:px-3 md:py-3',
+                      // Mobile layout - always compact/centered
+                      'max-md:px-2 max-md:py-3 max-md:justify-center',
                       isActiveLink
                         ? 'bg-accent/20 text-accent shadow-lg border border-accent/30 card-glow'
                         : 'text-foreground/70 hover:bg-muted hover:text-foreground hover:shadow-md hover:border hover:border-border',
@@ -263,20 +263,24 @@ export default function Sidebar({ className }: SidebarProps) {
                     )}
                   >
                     <Icon className={cn(
-                      "h-4 w-4 transition-transform duration-200",
+                      "h-5 w-5 transition-transform duration-200", // Slightly larger icons
                       isActiveLink && "scale-110",
-                      !isCollapsed && "mr-3"
+                      // Desktop text spacing
+                      !isCollapsed && "md:mr-3",
+                      // Mobile never has text spacing since always icon-only
                     )} />
+                    {/* Desktop text - only show when not collapsed */}
                     {!isCollapsed && (
                       <span className={cn(
+                        "hidden md:block", // Hide text on mobile
                         isAdminItem && "font-semibold"
                       )}>
                         {item.name}
                       </span>
                     )}
-                    
-                    {/* Tooltip for collapsed state */}
-                    {isCollapsed && (
+
+                    {/* Tooltip for collapsed state or mobile */}
+                    {(isCollapsed || true) && ( // Always show tooltip potential for mobile
                       <div className="absolute left-full ml-2 px-2 py-1 bg-popover text-popover-foreground text-xs rounded-md shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50">
                         {item.name}
                       </div>
