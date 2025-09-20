@@ -23,7 +23,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import ProfileSection from './ProfileSection';
 import { useUser } from '@clerk/nextjs';
 import { checkAdminStatus } from '@/lib/admin-utils';
@@ -84,6 +84,23 @@ export default function Sidebar({ className }: SidebarProps) {
   
   const { isAdmin } = checkAdminStatus(user);
 
+  // Close mobile menu when screen size changes to desktop
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 768) { // md breakpoint
+        setIsOpen(false);
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // Close mobile menu when route changes
+  useEffect(() => {
+    setIsOpen(false);
+  }, [pathname]);
+
   // Add admin navigation if user is admin
   const adminNavigation = isAdmin ? [
     {
@@ -124,15 +141,17 @@ export default function Sidebar({ className }: SidebarProps) {
 
   return (
     <>
-      {/* Mobile menu button */}
-      <Button
-        variant="ghost"
-        size="sm"
-        className="md:hidden fixed top-4 left-4 z-50"
-        onClick={() => setIsOpen(!isOpen)}
-      >
-        {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-      </Button>
+      {/* Mobile menu button - Only show when sidebar is closed */}
+      {!isOpen && (
+        <Button
+          variant="ghost"
+          size="sm"
+          className="md:hidden fixed top-4 left-4 z-50 bg-background/80 backdrop-blur-sm border border-border/50 hover:bg-accent/20"
+          onClick={() => setIsOpen(true)}
+        >
+          <Menu className="h-5 w-5" />
+        </Button>
+      )}
 
       {/* Mobile overlay */}
       {isOpen && (
@@ -165,27 +184,43 @@ export default function Sidebar({ className }: SidebarProps) {
               />
             </div>
             
-            {/* Collapse/Expand button - Desktop only */}
-            {!isCollapsed && (
+            {/* Desktop buttons */}
+            <div className="hidden md:flex items-center gap-1">
+              {!isCollapsed && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="p-2 h-8 w-8 hover:bg-accent/20"
+                  onClick={() => setIsCollapsed(true)}
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
+              )}
+            </div>
+
+            {/* Mobile buttons */}
+            <div className="md:hidden flex items-center gap-1">
+              {!isCollapsed && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="p-2 h-8 w-8 hover:bg-accent/20"
+                  onClick={() => setIsCollapsed(true)}
+                  title="Minimize sidebar"
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
+              )}
               <Button
                 variant="ghost"
                 size="sm"
-                className="hidden md:flex p-2 h-8 w-8 hover:bg-accent/20"
-                onClick={() => setIsCollapsed(true)}
+                className="p-2 h-8 w-8 hover:bg-accent/20"
+                onClick={() => setIsOpen(false)}
+                title="Close sidebar"
               >
-                <ChevronLeft className="h-4 w-4" />
+                <X className="h-4 w-4" />
               </Button>
-            )}
-
-            {/* Mobile close button inside sidebar */}
-            <Button
-              variant="ghost"
-              size="sm"
-              className="md:hidden p-2 h-8 w-8"
-              onClick={() => setIsOpen(false)}
-            >
-              <X className="h-4 w-4" />
-            </Button>
+            </div>
           </div>
 
           {/* Expand button when collapsed */}

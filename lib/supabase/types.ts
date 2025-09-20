@@ -41,6 +41,94 @@ export interface Database {
           updated_at?: string
         }
       }
+      user_profiles: {
+        Row: {
+          id: string
+          user_id: string
+          clerk_user_id: string | null
+          email: string
+          username: string
+          full_name: string | null
+          avatar_url: string | null
+          age: number
+          gender: 'MALE' | 'FEMALE' | 'OTHER' | 'PREFER_NOT_TO_SAY'
+          trader_level: 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED' | 'EXPERT'
+          account_balance: number
+          is_verified: boolean
+          package: 'BASIC' | 'PREMIUM' | 'VIP' | 'ENTERPRISE'
+          status: 'ONLINE' | 'OFFLINE' | 'AWAY' | 'BUSY'
+          timezone: string
+          language: string
+          password: string | null
+          phone: string | null
+          country: string | null
+          bio: string | null
+          social_links: Json
+          trading_preferences: Json
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          clerk_user_id?: string | null
+          email: string
+          username: string
+          full_name?: string | null
+          avatar_url?: string | null
+          age?: number
+          gender?: 'MALE' | 'FEMALE' | 'OTHER' | 'PREFER_NOT_TO_SAY'
+          trader_level?: 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED' | 'EXPERT'
+          account_balance?: number
+          is_verified?: boolean
+          package?: 'BASIC' | 'PREMIUM' | 'VIP' | 'ENTERPRISE'
+          status?: 'ONLINE' | 'OFFLINE' | 'AWAY' | 'BUSY'
+          timezone?: string
+          language?: string
+          password?: string | null
+          phone?: string | null
+          country?: string | null
+          bio?: string | null
+          social_links?: Json
+          trading_preferences?: Json
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          clerk_user_id?: string | null
+          email?: string
+          username?: string
+          full_name?: string | null
+          avatar_url?: string | null
+          age?: number
+          gender?: 'MALE' | 'FEMALE' | 'OTHER' | 'PREFER_NOT_TO_SAY'
+          trader_level?: 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED' | 'EXPERT'
+          account_balance?: number
+          is_verified?: boolean
+          package?: 'BASIC' | 'PREMIUM' | 'VIP' | 'ENTERPRISE'
+          status?: 'ONLINE' | 'OFFLINE' | 'AWAY' | 'BUSY'
+          timezone?: string
+          language?: string
+          password?: string | null
+          phone?: string | null
+          country?: string | null
+          bio?: string | null
+          social_links?: Json
+          trading_preferences?: Json
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_profiles_user_id_fkey"
+            columns: ["user_id"]
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
       trades: {
         Row: {
           id: string

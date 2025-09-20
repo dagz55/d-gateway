@@ -49,7 +49,9 @@ components/
 ├── dashboard/          # Trading dashboard components (charts, portfolio, signals)
 ├── layout/            # AppLayout, Header, Sidebar, ProfileDropdown, NotificationDropdown for dashboard pages
 ├── ui/                # Complete shadcn/ui component library (26 components)
-└── settings/          # Profile settings, photo upload, and configuration forms
+├── wallet/            # Comprehensive wallet management components (deposit, withdraw, history)
+├── settings/          # Profile settings, photo upload, and configuration forms
+└── landing/           # Landing page components with navigation and features
 ```
 
 #### Data Fetching Pattern
@@ -62,6 +64,8 @@ components/
 - **Landing**: `/` - Original login page (redirects to dashboard if authenticated)
 - **Auth**: `/auth/*` - Authentication flows with OAuth support
 - **Dashboard**: `/dashboard` - Main trading dashboard with AppLayout
+- **Market**: `/market` - Live cryptocurrency market data with professional navigation
+- **Wallet**: `/wallet` - Comprehensive wallet management system
 - **Profile**: `/profile` - User profile management
 - **Settings**: `/settings` - User preferences and account settings
 - **Admin**: `/admin` - Admin panel for system management
@@ -90,8 +94,21 @@ All dashboard pages use the `(dashboard)` route group which provides:
 - **Component**: `NotificationDropdown` in header with bell icon and unread badge
 - **Database**: `notifications` table with proper RLS policies for user data protection
 - **Features**: Mark as read, mark all as read, categorized icons (trade, success, warning, error, system)
+- **Colors**: Enhanced contrast colors for better readability (emerald-400, amber-400, red-400, cyan-400)
 - **Testing**: `/test-notifications` page and `/api/test-notifications` API for creating sample data
 - **Integration**: Fully integrated with Clerk authentication and existing dashboard layout
+
+#### Wallet Management System
+- **Comprehensive Wallet**: Dual-wallet system (Trading Wallet + Income Wallet) with real-time balance tracking
+- **Deposit Flow**: Complete deposit form with amount, reference number, payment method, and screenshot upload
+- **Withdrawal Flow**: Portfolio-integrated withdrawal with balance validation and multiple wallet sources
+- **Transaction History**: Detailed history tracking for both deposits and withdrawals with filtering and search
+- **Components**:
+  - `DepositComponent`: Full deposit form with file upload and validation
+  - `WithdrawComponent`: Portfolio-aware withdrawal with balance checks
+  - `DepositHistory`: Searchable deposit transaction history
+  - `WithdrawalHistory`: Searchable withdrawal transaction history
+- **Features**: Real portfolio integration, file upload validation, payment method selection, and transaction tracking
 
 ## Development Workflow
 

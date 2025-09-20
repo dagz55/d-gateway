@@ -5,6 +5,30 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.11.2] - 2025-09-20
+
+### Added
+- **🗃️ Database Enhancement**: Added `clerk_user_id` column to `user_profiles` table for photo uploads
+  - Added `clerk_user_id` TEXT column with unique constraint for Clerk integration
+  - Created performance index `idx_user_profiles_clerk_user_id` for optimized lookups
+  - Added helper functions: `get_user_profile_by_clerk_id()`, `update_user_avatar_by_clerk_id()`
+  - Updated `handle_new_user()` trigger function to include Clerk user ID from metadata
+  - Enhanced RLS policies to support Clerk user ID access patterns
+
+### Enhanced
+- **🔧 TypeScript Integration**: Comprehensive type definitions and utility functions
+  - Added complete `user_profiles` table type definition with `clerk_user_id` support
+  - Created `lib/supabase/clerk-integration.ts` utility module for Clerk-Supabase integration
+  - Added photo upload utilities: `getCurrentAvatarUrl()`, `updateAvatar()`, `deleteAvatar()`
+  - Implemented user profile sync functions for seamless Clerk-Supabase data consistency
+
+### Documentation
+- **📚 Comprehensive Documentation**: Complete guide for Clerk user ID integration
+  - Created `CLERK_USER_ID_INTEGRATION.md` with migration, usage, and troubleshooting guides
+  - Added migration script `apply-clerk-user-id-migration.js` for easy deployment
+  - Created test script `test-clerk-user-id-migration.js` for validation
+  - Included security considerations, best practices, and usage examples
+
 ## [2.11.1] - 2025-09-20
 
 ### Added
@@ -28,6 +52,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Maintained Zignal brand color scheme and gradient patterns
   - Preserved existing market page functionality while adding navigation layer
   - Enhanced user experience with consistent navigation patterns
+
+- **🔔 Notification Readability**: Improved notification contrast and visibility
+  - Updated notification icons with brighter, high-contrast colors (emerald-400, amber-400, red-400, cyan-400)
+  - Enhanced notification backgrounds with better opacity and border contrast
+  - Improved text colors using white/slate-200 for unread and slate-300/slate-400 for read notifications
+  - Updated header and footer elements with improved contrast (white text on dark backgrounds)
+  - Enhanced loading spinner and empty states with brand-consistent colors
 
 ## [2.11.0] - 2025-09-20
 

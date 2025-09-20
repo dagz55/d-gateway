@@ -117,7 +117,7 @@ export default function Header({ className }: HeaderProps) {
 
       <header className={`relative flex h-16 items-center justify-between px-6 glass border-b border-border overflow-hidden ${className}`}>
         {/* Logo Section */}
-        <div className="flex items-center md:ml-0 ml-16 z-10">
+        <div className="flex items-center md:ml-0 ml-14 z-10">
           <div className="flex items-center space-x-3">
             <Logo size="md" showText={false} />
             <h1 className="text-xl font-bold gradient-text hidden sm:block">Zignal Dashboard</h1>

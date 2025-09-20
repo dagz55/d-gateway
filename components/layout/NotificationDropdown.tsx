@@ -24,34 +24,34 @@ interface Notification {
 const getNotificationIcon = (type: string) => {
   switch (type) {
     case 'trade':
-      return <TrendingUp className="h-4 w-4 text-green-500" />;
+      return <TrendingUp className="h-4 w-4 text-emerald-400" />;
     case 'warning':
-      return <AlertCircle className="h-4 w-4 text-yellow-500" />;
+      return <AlertCircle className="h-4 w-4 text-amber-400" />;
     case 'error':
-      return <X className="h-4 w-4 text-red-500" />;
+      return <X className="h-4 w-4 text-red-400" />;
     case 'success':
-      return <Check className="h-4 w-4 text-green-500" />;
+      return <Check className="h-4 w-4 text-emerald-400" />;
     case 'system':
-      return <Settings className="h-4 w-4 text-blue-500" />;
+      return <Settings className="h-4 w-4 text-cyan-400" />;
     default:
-      return <Bell className="h-4 w-4 text-muted-foreground" />;
+      return <Bell className="h-4 w-4 text-slate-400" />;
   }
 };
 
 const getNotificationBgColor = (type: string) => {
   switch (type) {
     case 'trade':
-      return 'bg-green-50 dark:bg-green-950/20 border-green-200 dark:border-green-800';
+      return 'bg-emerald-50 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-700/50';
     case 'warning':
-      return 'bg-yellow-50 dark:bg-yellow-950/20 border-yellow-200 dark:border-yellow-800';
+      return 'bg-amber-50 dark:bg-amber-950/30 border-amber-200 dark:border-amber-700/50';
     case 'error':
-      return 'bg-red-50 dark:bg-red-950/20 border-red-200 dark:border-red-800';
+      return 'bg-red-50 dark:bg-red-950/30 border-red-200 dark:border-red-700/50';
     case 'success':
-      return 'bg-green-50 dark:bg-green-950/20 border-green-200 dark:border-green-800';
+      return 'bg-emerald-50 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-700/50';
     case 'system':
-      return 'bg-blue-50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-800';
+      return 'bg-cyan-50 dark:bg-cyan-950/30 border-cyan-200 dark:border-cyan-700/50';
     default:
-      return 'bg-card border-border';
+      return 'bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-600/50';
   }
 };
 
@@ -222,14 +222,14 @@ export default function NotificationDropdown() {
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-80 p-0" align="end">
-        <div className="flex items-center justify-between p-4 border-b">
-          <h3 className="font-semibold">Notifications</h3>
+        <div className="flex items-center justify-between p-4 border-b border-slate-600/50">
+          <h3 className="font-semibold text-white">Notifications</h3>
           {unreadCount > 0 && (
             <Button
               variant="ghost"
               size="sm"
               onClick={markAllAsRead}
-              className="text-xs"
+              className="text-xs text-slate-300 hover:text-white hover:bg-slate-700/50"
             >
               Mark all read
             </Button>
@@ -239,13 +239,13 @@ export default function NotificationDropdown() {
         <ScrollArea className="h-96">
           {loading ? (
             <div className="flex items-center justify-center p-8">
-              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
+              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-[#33E1DA]"></div>
             </div>
           ) : notifications.length === 0 ? (
             <div className="flex flex-col items-center justify-center p-8 text-center">
-              <Bell className="h-8 w-8 text-muted-foreground mb-2" />
-              <p className="text-sm text-muted-foreground">No notifications yet</p>
-              <p className="text-xs text-muted-foreground mt-1">
+              <Bell className="h-8 w-8 text-slate-400 mb-2" />
+              <p className="text-sm text-slate-300">No notifications yet</p>
+              <p className="text-xs text-slate-400 mt-1">
                 You'll see notifications about trades, market updates, and system alerts here
               </p>
             </div>
@@ -254,8 +254,8 @@ export default function NotificationDropdown() {
               {notifications.map((notification, index) => (
                 <div key={notification.id}>
                   <div
-                    className={`p-4 cursor-pointer transition-colors hover:bg-muted/50 ${
-                      !notification.is_read ? 'bg-muted/30' : ''
+                    className={`p-4 cursor-pointer transition-colors hover:bg-slate-700/30 ${
+                      !notification.is_read ? 'bg-slate-800/40' : ''
                     }`}
                     onClick={() => {
                       if (!notification.is_read) {
@@ -270,18 +270,20 @@ export default function NotificationDropdown() {
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between">
                           <p className={`text-sm font-medium truncate ${
-                            !notification.is_read ? 'text-foreground' : 'text-muted-foreground'
+                            !notification.is_read ? 'text-white' : 'text-slate-300'
                           }`}>
                             {notification.title}
                           </p>
                           {!notification.is_read && (
-                            <div className="w-2 h-2 bg-primary rounded-full flex-shrink-0" />
+                            <div className="w-2 h-2 bg-[#33E1DA] rounded-full flex-shrink-0" />
                           )}
                         </div>
-                        <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
+                        <p className={`text-xs mt-1 line-clamp-2 ${
+                          !notification.is_read ? 'text-slate-200' : 'text-slate-400'
+                        }`}>
                           {notification.message}
                         </p>
-                        <p className="text-xs text-muted-foreground mt-2">
+                        <p className="text-xs text-slate-400 mt-2">
                           {timeAgo(notification.created_at)}
                         </p>
                       </div>
@@ -296,12 +298,12 @@ export default function NotificationDropdown() {
 
         {notifications.length > 0 && (
           <>
-            <Separator />
+            <Separator className="bg-slate-600/50" />
             <div className="p-2">
               <Button
                 variant="ghost"
                 size="sm"
-                className="w-full text-xs"
+                className="w-full text-xs text-slate-300 hover:text-white hover:bg-slate-700/50"
                 onClick={() => {
                   setIsOpen(false);
                   // Could navigate to a full notifications page here

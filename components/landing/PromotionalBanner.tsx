@@ -7,23 +7,23 @@ export function PromotionalBanner() {
 
   const banners = [
     {
-      title: "🎉 New User Bonus: $50 in BTC",
-      description: "Sign up today and get $50 worth of Bitcoin when you make your first trade",
-      cta: "Claim Bonus",
+      title: "💰 Cryptocurrency trading made simple.",
+      description: "Want to experience risk-free trading? Go ahead and purchase our trade signals packages!",
+      cta: "Get Started",
       bgGradient: "from-green-500/20 to-emerald-500/20",
       borderColor: "border-green-500/30"
     },
     {
-      title: "⚡ Zero Trading Fees",
-      description: "Trade Bitcoin, Ethereum, and 400+ cryptos with zero fees for the first 30 days",
-      cta: "Start Trading",
+      title: "📦 Flexible Package Pricing",
+      description: "Package price will depend on the duration of the availed packages.",
+      cta: "View Packages",
       bgGradient: "from-blue-500/20 to-cyan-500/20",
       borderColor: "border-blue-500/30"
     },
     {
-      title: "🚀 Advanced Trading Tools",
-      description: "Access professional-grade charts, signals, and automated trading strategies",
-      cta: "Explore Tools",
+      title: "🎯 Expert Guidance Available",
+      description: "Having a hard time mastering the art of cryptocurrency? Fret not, we have you covered. Reach out to your Zignals advisor to learn more.",
+      cta: "Contact Advisor",
       bgGradient: "from-purple-500/20 to-pink-500/20",
       borderColor: "border-purple-500/30"
     }
