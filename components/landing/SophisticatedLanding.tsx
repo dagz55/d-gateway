@@ -155,7 +155,15 @@ function HeroSection() {
   ]
 
   return (
-    <BackgroundCells className="bg-slate-950">
+    <BackgroundCells 
+      variant="zignal"
+      intensity={isHighPerformance ? "high" : "medium"}
+      enableRipple={!prefersReducedMotion}
+      enableMouse={isHighPerformance}
+      cellSize={isHighPerformance ? 14 : 18}
+      rows={isHighPerformance ? 30 : 20}
+      cols={isHighPerformance ? 45 : 30}
+    >
       {/* Floating crypto icons background */}
       <FloatingCryptoIcons 
         className="opacity-20" 
