@@ -4,7 +4,7 @@ import { requireAdmin } from '@/lib/admin';
 export default async function AdminPage() {
   // Require admin authentication
   await requireAdmin();
-  
+
   // Redirect to admin dashboard
-  redirect('/admin/dashboard');
+  redirect('/dashboard/admins/dashboard');
 }
