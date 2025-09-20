@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Logo from '@/components/ui/Logo';
-import { LiveSignalsChart } from './LiveSignalsChart';
+import { OptimizedTradingChart } from '@/components/trading/OptimizedTradingChart';
 import { PromotionalBanner } from './PromotionalBanner';
 import { PriceConverter } from './PriceConverter';
 import { CryptoPriceCard } from './CryptoPriceCard';
@@ -175,11 +175,15 @@ export function LandingContent() {
               </div>
             </div>
 
-            {/* Live Signals Chart */}
+            {/* Advanced Trading Chart */}
             <div className="mb-16">
-              <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-8 border border-white/10">
-                <LiveSignalsChart />
+              <div className="text-center mb-8">
+                <h2 className="text-4xl font-bold text-white mb-4">Advanced Trading Analysis</h2>
+                <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+                  Experience professional-grade charting with real-time data, technical indicators, and interactive analysis tools.
+                </p>
               </div>
+              <OptimizedTradingChart />
             </div>
           </div>
         </div>
