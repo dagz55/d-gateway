@@ -20,7 +20,7 @@ import {
   ArrowDownRight,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useMarketData, formatPrice, formatMarketCap, formatVolume, formatPercentage, type CryptoData } from '@/hooks/useMarketData';
+import { useMarketData, formatPrice, formatMarketCap, formatVolume, formatPercentage, type CryptoData } from '@/hooks/useLegacyMarketData';
 
 export default function MarketPage() {
   const { cryptoData, marketStats, loading, error, lastUpdated, refetch } = useMarketData();

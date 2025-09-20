@@ -301,3 +301,69 @@ export const useMarketData = (symbol: string = 'BTC', updateInterval: number = 2
     refreshData: fetchMarketData
   };
 };
+
+// Legacy interface for backward compatibility
+export interface CryptoData {
+  id: string;
+  symbol: string;
+  name: string;
+  current_price: number;
+  price_change_percentage_24h: number;
+  price_change_24h: number;
+  market_cap: number;
+  volume_24h: number;
+  circulating_supply: number;
+  image: string;
+  sparkline_in_7d?: {
+    price: number[];
+  };
+  market_cap_rank: number;
+}
+
+// Utility functions for formatting
+export const formatPrice = (price: number | undefined | null): string => {
+  if (!price || price === 0) {
+    return '$0.00';
+  }
+  if (price >= 1) {
+    return `$${price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  }
+  return `$${price.toFixed(6)}`;
+};
+
+export const formatMarketCap = (marketCap: number | undefined | null): string => {
+  if (!marketCap || marketCap === 0) {
+    return '$0';
+  }
+  if (marketCap >= 1e12) {
+    return `$${(marketCap / 1e12).toFixed(2)}T`;
+  }
+  if (marketCap >= 1e9) {
+    return `$${(marketCap / 1e9).toFixed(2)}B`;
+  }
+  if (marketCap >= 1e6) {
+    return `$${(marketCap / 1e6).toFixed(2)}M`;
+  }
+  return `$${marketCap.toLocaleString()}`;
+};
+
+export const formatVolume = (volume: number | undefined | null): string => {
+  if (!volume || volume === 0) {
+    return '$0';
+  }
+  if (volume >= 1e9) {
+    return `$${(volume / 1e9).toFixed(2)}B`;
+  }
+  if (volume >= 1e6) {
+    return `$${(volume / 1e6).toFixed(2)}M`;
+  }
+  return `$${volume.toLocaleString()}`;
+};
+
+export const formatPercentage = (percentage: number | undefined | null): string => {
+  if (percentage === undefined || percentage === null) {
+    return '0.00%';
+  }
+  const sign = percentage >= 0 ? '+' : '';
+  return `${sign}${percentage.toFixed(2)}%`;
+};
