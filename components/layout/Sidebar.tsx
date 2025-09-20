@@ -156,7 +156,7 @@ export default function Sidebar({ className }: SidebarProps) {
       {/* Mobile overlay */}
       {isOpen && (
         <div
-          className="fixed inset-0 bg-black/50 z-40 md:hidden"
+          className="fixed inset-0 bg-black/50 z-40 md:hidden max-md:top-16"
           onClick={() => setIsOpen(false)}
         />
       )}
@@ -164,7 +164,9 @@ export default function Sidebar({ className }: SidebarProps) {
       {/* Sidebar */}
       <div
         className={cn(
-          'fixed left-0 top-0 z-40 h-full glass border-r border-border transform transition-all duration-300 ease-in-out md:translate-x-0',
+          'fixed left-0 z-40 glass border-r border-border transform transition-all duration-300 ease-in-out md:translate-x-0',
+          'top-0 h-full md:top-0 md:h-full', // Desktop: full height from top
+          'max-md:top-16 max-md:h-[calc(100vh-4rem)]', // Mobile: start below header (64px/4rem)
           isCollapsed ? 'w-16' : 'w-64',
           isOpen ? 'translate-x-0' : '-translate-x-full',
           className
