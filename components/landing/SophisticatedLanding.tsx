@@ -24,6 +24,7 @@ import {
   ParallaxSection,
   InteractiveParallax
 } from '@/components/animations/Parallax'
+import { BackgroundCells } from '@/components/ui/background-ripple-effect'
 import { useReducedMotion, useDeviceCapabilities, useIntersectionObserver } from '@/hooks/useAnimation'
 
 interface LandingSection {
@@ -154,26 +155,13 @@ function HeroSection() {
   ]
 
   return (
-    <ParallaxSection 
-      className="relative min-h-screen flex items-center justify-center overflow-hidden"
-      background={isHighPerformance ? undefined : '/crypto_image.jpg'}
-    >
+    <BackgroundCells className="bg-slate-950">
       {/* Floating crypto icons background */}
       <FloatingCryptoIcons 
         className="opacity-20" 
         count={prefersReducedMotion ? 8 : 25}
       />
       
-      {/* Animated background patterns */}
-      {isHighPerformance && !prefersReducedMotion && (
-        <div className="absolute inset-0">
-          <div className="absolute inset-0 bg-gradient-to-br from-[#0A0F1F] via-[#1E2A44] to-[#1A7FB3]" />
-          <ParallaxElement speed={0.2} className="absolute inset-0">
-            <div className="w-full h-full opacity-30 bg-[radial-gradient(circle_at_20%_80%,rgba(51,225,218,0.1)_0%,transparent_50%),radial-gradient(circle_at_80%_20%,rgba(26,127,179,0.1)_0%,transparent_50%)]" />
-          </ParallaxElement>
-        </div>
-      )}
-
       {/* Main content */}
       <div className="relative z-10 max-w-6xl mx-auto px-6 text-center">
         {/* Hero title with staggered animation */}
@@ -189,7 +177,7 @@ function HeroSection() {
         <div className="h-16 mb-8">
           <MorphingText
             texts={morphingTexts}
-            className="text-2xl lg:text-3xl font-medium"
+            className="text-2xl lg:text-3xl font-medium text-white"
             interval={3000}
           />
         </div>
@@ -248,7 +236,7 @@ function HeroSection() {
           </div>
         </SlideIn>
       </div>
-    </ParallaxSection>
+    </BackgroundCells>
   )
 }
 

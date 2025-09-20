@@ -189,8 +189,7 @@ export default function Sidebar({ className }: SidebarProps) {
             <div className="flex items-center">
               <Logo
                 size={isCollapsed ? 'sm' : 'md'}
-                showText={!isCollapsed} // Will be hidden on mobile via CSS
-                textClassName="gradient-text font-bold"
+                showText={false} // Never show text, logo only
               />
             </div>
             
