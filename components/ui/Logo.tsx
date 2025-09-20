@@ -27,9 +27,9 @@ const textSizeClasses = {
 };
 
 const logoVariants = {
-  default: '/official_zignals_logo.png',
-  dark: '/official_zignals_logo.png',
-  'high-quality': '/official_zignals_logo.png',
+  default: '/zignal-mix.png',
+  dark: '/zignal-mix.png',
+  'high-quality': '/zignal-mix.png',
 };
 
 export default function Logo({
