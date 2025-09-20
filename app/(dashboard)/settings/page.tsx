@@ -60,7 +60,6 @@ export default function SettingsPage() {
             />
             <ChangeUsernameForm
               currentUsername={profileData.username}
-              userEmail={profileData.email}
             />
           </CardContent>
         </Card>
@@ -77,7 +76,7 @@ export default function SettingsPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <ChangePasswordForm userEmail={profileData.email} />
+            <ChangePasswordForm />
           </CardContent>
         </Card>
 

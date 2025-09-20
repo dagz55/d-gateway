@@ -45,6 +45,10 @@ export default async function DashboardPage() {
   // Note: Auth is already checked in the layout, so we can proceed directly
   const user = await currentUser();
 
+  if (!user) {
+    redirect('/sign-in');
+  }
+
   const recentSignals = await getRecentSignals(3);
 
   const firstName = user.firstName || 'Trader';
@@ -98,16 +102,7 @@ export default async function DashboardPage() {
             <p className="text-xs text-muted-foreground mt-1">+20.1% from last month</p>
             <div className="h-20 mt-3">
               <Spark
-                data={[
-                  { value: 35000 },
-                  { value: 38000 },
-                  { value: 36000 },
-                  { value: 40000 },
-                  { value: 42000 },
-                  { value: 41000 },
-                  { value: 45238.90 },
-                ]}
-                type="portfolio"
+                data={[35000, 38000, 36000, 40000, 42000, 41000, 45238.90]}
               />
             </div>
           </CardContent>
@@ -123,16 +118,7 @@ export default async function DashboardPage() {
             <p className="text-xs text-muted-foreground mt-1">+5.8% gain</p>
             <div className="h-20 mt-3">
               <Spark
-                data={[
-                  { value: -200 },
-                  { value: 400 },
-                  { value: 800 },
-                  { value: 600 },
-                  { value: 1200 },
-                  { value: 1800 },
-                  { value: 2489.32 },
-                ]}
-                type="profit"
+                data={[-200, 400, 800, 600, 1200, 1800, 2489.32]}
               />
             </div>
           </CardContent>
@@ -148,16 +134,7 @@ export default async function DashboardPage() {
             <p className="text-xs text-muted-foreground mt-1">29 of 40 trades</p>
             <div className="h-20 mt-3">
               <Spark
-                data={[
-                  { value: 65 },
-                  { value: 68 },
-                  { value: 70 },
-                  { value: 69 },
-                  { value: 71 },
-                  { value: 70 },
-                  { value: 72.4 },
-                ]}
-                type="winrate"
+                data={[65, 68, 70, 69, 71, 70, 72.4]}
               />
             </div>
           </CardContent>
@@ -173,16 +150,7 @@ export default async function DashboardPage() {
             <p className="text-xs text-muted-foreground mt-1">3 pending execution</p>
             <div className="h-20 mt-3">
               <Spark
-                data={[
-                  { value: 5 },
-                  { value: 6 },
-                  { value: 7 },
-                  { value: 6 },
-                  { value: 8 },
-                  { value: 9 },
-                  { value: 8 },
-                ]}
-                type="signals"
+                data={[5, 6, 7, 6, 8, 9, 8]}
               />
             </div>
           </CardContent>
@@ -231,16 +199,7 @@ export default async function DashboardPage() {
               </div>
               <div className="h-32">
                 <Spark
-                  data={[
-                    { value: 2400 },
-                    { value: 2450 },
-                    { value: 2480 },
-                    { value: 2600 },
-                    { value: 2750 },
-                    { value: 2820 },
-                    { value: 2842 },
-                  ]}
-                  type="price"
+                  data={[2400, 2450, 2480, 2600, 2750, 2820, 2842]}
                 />
               </div>
             </CardContent>

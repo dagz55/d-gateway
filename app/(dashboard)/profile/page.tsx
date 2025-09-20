@@ -25,7 +25,7 @@ async function getUser() {
 export default async function ProfilePage() {
   const user = await getUser();
   const fullName = `${user.firstName} ${user.lastName}` || 'User';
-  const email = user.email || '';
+  const email = user.emailAddresses[0]?.emailAddress || '';
 
   // Get user profile from database
   const profileResult = await getUserProfile();
