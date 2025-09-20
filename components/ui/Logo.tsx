@@ -27,9 +27,9 @@ const textSizeClasses = {
 };
 
 const logoVariants = {
-  default: '/official_zignals_logo.png',
-  dark: '/official_zignals_logo.png',
-  'high-quality': '/official_zignals_logo.png',
+  default: '/zignal_logo.png',
+  dark: '/zignal_logo.png',
+  'high-quality': '/zignal_logo.png',
 };
 
 export default function Logo({
@@ -48,7 +48,7 @@ export default function Logo({
       <div className="relative">
         <Image 
           src={logoSrc}
-          alt="Zignals Logo"
+          alt="Zignal Logo"
           width={width}
           height={height}
           className="object-contain"
