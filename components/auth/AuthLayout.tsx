@@ -39,7 +39,8 @@ export default function AuthLayout({ defaultMode = 'sign-in' }: AuthLayoutProps)
                 size="xl"
                 showText={false}
                 enableAnimations={true}
-                asLink={false}
+                asLink={true}
+                href="/"
                 className="scale-150"
               />
             </div>
@@ -104,7 +105,8 @@ export default function AuthLayout({ defaultMode = 'sign-in' }: AuthLayoutProps)
               size="lg"
               showText={false}
               enableAnimations={true}
-              asLink={false}
+              asLink={true}
+              href="/"
             />
           </div>
 
@@ -115,27 +117,29 @@ export default function AuthLayout({ defaultMode = 'sign-in' }: AuthLayoutProps)
                 appearance={{
                   elements: {
                     rootBox: 'w-full',
-                    card: 'bg-transparent shadow-none border-none w-full',
+                    card: 'bg-white dark:bg-gray-800 shadow-lg border border-gray-200 dark:border-gray-700 rounded-lg w-full p-6',
                     headerTitle: 'text-2xl font-bold text-gray-900 dark:text-white',
-                    headerSubtitle: 'text-gray-700 dark:text-gray-200',
+                    headerSubtitle: 'text-gray-600 dark:text-gray-300',
                     socialButtonsBlockButton:
-                      'border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-900 dark:text-white',
+                      'border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-900 dark:text-white bg-white dark:bg-gray-800',
                     socialButtonsBlockButtonText: 'text-gray-900 dark:text-white font-medium',
                     formButtonPrimary:
                       'bg-[#0577DA] hover:bg-[#0466c4] text-white font-medium',
                     formFieldInput:
-                      'border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white text-gray-900',
+                      'border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white text-gray-900 bg-white',
                     formFieldLabel: 'text-gray-900 dark:text-white font-medium',
                     footerActionLink:
                       'text-[#0577DA] hover:text-[#0466c4] dark:text-[#1199FA] dark:hover:text-[#33E1DA] font-medium',
-                    footerActionText: 'text-gray-700 dark:text-gray-200',
+                    footerActionText: 'text-gray-600 dark:text-gray-300',
                     identityPreviewText: 'text-gray-900 dark:text-gray-100',
                     identityPreviewEditButton: 'text-[#0577DA] dark:text-[#1199FA]',
                     formFieldInputShowPasswordButton: 'text-gray-600 dark:text-gray-300',
-                    alternativeMethodsBlockButton: 'text-gray-900 dark:text-white border-gray-300 dark:border-gray-600',
-                    otpCodeFieldInput: 'border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white',
+                    alternativeMethodsBlockButton: 'text-gray-900 dark:text-white border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800',
+                    otpCodeFieldInput: 'border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white bg-white dark:bg-gray-700',
                     formResendCodeLink: 'text-[#0577DA] dark:text-[#1199FA] font-medium',
                     main: 'text-gray-900 dark:text-white',
+                    dividerText: 'text-gray-500 dark:text-gray-400',
+                    dividerLine: 'bg-gray-300 dark:bg-gray-600',
                   },
                 }}
               />
@@ -144,27 +148,29 @@ export default function AuthLayout({ defaultMode = 'sign-in' }: AuthLayoutProps)
                 appearance={{
                   elements: {
                     rootBox: 'w-full',
-                    card: 'bg-transparent shadow-none border-none w-full',
+                    card: 'bg-white dark:bg-gray-800 shadow-lg border border-gray-200 dark:border-gray-700 rounded-lg w-full p-6',
                     headerTitle: 'text-2xl font-bold text-gray-900 dark:text-white',
-                    headerSubtitle: 'text-gray-700 dark:text-gray-200',
+                    headerSubtitle: 'text-gray-600 dark:text-gray-300',
                     socialButtonsBlockButton:
-                      'border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-900 dark:text-white',
+                      'border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-900 dark:text-white bg-white dark:bg-gray-800',
                     socialButtonsBlockButtonText: 'text-gray-900 dark:text-white font-medium',
                     formButtonPrimary:
                       'bg-[#0577DA] hover:bg-[#0466c4] text-white font-medium',
                     formFieldInput:
-                      'border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white text-gray-900',
+                      'border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white text-gray-900 bg-white',
                     formFieldLabel: 'text-gray-900 dark:text-white font-medium',
                     footerActionLink:
                       'text-[#0577DA] hover:text-[#0466c4] dark:text-[#1199FA] dark:hover:text-[#33E1DA] font-medium',
-                    footerActionText: 'text-gray-700 dark:text-gray-200',
+                    footerActionText: 'text-gray-600 dark:text-gray-300',
                     identityPreviewText: 'text-gray-900 dark:text-gray-100',
                     identityPreviewEditButton: 'text-[#0577DA] dark:text-[#1199FA]',
                     formFieldInputShowPasswordButton: 'text-gray-600 dark:text-gray-300',
-                    alternativeMethodsBlockButton: 'text-gray-900 dark:text-white border-gray-300 dark:border-gray-600',
-                    otpCodeFieldInput: 'border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white',
+                    alternativeMethodsBlockButton: 'text-gray-900 dark:text-white border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800',
+                    otpCodeFieldInput: 'border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white bg-white dark:bg-gray-700',
                     formResendCodeLink: 'text-[#0577DA] dark:text-[#1199FA] font-medium',
                     main: 'text-gray-900 dark:text-white',
+                    dividerText: 'text-gray-500 dark:text-gray-400',
+                    dividerLine: 'bg-gray-300 dark:bg-gray-600',
                   },
                 }}
               />

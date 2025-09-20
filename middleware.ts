@@ -54,18 +54,16 @@ export default clerkMiddleware(async (auth, req) => {
       });
     }
     
-    // Check multiple possible locations for admin role
+    // Check admin role - simplified to remove organization dependency
     const publicMetadataRole = (sessionClaims as any)?.publicMetadata?.role;
     const metadataRole = (sessionClaims as any)?.metadata?.role;
     const directRole = (sessionClaims as any)?.role;
-    const organizationRole = (sessionClaims as any)?.o?.rol;
-    
-    const isUserAdmin = 
+
+    const isUserAdmin =
       publicMetadataRole === "admin" ||
       metadataRole === "admin" ||
       (sessionClaims?.publicMetadata as any)?.role === "admin" ||
-      directRole === "admin" ||
-      organizationRole === "admin";
+      directRole === "admin";
     
     if (process.env.NODE_ENV === 'development') {
       console.log('🔍 Middleware Debug - Admin Check Result:', {
@@ -73,7 +71,6 @@ export default clerkMiddleware(async (auth, req) => {
         publicMetadataRole,
         metadataRole,
         directRole,
-        organizationRole,
         currentPath: req.nextUrl.pathname
       });
     }
@@ -104,6 +101,15 @@ export default clerkMiddleware(async (auth, req) => {
       if (process.env.NODE_ENV === 'development') {
         console.log('🔐 Admin Route Check:', { isUserAdmin, currentPath: req.nextUrl.pathname });
       }
+
+      // Allow access to make-first-admin endpoint for any authenticated user
+      if (req.nextUrl.pathname === "/api/admin/make-first-admin") {
+        if (process.env.NODE_ENV === 'development') {
+          console.log('🔑 Allowing access to make-first-admin endpoint');
+        }
+        return NextResponse.next();
+      }
+
       if (!isUserAdmin) {
         // Prevent redirect loop - only redirect if not already on member dashboard
         if (req.nextUrl.pathname !== "/member/dashboard") {

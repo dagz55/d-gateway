@@ -23,8 +23,9 @@ SUPABASE_SERVICE_ROLE_KEY=your_service_role_key  # For admin operations
 ## Architecture Overview
 
 ### Core Stack
-- **Framework**: Next.js 15.5.2 with App Router and React 19
-- **Database & Auth**: Supabase with Row Level Security
+- **Framework**: Next.js 15.5.3 with App Router and React 19
+- **Authentication**: Clerk with App Router integration
+- **Database**: Supabase with Row Level Security
 - **Styling**: Tailwind CSS with shadcn/ui component library
 - **State Management**: TanStack Query + Zustand
 - **Charts**: Recharts for data visualization
@@ -33,9 +34,9 @@ SUPABASE_SERVICE_ROLE_KEY=your_service_role_key  # For admin operations
 ### Key Architecture Patterns
 
 #### Route Protection & Middleware
-- Middleware handles authentication state and redirects authenticated users from `/` to `/dashboard`
+- Middleware uses `clerkMiddleware()` from `@clerk/nextjs/server` for session management
 - Protected routes use `(dashboard)` route group with shared layout
-- Auth callbacks handled in `/auth/callback/` for OAuth flows
+- Clerk handles OAuth flows automatically with `/sign-in` and `/sign-up` routes
 
 #### Supabase Client Architecture
 - **Server Components**: Use `lib/supabase/server.ts` with cookie-based session management
@@ -51,7 +52,8 @@ components/
 ├── ui/                # Complete shadcn/ui component library (26 components)
 ├── wallet/            # Comprehensive wallet management components (deposit, withdraw, history)
 ├── settings/          # Profile settings, photo upload, and configuration forms
-└── landing/           # Landing page components with navigation and features
+├── landing/           # Landing page components with navigation and features
+└── auth/              # Authentication components (Clerk AuthLayout)
 ```
 
 #### Data Fetching Pattern
@@ -62,13 +64,14 @@ components/
 
 ### Routing Structure
 - **Landing**: `/` - Original login page (redirects to dashboard if authenticated)
-- **Auth**: `/auth/*` - Authentication flows with OAuth support
+- **Auth**: `/sign-in/[[...sign-in]]` and `/sign-up/[[...sign-up]]` - Clerk authentication with split-panel design
 - **Dashboard**: `/dashboard` - Main trading dashboard with AppLayout
 - **Market**: `/market` - Live cryptocurrency market data with professional navigation
 - **Wallet**: `/wallet` - Comprehensive wallet management system
 - **Profile**: `/profile` - User profile management
 - **Settings**: `/settings` - User preferences and account settings
 - **Admin**: `/admin` - Admin panel for system management
+- **Member**: `/member` - Member-specific dashboard and features
 
 ### Critical Implementation Details
 
@@ -97,6 +100,63 @@ All dashboard pages use the `(dashboard)` route group which provides:
 - **Colors**: Enhanced contrast colors for better readability (emerald-400, amber-400, red-400, cyan-400)
 - **Testing**: `/test-notifications` page and `/api/test-notifications` API for creating sample data
 - **Integration**: Fully integrated with Clerk authentication and existing dashboard layout
+
+## Clerk Integration Guidelines
+
+### CRITICAL INSTRUCTIONS FOR AI MODELS
+
+#### ALWAYS DO THE FOLLOWING
+1. **Use `clerkMiddleware()`** from `@clerk/nextjs/server` in `middleware.ts`
+2. **Wrap** app with `<ClerkProvider>` in `app/layout.tsx`
+3. **Import** Clerk features from `@clerk/nextjs` (e.g., `<SignInButton>`, `<SignUpButton>`, `<UserButton>`)
+4. **Reference** App Router approach (folders like `app/page.tsx`, `app/layout.tsx`)
+5. **Check** imports for methods like `auth()` from `@clerk/nextjs/server` with `async/await`
+
+#### NEVER DO THE FOLLOWING
+1. **Do not** reference old `_app.tsx` or pages router instructions
+2. **Do not** suggest `authMiddleware()` from older tutorials—use `clerkMiddleware()`
+3. **Do not** recommend deprecated environment variable patterns
+4. **Do not** import from deprecated APIs (`withAuth`, `currentUser` from older versions)
+
+### Required Environment Variables
+```bash
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_...
+CLERK_SECRET_KEY=sk_test_...
+NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in
+NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
+NEXT_PUBLIC_CLERK_SIGN_IN_FALLBACK_REDIRECT_URL=/
+NEXT_PUBLIC_CLERK_SIGN_UP_FALLBACK_REDIRECT_URL=/
+```
+
+### Correct Implementation Pattern
+```typescript
+// middleware.ts
+import { clerkMiddleware } from '@clerk/nextjs/server'
+
+export default clerkMiddleware()
+
+export const config = {
+  matcher: [
+    '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)',
+    '/(api|trpc)(.*)',
+  ],
+}
+```
+
+```typescript
+// app/layout.tsx
+import { ClerkProvider } from '@clerk/nextjs'
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <ClerkProvider>
+      <html lang="en">
+        <body>{children}</body>
+      </html>
+    </ClerkProvider>
+  )
+}
+```
 
 #### Wallet Management System
 - **Comprehensive Wallet**: Dual-wallet system (Trading Wallet + Income Wallet) with real-time balance tracking

@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 
 interface LogoProps {
@@ -51,11 +52,24 @@ export default function Logo({
   const { width, height } = sizeMap[size];
   const logoSrc = logoVariants[variant];
   const [isAnimating, setIsAnimating] = useState(false);
+  const router = useRouter();
 
-  const handleClick = () => {
+  const handleClick = (e?: React.MouseEvent) => {
     if (enableAnimations) {
+      // Prevent default navigation if animations are enabled
+      if (e && asLink) {
+        e.preventDefault();
+      }
+
       setIsAnimating(true);
-      setTimeout(() => setIsAnimating(false), 2000); // Animation duration
+
+      // Navigate after animation completes
+      setTimeout(() => {
+        setIsAnimating(false);
+        if (asLink && href) {
+          router.push(href);
+        }
+      }, 2000); // Animation duration
     }
   };
 
@@ -105,7 +119,7 @@ export default function Logo({
   if (asLink) {
     return (
       <Link
-        href={href}
+        href={enableAnimations ? "#" : href}
         className={cn(
           "cursor-pointer transition-all duration-300",
           enableAnimations ? "hover:scale-105" : "hover:opacity-80"

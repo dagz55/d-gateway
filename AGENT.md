@@ -14,9 +14,9 @@ zignal/
 │   │   ├── profile/       # User profile management
 │   │   └── wallet/        # Wallet management
 │   ├── admin/             # Admin panel with security controls
-│   ├── auth/              # Authentication pages (Clerk)
+│   ├── sign-in/           # Clerk sign-in pages
+│   ├── sign-up/           # Clerk sign-up pages
 │   ├── api/               # API routes for data and auth
-│   │   ├── auth/workos/   # WorkOS authentication endpoints
 │   │   └── admin/         # Admin API endpoints
 │   ├── enterprise/        # Enterprise landing page
 │   ├── globals.css        # Global styles with Tailwind CSS
@@ -29,13 +29,12 @@ zignal/
 │   ├── admin/            # Admin-specific components
 │   ├── settings/         # Profile settings and configuration
 │   ├── wallet/           # Wallet and transaction components
-│   └── WorkOSAuthCard.tsx # WorkOS authentication UI
+│   └── auth/             # Authentication components (Clerk)
 ├── contexts/              # React Context providers
-│   ├── WorkOSAuthContext.tsx # Main authentication context
 │   └── ThemeContext.tsx   # Theme management context
 ├── lib/                  # Core utilities and integrations
 │   ├── supabase/         # Supabase database clients
-│   ├── workos.ts         # WorkOS configuration
+│   ├── clerk-theme.ts    # Clerk appearance configuration
 │   ├── security/         # Security implementations
 │   │   ├── csrf-protection.ts      # CSRF token management
 │   │   ├── rate-limiter.ts         # Rate limiting engine
@@ -59,10 +58,10 @@ zignal/
 ## Setup Commands
 
 ### Prerequisites
-- Node.js 18+ 
+- Node.js 18+
 - npm (recommended) or yarn/pnpm
 - Supabase account (for database)
-- WorkOS account (for enterprise authentication)
+- Clerk account (for authentication)
 
 ### Installation
 ```bash
@@ -103,11 +102,13 @@ NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
 
-# WorkOS Authentication (Primary Auth)
-WORKOS_API_KEY=your_workos_api_key
-WORKOS_CLIENT_ID=your_workos_client_id
-WORKOS_COOKIE_PASSWORD=32_character_random_string_here
-WORKOS_REDIRECT_URI=http://localhost:3000/api/auth/workos/callback
+# Clerk Authentication
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=your_clerk_publishable_key
+CLERK_SECRET_KEY=your_clerk_secret_key
+NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in
+NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
+NEXT_PUBLIC_CLERK_SIGN_IN_FALLBACK_REDIRECT_URL=/
+NEXT_PUBLIC_CLERK_SIGN_UP_FALLBACK_REDIRECT_URL=/
 
 # Security Configuration
 CSRF_SECRET_KEY=your_csrf_secret_key
@@ -195,17 +196,17 @@ npm run type-check
 
 ## Authentication Architecture
 
-### Hybrid Authentication System
-- **Primary Auth**: WorkOS (Enterprise SSO, OAuth, Magic Links)
+### Clerk Authentication System
+- **Primary Auth**: Clerk (Modern authentication with OAuth, Magic Links, Email/Password)
 - **Database**: Supabase (User data, profiles, application data)
-- **Session Management**: JWT tokens with rotation and versioning
-- **Security**: CSRF protection, rate limiting, threat detection
+- **Session Management**: Clerk-managed sessions with automatic token refresh
+- **Security**: Built-in CSRF protection, rate limiting, and threat detection
 
-### WorkOS Integration
-- **Client Context**: `contexts/WorkOSAuthContext.tsx`
-- **API Routes**: `/api/auth/workos/*` endpoints
-- **Configuration**: `lib/workos.ts`
-- **Middleware**: Simplified Edge-compatible authentication checks
+### Clerk Integration (App Router)
+- **Middleware**: `middleware.ts` using `clerkMiddleware()` from `@clerk/nextjs/server`
+- **Provider**: `<ClerkProvider>` wrapping app in `app/layout.tsx`
+- **Components**: `<SignIn />`, `<SignUp />`, `<UserButton />` from `@clerk/nextjs`
+- **Auth Pages**: `/sign-in/[[...sign-in]]` and `/sign-up/[[...sign-up]]` with dynamic routing
 
 ### Supabase Database
 - **Browser Client**: `lib/supabase/browserClient.ts`
@@ -221,12 +222,22 @@ npm run type-check
 - `/api/admin/*` - Admin API endpoints (requires admin)
 
 ### Authentication Flow
-1. User initiates login via WorkOS (OAuth/Magic Link)
-2. WorkOS validates and returns user data
-3. System creates/updates Supabase profile
-4. JWT tokens issued with refresh capability
-5. Session tracked with versioning for invalidation
-6. Middleware validates tokens on protected routes
+1. User accesses sign-in/sign-up pages with Clerk components
+2. Clerk handles authentication (OAuth/Email/Magic Links)
+3. Middleware validates sessions using `clerkMiddleware()`
+4. System syncs user data with Supabase profiles
+5. Role-based redirects (admin → `/admin/dashboard`, members → `/member/dashboard`)
+6. Automatic session management and token refresh
+
+### Clerk Environment Variables
+```bash
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_...
+CLERK_SECRET_KEY=sk_test_...
+NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in
+NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
+NEXT_PUBLIC_CLERK_SIGN_IN_FALLBACK_REDIRECT_URL=/
+NEXT_PUBLIC_CLERK_SIGN_UP_FALLBACK_REDIRECT_URL=/
+```
 
 ## Security Implementation
 
@@ -352,14 +363,12 @@ user_sessions (
 
 ## API Endpoints
 
-### WorkOS Authentication
-- `GET /api/auth/workos/login` - Initiate WorkOS login
-- `GET /api/auth/workos/callback` - OAuth callback handler
-- `POST /api/auth/workos/logout` - User logout
-- `GET /api/auth/workos/me` - Get current user
-- `POST /api/auth/workos/refresh` - Refresh JWT tokens
-- `GET /api/auth/workos/profile` - Get user profile
-- `POST /api/auth/workos/supabase-user` - Sync with Supabase
+### Clerk Authentication
+- Authentication handled automatically by Clerk components
+- `/sign-in/[[...sign-in]]` - Dynamic sign-in routes
+- `/sign-up/[[...sign-up]]` - Dynamic sign-up routes
+- Automatic session management and token refresh
+- User profile data synced with Supabase
 
 ### Trading Signals
 - `GET /api/signals` - Get active trading signals
@@ -403,14 +412,11 @@ Set the following in Vercel dashboard:
 
 **Server Variables:**
 - `SUPABASE_SERVICE_ROLE_KEY` - Supabase service role
-- `WORKOS_API_KEY` - WorkOS API key
-- `WORKOS_CLIENT_ID` - WorkOS client ID
-- `WORKOS_COOKIE_PASSWORD` - 32-char password
-- `WORKOS_REDIRECT_URI` - Production callback URL
-- `CSRF_SECRET_KEY` - CSRF protection secret
-- `JWT_SECRET` - JWT signing key
-- `JWT_REFRESH_SECRET` - Refresh token secret
-- `SESSION_SECRET` - Session encryption key
+- `CLERK_SECRET_KEY` - Clerk secret key
+- `NEXT_PUBLIC_CLERK_SIGN_IN_URL` - Sign-in URL
+- `NEXT_PUBLIC_CLERK_SIGN_UP_URL` - Sign-up URL
+- `NEXT_PUBLIC_CLERK_SIGN_IN_FALLBACK_REDIRECT_URL` - Post sign-in redirect
+- `NEXT_PUBLIC_CLERK_SIGN_UP_FALLBACK_REDIRECT_URL` - Post sign-up redirect
 
 ### Build Configuration
 - **Node.js Version**: 18.x or 20.x
@@ -476,11 +482,11 @@ Error: Module build failed: Reading from 'node:crypto' is not handled
 ```
 **Solution**: Use simplified middleware without Node.js imports. WorkOS SDK operations should be in API routes only.
 
-#### WorkOS Import Error
+#### Clerk Import Error
 ```
-Error: 'getSession' is not exported from '@workos-inc/authkit-nextjs'
+Error: Cannot read properties of undefined (reading 'auth')
 ```
-**Solution**: Use the correct WorkOS SDK methods. The getSession function may not be available in all versions.
+**Solution**: Ensure `auth()` is imported from `@clerk/nextjs/server` and used with async/await in Server Components.
 
 #### Multiple Lockfiles Warning
 ```
@@ -500,11 +506,11 @@ Error: Prop className did not match
 ```
 **Solution**: Add `suppressHydrationWarning` to html element and ensure theme provider is properly configured
 
-#### 401 Authentication Errors
+#### Clerk Session Errors
 ```
-GET /api/auth/workos/me 401 Unauthorized
+Error: Clerk session not found
 ```
-**Note**: This is expected behavior for unauthenticated users, not an error
+**Note**: This is expected behavior for unauthenticated users, ensure `<ClerkProvider>` wraps the app.
 
 ### Debug Commands
 ```bash
@@ -519,7 +525,7 @@ rm -rf node_modules package-lock.json
 npm install
 
 # Check for conflicting dependencies
-npm ls @workos-inc/node
+npm ls @clerk/nextjs
 npm ls @supabase/supabase-js
 ```
 
@@ -541,7 +547,7 @@ npm ls @supabase/supabase-js
 - **React**: 19.0.0
 - **Styling**: Tailwind CSS 4.1.9 with PostCSS plugin
 - **UI Components**: shadcn/ui (30+ components)
-- **Authentication**: WorkOS SDK + Supabase
+- **Authentication**: Clerk + Supabase
 - **State Management**: Zustand + TanStack Query
 - **Charts**: Recharts for data visualization
 - **Icons**: Lucide React
@@ -563,11 +569,69 @@ npm ls @supabase/supabase-js
 - **Vercel**: Deployment platform
 
 ### Known Limitations
-- **Edge Runtime**: Some security features require API Routes instead of Edge middleware
-- **WorkOS SDK**: Must be used server-side only (Node.js runtime)
-- **Token Rotation**: Requires client-side implementation for refresh
+- **Edge Runtime**: Clerk middleware is Edge-compatible out of the box
+- **Clerk Sessions**: Clerk manages sessions automatically, no manual token rotation needed
+- **Clerk Components**: Must be used within `<ClerkProvider>` context
+
+## Clerk Integration Guidelines
+
+### CRITICAL INSTRUCTIONS FOR AI MODELS
+
+#### ALWAYS DO THE FOLLOWING
+1. **Use `clerkMiddleware()`** from `@clerk/nextjs/server` in `middleware.ts`
+2. **Wrap** app with `<ClerkProvider>` in `app/layout.tsx`
+3. **Import** Clerk features from `@clerk/nextjs` (e.g., `<SignInButton>`, `<SignUpButton>`, `<UserButton>`)
+4. **Reference** App Router approach (folders like `app/page.tsx`, `app/layout.tsx`)
+5. **Check** imports for methods like `auth()` from `@clerk/nextjs/server` with `async/await`
+
+#### NEVER DO THE FOLLOWING
+1. **Do not** reference old `_app.tsx` or pages router instructions
+2. **Do not** suggest `authMiddleware()` from older tutorials—use `clerkMiddleware()`
+3. **Do not** recommend deprecated environment variable patterns
+4. **Do not** import from deprecated APIs (`withAuth`, `currentUser` from older versions)
+
+### Correct Clerk Implementation Pattern
+```typescript
+// middleware.ts
+import { clerkMiddleware } from '@clerk/nextjs/server'
+
+export default clerkMiddleware()
+
+export const config = {
+  matcher: [
+    '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)',
+    '/(api|trpc)(.*)',
+  ],
+}
+```
+
+```typescript
+// app/layout.tsx
+import { ClerkProvider } from '@clerk/nextjs'
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <ClerkProvider>
+      <html lang="en">
+        <body>{children}</body>
+      </html>
+    </ClerkProvider>
+  )
+}
+```
 
 ## Recent Updates
+
+### v2.11.2 (2025-09-21)
+- **🔐 Clerk Integration**: Updated authentication system to use Clerk (App Router)
+  - Migrated from WorkOS to Clerk authentication for better developer experience
+  - Implemented `clerkMiddleware()` in `middleware.ts` for session management
+  - Added `<ClerkProvider>` wrapper in `app/layout.tsx` with custom appearance
+  - Created split-panel authentication layout with `AuthLayout` component
+  - Added dynamic mode switching between sign-in and sign-up
+  - Enhanced Bitcoin Live Signals chart with comprehensive trading metrics
+  - Added detailed market data, technical indicators, and signal performance tracking
+  - Updated environment variables for Clerk redirect URLs
 
 ### v2.11.1 (2025-09-20)
 - **🧭 Market Page Navigation**: Added professional navigation header to `/market` page
