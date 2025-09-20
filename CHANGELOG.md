@@ -5,6 +5,30 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.11.0] - 2025-09-20
+
+### Fixed
+- **🔧 Code Quality & Performance Improvements**: Major bug fixes and performance optimizations
+  - Fixed invalid `@utility` directive in globals.css - replaced with proper CSS class syntax
+  - Added accessibility attributes (aria-label, title) to all SVG icons in FeatureHighlights.tsx
+  - Added explicit `type="button"` attributes to all button elements to prevent form submission issues
+  - Fixed hydration mismatch in CryptoBackgroundAnimation.tsx by pre-calculating animation durations
+  - Made animation element counts configurable for better performance on low-end devices
+  - Improved TypeScript typing by replacing generic `React.ComponentType<any>` with `LucideIcon`
+  - Fixed memory leak in PriceTickerAnimation.tsx by properly cleaning up setTimeout in useEffect
+  - Made particle counts configurable in TechBackgroundAnimation.tsx for scalable performance
+  - Fixed hardcoded SVG IDs that could cause conflicts with multiple component instances
+  - All components now use unique IDs generated with React's useId hook
+
+### Enhanced  
+- **🎯 Landing Page Header Improvements**: Enhanced header with better conversion-focused messaging
+  - Updated main title to "Zignal - Advanced Trading Signals" for better brand clarity
+  - Improved morphing subtitle texts with more professional and benefit-focused messaging
+  - Enhanced description with professional-grade positioning and clear value propositions
+  - Added trust indicators (SEC Regulated, 4.9/5 Rating) for credibility
+  - Improved CTA buttons with better copy ("Get Started Free", "Watch Demo")
+  - Added value proposition text: "No credit card required • Start with $0 • Cancel anytime"
+
 ## [2.10.9] - 2025-09-20
 
 ### Added

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useId } from 'react';
 
 interface Particle {
   id: number;
@@ -13,9 +13,16 @@ interface Particle {
   color: string;
 }
 
-export function TechBackgroundAnimation() {
+interface TechBackgroundAnimationProps {
+  particleCount?: number;
+}
+
+export function TechBackgroundAnimation({ particleCount = 50 }: TechBackgroundAnimationProps = {}) {
   const [particles, setParticles] = useState<Particle[]>([]);
   const [mounted, setMounted] = useState(false);
+  const uniqueId = useId();
+  const hexagonsId = `hexagons-${uniqueId}`;
+  const networkGradientId = `network-gradient-${uniqueId}`;
 
   useEffect(() => {
     setMounted(true);
@@ -24,7 +31,7 @@ export function TechBackgroundAnimation() {
     const newParticles: Particle[] = [];
     const colors = ['#33E1DA', '#1A7FB3', '#10B981', '#F59E0B', '#8B5CF6'];
     
-    for (let i = 0; i < 50; i++) {
+    for (let i = 0; i < particleCount; i++) {
       newParticles.push({
         id: i,
         x: Math.random() * 100,
@@ -48,7 +55,7 @@ export function TechBackgroundAnimation() {
       <div className="absolute inset-0 opacity-5">
         <svg width="100%" height="100%" className="w-full h-full">
           <defs>
-            <pattern id="hexagons" x="0" y="0" width="100" height="87" patternUnits="userSpaceOnUse">
+            <pattern id={hexagonsId} x="0" y="0" width="100" height="87" patternUnits="userSpaceOnUse">
               <polygon
                 points="50,1 85,25 85,62 50,86 15,62 15,25"
                 fill="none"
@@ -57,7 +64,7 @@ export function TechBackgroundAnimation() {
               />
             </pattern>
           </defs>
-          <rect width="100%" height="100%" fill="url(#hexagons)" />
+          <rect width="100%" height="100%" fill={`url(#${hexagonsId})`} />
         </svg>
       </div>
 
@@ -129,7 +136,7 @@ export function TechBackgroundAnimation() {
       {/* Network Connections */}
       <svg className="absolute inset-0 w-full h-full opacity-15">
         <defs>
-          <linearGradient id="network-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+          <linearGradient id={networkGradientId} x1="0%" y1="0%" x2="100%" y2="100%">
             <stop offset="0%" stopColor="#33E1DA" stopOpacity="0.8" />
             <stop offset="50%" stopColor="#1A7FB3" stopOpacity="0.4" />
             <stop offset="100%" stopColor="#10B981" stopOpacity="0.8" />
@@ -150,7 +157,7 @@ export function TechBackgroundAnimation() {
               y1={startY}
               x2={endX}
               y2={endY}
-              stroke="url(#network-gradient)"
+              stroke={`url(#${networkGradientId})`}
               strokeWidth="1"
               className="animate-chart-draw"
               style={{

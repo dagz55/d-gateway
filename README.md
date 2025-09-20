@@ -4,6 +4,14 @@ Zignal is a comprehensive crypto trading platform built with [Next.js 15.5.3](ht
 
 ## 🚀 Features
 
+### Recent Improvements (v2.11.0)
+- 🔧 **Code Quality & Performance**: Fixed critical issues including hydration mismatches, memory leaks, and accessibility improvements
+- 🎯 **Enhanced Landing Header**: Professional conversion-focused messaging with trust indicators and improved CTAs
+- 🏎️ **Performance Optimizations**: Configurable animation counts for better performance on low-end devices
+- ♿ **Accessibility**: Added proper ARIA labels and semantic markup to all interactive elements
+- 🔒 **Type Safety**: Improved TypeScript definitions with proper Lucide icon typing
+- 🎨 **UI Polish**: Fixed button behaviors and prevented unintended form submissions
+
 ### Core Platform
 - 🔐 **Enterprise Authentication**: Clerk authentication with role-based access control
 - 🎬 **Enhanced Landing Page**: Fully separated landing page with 3D particle animations, shader effects, floating elements, and interactive background animations

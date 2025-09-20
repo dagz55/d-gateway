@@ -513,7 +513,7 @@
 }
 
 /* Additional animation utilities */
-@utility animate-fade-in {
+.animate-fade-in {
   animation: fadeIn 0.6s ease-out forwards;
 }
 

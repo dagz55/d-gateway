@@ -26,15 +26,22 @@ export function PriceTickerAnimation() {
   const [isVisible, setIsVisible] = useState(true);
 
   useEffect(() => {
+    let timeoutId: NodeJS.Timeout;
+    
     const interval = setInterval(() => {
       setIsVisible(false);
-      setTimeout(() => {
+      timeoutId = setTimeout(() => {
         setCurrentIndex((prev) => (prev + 1) % mockPriceData.length);
         setIsVisible(true);
       }, 300);
     }, 3000);
 
-    return () => clearInterval(interval);
+    return () => {
+      clearInterval(interval);
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    };
   }, []);
 
   const currentData = mockPriceData[currentIndex];

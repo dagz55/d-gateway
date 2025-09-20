@@ -220,7 +220,7 @@ function HeroSection() {
 
         {/* CTA buttons */}
         <SlideIn direction="up" delay={2000} className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-          <button className="group relative px-10 py-5 bg-gradient-to-r from-[#33E1DA] to-[#1A7FB3] text-[#0A0F1F] font-bold text-xl rounded-xl hover:scale-105 transition-all duration-300 overflow-hidden shadow-lg shadow-[#33E1DA]/25">
+          <button type="button" className="group relative px-10 py-5 bg-gradient-to-r from-[#33E1DA] to-[#1A7FB3] text-[#0A0F1F] font-bold text-xl rounded-xl hover:scale-105 transition-all duration-300 overflow-hidden shadow-lg shadow-[#33E1DA]/25">
             <span className="relative z-10 flex items-center gap-2">
               Get Started Free
               <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
@@ -228,7 +228,7 @@ function HeroSection() {
             <div className="absolute inset-0 bg-gradient-to-r from-[#1A7FB3] to-[#33E1DA] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
           </button>
           
-          <button className="px-10 py-5 border-2 border-[#33E1DA] text-[#33E1DA] font-bold text-xl rounded-xl hover:bg-[#33E1DA] hover:text-[#0A0F1F] transition-all duration-300 backdrop-blur-sm bg-white/5">
+          <button type="button" className="px-10 py-5 border-2 border-[#33E1DA] text-[#33E1DA] font-bold text-xl rounded-xl hover:bg-[#33E1DA] hover:text-[#0A0F1F] transition-all duration-300 backdrop-blur-sm bg-white/5">
             Watch Demo
           </button>
         </SlideIn>
@@ -422,7 +422,7 @@ function CTASection() {
         />
 
         <SlideIn direction="up" delay={2000}>
-          <button className="group relative px-12 py-6 bg-[#0A0F1F] text-[#EAF2FF] font-bold text-xl rounded-xl hover:scale-105 transition-all duration-300 overflow-hidden">
+          <button type="button" className="group relative px-12 py-6 bg-[#0A0F1F] text-[#EAF2FF] font-bold text-xl rounded-xl hover:scale-105 transition-all duration-300 overflow-hidden">
             <span className="relative z-10 flex items-center gap-3">
               Get Started Now
               <ArrowRight className="w-6 h-6 group-hover:translate-x-2 transition-transform" />

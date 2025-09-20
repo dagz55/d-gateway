@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { Bitcoin, Gem, Diamond, GitBranch, Route, Orbit, Activity, ArrowUp } from 'lucide-react';
+import { Bitcoin, Gem, Diamond, GitBranch, Route, Orbit, Activity, ArrowUp, LucideIcon } from 'lucide-react';
 
 interface FloatingElement {
   id: number;
@@ -12,9 +12,10 @@ interface FloatingElement {
   rotation: number;
   opacity: number;
   type: 'crypto' | 'tech';
-  icon: React.ComponentType<any>;
+  icon: LucideIcon;
   color: string;
   delay: number;
+  animationDuration: number;
 }
 
 const cryptoIcons = [
@@ -31,7 +32,15 @@ const techIcons = [
   { icon: ArrowUp, color: '#F59E0B' },
 ];
 
-export function CryptoBackgroundAnimation() {
+interface CryptoBackgroundAnimationProps {
+  cryptoCount?: number;
+  techCount?: number;
+}
+
+export function CryptoBackgroundAnimation({ 
+  cryptoCount = 15, 
+  techCount = 15 
+}: CryptoBackgroundAnimationProps = {}) {
   const [elements, setElements] = useState<FloatingElement[]>([]);
   const [mounted, setMounted] = useState(false);
 
@@ -42,7 +51,7 @@ export function CryptoBackgroundAnimation() {
     const newElements: FloatingElement[] = [];
     
     // Add crypto elements
-    for (let i = 0; i < 15; i++) {
+    for (let i = 0; i < cryptoCount; i++) {
       const cryptoIcon = cryptoIcons[i % cryptoIcons.length];
       newElements.push({
         id: i,
@@ -56,12 +65,13 @@ export function CryptoBackgroundAnimation() {
         icon: cryptoIcon.icon,
         color: cryptoIcon.color,
         delay: Math.random() * 10,
+        animationDuration: 12 + Math.random() * 8,
       });
     }
     
     // Add tech elements
-    for (let i = 15; i < 30; i++) {
-      const techIcon = techIcons[(i - 15) % techIcons.length];
+    for (let i = cryptoCount; i < cryptoCount + techCount; i++) {
+      const techIcon = techIcons[(i - cryptoCount) % techIcons.length];
       newElements.push({
         id: i,
         x: Math.random() * 100,
@@ -74,6 +84,7 @@ export function CryptoBackgroundAnimation() {
         icon: techIcon.icon,
         color: techIcon.color,
         delay: Math.random() * 15,
+        animationDuration: 12 + Math.random() * 8,
       });
     }
     
@@ -109,7 +120,7 @@ export function CryptoBackgroundAnimation() {
               left: `${element.x}%`,
               top: `${element.y}%`,
               animationDelay: `${element.delay}s`,
-              animationDuration: `${12 + Math.random() * 8}s`,
+              animationDuration: `${element.animationDuration}s`,
             }}
           >
             <IconComponent
