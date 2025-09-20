@@ -11,7 +11,7 @@ interface BackgroundCellsProps {
 
 export const BackgroundCells = ({ children, className }: BackgroundCellsProps) => {
   return (
-    <div className={cn("relative h-screen flex justify-center overflow-hidden", className)}>
+    <div className={cn("relative h-full w-full flex justify-center overflow-hidden", className)}>
       <BackgroundCellCore />
       {children && (
         <div className="relative z-50 mt-40 pointer-events-none select-none">
@@ -43,8 +43,8 @@ const BackgroundCellCore = () => {
       onMouseMove={handleMouseMove}
       className="h-full absolute inset-0"
     >
-      <div className="absolute h-[20rem] inset-y-0 overflow-hidden">
-        <div className="absolute h-full w-full pointer-events-none -bottom-2 z-40 bg-slate-950 [mask-image:linear-gradient(to_bottom,transparent,black)]" />
+      <div className="absolute h-full inset-0 overflow-hidden">
+        <div className="absolute h-full w-full pointer-events-none -bottom-2 z-40 bg-black/20 [mask-image:linear-gradient(to_bottom,transparent,black)]" />
         <div
           className="absolute inset-0 z-20 bg-transparent"
           style={{
@@ -60,9 +60,9 @@ const BackgroundCellCore = () => {
             WebkitMaskRepeat: "no-repeat",
           }}
         >
-          <Pattern cellClassName="border-blue-600 relative z-[100]" />
+          <Pattern cellClassName="border-blue-500/60 relative z-[100]" />
         </div>
-        <Pattern className="opacity-[0.5]" cellClassName="border-neutral-700" />
+        <Pattern className="opacity-[0.3]" cellClassName="border-neutral-600/40" />
       </div>
     </div>
   );
@@ -100,7 +100,7 @@ const Cell = ({ rowIdx, colIdx, clickedCell, cellClassName, onCellClick }: CellP
   return (
     <div
       className={cn(
-        "bg-transparent border-l border-b border-neutral-600",
+        "bg-transparent border-l border-b border-neutral-700/30",
         cellClassName
       )}
       onClick={() => onCellClick(rowIdx, colIdx)}
