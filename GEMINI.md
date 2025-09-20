@@ -79,5 +79,6 @@ The application uses Clerk for authentication with the following setup:
 1. Users access sign-in/sign-up pages with Clerk components
 2. Clerk handles authentication (OAuth/Email/Magic Links)
 3. Middleware validates sessions using `clerkMiddleware()`
-4. Role-based redirects (admin → `/admin/dashboard`, members → `/member/dashboard`)
+4. Role-based redirects (admin → `/dashboard/admins`, members → `/dashboard/members`)
 5. Automatic session management and token refresh
+6. Organization support enabled for admin role assignment

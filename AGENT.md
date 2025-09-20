@@ -226,8 +226,9 @@ npm run type-check
 2. Clerk handles authentication (OAuth/Email/Magic Links)
 3. Middleware validates sessions using `clerkMiddleware()`
 4. System syncs user data with Supabase profiles
-5. Role-based redirects (admin → `/admin/dashboard`, members → `/member/dashboard`)
+5. Role-based redirects (admin → `/dashboard/admins`, members → `/dashboard/members`)
 6. Automatic session management and token refresh
+7. Organization support enabled for admin role assignment
 
 ### Clerk Environment Variables
 ```bash
@@ -621,6 +622,23 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 ```
 
 ## Recent Updates
+
+### v2.11.4 (2025-09-21)
+- **🏗️ Dashboard Restructure**: Unified dashboard paths with organization support
+  - Created new dashboard structure: `/dashboard/admins/*` and `/dashboard/members/*`
+  - Maintained backward compatibility with legacy `/admin/*` and `/member/*` routes
+  - Re-enabled Clerk organization support for admin role assignment
+  - Enhanced middleware with organization metadata role checking
+  - Updated role-based redirects to new dashboard paths
+  - Improved admin access control for zignals.org domain issues
+
+### v2.11.3 (2025-09-21)
+- **🔧 Production Auth Fixes**: Enhanced authentication and logo navigation
+  - Fixed text contrast issues in sign-in/sign-up forms with proper backgrounds
+  - Enhanced logo component with radar signal animations and navigation
+  - Updated admin role assignment system for production use
+  - Added admin@zignals.org as predefined admin user
+  - Improved Clerk component styling for better accessibility
 
 ### v2.11.2 (2025-09-21)
 - **🔐 Clerk Integration**: Updated authentication system to use Clerk (App Router)

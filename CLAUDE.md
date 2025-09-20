@@ -65,13 +65,15 @@ components/
 ### Routing Structure
 - **Landing**: `/` - Original login page (redirects to dashboard if authenticated)
 - **Auth**: `/sign-in/[[...sign-in]]` and `/sign-up/[[...sign-up]]` - Clerk authentication with split-panel design
-- **Dashboard**: `/dashboard` - Main trading dashboard with AppLayout
+- **Dashboard**:
+  - **Admin Dashboard**: `/dashboard/admins/*` - Admin panel with full system management
+  - **Member Dashboard**: `/dashboard/members/*` - Member-specific dashboard and features
+  - **Legacy Dashboard**: `/dashboard` - Redirects to role-appropriate dashboard
 - **Market**: `/market` - Live cryptocurrency market data with professional navigation
 - **Wallet**: `/wallet` - Comprehensive wallet management system
 - **Profile**: `/profile` - User profile management
 - **Settings**: `/settings` - User preferences and account settings
-- **Admin**: `/admin` - Admin panel for system management
-- **Member**: `/member` - Member-specific dashboard and features
+- **Legacy Routes**: `/admin/*` and `/member/*` - Maintained for backward compatibility
 
 ### Critical Implementation Details
 

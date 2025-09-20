@@ -12,18 +12,20 @@ const isPublicRoute = createRouteMatcher([
 
 // Define admin routes that require admin role
 const isAdminRoute = createRouteMatcher([
-  "/admin(.*)",
+  "/admin(.*)", // Legacy admin routes
+  "/dashboard/admins(.*)", // New admin dashboard structure
   "/api/admin(.*)",
 ]);
 
 // Define member routes
 const isMemberRoute = createRouteMatcher([
-  "/member(.*)",
+  "/member(.*)", // Legacy member routes
+  "/dashboard/members(.*)", // New member dashboard structure
 ]);
 
 // Define legacy dashboard routes that need to be redirected
 const isLegacyDashboardRoute = createRouteMatcher([
-  "/dashboard(.*)",
+  "/dashboard$", // Exact match for /dashboard only
 ]);
 
 // Define dashboard routes that are accessible directly
@@ -54,16 +56,20 @@ export default clerkMiddleware(async (auth, req) => {
       });
     }
     
-    // Check admin role - simplified to remove organization dependency
+    // Check admin role - includes organization support since it's re-enabled
     const publicMetadataRole = (sessionClaims as any)?.publicMetadata?.role;
     const metadataRole = (sessionClaims as any)?.metadata?.role;
     const directRole = (sessionClaims as any)?.role;
+    const organizationRole = (sessionClaims as any)?.org_role;
+    const orgMetadataRole = (sessionClaims as any)?.orgMetadata?.role;
 
     const isUserAdmin =
       publicMetadataRole === "admin" ||
       metadataRole === "admin" ||
       (sessionClaims?.publicMetadata as any)?.role === "admin" ||
-      directRole === "admin";
+      directRole === "admin" ||
+      organizationRole === "admin" ||
+      orgMetadataRole === "admin";
     
     if (process.env.NODE_ENV === 'development') {
       console.log('🔍 Middleware Debug - Admin Check Result:', {
@@ -71,6 +77,8 @@ export default clerkMiddleware(async (auth, req) => {
         publicMetadataRole,
         metadataRole,
         directRole,
+        organizationRole,
+        orgMetadataRole,
         currentPath: req.nextUrl.pathname
       });
     }
@@ -81,9 +89,9 @@ export default clerkMiddleware(async (auth, req) => {
         console.log('🔄 Legacy Dashboard Redirect:', { isUserAdmin, currentPath: req.nextUrl.pathname });
       }
       if (isUserAdmin) {
-        return NextResponse.redirect(new URL("/admin/dashboard", req.url));
+        return NextResponse.redirect(new URL("/dashboard/admins", req.url));
       } else {
-        return NextResponse.redirect(new URL("/member/dashboard", req.url));
+        return NextResponse.redirect(new URL("/dashboard/members", req.url));
       }
     }
 
@@ -112,16 +120,16 @@ export default clerkMiddleware(async (auth, req) => {
 
       if (!isUserAdmin) {
         // Prevent redirect loop - only redirect if not already on member dashboard
-        if (req.nextUrl.pathname !== "/member/dashboard") {
+        if (req.nextUrl.pathname !== "/dashboard/members") {
           if (process.env.NODE_ENV === 'development') {
             console.log('🚫 Non-admin accessing admin route, redirecting to member dashboard');
           }
-          return NextResponse.redirect(new URL("/member/dashboard", req.url));
+          return NextResponse.redirect(new URL("/dashboard/members", req.url));
         }
       }
-      // Redirect from /admin to /admin/dashboard for authenticated admins
-      if (req.nextUrl.pathname === "/admin" && isUserAdmin) {
-        return NextResponse.redirect(new URL("/admin/dashboard", req.url));
+      // Redirect from legacy admin routes to new admin dashboard for authenticated admins
+      if ((req.nextUrl.pathname === "/admin" || req.nextUrl.pathname === "/dashboard/admins") && isUserAdmin) {
+        return NextResponse.redirect(new URL("/dashboard/admins", req.url));
       }
     }
 
@@ -131,8 +139,8 @@ export default clerkMiddleware(async (auth, req) => {
         console.log('🔄 Admin accessing member route, redirecting to admin dashboard');
       }
       // Prevent redirect loop - only redirect if not already on admin dashboard
-      if (req.nextUrl.pathname !== "/admin/dashboard") {
-        return NextResponse.redirect(new URL("/admin/dashboard", req.url));
+      if (req.nextUrl.pathname !== "/dashboard/admins") {
+        return NextResponse.redirect(new URL("/dashboard/admins", req.url));
       }
     }
 
@@ -142,9 +150,9 @@ export default clerkMiddleware(async (auth, req) => {
         console.log('🔄 Auth page redirect:', { isUserAdmin });
       }
       if (isUserAdmin) {
-        return NextResponse.redirect(new URL("/admin/dashboard", req.url));
+        return NextResponse.redirect(new URL("/dashboard/admins", req.url));
       } else {
-        return NextResponse.redirect(new URL("/member/dashboard", req.url));
+        return NextResponse.redirect(new URL("/dashboard/members", req.url));
       }
     }
 
@@ -154,9 +162,9 @@ export default clerkMiddleware(async (auth, req) => {
         console.log('🏠 Root path redirect:', { isUserAdmin });
       }
       if (isUserAdmin) {
-        return NextResponse.redirect(new URL("/admin/dashboard", req.url));
+        return NextResponse.redirect(new URL("/dashboard/admins", req.url));
       } else {
-        return NextResponse.redirect(new URL("/member/dashboard", req.url));
+        return NextResponse.redirect(new URL("/dashboard/members", req.url));
       }
     }
   }
