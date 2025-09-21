@@ -7,7 +7,14 @@ const isPublicRoute = createRouteMatcher([
   "/", // Root path for landing page
   "/sign-in(.*)",
   "/sign-up(.*)",
-  "/auth(.*)", // All auth routes including OAuth callbacks
+  "/auth/callback(.*)", // OAuth callbacks only
+  "/auth/oauth-success(.*)", // OAuth success handling
+  "/auth/oauth-timeout", // OAuth timeout page
+  "/auth/clean-session", // Session cleanup
+  "/auth/auth-code-error", // Auth errors
+  "/auth/forgot-password", // Password reset
+  "/auth/reset-password", // Password reset
+  "/auth/signup", // Legacy signup
   "/api/webhooks(.*)",
   "/market", // Public market page
 ]);
@@ -177,7 +184,9 @@ export default clerkMiddleware(async (auth, req) => {
     }
 
     // Redirect authenticated users from sign-in/sign-up pages based on role
-    if (req.nextUrl.pathname === "/sign-in" || req.nextUrl.pathname === "/sign-up") {
+    // But only if they're not in the middle of an auth flow
+    if ((req.nextUrl.pathname === "/sign-in" || req.nextUrl.pathname === "/sign-up") &&
+        !req.nextUrl.searchParams.has('redirect_url')) {
       if (process.env.NODE_ENV === 'development') {
         console.log('🔄 Auth page redirect:', { isUserAdmin });
       }
@@ -188,8 +197,9 @@ export default clerkMiddleware(async (auth, req) => {
       }
     }
 
-    // Redirect root path based on user role
-    if (req.nextUrl.pathname === "/") {
+    // Redirect root path based on user role - but only for authenticated users
+    // Keep the landing page accessible for unauthenticated users
+    if (req.nextUrl.pathname === "/" && userId) {
       if (process.env.NODE_ENV === 'development') {
         console.log('🏠 Root path redirect:', { isUserAdmin });
       }
