@@ -5,8 +5,8 @@ import { NextResponse } from "next/server";
 // Define public routes that don't require authentication
 const isPublicRoute = createRouteMatcher([
   "/", // Root path for landing page
-  "/sign-in(.*)", // Clerk sign-in pages
-  "/sign-up(.*)", // Clerk sign-up pages
+  "/sign-in(.*)", // Clerk sign-in pages and internal routes
+  "/sign-up(.*)", // Clerk sign-up pages and internal routes
   "/admin-setup", // Admin setup page
   "/api/webhooks(.*)", // Webhook endpoints
   "/market", // Public market page
@@ -42,10 +42,37 @@ const isDashboardRoute = createRouteMatcher([
 ]);
 
 export default clerkMiddleware(async (auth, req) => {
+  const pathname = req.nextUrl.pathname;
+  
+  // Early return for landing page - no middleware processing needed
+  if (pathname === "/") {
+    return NextResponse.next();
+  }
+
+  // Early return for Clerk internal routes (catchall checks) - most specific first
+  if (pathname.includes("clerk_catchall_check") || 
+      pathname.includes("SignIn_clerk") ||
+      pathname.includes("SignUp_clerk") ||
+      pathname.match(/\/sign-in\/.*_clerk.*/) ||
+      pathname.match(/\/sign-up\/.*_clerk.*/)) {
+    if (process.env.NODE_ENV === 'development') {
+      console.log('🚀 Clerk internal route - immediate return:', pathname);
+    }
+    return NextResponse.next();
+  }
+
+  // Early return for other public routes that don't need auth processing
+  if (isPublicRoute(req)) {
+    if (process.env.NODE_ENV === 'development') {
+      console.log('📍 Public route - early return:', pathname);
+    }
+    return NextResponse.next();
+  }
+
   const { userId, sessionClaims } = await auth();
 
   // Protect all routes except public ones
-  if (!isPublicRoute(req) && !userId) {
+  if (!userId) {
     // Redirect to sign-in page if not authenticated
     const signInUrl = new URL("/sign-in", req.url);
     signInUrl.searchParams.set("redirect_url", req.url);
@@ -196,29 +223,6 @@ export default clerkMiddleware(async (auth, req) => {
       }
     }
 
-    // Redirect root path based on user role - but only for authenticated users
-    // Keep the landing page accessible for unauthenticated users
-    // IMPORTANT: Skip redirect if coming from admin_access_denied to prevent loops
-    if (req.nextUrl.pathname === "/" && userId && !req.nextUrl.searchParams.has("admin_access_denied")) {
-      const referrer = req.headers.get('referer');
-
-      // Skip redirect if we just came from a redirect loop scenario
-      if (referrer && (referrer.includes("admin_access_denied") || referrer.includes("admin-setup"))) {
-        if (process.env.NODE_ENV === 'development') {
-          console.log('🛑 Skipping root redirect due to loop prevention');
-        }
-        return NextResponse.next();
-      }
-
-      if (process.env.NODE_ENV === 'development') {
-        console.log('🏠 Root path redirect:', { isUserAdmin });
-      }
-      if (isUserAdmin) {
-        return NextResponse.redirect(new URL("/dashboard/admins", req.url));
-      } else {
-        return NextResponse.redirect(new URL("/dashboard/members", req.url));
-      }
-    }
   }
 
   return NextResponse.next();
@@ -226,9 +230,9 @@ export default clerkMiddleware(async (auth, req) => {
 
 export const config = {
   matcher: [
-    // Skip Next.js internals and all static files, unless found in search params
+    // Skip Next.js internals and all static files
     "/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)",
-    // Always run for API routes
+    // Always run for API routes  
     "/(api|trpc)(.*)",
   ],
 };
