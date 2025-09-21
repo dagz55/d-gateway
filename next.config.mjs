@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Simplified config for Vercel compatibility
-  productionBrowserSourceMaps: process.env.NODE_ENV === "production",
+  // Performance optimizations
+  productionBrowserSourceMaps: false, // Disable source maps in production for better performance
   reactStrictMode: true,
   typescript: {
     ignoreBuildErrors: true,
@@ -10,13 +10,19 @@ const nextConfig = {
     ignoreDuringBuilds: true,
   },
   env: {},
-  // Increase body size limit for photo uploads
+  // Performance and optimization features
   experimental: {
     serverActions: {
       bodySizeLimit: '10mb', // Increase from default 1mb to 10mb
     },
+    optimizePackageImports: ['lucide-react', '@radix-ui/react-icons'], // Optimize specific packages
   },
+  // Image optimization settings
   images: {
+    formats: ['image/webp', 'image/avif'], // Enable modern image formats
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
+    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
+    minimumCacheTTL: 31536000, // Cache images for 1 year
     remotePatterns: [
       {
         protocol: "https",
@@ -33,6 +39,9 @@ const nextConfig = {
       // Add other trusted domains as needed
     ],
   },
+  // Compression and performance headers
+  compress: true,
+  poweredByHeader: false, // Remove X-Powered-By header for security and performance
   // External packages for server components
   serverExternalPackages: ['@workos-inc/node'],
   webpack: (config, options) => {

@@ -1,7 +1,8 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, Suspense } from 'react';
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
 import {
   Menu,
   X,
@@ -17,12 +18,46 @@ import {
   HeartHandshake,
 } from 'lucide-react';
 import Logo from '@/components/ui/Logo';
-import { OptimizedTradingChart } from '@/components/trading/OptimizedTradingChart';
 import { PromotionalBanner } from './PromotionalBanner';
-import { PriceConverter } from './PriceConverter';
-import { CryptoPriceCard } from './CryptoPriceCard';
-import { FeatureHighlights } from './FeatureHighlights';
-import { FAQSection } from './FAQSection';
+
+// Lazy load heavy components for better performance
+const OptimizedTradingChart = dynamic(() => import('@/components/trading/OptimizedTradingChart').then(mod => ({ default: mod.OptimizedTradingChart })), {
+  ssr: false,
+  loading: () => (
+    <div className="h-96 rounded-2xl border border-white/10 bg-white/[0.04] backdrop-blur animate-pulse flex items-center justify-center">
+      <div className="text-white/50">Loading chart...</div>
+    </div>
+  )
+});
+
+const PriceConverter = dynamic(() => import('./PriceConverter').then(mod => ({ default: mod.PriceConverter })), {
+  ssr: false,
+  loading: () => (
+    <div className="h-64 rounded-2xl border border-white/10 bg-white/[0.04] backdrop-blur animate-pulse"></div>
+  )
+});
+
+const CryptoPriceCard = dynamic(() => import('./CryptoPriceCard').then(mod => ({ default: mod.CryptoPriceCard })), {
+  ssr: false
+});
+
+const FeatureHighlights = dynamic(() => import('./FeatureHighlights').then(mod => ({ default: mod.FeatureHighlights })), {
+  ssr: false,
+  loading: () => (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {[1, 2, 3, 4, 5, 6].map(i => (
+        <div key={i} className="h-64 rounded-2xl border border-white/10 bg-white/[0.04] backdrop-blur animate-pulse"></div>
+      ))}
+    </div>
+  )
+});
+
+const FAQSection = dynamic(() => import('./FAQSection').then(mod => ({ default: mod.FAQSection })), {
+  ssr: false,
+  loading: () => (
+    <div className="h-96 rounded-2xl border border-white/10 bg-white/[0.04] backdrop-blur animate-pulse"></div>
+  )
+});
 
 const navLinks = [
   { label: 'Features', href: '#features' },
@@ -395,7 +430,15 @@ export function LandingContent() {
                 Actionable signals, human guidance, and automation working together so you can scale decisions without second-guessing.
               </p>
             </div>
-            <FeatureHighlights />
+            <Suspense fallback={
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {[1, 2, 3, 4, 5, 6].map(i => (
+                  <div key={i} className="h-64 rounded-2xl border border-white/10 bg-white/[0.04] backdrop-blur animate-pulse"></div>
+                ))}
+              </div>
+            }>
+              <FeatureHighlights />
+            </Suspense>
           </div>
         </section>
 
@@ -409,7 +452,11 @@ export function LandingContent() {
                   Streamline your entries with the built-in converter and see real-time package performance before you commit.
                 </p>
               </div>
-              <PriceConverter />
+              <Suspense fallback={
+                <div className="h-64 rounded-2xl border border-white/10 bg-white/[0.04] backdrop-blur animate-pulse"></div>
+              }>
+                <PriceConverter />
+              </Suspense>
             </div>
             <div className="space-y-8">
               <div className="rounded-3xl border border-white/10 bg-white/[0.04] p-8 backdrop-blur">
@@ -480,7 +527,13 @@ export function LandingContent() {
                 Track structure, momentum, and liquidity from a single interactive canvas built for actionable decisions.
               </p>
             </div>
-            <OptimizedTradingChart />
+            <Suspense fallback={
+              <div className="h-96 rounded-2xl border border-white/10 bg-white/[0.04] backdrop-blur animate-pulse flex items-center justify-center">
+                <div className="text-white/50">Loading chart...</div>
+              </div>
+            }>
+              <OptimizedTradingChart />
+            </Suspense>
           </div>
         </section>
 
@@ -534,7 +587,11 @@ export function LandingContent() {
         </section>
 
         <section id="support" className="relative">
-          <FAQSection />
+          <Suspense fallback={
+            <div className="h-96 rounded-2xl border border-white/10 bg-white/[0.04] backdrop-blur animate-pulse"></div>
+          }>
+            <FAQSection />
+          </Suspense>
         </section>
       </main>
 
