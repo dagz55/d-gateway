@@ -79,8 +79,11 @@ export default clerkMiddleware(async (auth, req) => {
       });
     }
     
-    // Check admin role - includes organization support since it's re-enabled
-    const publicMetadataRole = (sessionClaims as any)?.publicMetadata?.role;
+    // CRITICAL FIX: Properly access session claims for admin role detection
+    const publicMetadata = sessionClaims?.publicMetadata as any;
+
+    const publicMetadataRole = publicMetadata?.role;
+    const isAdminFlag = publicMetadata?.is_admin;
     const metadataRole = (sessionClaims as any)?.metadata?.role;
     const directRole = (sessionClaims as any)?.role;
     const organizationRole = (sessionClaims as any)?.org_role;
@@ -88,9 +91,8 @@ export default clerkMiddleware(async (auth, req) => {
 
     const isUserAdmin =
       publicMetadataRole === "admin" ||
+      isAdminFlag === true ||
       metadataRole === "admin" ||
-      (sessionClaims?.publicMetadata as any)?.role === "admin" ||
-      (sessionClaims?.publicMetadata as any)?.is_admin === true ||
       directRole === "admin" ||
       organizationRole === "admin" ||
       orgMetadataRole === "admin";
@@ -99,12 +101,12 @@ export default clerkMiddleware(async (auth, req) => {
       console.log('🔍 Middleware Debug - Admin Check Result:', {
         isUserAdmin,
         publicMetadataRole,
+        isAdminFlag,
         metadataRole,
         directRole,
         organizationRole,
         orgMetadataRole,
-        isAdminFlag: (sessionClaims?.publicMetadata as any)?.is_admin,
-        fullPublicMetadata: sessionClaims?.publicMetadata,
+        fullPublicMetadata: publicMetadata,
         currentPath: req.nextUrl.pathname
       });
     }
