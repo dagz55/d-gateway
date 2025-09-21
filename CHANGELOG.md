@@ -203,6 +203,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Improved route protection and access control
   - Better logging for route access debugging
 
+## [2.11.5] - 2025-09-21
+
+### Fixed
+- Market page now integrates with dashboard shell when users are signed in
+  - Uses AppLayout (Sidebar + Header) to ensure Market menu item behaves like other dashboard pages
+  - Keeps public Market page available for signed-out visitors with its standalone header
+  - Preserves existing market data features (refresh, sorting, sparkline, favorites)
+
+### Enhanced
+- Sidebar Active State: ensures '/market' highlights correctly in the sidebar
+- Mobile UX: Market navigation closes the mobile sidebar and renders responsively inside the dashboard layout
+
+### Technical Notes
+- app/market/page.tsx updated to conditionally render with AppLayout for signed-in users via Clerk useUser()
+- No breaking changes to routing; middleware continues to allow public access to /market
+
 ## [2.10.6] - 2025-09-19
 
 
@@ -386,7 +402,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Resolved useEffect dependency array warnings in photo components
   - Added proper error handling and fallback mechanisms
 - **Settings Page Integration**: Fixed profile settings not saving
-  - Updated ChangePhotoForm to use WorkOS authentication context
+  - Updated ChangePhotoForm to use Clerk authentication context
   - Connected settings page to real profile data instead of mock data
   - Fixed avatar URL display from multiple data sources (profile, user)
 - **Database Schema Issues**: Resolved multiple database constraint errors
@@ -407,7 +423,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Fallback to base64 storage when Supabase storage unavailable
   - Secure file access with authenticated upload/update/delete
   - Public read access for avatar images
-- **Authentication System**: Strengthened WorkOS integration
+- **Authentication System**: Strengthened Clerk integration
   - Fixed admin detection and permissions system
   - Added proper environment variable configuration
   - Enhanced security logging for all avatar operations
@@ -426,17 +442,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [2.8.2] - 2025-09-19
 
 ### Fixed
-- **WorkOS Authentication Flow**: Resolved critical authentication issues
-  - Fixed 401 Unauthorized error by updating AuthContext to use correct WorkOS endpoint
+- **Clerk Authentication Flow**: Resolved critical authentication issues
+  - Fixed 401 Unauthorized error by updating AuthContext to use correct Clerk endpoint
   - Added fallback authentication flow for backward compatibility
-  - Implemented proper WorkOS authentication endpoint routing
+  - Implemented proper Clerk authentication endpoint routing
 - **Hydration Mismatch**: Fixed React hydration errors in background animations
   - Moved Math.random() calls to useEffect to avoid server/client mismatch
   - Added client-side initialization for FloatingParticle and ParticleField components
   - Eliminated hydration warnings in floating particle animations
 
 ### Enhanced
-- **WorkOS Authentication UI**: Complete visual redesign with modern enterprise-grade styling
+- **Clerk Authentication UI**: Complete visual redesign with modern enterprise-grade styling
   - Added sophisticated animations using Framer Motion
   - Implemented gradient backgrounds with animated elements
   - Enhanced button interactions with hover and tap animations
@@ -452,20 +468,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Added visual feedback for all interactive elements
 
 ### Added
-- **WorkOS Domain Configuration**: Complete WorkOS domain setup implementation
-  - Implemented proper domain configuration based on WorkOS admin panel settings
-  - Added comprehensive WorkOS authentication service with domain support
-  - Created WorkOS configuration documentation and environment templates
-  - Added health checks and service validation for WorkOS integration
-- **Enhanced Authentication Service**: New WorkOS authentication service architecture
+- **Clerk Domain Configuration**: Complete Clerk domain setup implementation
+  - Implemented proper domain configuration based on Clerk admin panel settings
+  - Added comprehensive Clerk authentication service with domain support
+  - Created Clerk configuration documentation and environment templates
+  - Added health checks and service validation for Clerk integration
+- **Enhanced Authentication Service**: New Clerk authentication service architecture
   - Comprehensive domain configuration support (email, admin portal, auth API, AuthKit)
   - State validation and security features for OAuth flow
   - Proper error handling and logging integration
   - Health check endpoints for service monitoring
 
 ### Fixed
-- **WorkOS Authentication Errors**: Resolved critical authentication configuration issues
-  - Fixed import errors in WorkOS callback route
+- **Clerk Authentication Errors**: Resolved critical authentication configuration issues
+  - Fixed import errors in Clerk callback route
   - Added environment variable validation and debugging tools
   - Created environment configuration checker script (`npm run check-env`)
   - Provided comprehensive environment template for easy setup
@@ -484,8 +500,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Added environment variable validation script
   - Created comprehensive environment template
   - Improved error debugging and configuration validation
-- **WorkOS Integration**: Complete overhaul of WorkOS authentication system
-  - Updated API endpoints to use new WorkOS authentication service
+- **Clerk Integration**: Complete overhaul of Clerk authentication system
+  - Updated API endpoints to use new Clerk authentication service
   - Proper domain configuration and environment-specific settings
   - Enhanced security with state validation and CSRF protection
   - Improved error categorization and user-friendly error messages
@@ -609,7 +625,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Ensured ThemeProvider wraps app root with `attribute="class"` and `defaultTheme="light"`
   - Theme switching now works correctly without conflicts
 
-- **WorkOS Authentication Security**: Enhanced password generation and username handling
+- **Clerk Authentication Security**: Enhanced password generation and username handling
   - Replaced `randomUUID()` with cryptographically secure password generator using `crypto.randomBytes`
   - Improved password complexity with upper/lower case, digits, and symbols (24 characters)
   - Enhanced username generation with better collision handling and validation
@@ -733,7 +749,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `components/ui/animated-stats.tsx` - Fixed trend colors and progress bar backgrounds
 - `components/layout/ProfileDropdown.tsx` - Updated gray color references to Zignal colors
 - `components/layout/ProfileSection.tsx` - Fixed status indicator colors
-- `components/WorkOSAuthCard.tsx` - Updated all gray text colors to proper contrast colors
+- `components/ClerkAuthCard.tsx` - Updated all gray text colors to proper contrast colors
 - `app/page.tsx` - Fixed navigation button colors and right panel background
 - `package.json` - Removed next-themes dependency, version bumped to 2.7.0
 - `README.md` - Updated with new landing page features
@@ -746,47 +762,47 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [2.6.0] - 2025-09-15
 
 ### Added
-- **WorkOS AuthKit + Supabase Integration**: Enterprise-grade authentication with database integration
-  - WorkOS AuthKit as Supabase third-party auth provider
-  - WorkOS access tokens authenticate with Supabase APIs
+- **Clerk AuthKit + Supabase Integration**: Enterprise-grade authentication with database integration
+  - Clerk AuthKit as Supabase third-party auth provider
+  - Clerk access tokens authenticate with Supabase APIs
   - Encrypted session management with automatic refresh
   - Enterprise SSO capabilities (SAML, OIDC, Google Workspace, Microsoft 365)
   - SOC 2 Type II compliance for financial services
   - Advanced audit trails and session controls
   - Professional authentication UI components
   - JWT template configuration for Supabase RLS policies
-- **WorkOS Configuration**: Complete setup and configuration system
+- **Clerk Configuration**: Complete setup and configuration system
   - Environment variable validation and setup
   - API endpoints for login, callback, logout, and user management
   - Authentication middleware for protected routes
-  - WorkOS context provider for React components
+  - Clerk context provider for React components
 - **Testing & Validation**: Comprehensive testing suite
-  - WorkOS authentication test script
+  - Clerk authentication test script
   - Environment variable validation
   - API endpoint testing
   - Configuration validation
 - **Documentation**: Complete setup and usage documentation
   - WORKOS_SETUP.md with detailed configuration instructions
-  - Updated README.md with WorkOS authentication features
+  - Updated README.md with Clerk authentication features
   - Architecture documentation for hybrid auth/database setup
 
 ### Changed
-- **Authentication System**: Migrated to WorkOS AuthKit + Supabase integration
-  - WorkOS handles authentication, Supabase provides database
-  - Updated middleware to use WorkOS session validation
-  - WorkOS access tokens authenticate with Supabase APIs
+- **Authentication System**: Migrated to Clerk AuthKit + Supabase integration
+  - Clerk handles authentication, Supabase provides database
+  - Updated middleware to use Clerk session validation
+  - Clerk access tokens authenticate with Supabase APIs
   - Maintained Supabase for trading data and real-time features
-  - RLS policies work with WorkOS JWT tokens
+  - RLS policies work with Clerk JWT tokens
 - **UI Components**: Updated authentication interface
-  - WorkOSAuthCard component with enterprise branding
+  - ClerkAuthCard component with enterprise branding
   - Professional authentication flow and user experience
   - Enhanced security messaging and compliance indicators
 
 ### Technical Details
-- **Architecture**: WorkOS + Supabase third-party auth integration
-  - WorkOS handles all user authentication and session management
-  - Supabase provides database with RLS policies using WorkOS tokens
-  - WorkOS access tokens authenticate with Supabase APIs
+- **Architecture**: Clerk + Supabase third-party auth integration
+  - Clerk handles all user authentication and session management
+  - Supabase provides database with RLS policies using Clerk tokens
+  - Clerk access tokens authenticate with Supabase APIs
   - Clean separation of concerns between auth and data layers
 - **Security**: Enhanced security measures
   - Encrypted session cookies with 32-character passwords
