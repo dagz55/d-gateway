@@ -70,6 +70,7 @@ components/
   - **Local Dev**: `/sign-in/[[...sign-in]]` and `/sign-up/[[...sign-up]]` - Clerk authentication with split-panel design
   - **Production**: External domain `https://account.zignals.org/sign-in` and `https://account.zignals.org/sign-up`
   - **Admin Setup**: `/admin-setup` - Role assignment for predefined admin emails
+  - **OAuth Compatibility**: `/auth/oauth-success` - Temporary redirect handler for Clerk OAuth callbacks
 - **Dashboard**:
   - **Admin Dashboard**: `/dashboard/admins/*` - Admin panel with full system management
   - **Member Dashboard**: `/dashboard/members/*` - Member-specific dashboard and features
@@ -209,6 +210,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 - Test authentication flows including OAuth
 
 ## Recent Changes & Version History
+
+### v2.11.6 - OAuth Redirect Fix (September 2025)
+- **HOTFIX**: Added temporary `/auth/oauth-success` redirect handler for Clerk compatibility
+- **Fixed**: 404 errors during OAuth login flow that broke user authentication
+- **Added**: Compatibility layer until Clerk OAuth URLs can be updated in dashboard
+- **Updated**: Middleware to allow OAuth callback route as public
 
 ### v2.11.5 - Auth Path Cleanup (September 2025)
 - **BREAKING**: Removed deprecated `/auth/*` paths - production uses external domain
