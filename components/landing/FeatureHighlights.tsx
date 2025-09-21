@@ -1,52 +1,63 @@
 'use client';
 
-export function FeatureHighlights() {
-  const features = [
-    {
-      icon: (
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Real-time signals icon">
-          <title>Real-time Signals</title>
-          <path d="M3 3L21 21M9 9L21 3L12 12L3 21L9 9Z" stroke="#0577DA" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-        </svg>
-      ),
-      title: "Real-time Signals",
-      description: "Professional trading signals with instant notifications"
-    },
-    {
-      icon: (
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Advanced analytics icon">
-          <title>Advanced Analytics</title>
-          <path d="M3 3V9L9 12L15 9V3M3 3L9 6L15 3M3 3L9 6M15 3L9 6" stroke="#0577DA" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-          <path d="M9 12V18L15 21V15" stroke="#0577DA" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-        </svg>
-      ),
-      title: "Advanced Analytics",
-      description: "Professional-grade charts and market analysis tools"
-    },
-    {
-      icon: (
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Secure platform icon">
-          <title>Secure Platform</title>
-          <path d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="#0577DA" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-        </svg>
-      ),
-      title: "Secure Platform",
-      description: "Enterprise-grade security with encrypted data"
-    }
-  ];
+import { TrendingUp, Cpu, ShieldCheck, Users, ArrowRight } from 'lucide-react';
 
+const highlights = [
+  {
+    icon: TrendingUp,
+    title: 'Real-time Signals',
+    description: 'Institutional-grade alerts that react to market structure in under 200ms.',
+    badge: '0.2s latency',
+  },
+  {
+    icon: Cpu,
+    title: 'Automated Workflows',
+    description: 'Pre-built strategies with configurable risk templates and automated exits.',
+    badge: 'Plug & play',
+  },
+  {
+    icon: ShieldCheck,
+    title: 'Security & Compliance',
+    description: 'Multi-layer protection, encrypted data, and transparent governance out of the box.',
+    badge: 'SOC2 roadmap',
+  },
+  {
+    icon: Users,
+    title: 'Human Guidance',
+    description: 'Senior strategists and an active community ready to validate every play.',
+    badge: 'Desk access',
+  },
+];
+
+export function FeatureHighlights() {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-      {features.map((feature, index) => (
-        <div key={index} className="flex items-start space-x-4 p-4 rounded-xl bg-white/5 border border-white/10 hover:border-white/20 transition-colors">
-          <div className="flex-shrink-0 w-12 h-12 bg-[#0577DA]/10 rounded-lg flex items-center justify-center">
-            {feature.icon}
+    <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-4">
+      {highlights.map((feature) => (
+        <article
+          key={feature.title}
+          className="group relative overflow-hidden rounded-3xl border border-white/10 bg-white/[0.05] p-6 backdrop-blur transition duration-300 hover:-translate-y-1 hover:border-white/30"
+        >
+          <div
+            aria-hidden="true"
+            className="absolute inset-0 opacity-0 transition duration-300 group-hover:opacity-100"
+          >
+            <div className="absolute inset-0 bg-gradient-to-br from-[#0577DA]/20 via-transparent to-transparent" />
           </div>
-          <div>
-            <h3 className="text-white font-semibold mb-2">{feature.title}</h3>
-            <p className="text-gray-300 text-sm">{feature.description}</p>
+          <div className="relative flex h-12 w-12 items-center justify-center rounded-2xl bg-[#0577DA]/10 text-[#57c8ff]">
+            <feature.icon className="h-6 w-6" />
           </div>
-        </div>
+          <div className="relative mt-6">
+            <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3 py-1 text-xs font-semibold uppercase tracking-[0.3em] text-white/50">
+              {feature.badge}
+            </span>
+            <h3 className="mt-4 text-xl font-semibold text-white">{feature.title}</h3>
+            <p className="mt-3 text-sm text-white/70">{feature.description}</p>
+          </div>
+          <div className="relative mt-6 flex items-center justify-between text-sm text-white/50">
+            <span>Learn more</span>
+            <ArrowRight className="h-4 w-4 transition group-hover:translate-x-1 group-hover:text-white" />
+          </div>
+        </article>
       ))}
     </div>
   );

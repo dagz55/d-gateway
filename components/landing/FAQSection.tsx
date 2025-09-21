@@ -1,127 +1,132 @@
 'use client';
 
 import { useState } from 'react';
+import { ChevronDown, MessageCircle, LifeBuoy } from 'lucide-react';
 
 interface FAQItem {
   question: string;
   answer: string;
 }
 
-export function FAQSection() {
-  const [openItems, setOpenItems] = useState<number[]>([]);
+const faqItems: FAQItem[] = [
+  {
+    question: 'How do I get started with crypto trading?',
+    answer:
+      'Create your Zignal account, complete the quick verification flow, and you can immediately access live signals in the demo workspace. Upgrade whenever you want to unlock automated execution and portfolio syncing.',
+  },
+  {
+    question: 'What are the trading fees?',
+    answer:
+      'Signal delivery is included in your plan. Execution fees start from 0.1% maker / 0.2% taker, with automatic volume discounts and additional reductions when you hold a Zignal premium subscription.',
+  },
+  {
+    question: 'Is my crypto safe on the platform?',
+    answer:
+      'Security is our first priority. 95% of assets sit in cold storage, multi-signature approvals are required for major actions, and every account can enable hardware-backed MFA to keep attackers out.',
+  },
+  {
+    question: 'What payment methods do you accept?',
+    answer:
+      'Support spans bank transfer (ACH, SEPA, wire), debit/credit card, Apple Pay, Google Pay, and direct crypto deposits. Most fiat deposits post instantly and are fee-free on standard plans.',
+  },
+  {
+    question: 'Can I trade on mobile?',
+    answer:
+      'Yes. The Zignal iOS and Android apps mirror the desktop desk so you can trigger automations, approve trades, and monitor alerts on the go.',
+  },
+  {
+    question: 'What is the minimum deposit amount?',
+    answer:
+      'Crypto deposits have no minimums. Fiat minimums start at $25 depending on region and payment rail, and there are no penalties for withdrawing whenever you need.',
+  },
+];
 
-  const faqItems: FAQItem[] = [
-    {
-      question: "How do I get started with crypto trading?",
-      answer: "Getting started is easy! Simply create an account, complete the verification process, and you can start trading immediately. We support over 400 cryptocurrencies with competitive fees and advanced trading tools."
-    },
-    {
-      question: "What are the trading fees?",
-      answer: "Our trading fees start from 0.1% for makers and 0.2% for takers. We offer volume-based discounts, and you can reduce fees further by holding our native token or using our premium subscription plans."
-    },
-    {
-      question: "Is my crypto safe on the platform?",
-      answer: "Security is our top priority. We use industry-leading security measures including cold storage for 95% of funds, multi-signature wallets, and advanced encryption. We're also regulated and insured for additional protection."
-    },
-    {
-      question: "What payment methods do you accept?",
-      answer: "We accept various payment methods including bank transfers (ACH, wire), credit/debit cards, Apple Pay, Google Pay, and cryptocurrency deposits. Most USD deposits are free of charge."
-    },
-    {
-      question: "Can I trade on mobile?",
-      answer: "Yes! Our mobile app is available for both iOS and Android devices. You can trade, monitor your portfolio, set price alerts, and access all features on the go."
-    },
-    {
-      question: "What is the minimum deposit amount?",
-      answer: "The minimum deposit varies by payment method. For cryptocurrency deposits, there's no minimum. For fiat deposits, the minimum is typically $10-50 depending on your region and payment method."
-    }
-  ];
+export function FAQSection() {
+  const [openItems, setOpenItems] = useState<number[]>([0]);
 
   const toggleItem = (index: number) => {
-    setOpenItems(prev =>
-      prev.includes(index)
-        ? prev.filter(i => i !== index)
-        : [...prev, index]
-    );
+    setOpenItems((prev) => (prev.includes(index) ? prev.filter((item) => item !== index) : [...prev, index]));
   };
 
   return (
-    <div className="relative z-10 bg-[#0a1429] border-t border-white/10">
-      <div className="max-w-4xl mx-auto px-4 py-16">
-        <div className="text-center mb-12">
-          <h2 className="text-4xl font-bold text-white mb-4">
-            Frequently Asked Questions
-          </h2>
-          <p className="text-gray-300 text-lg">
-            Got questions? We've got answers. Can't find what you're looking for?
-            <a href="#" className="text-[#0577DA] hover:underline ml-1">
-              Contact our support team
-            </a>
+    <div className="relative overflow-hidden border-t border-white/10 bg-[#030a18]">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(17,153,250,0.35)_0%,transparent_65%)] opacity-40" />
+      <div className="relative mx-auto max-w-5xl px-4 py-20">
+        <div className="text-center">
+          <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3 py-1 text-xs font-semibold uppercase tracking-[0.3em] text-white/50">
+            Support
+          </span>
+          <h2 className="mt-4 text-4xl font-semibold text-white sm:text-5xl">Frequently asked questions</h2>
+          <p className="mt-4 text-base text-white/70">
+            Quick answers to the most common questions. If you need something more specific, our team is one click away.
           </p>
         </div>
 
-        <div className="space-y-4">
-          {faqItems.map((item, index) => (
-            <div key={index} className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 overflow-hidden">
-              <button
-                onClick={() => toggleItem(index)}
-                className="w-full px-6 py-4 text-left flex items-center justify-between hover:bg-white/5 transition-colors"
+        <div className="mt-12 space-y-4">
+          {faqItems.map((item, index) => {
+            const isOpen = openItems.includes(index);
+            return (
+              <div
+                key={item.question}
+                className="overflow-hidden rounded-3xl border border-white/10 bg-white/[0.04] backdrop-blur transition hover:border-white/25"
               >
-                <span className="text-white font-medium text-lg pr-4">
-                  {item.question}
-                </span>
-                <div className="flex-shrink-0">
-                  <svg
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                    className={`text-[#0577DA] transition-transform duration-200 ${
-                      openItems.includes(index) ? 'rotate-180' : ''
+                <button
+                  type="button"
+                  onClick={() => toggleItem(index)}
+                  className="flex w-full items-center justify-between gap-4 px-6 py-5 text-left"
+                  aria-expanded={isOpen}
+                >
+                  <span className="text-base font-semibold text-white sm:text-lg">{item.question}</span>
+                  <span
+                    className={`flex h-9 w-9 items-center justify-center rounded-full border border-white/15 text-white/70 transition ${
+                      isOpen ? 'bg-[#0577DA]/20 text-white' : 'hover:border-white/30 hover:text-white'
                     }`}
                   >
-                    <path
-                      d="M6 9L12 15L18 9"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                </div>
-              </button>
-
-              <div className={`overflow-hidden transition-all duration-300 ${
-                openItems.includes(index) ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
-              }`}>
-                <div className="px-6 pb-4">
-                  <p className="text-gray-300 leading-relaxed">
-                    {item.answer}
-                  </p>
+                    <ChevronDown className={`h-4 w-4 transition duration-200 ${isOpen ? 'rotate-180' : ''}`} />
+                  </span>
+                </button>
+                <div
+                  className={`grid transition-[grid-template-rows,opacity] duration-300 ${
+                    isOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'
+                  }`}
+                >
+                  <div className="overflow-hidden px-6 pb-6 text-sm text-white/70 sm:text-base">{item.answer}</div>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
-        {/* Contact CTA */}
-        <div className="text-center mt-12">
-          <div className="bg-gradient-to-r from-[#0577DA]/10 to-[#1199FA]/10 rounded-2xl p-8 border border-[#0577DA]/20">
-            <h3 className="text-2xl font-bold text-white mb-4">
-              Still have questions?
-            </h3>
-            <p className="text-gray-300 mb-6">
-              Our support team is here to help you 24/7 with any questions about trading, security, or account management.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button className="bg-[#0577DA] hover:bg-[#0466c4] text-white px-8 py-3 rounded-xl font-semibold transition-colors">
-                Contact Support
-              </button>
-              <button className="bg-white/10 hover:bg-white/20 text-white px-8 py-3 rounded-xl font-semibold transition-colors">
-                Visit Help Center
-              </button>
+        <div className="mt-16 grid gap-6 rounded-3xl border border-white/15 bg-white/[0.05] p-8 text-white/80 sm:grid-cols-2">
+          <div>
+            <div className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-[#0577DA]/15 text-[#57c8ff]">
+              <MessageCircle className="h-6 w-6" />
             </div>
+            <h3 className="mt-4 text-xl font-semibold text-white">Chat with support</h3>
+            <p className="mt-2 text-sm text-white/70">
+              Our humans (not bots) are available 24/7 for account questions, live trade checks, and onboarding help.
+            </p>
+            <a
+              href="mailto:support@zignal.com"
+              className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-white transition hover:text-white/60"
+            >
+              support@zignal.com
+            </a>
+          </div>
+          <div>
+            <div className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-[#22d3ee]/15 text-[#22d3ee]">
+              <LifeBuoy className="h-6 w-6" />
+            </div>
+            <h3 className="mt-4 text-xl font-semibold text-white">Visit the help center</h3>
+            <p className="mt-2 text-sm text-white/70">
+              Step-by-step guides, best practices, and release notes to keep you ahead of the curve.
+            </p>
+            <a
+              href="#"
+              className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-white transition hover:text-white/60"
+            >
+              Browse articles →
+            </a>
           </div>
         </div>
       </div>
