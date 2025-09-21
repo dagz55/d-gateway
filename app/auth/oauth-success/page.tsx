@@ -1,23 +1,21 @@
-'use client';
+import { currentUser } from '@clerk/nextjs/server';
+import { redirect } from 'next/navigation';
 
-import { useUser } from '@clerk/nextjs';
-import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+// Force dynamic rendering since this route uses server-side authentication
+export const dynamic = 'force-dynamic';
 
-export default function OAuthSuccessPage() {
-  const { user, isLoaded } = useUser();
-  const router = useRouter();
+import ClientFallback from './ClientFallback';
 
-  useEffect(() => {
-    if (!isLoaded) return;
+export default async function OAuthSuccessPage() {
+  try {
+    const user = await currentUser();
 
     if (!user) {
       // User not authenticated, redirect to sign in
-      router.replace('/sign-in');
-      return;
+      redirect('/sign-in');
     }
 
-    // Check if user is admin (matching middleware logic)
+    // Check if user is admin (matching middleware logic exactly)
     const isAdmin =
       user.publicMetadata?.role === 'admin' ||
       (user as any)?.metadata?.role === 'admin' ||
@@ -25,7 +23,8 @@ export default function OAuthSuccessPage() {
       (user as any)?.org_role === 'admin' ||
       (user as any)?.orgMetadata?.role === 'admin';
 
-    console.log('OAuth Success - User role check:', {
+    // Log for debugging (server-side)
+    console.log('OAuth Success (Server) - User role check:', {
       userId: user.id,
       email: user.emailAddresses[0]?.emailAddress,
       publicMetadata: user.publicMetadata,
@@ -42,30 +41,17 @@ export default function OAuthSuccessPage() {
     // Redirect based on role
     if (isAdmin) {
       console.log('Redirecting admin to /dashboard/admins');
-      router.replace('/dashboard/admins');
+      redirect('/dashboard/admins');
     } else {
       console.log('Redirecting member to /dashboard/members');
-      router.replace('/dashboard/members');
+      redirect('/dashboard/members');
     }
-  }, [user, isLoaded, router]);
-
-  if (!isLoaded) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-[#0A0F1F] via-[#1A1F35] to-[#0A0F1F] flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin h-8 w-8 border-2 border-[#33E1DA] border-t-transparent rounded-full mx-auto mb-4"></div>
-          <p className="text-white">Redirecting to your dashboard...</p>
-        </div>
-      </div>
-    );
+  } catch (error) {
+    console.error('OAuth Success error:', error);
+    // Fallback to client-side handling if server-side fails
+    return <ClientFallback />;
   }
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0A0F1F] via-[#1A1F35] to-[#0A0F1F] flex items-center justify-center">
-      <div className="text-center">
-        <div className="animate-spin h-8 w-8 border-2 border-[#33E1DA] border-t-transparent rounded-full mx-auto mb-4"></div>
-        <p className="text-white">Setting up your account...</p>
-      </div>
-    </div>
-  );
+  // This should never be reached, but provide fallback just in case
+  return <ClientFallback />;
 }
