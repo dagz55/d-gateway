@@ -37,6 +37,8 @@ SUPABASE_SERVICE_ROLE_KEY=your_service_role_key  # For admin operations
 - Middleware uses `clerkMiddleware()` from `@clerk/nextjs/server` for session management
 - Protected routes use `(dashboard)` route group with shared layout
 - Clerk handles OAuth flows automatically with `/sign-in` and `/sign-up` routes
+- **IMPORTANT**: Deprecated `/auth/*` paths have been removed (production uses external domain)
+- Role-based redirects: `/dashboard` → `/dashboard/admins` (admin) or `/dashboard/members` (member)
 
 #### Supabase Client Architecture
 - **Server Components**: Use `lib/supabase/server.ts` with cookie-based session management
@@ -64,16 +66,20 @@ components/
 
 ### Routing Structure
 - **Landing**: `/` - Original login page (redirects to dashboard if authenticated)
-- **Auth**: `/sign-in/[[...sign-in]]` and `/sign-up/[[...sign-up]]` - Clerk authentication with split-panel design
+- **Authentication**:
+  - **Local Dev**: `/sign-in/[[...sign-in]]` and `/sign-up/[[...sign-up]]` - Clerk authentication with split-panel design
+  - **Production**: External domain `https://account.zignals.org/sign-in` and `https://account.zignals.org/sign-up`
+  - **Admin Setup**: `/admin-setup` - Role assignment for predefined admin emails
 - **Dashboard**:
   - **Admin Dashboard**: `/dashboard/admins/*` - Admin panel with full system management
   - **Member Dashboard**: `/dashboard/members/*` - Member-specific dashboard and features
-  - **Legacy Dashboard**: `/dashboard` - Redirects to role-appropriate dashboard
+  - **Legacy Dashboard**: `/dashboard` - Redirects to role-appropriate dashboard based on user role
 - **Market**: `/market` - Live cryptocurrency market data with professional navigation
 - **Wallet**: `/wallet` - Comprehensive wallet management system
 - **Profile**: `/profile` - User profile management
 - **Settings**: `/settings` - User preferences and account settings
 - **Legacy Routes**: `/admin/*` and `/member/*` - Maintained for backward compatibility
+- **Public Pages**: `/enterprise`, `/help` - Marketing and support pages
 
 ### Critical Implementation Details
 
@@ -201,3 +207,19 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 - Test both light and dark themes
 - Verify responsive design on mobile devices
 - Test authentication flows including OAuth
+
+## Recent Changes & Version History
+
+### v2.11.5 - Auth Path Cleanup (September 2025)
+- **BREAKING**: Removed deprecated `/auth/*` paths - production uses external domain
+- **Fixed**: Dashboard route conflicts that caused build errors
+- **Removed**: Conflicting `app/(dashboard)/dashboard/page.tsx`
+- **Updated**: Hardcoded auth links from `/auth` to `/sign-in`
+- **Improved**: Middleware routing logic for role-based redirects
+- **Performance**: Optimized landing page with lazy loading and image optimization
+- **Build**: Resolved "Cannot find module for page: /dashboard" error
+
+### Production URLs
+- **Sign In**: `https://account.zignals.org/sign-in`
+- **Sign Up**: `https://account.zignals.org/sign-up`
+- **Development**: Local `/sign-in` and `/sign-up` routes via Clerk
