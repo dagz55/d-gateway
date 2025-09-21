@@ -1,5 +1,5 @@
 import crypto from 'crypto';
-import { createWorkOSSupabaseClient } from './supabase/workosClient';
+import { createBrowserClient } from './supabase/browserClient';
 import { TokenFamily } from './token-manager';
 
 // Database schema for token storage
@@ -38,7 +38,7 @@ export class RefreshTokenStore {
   private supabaseClient: any;
 
   private constructor() {
-    this.supabaseClient = createWorkOSSupabaseClient();
+    this.supabaseClient = createBrowserClient();
   }
 
   public static getInstance(): RefreshTokenStore {

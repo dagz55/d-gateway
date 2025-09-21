@@ -1,0 +1,181 @@
+
+services:
+  # MCP Gateway - Central proxy and load balancer
+  mcp-gateway:
+    build:
+      context: ./docker/mcp-gateway
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - NODE_ENV=production
+      - GATEWAY_PORT=8080
+      - LOG_LEVEL=info
+    networks:
+      - mcp-network
+    depends_on:
+      - mcp-supabase
+      - mcp-filesystem
+      - mcp-memory
+      - mcp-puppeteer
+      - mcp-context7
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+
+  # Supabase MCP Server
+  mcp-supabase:
+    image: node:20-alpine
+    working_dir: /app
+    command: ["sh", "-c", "npm install -g @supabase/mcp-server-supabase@latest && mcp-server-supabase --read-only --project-ref=elnntdfdlojxpcjiyehe"]
+    environment:
+      - NODE_ENV=production
+      - SUPABASE_ACCESS_TOKEN=${SUPABASE_ACCESS_TOKEN:-}
+    networks:
+      - mcp-network
+    ports:
+      - "8081:3000"
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/health", "||", "true"]
+      interval: 60s
+      timeout: 10s
+      retries: 5
+    restart: unless-stopped
+
+  # Filesystem MCP Server
+  mcp-filesystem:
+    image: node:20-alpine
+    working_dir: /app
+    command: ["npx", "@modelcontextprotocol/server-filesystem", "/workspace"]
+    volumes:
+      - ${PWD}:/workspace:ro
+    networks:
+      - mcp-network
+    environment:
+      - NODE_ENV=production
+    healthcheck:
+      test: ["CMD", "ls", "/workspace"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    restart: unless-stopped
+
+  # Memory MCP Server
+  mcp-memory:
+    image: node:20-alpine
+    working_dir: /app
+    command: ["npx", "@modelcontextprotocol/server-memory"]
+    networks:
+      - mcp-network
+    environment:
+      - NODE_ENV=production
+    volumes:
+      - mcp-memory-data:/app/data
+    healthcheck:
+      test: ["CMD", "test", "-f", "/app/data/memory.json"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    restart: unless-stopped
+
+  # Puppeteer MCP Server
+  mcp-puppeteer:
+    image: node:20-alpine
+    working_dir: /app
+    command: ["npx", "mcp-server-puppeteer"]
+    networks:
+      - mcp-network
+    environment:
+      - NODE_ENV=production
+      - PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
+    # Install Chromium for Puppeteer
+    entrypoint: |
+      sh -c "
+        apk add --no-cache chromium nss freetype freetype-dev harfbuzz ca-certificates ttf-freefont &&
+        npx mcp-server-puppeteer
+      "
+    healthcheck:
+      test: ["CMD", "pgrep", "node"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+
+  # Context7 MCP Server
+  mcp-context7:
+    image: node:20-alpine
+    working_dir: /app
+    command: ["npx", "@upstash/context7-mcp@latest"]
+    networks:
+      - mcp-network
+    environment:
+      - NODE_ENV=production
+    healthcheck:
+      test: ["CMD", "pgrep", "node"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    restart: unless-stopped
+
+  # ReactBits MCP Server
+  mcp-reactbits:
+    image: node:20-alpine
+    working_dir: /app
+    command: ["npx", "reactbits-dev-mcp-server"]
+    networks:
+      - mcp-network
+    environment:
+      - NODE_ENV=development
+    healthcheck:
+      test: ["CMD", "pgrep", "node"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    restart: unless-stopped
+
+  # Browser Tools MCP Server
+  mcp-browser-tools:
+    image: node:20-alpine
+    working_dir: /app
+    command: ["npx", "@agentdeskai/browser-tools-mcp@1.2.0"]
+    networks:
+      - mcp-network
+    environment:
+      - NODE_ENV=production
+    healthcheck:
+      test: ["CMD", "pgrep", "node"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    restart: unless-stopped
+
+  # Tavily MCP Server (Search)
+  mcp-tavily:
+    image: node:20-alpine
+    working_dir: /app
+    command: ["npx", "tavily-mcp@0.2.3"]
+    networks:
+      - mcp-network
+    environment:
+      - NODE_ENV=production
+      - TAVILY_API_KEY=${TAVILY_API_KEY:-}
+    healthcheck:
+      test: ["CMD", "pgrep", "node"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    restart: unless-stopped
+
+networks:
+  mcp-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+
+volumes:
+  mcp-memory-data:
+    driver: local

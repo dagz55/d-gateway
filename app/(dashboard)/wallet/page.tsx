@@ -279,7 +279,7 @@ export default async function WalletPage() {
       </div>
     );
   } catch (error) {
-    console.warn('WorkOS auth error in wallet page:', error);
+    console.warn('Auth error in wallet page:', error);
     redirect('/');
   }
 }

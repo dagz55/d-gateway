@@ -2,18 +2,17 @@
 
 /**
  * Environment Configuration Checker
- * Checks if all required WorkOS environment variables are set
+ * Checks if all required Clerk environment variables are set
  */
 
 const requiredEnvVars = [
-  'WORKOS_API_KEY',
-  'WORKOS_CLIENT_ID', 
-  'WORKOS_COOKIE_PASSWORD',
+  'NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY',
+  'CLERK_SECRET_KEY', 
   'NEXT_PUBLIC_SITE_URL',
   'JWT_SECRET'
 ];
 
-console.log('🔍 Checking WorkOS Environment Configuration...\n');
+console.log('🔍 Checking Clerk Environment Configuration...\n');
 
 let allSet = true;
 const missing = [];
@@ -25,18 +24,14 @@ requiredEnvVars.forEach(envVar => {
     missing.push(envVar);
     allSet = false;
   } else {
-    // Check length requirements for different secrets
-    if (envVar === 'WORKOS_COOKIE_PASSWORD' && value.length !== 32) {
-      console.log(`❌ ${envVar}: WRONG LENGTH (${value.length} chars, need exactly 32)`);
-      missing.push(`${envVar} (wrong length)`);
-      allSet = false;
-    } else if (envVar === 'JWT_SECRET' && value.length < 32) {
+    // Check length requirements for JWT_SECRET
+    if (envVar === 'JWT_SECRET' && value.length < 32) {
       console.log(`❌ ${envVar}: TOO SHORT (${value.length} chars, need 32+)`);
       missing.push(`${envVar} (too short)`);
       allSet = false;
     } else {
       // Mask sensitive values
-      const displayValue = envVar.includes('KEY') || envVar.includes('PASSWORD') || envVar.includes('SECRET')
+      const displayValue = envVar.includes('KEY') || envVar.includes('SECRET')
         ? '***SET***' 
         : value;
       console.log(`✅ ${envVar}: ${displayValue}`);
@@ -51,23 +46,20 @@ if (!allSet) {
   });
   
   console.log('\n📝 Create .env.local with these variables:');
-  console.log('WORKOS_API_KEY=sk_test_your_api_key_here');
-  console.log('WORKOS_CLIENT_ID=client_your_client_id_here');
-  console.log('WORKOS_COOKIE_PASSWORD=your_exactly_32_character_password');
+  console.log('NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_your_publishable_key_here');
+  console.log('CLERK_SECRET_KEY=sk_test_your_secret_key_here');
   console.log('JWT_SECRET=your_32_plus_character_jwt_secret_here');
   console.log('NEXT_PUBLIC_SITE_URL=http://localhost:3000');
   
-  console.log('\n🔑 Generate secrets with correct lengths:');
+  console.log('\n🔑 Generate JWT secret:');
   console.log('npm run generate-secrets');
   console.log('');
   console.log('# Or manually:');
-  console.log('# WORKOS_COOKIE_PASSWORD (exactly 32 chars):');
-  console.log('node -e "console.log(require(\'crypto\').randomBytes(16).toString(\'hex\'))"');
   console.log('# JWT_SECRET (32+ chars):');
   console.log('node -e "console.log(require(\'crypto\').randomBytes(32).toString(\'hex\'))"');
   
   process.exit(1);
 } else {
   console.log('\n✅ All required environment variables are set!');
-  console.log('🚀 WorkOS authentication should work now.');
+  console.log('🚀 Clerk authentication should work now.');
 }

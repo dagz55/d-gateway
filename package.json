@@ -21,10 +21,14 @@
     "fresh": "npm run clean && npm install && npm run dev",
     "check-env": "node check-env.js",
     "generate-secrets": "node generate-secrets.js",
+    "setup-clerk": "node setup-clerk-auth.js",
     "setup-db": "node apply-missing-tables.js",
     "test:clerk": "node lib/clerk/test-clerk.js",
     "test:supabase": "node test-current-setup.js",
-    "test:all": "npm run test:supabase && npm run test:clerk"
+    "test:all": "npm run test:supabase && npm run test:clerk",
+    "analyze": "ANALYZE=true npm run build",
+    "analyze:server": "BUNDLE_ANALYZE=server npm run build",
+    "analyze:browser": "BUNDLE_ANALYZE=browser npm run build"
   },
   "dependencies": {
     "@adyen/adyen-web": "^6.21.0",

@@ -62,31 +62,6 @@ export const RATE_LIMIT_CONFIG: RateLimitConfig = {
   
   // Authentication endpoint specific rules
   endpointRules: {
-    '/api/auth/workos/login': {
-      requests: 5,
-      window: 900, // 15 minutes
-      burstLimit: 2
-    },
-    '/api/auth/workos/callback': {
-      requests: 10,
-      window: 300, // 5 minutes
-      burstLimit: 3
-    },
-    '/api/auth/workos/me': {
-      requests: 100,
-      window: 60, // 1 minute
-      burstLimit: 20
-    },
-    '/api/auth/workos/logout': {
-      requests: 10,
-      window: 300, // 5 minutes
-      burstLimit: 2
-    },
-    '/api/auth/workos/profile': {
-      requests: 50,
-      window: 300, // 5 minutes
-      burstLimit: 10
-    },
     '/api/auth/supabase/me': {
       requests: 100,
       window: 60, // 1 minute

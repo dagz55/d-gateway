@@ -58,11 +58,11 @@ Successfully implemented enterprise-grade Cross-Site Request Forgery (CSRF) prot
 ### Modified Files
 ```
 /middleware.ts                    - Integrated CSRF middleware
-/contexts/WorkOSAuthContext.tsx   - Added client token management
+Authentication context - Added client token management
 /lib/session-security.ts          - Extended security event types
 /lib/actions.ts                   - Enhanced security logging
 /app/api/deposits/route.ts        - Example protected API route
-/app/api/auth/workos/profile/route.ts - Enhanced input validation
+/app/api/auth/profile/route.ts - Enhanced input validation
 ```
 
 ## Security Implementation Details
@@ -186,7 +186,7 @@ CSRF_DEV_BYPASS_TOKEN=dev-only-token
 ### Simple Integration
 ```typescript
 // Automatic CSRF protection
-const { makeAuthenticatedRequest } = useWorkOSAuth();
+const { makeAuthenticatedRequest } = useAuth();
 
 // Protected API call
 const response = await makeAuthenticatedRequest('/api/deposits', {

@@ -1,5 +1,10 @@
+import path from 'path';
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Fix lockfile warning by setting the correct project root
+  outputFileTracingRoot: path.resolve(process.cwd()),
+  
   // Performance optimizations
   productionBrowserSourceMaps: false, // Disable source maps in production for better performance
   reactStrictMode: true,
@@ -15,7 +20,16 @@ const nextConfig = {
     serverActions: {
       bodySizeLimit: '10mb', // Increase from default 1mb to 10mb
     },
-    optimizePackageImports: ['lucide-react', '@radix-ui/react-icons'], // Optimize specific packages
+    optimizePackageImports: [
+      'lucide-react', 
+      '@radix-ui/react-icons',
+      'framer-motion',
+      '@clerk/nextjs',
+      '@supabase/supabase-js'
+    ], // Optimize specific packages
+    webVitalsAttribution: ['CLS', 'LCP'], // Track Core Web Vitals
+    optimizeCss: true, // Enable CSS optimization
+    scrollRestoration: true, // Optimize scroll restoration
   },
   // Image optimization settings
   images: {
@@ -24,10 +38,6 @@ const nextConfig = {
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
     minimumCacheTTL: 31536000, // Cache images for 1 year
     remotePatterns: [
-      {
-        protocol: "https",
-        hostname: "workoscdn.com",
-      },
       {
         protocol: "https",
         hostname: "images.unsplash.com",
@@ -42,10 +52,8 @@ const nextConfig = {
   // Compression and performance headers
   compress: true,
   poweredByHeader: false, // Remove X-Powered-By header for security and performance
-  // External packages for server components
-  serverExternalPackages: ['@workos-inc/node'],
   webpack: (config, options) => {
-    // Only apply client-side configuration for WorkOS resolution
+    // Client-side configuration
     if (!options.isServer) {
       config.resolve = config.resolve || {};
       config.resolve.fallback = {
@@ -57,6 +65,7 @@ const nextConfig = {
         "buffer": "buffer",
         "util": "util",
       };
+      
     }
 
     // Remove devtool override to use Next.js default settings
@@ -67,6 +76,29 @@ const nextConfig = {
       config.optimization = {
         ...config.optimization,
         minimize: true,
+        splitChunks: {
+          chunks: 'all',
+          cacheGroups: {
+            vendor: {
+              test: /[\\/]node_modules[\\/]/,
+              name: 'vendors',
+              chunks: 'all',
+              priority: 10,
+            },
+            animations: {
+              test: /[\\/]node_modules[\\/](framer-motion|@react-spring)[\\/]/,
+              name: 'animations',
+              chunks: 'all',
+              priority: 20,
+            },
+            ui: {
+              test: /[\\/]node_modules[\\/](@radix-ui|@clerk)[\\/]/,
+              name: 'ui',
+              chunks: 'all',
+              priority: 15,
+            },
+          },
+        },
       };
     }
     config.plugins = config.plugins || [];

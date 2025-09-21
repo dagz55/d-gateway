@@ -20,7 +20,7 @@ The CSRF protection system implements a robust defense against state-changing at
 2. **`/lib/csrf-protection.ts`** - Core CSRF protection logic
 3. **`/middleware/csrf.ts`** - CSRF validation middleware
 4. **`/middleware.ts`** - Main Next.js middleware integration
-5. **`/contexts/WorkOSAuthContext.tsx`** - Client-side CSRF token management
+5. **Authentication Context** - Client-side CSRF token management
 6. **`/hooks/useCSRFProtectedFetch.ts`** - React hooks for protected API calls
 
 ### Token Structure
@@ -45,10 +45,7 @@ const CSRF_CONFIG = {
   FINGERPRINT_COOKIE: 'csrf-fp',     // Fingerprint cookie
   PROTECTED_METHODS: ['POST', 'PUT', 'DELETE', 'PATCH'],
   EXCLUDE_PATHS: [
-    '/api/auth/workos/callback',
-    '/api/auth/workos/login',
-    '/api/auth/workos/logout',
-    '/api/auth/workos/me',
+    '/api/auth/supabase/me',
     '/api/crypto/prices',
     '/_next/',
     '/favicon.ico'
@@ -117,7 +114,7 @@ Request → CSRF Check → Origin Validation → Security Headers → Response
 
 **Automatic Token Management:**
 ```typescript
-const { makeAuthenticatedRequest, csrfToken } = useWorkOSAuth();
+const { makeAuthenticatedRequest, csrfToken } = useAuth();
 
 // CSRF token automatically included in state-changing requests
 const response = await makeAuthenticatedRequest('/api/deposits', {
@@ -189,7 +186,7 @@ export async function POST(request: NextRequest) {
 
 ```typescript
 // Using the auth context
-const { makeAuthenticatedRequest } = useWorkOSAuth();
+const { makeAuthenticatedRequest } = useAuth();
 
 const handleSubmit = async (data) => {
   try {

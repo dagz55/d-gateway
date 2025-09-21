@@ -290,10 +290,10 @@ NEXT_PUBLIC_CLERK_SIGN_UP_FALLBACK_REDIRECT_URL=/
 
 ### Core Tables Structure
 ```sql
--- User profiles (synced with WorkOS)
+-- User profiles (synced with Clerk)
 profiles (
   id UUID PRIMARY KEY,
-  user_id TEXT UNIQUE NOT NULL,      -- WorkOS user ID
+  user_id TEXT UNIQUE NOT NULL,      -- Clerk user ID
   email TEXT UNIQUE NOT NULL,
   full_name TEXT,
   avatar_url TEXT,
@@ -481,7 +481,7 @@ npm run analyze
 ```
 Error: Module build failed: Reading from 'node:crypto' is not handled
 ```
-**Solution**: Use simplified middleware without Node.js imports. WorkOS SDK operations should be in API routes only.
+**Solution**: Use simplified middleware without Node.js imports. Authentication SDK operations should be in API routes only.
 
 #### Clerk Import Error
 ```
@@ -642,7 +642,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
 ### v2.11.2 (2025-09-21)
 - **🔐 Clerk Integration**: Updated authentication system to use Clerk (App Router)
-  - Migrated from WorkOS to Clerk authentication for better developer experience
+  - Uses Clerk authentication for better developer experience
   - Implemented `clerkMiddleware()` in `middleware.ts` for session management
   - Added `<ClerkProvider>` wrapper in `app/layout.tsx` with custom appearance
   - Created split-panel authentication layout with `AuthLayout` component

@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Zignals — Client Kanban (Pro, Seeded)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <meta name="color-scheme" content="light dark">
+  <style>
+    .dragging{opacity:.6}
+    .drop-hover{outline:2px dashed rgb(99 102 241);outline-offset:2px}
+    .card{cursor:grab}
+    .card:active{cursor:grabbing}
+    .kbd{border:1px solid rgb(229,231,235);padding:0 .35rem;border-radius:.25rem;font-size:.8rem;background:rgb(249,250,251)}
+    @media (prefers-color-scheme:dark){.kbd{border-color:rgb(55,65,81);background:rgb(31,41,55)}}
+  </style>
+</head>
+<body class="min-h-screen bg-slate-50 text-slate-900 dark:bg-slate-900 dark:text-slate-100">
+  <header class="sticky top-0 z-10 border-b border-slate-200/70 dark:border-slate-700/60 bg-white/80 dark:bg-slate-900/80 backdrop-blur">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between gap-3">
+      <div>
+        <h1 class="text-xl sm:text-2xl font-bold">Zignals — Client Kanban (Pro, Seeded)</h1>
+        <p class="text-sm text-slate-600 dark:text-slate-400">Owners & links prefilled; use buttons (👤, 🔗) to update live.</p>
+      </div>
+      <div class="flex items-center gap-2">
+        <input id="filter" type="search" placeholder="Filter (title/tag/owner)…" class="hidden sm:block px-3 py-2 rounded-md bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 outline-none focus:ring-2 focus:ring-indigo-500">
+        <button id="themeToggle" class="px-3 py-2 rounded-md text-sm border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800">🌗 Theme</button>
+        <button id="exportBtn" class="px-3 py-2 rounded-md text-sm border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800">Export</button>
+        <label class="px-3 py-2 rounded-md text-sm border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer">Import
+          <input id="importInput" type="file" accept="application/json" class="hidden">
+        </label>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 py-6 space-y-6">
+    <section class="rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-4 text-sm">
+      <strong>Note:</strong> Owner roster — <span class="font-medium">Dagz</span> (Auth), <span class="font-medium">Dagz</span> (Wallet), <span class="font-medium">Dagz</span> (Trades), <span class="font-medium">Dagz</span> (News/Settings), <span class="font-medium">Dagz</span> (Balances), <span class="font-medium">Dagz</span> (Admin metrics). Links point to example paths you can swap to your real docs.
+    </section>
+
+    <section id="board" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div class="lane" data-lane="planned">
+        <header class="flex items-center justify-between mb-2"><h2 class="font-semibold">Planned</h2><span class="count text-xs text-slate-500"></span></header>
+        <div class="lane-drop space-y-3 min-h-[220px] p-2 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700"></div>
+      </div>
+      <div class="lane" data-lane="inprogress">
+        <header class="flex items-center justify-between mb-2"><h2 class="font-semibold">In Progress</h2><span class="count text-xs text-slate-500"></span></header>
+        <div class="lane-drop space-y-3 min-h-[220px] p-2 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700"></div>
+      </div>
+      <div class="lane" data-lane="uat">
+        <header class="flex items-center justify-between mb-2"><h2 class="font-semibold">UAT</h2><span class="count text-xs text-slate-500"></span></header>
+        <div class="lane-drop space-y-3 min-h-[220px] p-2 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700"></div>
+      </div>
+      <div class="lane" data-lane="done">
+        <header class="flex items-center justify-between mb-2"><h2 class="font-semibold">Done</h2><span class="count text-xs text-slate-500"></span></header>
+        <div class="lane-drop space-y-3 min-h-[220px] p-2 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700"></div>
+      </div>
+    </section>
+  </main>
+
+  <template id="cardTemplate">
+    <article class="card border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 p-3" draggable="true" tabindex="0">
+      <div class="flex items-start justify-between gap-2">
+        <h3 class="title font-medium"></h3>
+        <menu class="flex items-center gap-1 text-slate-500">
+          <button class="owner p-1 rounded hover:bg-slate-100 dark:hover:bg-slate-800" title="Set owner">👤</button>
+          <button class="link p-1 rounded hover:bg-slate-100 dark:hover:bg-slate-800" title="Set link">🔗</button>
+          <button class="edit p-1 rounded hover:bg-slate-100 dark:hover:bg-slate-800" title="Edit">✏️</button>
+          <button class="delete p-1 rounded hover:bg-slate-100 dark:hover:bg-slate-800" title="Delete">🗑️</button>
+        </menu>
+      </div>
+      <p class="desc text-sm text-slate-600 dark:text-slate-400 mt-1"></p>
+      <div class="mt-2 flex flex-wrap items-center gap-2">
+        <span class="tag inline-block text-xs px-2 py-1 rounded"></span>
+        <span class="ownerBadge inline-block text-xs px-2 py-1 rounded bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hidden"></span>
+        <a class="linkBadge inline-block text-xs px-2 py-1 rounded bg-sky-100 dark:bg-sky-900/40 text-sky-800 dark:text-sky-200 hidden" target="_blank">Open</a>
+      </div>
+      <footer class="mt-2 text-[11px] text-slate-500"><span class="meta"></span></footer>
+    </article>
+  </template>
+
+  <script>
+    const STORAGE_KEY = 'zignals.kanban.client.pro.seeded.v1';
+    const THEME_KEY = 'zignals.kanban.theme';
+    const id = () => crypto.randomUUID();
+    const $ = (s,el=document)=>el.querySelector(s);
+    const $$ = (s,el=document)=>[...el.querySelectorAll(s)];
+
+    const TAG_STYLES = {
+      Admin:'bg-purple-100 text-purple-800 dark:bg-purple-900/40 dark:text-purple-200',
+      Trades:'bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-200',
+      Wallet:'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-200',
+      Member:'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/40 dark:text-indigo-200',
+      Auth:'bg-rose-100 text-rose-800 dark:bg-rose-900/40 dark:text-rose-200',
+      Dashboard:'bg-cyan-100 text-cyan-800 dark:bg-cyan-900/40 dark:text-cyan-200',
+      Settings:'bg-slate-200 text-slate-800 dark:bg-slate-700/60 dark:text-slate-100',
+      News:'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-200',
+      Copy:'bg-teal-100 text-teal-800 dark:bg-teal-900/40 dark:text-teal-200'
+    };
+
+    const ownerFor = (tag)=>'Dagz';
+    const linkFor = (title, tag)=>{
+      const slug = title.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'');
+      const base = "https://example.com/zignals";
+      return `${base}/${(tag||'custom').toLowerCase()}/${slug}`;
+    };
+
+    // Seed with owners & example links
+    const planned = [
+      ["Members List","Admin"],["Members Info — Date Registered","Admin"],["Active Trades","Admin"],
+      ["Username (Admin search)","Admin"],["Trading Signal (Admin feed)","Admin"],
+      ["Deposit History (Admin)","Admin"],["Daily Sales / Deposits","Admin"],["Total Sales / Deposits","Admin"],
+      ["Withdrawal History (Admin)","Admin"],["Payout Modes — Crypto / Local Bank","Wallet"],
+      ["Trading History — Date/Time/Amount","Trades"],["Active Trading — Details","Trades"],["Offer Detail Card","Trades"],
+      ["Deposit → Trading Wallet","Wallet"],["Deposit History (Wallet)","Wallet"],
+      ["Dashboard — Crypto Graph","Dashboard"],["Trading History (Member)","Member"],["Trading Signals (Member)","Member"],
+      ["Deposit (Member)","Member"],["Deposit History (Member)","Member"],["Withdraw (Member)","Member"],
+      ["Withdrawal History (Member)","Member"],["Crypto News","News"],["Copy Trading Signal","Copy"],
+      ["Account Settings — Change Username","Settings"],["Account Settings — Change Password","Settings"],["Account Settings — Change Photo","Settings"]
+    ].map(([title, tag])=>({id:id(), title, desc:"", tag, owner:"Dagz", link:linkFor(title, tag)}));
+
+    const inprogress = [
+      ["Account Creation","Auth","Full name, username, password, email OTP"],
+      ["Login","Auth","Username, password, reset password"],
+      ["Deposit Flow","Wallet","Deposit details w/ Ref # + screenshot"],
+      ["Trading Zignals — Offers 1–3","Trades","Define terms/min amounts/durations"]
+    ].map(([title, tag, desc])=>({id:id(), title, desc, tag, owner:"Dagz", link:linkFor(title, tag)}));
+
+    const uat = [
+      ["Withdrawal Request (Admin Approval)","Wallet","Queue + approve/deny + audit"]
+    ].map(([title, tag, desc])=>({id:id(), title, desc, tag, owner:"Dagz", link:linkFor(title, tag)}));
+
+    const done = [
+      ["Total Members — Active","Admin","Metric tile on Admin Dashboard"],
+      ["Total Members — Not Active","Admin","Metric tile on Admin Dashboard"],
+      ["Password Handling","Auth","Secure hashing & reset flows"]
+    ].map(([title, tag, desc])=>({id:id(), title, desc, tag, owner:"Dagz", link:linkFor(title, tag)}));
+
+    const seed = { planned, inprogress, uat, done };
+
+    function load(){ try{ return JSON.parse(localStorage.getItem(STORAGE_KEY)) || seed; }catch{ return seed; } }
+    function save(s){ localStorage.setItem(STORAGE_KEY, JSON.stringify(s)); }
+    const state = load();
+
+    const tpl = $('#cardTemplate');
+
+    function render(){
+      for (const lane of ['planned','inprogress','uat','done']) {
+        const el = document.querySelector(`.lane[data-lane="${lane}"] .lane-drop`);
+        el.innerHTML = '';
+        for (const c of state[lane]) el.appendChild(renderCard(c));
+        document.querySelector(`.lane[data-lane="${lane}"] .count`).textContent = `${state[lane].length} items`;
+      }
+      applyFilter($('#filter')?.value || '');
+      hookDnD();
+    }
+
+    function renderCard(card){
+      const n = tpl.content.cloneNode(true);
+      const el = n.querySelector('.card');
+      el.dataset.id = card.id;
+      n.querySelector('.title').textContent = card.title;
+      n.querySelector('.desc').textContent = card.desc || '';
+      n.querySelector('.meta').textContent = new Date().toLocaleString();
+      // tag
+      const tag = n.querySelector('.tag');
+      tag.textContent = card.tag || 'Custom';
+      tag.className = 'tag inline-block text-xs px-2 py-1 rounded ' + (TAG_STYLES[card.tag] || 'bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-200');
+      // owner
+      const owner = n.querySelector('.ownerBadge');
+      if (card.owner) { owner.textContent = 'Owner: ' + card.owner; owner.classList.remove('hidden'); }
+      // link
+      const link = n.querySelector('.linkBadge');
+      if (card.link) { link.href = card.link; link.classList.remove('hidden'); }
+
+      // actions
+      n.querySelector('.owner').addEventListener('click', ()=>setOwner(card.id));
+      n.querySelector('.link').addEventListener('click', ()=>setLink(card.id));
+      n.querySelector('.edit').addEventListener('click', ()=>editCard(card.id));
+      n.querySelector('.delete').addEventListener('click', ()=>deleteCard(card.id));
+      return n;
+    }
+
+    function laneOf(id){
+      for (const l of ['planned','inprogress','uat','done']) if (state[l].some(c=>c.id===id)) return l;
+      return null;
+    }
+
+    function editCard(id){
+      const lane = laneOf(id); const c = state[lane].find(x=>x.id===id);
+      const title = prompt('Title', c.title); if (title===null) return;
+      const desc = prompt('Description', c.desc||''); if (desc===null) return;
+      const tag = prompt('Tag (Admin, Trades, Wallet, Member, Auth, Dashboard, Settings, News, Copy)', c.tag||''); if (tag===null) return;
+      c.title = title.trim() || c.title; c.desc = desc.trim(); c.tag = tag.trim() || c.tag;
+      c.owner = ownerFor(c.tag) || c.owner; // auto-assign if tag changed
+      c.link = c.link || linkFor(c.title, c.tag);
+      save(state); render();
+    }
+
+    function setOwner(id){
+      const lane = laneOf(id); const c = state[lane].find(x=>x.id===id);
+      const owner = prompt('Owner name:', c.owner||''); if (owner===null) return;
+      c.owner = owner.trim(); save(state); render();
+    }
+
+    function setLink(id){
+      const lane = laneOf(id); const c = state[lane].find(x=>x.id===id);
+      const link = prompt('Paste link (Confluence/Figma/GitHub/Jira):', c.link||''); if (link===null) return;
+      c.link = link.trim(); save(state); render();
+    }
+
+    function deleteCard(id){
+      const lane = laneOf(id); if (!confirm('Delete this card?')) return;
+      state[lane] = state[lane].filter(x=>x.id!==id); save(state); render();
+    }
+
+    function hookDnD(){
+      for (const el of $$('.card')){
+        el.addEventListener('dragstart', e=>{ e.dataTransfer.setData('text/plain', el.dataset.id); el.classList.add('dragging'); });
+        el.addEventListener('dragend', ()=> el.classList.remove('dragging'));
+      }
+      for (const drop of $$('.lane-drop')){
+        drop.addEventListener('dragover', e=>{ e.preventDefault(); drop.classList.add('drop-hover'); });
+        drop.addEventListener('dragleave', ()=> drop.classList.remove('drop-hover'));
+        drop.addEventListener('drop', e=>{
+          e.preventDefault(); drop.classList.remove('drop-hover');
+          const id = e.dataTransfer.getData('text/plain');
+          const from = laneOf(id);
+          const to = drop.closest('.lane').dataset.lane;
+          const i = state[from].findIndex(c=>c.id===id);
+          const [card] = state[from].splice(i,1);
+          state[to].push(card);
+          save(state); render();
+        });
+      }
+    }
+
+    // Controls (theme, filter, export/import)
+    function loadTheme(){ return localStorage.getItem(THEME_KEY) || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark':'light'); }
+    function saveTheme(t){ localStorage.setItem(THEME_KEY, t); }
+    function applyTheme(t){ const r=document.documentElement; if(t==='dark') r.classList.add('dark'); else r.classList.remove('dark'); }
+    applyTheme(loadTheme());
+    $('#themeToggle').addEventListener('click', ()=>{ const next=loadTheme()==='dark'?'light':'dark'; applyTheme(next); saveTheme(next); });
+
+    function applyFilter(q){
+      q = (q||'').toLowerCase();
+      for (const el of $$('.card')){
+        const text = el.textContent.toLowerCase();
+        el.classList.toggle('hidden', !text.includes(q));
+      }
+    }
+    $('#filter')?.addEventListener('input', ()=>applyFilter($('#filter').value));
+    document.addEventListener('keydown', e=>{
+      if (e.key==='/'){ e.preventDefault(); $('#filter')?.focus(); }
+      if (e.key==='o'){ const sel = document.activeElement.closest?.('.card'); if (sel) setOwner(sel.dataset.id); }
+      if (e.key==='l'){ const sel = document.activeElement.closest?.('.card'); if (sel) setLink(sel.dataset.id); }
+    });
+
+    $('#exportBtn').addEventListener('click', ()=>{
+      const blob = new Blob([JSON.stringify(state,null,2)], {type:'application/json'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href=url; a.download='zignals-kanban-client-pro-seeded.json'; a.click(); URL.revokeObjectURL(url);
+    });
+
+    $('#importInput').addEventListener('change', (e)=>{
+      const file = e.target.files?.[0]; if(!file) return;
+      const reader = new FileReader();
+      reader.onload = ev => {
+        try{
+          const parsed = JSON.parse(String(ev.target.result));
+          if(!(parsed.planned&&parsed.inprogress&&parsed.uat&&parsed.done)) throw new Error('Invalid file');
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(parsed));
+          location.reload();
+        } catch(err){ alert('Import failed: '+err.message); }
+      };
+      reader.readAsText(file); e.target.value='';
+    });
+
+    // Initial render
+    render();
+  </script>
+</body>
+</html>

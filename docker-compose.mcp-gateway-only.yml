@@ -1,0 +1,27 @@
+services:
+  # MCP Gateway - Manages MCP services via stdio
+  mcp-gateway:
+    build:
+      context: ./docker/mcp-gateway
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - NODE_ENV=production
+      - GATEWAY_PORT=8080
+      - LOG_LEVEL=info
+    volumes:
+      - ${PWD}:/workspace:ro
+      - /tmp:/tmp
+    networks:
+      - mcp-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+
+networks:
+  mcp-network:
+    driver: bridge

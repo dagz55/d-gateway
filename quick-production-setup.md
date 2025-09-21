@@ -4,14 +4,14 @@
 
 You need to set these essential variables for production. Here are the commands:
 
-### 1. WorkOS Configuration
+### 1. Clerk Configuration
 ```bash
-# Get these from your WorkOS Dashboard (https://dashboard.workos.com/)
-vercel env add WORKOS_API_KEY production
-# Enter your production API key (starts with sk_live_)
+# Get these from your Clerk Dashboard (https://dashboard.clerk.com/)
+vercel env add NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY production
+# Enter your production publishable key (starts with pk_live_)
 
-vercel env add WORKOS_CLIENT_ID production  
-# Enter your production client ID (starts with client_)
+vercel env add CLERK_SECRET_KEY production  
+# Enter your production secret key (starts with sk_live_)
 ```
 
 ### 2. Site Configuration
@@ -19,45 +19,46 @@ vercel env add WORKOS_CLIENT_ID production
 vercel env add NEXT_PUBLIC_SITE_URL production
 # Enter: https://zignal-login.vercel.app (or your custom domain)
 
-vercel env add WORKOS_REDIRECT_URI production
-# Enter: https://zignal-login.vercel.app/api/auth/workos/callback
-
-vercel env add WORKOS_LOGOUT_REDIRECT_URI production
-# Enter: https://zignal-login.vercel.app/
+# Clerk handles OAuth redirects automatically
+# Just set your domain in Clerk dashboard: https://zignal-login.vercel.app
 ```
 
 ### 3. Supabase Configuration
 ```bash
 vercel env add NEXT_PUBLIC_SUPABASE_URL production
-# Enter your Supabase project URL
+# Enter your production Supabase URL
 
 vercel env add NEXT_PUBLIC_SUPABASE_ANON_KEY production
-# Enter your Supabase anon key
+# Enter your production anon key
 
 vercel env add SUPABASE_SERVICE_ROLE_KEY production
-# Enter your Supabase service role key
+# Enter your production service role key (keep this secret!)
 ```
 
-### 4. Admin Configuration
+### 4. Security Configuration
 ```bash
+vercel env add JWT_SECRET production
+# Generate: node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+
 vercel env add ALLOWED_ADMIN_EMAILS production
-# Enter: dagz55@gmail.com,admin@signals.org,admin@zignals.org
+# Enter: admin@zignals.org,your-email@example.com
 ```
 
-## ✅ Already Set
-- WORKOS_COOKIE_PASSWORD ✅
-- JWT_SECRET ✅
-- SECURITY_LOGGING_ENABLED ✅
-- SECURITY_LOG_LEVEL ✅
+## ✅ Verification Checklist
 
-## 🚀 After Setting Variables
+After setting variables, verify in Vercel dashboard:
+
+- NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY ✅
+- CLERK_SECRET_KEY ✅
+- NEXT_PUBLIC_SUPABASE_URL ✅
+- NEXT_PUBLIC_SUPABASE_ANON_KEY ✅
+- SUPABASE_SERVICE_ROLE_KEY ✅
+- JWT_SECRET ✅
+- ALLOWED_ADMIN_EMAILS ✅
+
+## 🚀 Deploy
 ```bash
-# Deploy to production
 vercel --prod
 ```
 
-## 📋 WorkOS Dashboard Setup
-1. Go to https://dashboard.workos.com/
-2. Navigate to Configuration → Redirect URIs
-3. Add: `https://your-domain.vercel.app/api/auth/workos/callback`
-4. Save changes
+Your production app will be live with all authentication and database features working!

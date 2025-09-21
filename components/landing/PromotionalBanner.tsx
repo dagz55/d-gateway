@@ -14,24 +14,24 @@ export function PromotionalBanner() {
   const banners: BannerItem[] = useMemo(
     () => [
       {
-        title: 'Live smart-order routing is here',
-        description: 'Execute with professional-grade routing across 8 liquidity venues inside a single click.',
-        cta: 'Explore routing',
+        title: 'Cryptocurrency trading made simple',
+        description: 'Want to experience risk-free trading? Go ahead and purchase our trade signals packages!',
+        cta: 'Get Started',
         href: '#pricing',
         accent: 'from-[#57c8ff]/20 via-[#1199FA]/20 to-[#9333EA]/20',
       },
       {
-        title: 'New onboarding slots now open',
-        description: 'Book a complimentary 30 minute desk review with a senior Zignal strategist this week.',
-        cta: 'Reserve a session',
-        href: '#support',
+        title: 'Package price will depend on the duration of the availed packages',
+        description: 'Choose from flexible pricing options that scale with your trading needs and commitment level.',
+        cta: 'View Packages',
+        href: '#pricing',
         accent: 'from-[#34d399]/20 via-[#0577DA]/20 to-[#22d3ee]/20',
       },
       {
-        title: 'Founders & fund pricing',
-        description: 'Scale your signal desk with collaborative seats, custom reporting, and dedicated support.',
-        cta: 'See plans',
-        href: '#pricing',
+        title: 'Having a hard time mastering the art of cryptocurrency?',
+        description: 'Fret not, we have you covered. Reach out to your Zignals advisor to learn more.',
+        cta: 'Contact Advisor',
+        href: '#support',
         accent: 'from-[#f97316]/20 via-[#facc15]/20 to-[#22d3ee]/20',
       },
     ],
@@ -60,7 +60,7 @@ export function PromotionalBanner() {
 
   return (
     <div
-      className="relative overflow-hidden border-b border-white/10 bg-[#020712]/95 text-white"
+      className="relative overflow-hidden border-b border-white/10 bg-[#020712]/95 text-white z-30"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
       role="region"

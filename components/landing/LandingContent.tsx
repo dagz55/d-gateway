@@ -1,8 +1,9 @@
 'use client';
 
-import { useEffect, useMemo, useState, Suspense } from 'react';
+import { useEffect, useMemo, useState, Suspense, useRef } from 'react';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
+import { motion, useScroll, useTransform } from 'framer-motion';
 import {
   Menu,
   X,
@@ -20,7 +21,7 @@ import {
 import Logo from '@/components/ui/Logo';
 import { PromotionalBanner } from './PromotionalBanner';
 
-// Lazy load heavy components for better performance
+// Lazy load heavy components for better performance with preload hints
 const OptimizedTradingChart = dynamic(() => import('@/components/trading/OptimizedTradingChart').then(mod => ({ default: mod.OptimizedTradingChart })), {
   ssr: false,
   loading: () => (
@@ -82,6 +83,7 @@ const FAQSection = dynamic(() => import('./FAQSection').then(mod => ({ default: 
 
 const navLinks = [
   { label: 'Features', href: '#features' },
+  { label: 'About Us', href: '#mission' },
   { label: 'Pricing', href: '#pricing' },
   { label: 'Security', href: '#security' },
   { label: 'Support', href: '#support' },
@@ -147,14 +149,27 @@ const cryptoPrices = [
 export function LandingContent() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const { scrollY } = useScroll();
+
+  // Parallax effects
+  const heroY = useTransform(scrollY, [0, 1000], [0, -200]);
+  const featuresY = useTransform(scrollY, [0, 2000], [0, -100]);
 
   useEffect(() => {
+    let ticking = false;
+
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 12);
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          setIsScrolled(window.scrollY > 50);
+          ticking = false;
+        });
+        ticking = true;
+      }
     };
 
     handleScroll();
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', handleScroll, { passive: true });
 
     return () => {
       window.removeEventListener('scroll', handleScroll);
@@ -187,7 +202,7 @@ export function LandingContent() {
             })
             .join(' ')
         : '',
-    []
+    [heroSparklinePoints]
   );
 
   const lastSparkX = heroSparklinePoints.length > 1 ? 260 : 0;
@@ -197,18 +212,19 @@ export function LandingContent() {
 
   return (
     <div className="relative z-10 flex min-h-screen flex-col bg-[#040918] text-white">
-      <header className="relative z-40">
+      {/* Fixed Header Container - Always Visible */}
+      <div className="fixed top-0 left-0 right-0 z-50">
         <PromotionalBanner />
         <nav
-          className={`sticky top-0 border-b transition-all duration-300 ${
+          className={`border-b transition-all duration-300 ${
             isScrolled
               ? 'border-white/10 bg-[#030815]/95 backdrop-blur-xl shadow-[0_20px_60px_-30px_rgba(5,119,218,0.6)]'
-              : 'border-transparent bg-transparent'
+              : 'border-white/5 bg-[#040918]/80 backdrop-blur-sm'
           }`}
         >
           <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4">
             <Link href="/" className="flex items-center gap-3">
-              <Logo size="lg" textClassName="gradient-text font-semibold" enableAnimations />
+              <Logo size="lg" textClassName="gradient-text font-semibold" enableAnimations asLink={false} />
             </Link>
 
             <div className="hidden items-center gap-8 md:flex">
@@ -216,7 +232,7 @@ export function LandingContent() {
                 <a
                   key={link.href}
                   href={link.href}
-                  className="text-sm font-medium text-white/70 transition-colors hover:text-white"
+                  className="text-sm font-medium text-white/70 transition-colors hover:text-white scroll-smooth"
                 >
                   {link.label}
                 </a>
@@ -258,7 +274,7 @@ export function LandingContent() {
                     key={link.href}
                     href={link.href}
                     onClick={closeMenu}
-                    className="block text-base font-medium text-white/80 transition hover:text-white"
+                    className="block text-base font-medium text-white/80 transition hover:text-white scroll-smooth"
                   >
                     {link.label}
                   </a>
@@ -284,10 +300,14 @@ export function LandingContent() {
             </div>
           )}
         </nav>
-      </header>
+      </div>
 
-      <main className="relative z-10 flex-1">
-        <section id="hero" className="relative overflow-hidden pt-28 pb-24 md:pt-32">
+      <main className="relative z-10 flex-1 pt-44">
+        <motion.section
+          id="hero"
+          className="relative overflow-hidden pt-8 pb-24 md:pt-12"
+          style={{ y: heroY }}
+        >
           <div className="absolute inset-0 bg-gradient-to-br from-[#071635] via-[#040918] to-[#02040B]" />
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(17,153,250,0.3)_0%,transparent_60%)] opacity-50" />
           <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_bottom_left,rgba(147,51,234,0.18)_0%,transparent_60%)]" />
@@ -424,9 +444,15 @@ export function LandingContent() {
               </div>
             </div>
           </div>
-        </section>
+        </motion.section>
 
-        <section className="border-y border-white/5 bg-[#030a18]/80 py-8 backdrop-blur">
+        <motion.section
+          className="border-y border-white/5 bg-[#030a18]/80 py-8 backdrop-blur"
+          initial={{ opacity: 0, y: 50 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          viewport={{ once: true }}
+        >
           <div className="mx-auto flex max-w-7xl flex-col items-center gap-4 px-4 text-sm text-white/50 md:flex-row md:justify-between">
             <span className="text-xs uppercase tracking-[0.4em] text-white/40">Trusted by teams at</span>
             <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-base font-semibold tracking-wide text-white/60 md:justify-end">
@@ -436,9 +462,17 @@ export function LandingContent() {
               <span>Vertex Labs</span>
             </div>
           </div>
-        </section>
+        </motion.section>
 
-        <section id="features" className="relative py-24">
+        <motion.section
+          id="features"
+          className="relative py-24"
+          style={{ y: featuresY }}
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          transition={{ duration: 1 }}
+          viewport={{ once: true, amount: 0.3 }}
+        >
           <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#040f25]/40 to-transparent" />
           <div className="relative mx-auto max-w-7xl px-4">
             <div className="mx-auto mb-14 max-w-3xl text-center">
@@ -461,9 +495,98 @@ export function LandingContent() {
               <FeatureHighlights />
             </Suspense>
           </div>
-        </section>
+        </motion.section>
 
-        <section id="pricing" className="relative overflow-hidden bg-[#030a18] py-24">
+        {/* Mission and Vision Section */}
+        <motion.section
+          id="mission"
+          className="relative py-24 bg-gradient-to-b from-[#030a18]/60 via-[#040f25]/80 to-[#030a18]/60"
+          initial={{ opacity: 0, y: 50 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          viewport={{ once: true, amount: 0.3 }}
+        >
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(51,225,218,0.08)_0%,transparent_70%)]" />
+          <div className="relative mx-auto max-w-7xl px-4">
+            <div className="mx-auto mb-16 max-w-3xl text-center">
+              <span className="inline-flex items-center gap-2 rounded-full border border-[#33E1DA]/30 bg-[#33E1DA]/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-[#33E1DA]">
+                <Sparkles className="h-4 w-4" />
+                Our Purpose
+              </span>
+              <h2 className="mt-6 text-4xl font-semibold sm:text-5xl">Driving your trading success</h2>
+              <p className="mt-4 text-lg text-white/70">
+                Built on clear values and a vision for the future of cryptocurrency trading
+              </p>
+            </div>
+            
+            <div className="grid gap-12 lg:grid-cols-2">
+              {/* Mission */}
+              <div className="relative">
+                <div className="rounded-3xl border border-white/10 bg-white/[0.04] p-8 backdrop-blur transition hover:border-[#33E1DA]/40 hover:bg-white/[0.06]">
+                  <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-[#0577DA]/20 to-[#33E1DA]/20 border border-[#33E1DA]/30">
+                    <ShieldCheck className="h-8 w-8 text-[#33E1DA]" />
+                  </div>
+                  <h3 className="text-2xl font-semibold text-white mb-4">Our Mission</h3>
+                  <p className="text-white/80 leading-relaxed">
+                    To guide every trader with clear and reliable cryptocurrency trading signals in order to make trading easier, straight to the point, and more profitable while building a supportive community that grows together.
+                  </p>
+                  <div className="mt-6 flex items-center gap-3">
+                    <div className="h-1 w-12 bg-gradient-to-r from-[#0577DA] to-[#33E1DA] rounded-full"></div>
+                    <span className="text-xs uppercase tracking-[0.3em] text-[#33E1DA] font-semibold">Community First</span>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Vision */}
+              <div className="relative">
+                <div className="rounded-3xl border border-white/10 bg-white/[0.04] p-8 backdrop-blur transition hover:border-[#33E1DA]/40 hover:bg-white/[0.06]">
+                  <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-[#1199FA]/20 to-[#6d5efc]/20 border border-[#1199FA]/30">
+                    <Sparkles className="h-8 w-8 text-[#1199FA]" />
+                  </div>
+                  <h3 className="text-2xl font-semibold text-white mb-4">Our Vision</h3>
+                  <p className="text-white/80 leading-relaxed">
+                    To be the go-to crypto signals hub for everyone. We are data-driven, trustworthy, and innovative in the cryptocurrency space. We do this by paving the way for financial freedom for Zignal members.
+                  </p>
+                  <div className="mt-6 flex items-center gap-3">
+                    <div className="h-1 w-12 bg-gradient-to-r from-[#1199FA] to-[#6d5efc] rounded-full"></div>
+                    <span className="text-xs uppercase tracking-[0.3em] text-[#1199FA] font-semibold">Financial Freedom</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            {/* Call to Action */}
+            <div className="mt-16 text-center">
+              <div className="mx-auto max-w-2xl rounded-3xl border border-[#33E1DA]/20 bg-gradient-to-br from-[#0577DA]/10 via-[#33E1DA]/5 to-[#1199FA]/10 p-8 backdrop-blur">
+                <h3 className="text-2xl font-semibold text-white mb-4">Ready to join our community?</h3>
+                <p className="text-white/70 mb-6">
+                  Experience the difference that clear signals and expert guidance can make in your trading journey.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                  <a
+                    href="#pricing"
+                    className="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#0577DA] to-[#1199FA] px-6 py-3 text-base font-semibold text-white shadow-lg shadow-[#0577DA]/20 transition hover:from-[#0a8ae8] hover:to-[#22a9ff]"
+                  >
+                    View Packages
+                    <ArrowRight className="h-4 w-4" />
+                  </a>
+                  <a
+                    href="#support"
+                    className="inline-flex items-center justify-center gap-2 rounded-xl border border-white/15 px-6 py-3 text-base font-semibold text-white/80 transition hover:border-white/30 hover:text-white"
+                  >
+                    <HeartHandshake className="h-5 w-5 text-[#33E1DA]" />
+                    Contact Advisor
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </motion.section>
+
+        <motion.section
+          id="pricing"
+          className="relative overflow-hidden bg-[#030a18] py-24"
+        >
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(17,153,250,0.35)_0%,transparent_60%)]" />
           <div className="relative mx-auto grid max-w-7xl gap-12 px-4 lg:grid-cols-[1.1fr_0.9fr]">
             <div>
@@ -536,9 +659,16 @@ export function LandingContent() {
               ))}
             </div>
           </div>
-        </section>
+        </motion.section>
 
-        <section id="live-signals" className="relative overflow-hidden py-24">
+        <motion.section
+          id="live-signals"
+          className="relative overflow-hidden py-24"
+          initial={{ opacity: 0, scale: 0.95 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.8 }}
+          viewport={{ once: true, amount: 0.2 }}
+        >
           <div className="absolute inset-0 bg-gradient-to-br from-[#01060f] via-[#040c1d] to-[#010308]" />
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(5,119,218,0.35)_0%,transparent_65%)] opacity-50" />
           <div className="relative mx-auto max-w-7xl px-4">
@@ -556,9 +686,16 @@ export function LandingContent() {
               <OptimizedTradingChart />
             </Suspense>
           </div>
-        </section>
+        </motion.section>
 
-        <section id="security" className="relative py-24">
+        <motion.section
+          id="security"
+          className="relative py-24"
+          initial={{ opacity: 0, y: 50 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.1 }}
+          viewport={{ once: true, amount: 0.3 }}
+        >
           <div className="absolute inset-0 bg-gradient-to-b from-[#010308] via-[#061121] to-[#010308]" />
           <div className="relative mx-auto max-w-7xl px-4">
             <div className="mb-14 text-center">
@@ -605,22 +742,29 @@ export function LandingContent() {
               </div>
             </div>
           </div>
-        </section>
+        </motion.section>
 
-        <section id="support" className="relative">
+        <motion.section
+          id="support"
+          className="relative"
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          transition={{ duration: 0.8 }}
+          viewport={{ once: true, amount: 0.2 }}
+        >
           <Suspense fallback={
             <div className="h-96 rounded-2xl border border-white/10 bg-white/[0.04] backdrop-blur animate-pulse"></div>
           }>
             <FAQSection />
           </Suspense>
-        </section>
+        </motion.section>
       </main>
 
       <footer className="border-t border-white/10 bg-[#02060f]">
         <div className="mx-auto grid max-w-7xl gap-12 px-4 py-16 md:grid-cols-2 lg:grid-cols-4">
           <div>
             <Link href="/" className="inline-flex items-center gap-3">
-              <Logo size="md" textClassName="font-semibold text-white" enableAnimations={false} />
+              <Logo size="md" textClassName="font-semibold text-white" enableAnimations={false} asLink={false} />
             </Link>
             <p className="mt-4 text-sm text-white/60">
               Professional-grade crypto signals, actionable insights, and automation built for fast-moving teams.

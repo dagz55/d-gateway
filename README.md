@@ -54,7 +54,7 @@ Zignal is a comprehensive crypto trading platform built with [Next.js 15.5.3](ht
 - ✅ **Type Safety**: Full TypeScript implementation with strict type checking
 - 📱 **Responsive Design**: Mobile-first approach with full responsiveness
 - ⚡ **Performance**: Optimized with Next.js 15.5.2 and React 19
-- 🔒 **Security**: WorkOS AuthKit for enterprise authentication + Supabase for trading data
+- 🔒 **Security**: Clerk authentication for enterprise-grade security + Supabase for trading data
 - 🏗️ **Architecture**: Clean separation with protected route groups
 - 📸 **Advanced File Upload**: Robust photo upload system with multiple improvements
   - Dedicated API routes for better performance and larger file support (up to 10MB)
@@ -68,7 +68,7 @@ Zignal is a comprehensive crypto trading platform built with [Next.js 15.5.3](ht
 - 🎯 **Better UX**: Improved error messages and user feedback for authentication and file operations
 - ♿ **Accessibility**: Full ARIA support and screen reader compatibility
 - 🎨 **Theme Management**: Fixed dashboard readability with proper CSS variable formatting and light theme enforcement
-- 🔧 **Authentication Security**: Enhanced WorkOS integration with secure password generation and improved username handling
+- 🔧 **Authentication Security**: Enhanced Clerk integration with secure password generation and improved username handling
 - 🚀 **Deployment Ready**: Fixed Vercel deployment issues with build-time protection for admin API routes
 
 ### ZIG TRADES Workflow
@@ -101,9 +101,9 @@ Zignal is a comprehensive crypto trading platform built with [Next.js 15.5.3](ht
 - 🌐 **Online Status**: Real-time online/offline status indicator
 - 🎨 **Modern Design**: Consistent with application theme and branding
 
-## 🔐 WorkOS Authentication
+## 🔐 Clerk Authentication
 
-Zignal now uses **WorkOS AuthKit** for enterprise-grade authentication, providing:
+Zignal uses **Clerk** for enterprise-grade authentication, providing:
 
 ### Enterprise Features
 - 🏢 **Professional Authentication**: Enterprise-grade security and compliance
@@ -156,7 +156,7 @@ The application uses role-based routing to provide different experiences for dif
 - **Authentication**: Sign-in/sign-up pages redirect to role-appropriate dashboard after login
 
 ### Setup
-See [WORKOS_SETUP.md](./WORKOS_SETUP.md) for detailed configuration instructions.
+See [CLERK_SETUP_GUIDE.md](./CLERK_SETUP_GUIDE.md) for detailed configuration instructions.
 
 ## Getting Started
 
@@ -218,10 +218,9 @@ NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
 
-# WorkOS Configuration
-WORKOS_API_KEY=your_workos_api_key
-WORKOS_CLIENT_ID=your_workos_client_id
-WORKOS_WEBHOOK_SECRET=your_workos_webhook_secret
+# Clerk Configuration
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=your_clerk_publishable_key
+CLERK_SECRET_KEY=your_clerk_secret_key
 
 # For local development, use:
 # AUTH_SERVICE_MODE=local
@@ -384,9 +383,9 @@ Zignal is deployed as a serverless application on Vercel with edge-compatible fu
 
 #### Authentication Microservice
 - `https://zignals.org/api/auth/session` - Session management
-- `https://zignals.org/api/auth/workos/login` - WorkOS authentication
-- `https://zignals.org/api/auth/workos/callback` - OAuth callbacks
-- `https://zignals.org/api/auth/workos/logout` - Secure logout
+- `https://zignals.org/api/auth/supabase/me` - Authentication status
+- OAuth callbacks handled by Clerk
+- Secure logout handled by Clerk
 - `https://zignals.org/api/auth/supabase/me` - User profile data
 
 #### Trading Functions
@@ -432,7 +431,7 @@ NODE_ENV=production
 - ⚡ **Edge Runtime**: Ultra-fast serverless functions
 - 🔄 **Auto-scaling**: Handles traffic spikes automatically
 - 🌍 **Global CDN**: Distributed across Vercel's edge network
-- 🔒 **Secure**: Enterprise-grade security with WorkOS
+- 🔒 **Secure**: Enterprise-grade security with Clerk
 - 📊 **Monitoring**: Built-in analytics and performance tracking
 - ✅ **Build-Time Protection**: Admin API routes handle build-time execution properly
 

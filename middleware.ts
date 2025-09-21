@@ -55,7 +55,7 @@ export default clerkMiddleware(async (auth, req) => {
       pathname.includes("SignUp_clerk") ||
       pathname.match(/\/sign-in\/.*_clerk.*/) ||
       pathname.match(/\/sign-up\/.*_clerk.*/)) {
-    if (process.env.NODE_ENV === 'development') {
+    if (process.env.NODE_ENV === 'production') {
       console.log('🚀 Clerk internal route - immediate return:', pathname);
     }
     return NextResponse.next();
@@ -63,7 +63,7 @@ export default clerkMiddleware(async (auth, req) => {
 
   // Early return for other public routes that don't need auth processing
   if (isPublicRoute(req)) {
-    if (process.env.NODE_ENV === 'development') {
+    if (process.env.NODE_ENV === 'production') {
       console.log('📍 Public route - early return:', pathname);
     }
     return NextResponse.next();
@@ -98,7 +98,7 @@ export default clerkMiddleware(async (auth, req) => {
       }
     }
     // Debug current path and user
-    if (process.env.NODE_ENV === 'development') {
+    if (process.env.NODE_ENV === 'production') {
       console.log('🔍 Middleware Debug - Request Info:', {
         userId,
         pathname: req.nextUrl.pathname,
@@ -124,7 +124,7 @@ export default clerkMiddleware(async (auth, req) => {
       organizationRole === "admin" ||
       orgMetadataRole === "admin";
     
-    if (process.env.NODE_ENV === 'development') {
+    if (process.env.NODE_ENV === 'production') {
       console.log('🔍 Middleware Debug - Admin Check Result:', {
         isUserAdmin,
         publicMetadataRole,
@@ -140,7 +140,7 @@ export default clerkMiddleware(async (auth, req) => {
 
     // Handle legacy dashboard route redirects
     if (isLegacyDashboardRoute(req)) {
-      if (process.env.NODE_ENV === 'development') {
+      if (process.env.NODE_ENV === 'production') {
         console.log('🔄 Legacy Dashboard Redirect:', { isUserAdmin, currentPath: req.nextUrl.pathname });
       }
       if (isUserAdmin) {
@@ -152,7 +152,7 @@ export default clerkMiddleware(async (auth, req) => {
 
     // Handle dashboard routes - these are accessible to all authenticated users
     if (isDashboardRoute(req)) {
-      if (process.env.NODE_ENV === 'development') {
+      if (process.env.NODE_ENV === 'production') {
         console.log('🏠 Dashboard Route Access:', { isUserAdmin, currentPath: req.nextUrl.pathname });
       }
       // Dashboard routes are accessible to all authenticated users
@@ -161,13 +161,13 @@ export default clerkMiddleware(async (auth, req) => {
 
     // Check admin access for admin routes
     if (isAdminRoute(req)) {
-      if (process.env.NODE_ENV === 'development') {
+      if (process.env.NODE_ENV === 'production') {
         console.log('🔐 Admin Route Check:', { isUserAdmin, currentPath: req.nextUrl.pathname });
       }
 
       // Allow access to make-first-admin endpoint for any authenticated user
       if (req.nextUrl.pathname === "/api/admin/make-first-admin") {
-        if (process.env.NODE_ENV === 'development') {
+        if (process.env.NODE_ENV === 'production') {
           console.log('🔑 Allowing access to make-first-admin endpoint');
         }
         return NextResponse.next();
@@ -180,7 +180,7 @@ export default clerkMiddleware(async (auth, req) => {
 
         // If we already redirected them once, send them to a safe landing page
         if (hasRedirectParam || (referrer && referrer.includes("admin_access_denied"))) {
-          if (process.env.NODE_ENV === 'development') {
+          if (process.env.NODE_ENV === 'production') {
             console.log('🚨 LOOP PREVENTION: Sending to landing page');
           }
           return NextResponse.redirect(new URL("/", req.url));
@@ -188,7 +188,7 @@ export default clerkMiddleware(async (auth, req) => {
 
         // First-time redirect to member dashboard
         if (!req.nextUrl.pathname.startsWith("/dashboard/members") && !req.nextUrl.pathname.startsWith("/member")) {
-          if (process.env.NODE_ENV === 'development') {
+          if (process.env.NODE_ENV === 'production') {
             console.log('🚫 Non-admin accessing admin route, redirecting to member dashboard');
           }
           const memberUrl = new URL("/dashboard/members", req.url);
@@ -200,7 +200,7 @@ export default clerkMiddleware(async (auth, req) => {
 
     // Check member access for member routes (prevent admins from accessing member routes)
     if (isMemberRoute(req) && isUserAdmin) {
-      if (process.env.NODE_ENV === 'development') {
+      if (process.env.NODE_ENV === 'production') {
         console.log('🔄 Admin accessing member route, redirecting to admin dashboard');
       }
       // Prevent redirect loop - only redirect if not already on admin routes
@@ -213,7 +213,7 @@ export default clerkMiddleware(async (auth, req) => {
     // But only if they're not in the middle of an auth flow
     if ((req.nextUrl.pathname === "/sign-in" || req.nextUrl.pathname === "/sign-up") &&
         !req.nextUrl.searchParams.has('redirect_url')) {
-      if (process.env.NODE_ENV === 'development') {
+      if (process.env.NODE_ENV === 'production') {
         console.log('🔄 Auth page redirect:', { isUserAdmin });
       }
       if (isUserAdmin) {

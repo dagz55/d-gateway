@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
     const { data: profile } = await supabase
       .from('user_profiles')
       .select('is_admin, role')
-      .eq('workos_user_id', user.id)
+      .eq('clerk_user_id', user.id)
       .single();
 
     if (!profile?.is_admin && profile?.role !== 'admin') {
@@ -152,7 +152,7 @@ export async function GET(request: NextRequest) {
     const { data: profile } = await supabase
       .from('user_profiles')
       .select('is_admin, role')
-      .eq('workos_user_id', user.id)
+      .eq('clerk_user_id', user.id)
       .single();
 
     if (!profile?.is_admin && profile?.role !== 'admin') {

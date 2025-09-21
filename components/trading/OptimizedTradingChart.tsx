@@ -331,6 +331,560 @@ const OptimizedCandlestickChart: React.FC<{
   );
 };
 
+// Optimized Line Chart Component
+const OptimizedLineChart: React.FC<{
+  data: CandlestickData[];
+  width: number;
+  height: number;
+  onHover: (data: TooltipData | null, x: number, y: number) => void;
+  getTechnicalIndicators: (index: number) => TechnicalIndicators;
+  getSupportResistanceLevels: () => SupportResistance;
+}> = ({ data, width, height, onHover, getTechnicalIndicators, getSupportResistanceLevels }) => {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  const animationRef = useRef<number>();
+  const lastDrawTime = useRef<number>(0);
+  
+  const padding = { top: 20, right: 80, bottom: 40, left: 80 };
+  const chartWidth = width - padding.left - padding.right;
+  const chartHeight = height - padding.top - padding.bottom;
+
+  // Memoize expensive calculations
+  const { priceRange, supportResistance } = useMemo(() => {
+    if (data.length === 0) return { priceRange: { min: 0, max: 0 }, supportResistance: { support: [], resistance: [] } };
+    
+    const allPrices = data.map(d => d.close);
+    const range = {
+      min: Math.min(...allPrices) * 0.995,
+      max: Math.max(...allPrices) * 1.005
+    };
+    
+    return {
+      priceRange: range,
+      supportResistance: getSupportResistanceLevels()
+    };
+  }, [data, getSupportResistanceLevels]);
+
+  // Optimized drawing function for line chart
+  const drawChart = useCallback(() => {
+    const now = performance.now();
+    if (now - lastDrawTime.current < 16.67) return; // Limit to 60fps
+    lastDrawTime.current = now;
+
+    const canvas = canvasRef.current;
+    if (!canvas || data.length === 0) return;
+
+    const ctx = canvas.getContext('2d', { 
+      alpha: false,
+      desynchronized: true,
+      willReadFrequently: false
+    });
+    if (!ctx) return;
+
+    // Optimized DPI handling
+    const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+    const canvasWidth = width * dpr;
+    const canvasHeight = height * dpr;
+    
+    if (canvas.width !== canvasWidth || canvas.height !== canvasHeight) {
+      canvas.width = canvasWidth;
+      canvas.height = canvasHeight;
+      ctx.scale(dpr, dpr);
+    }
+    
+    canvas.style.width = `${width}px`;
+    canvas.style.height = `${height}px`;
+
+    // Clear with solid background
+    ctx.fillStyle = '#0a0f1f';
+    ctx.fillRect(0, 0, width, height);
+
+    const priceToY = (price: number) => 
+      padding.top + chartHeight - ((price - priceRange.min) / (priceRange.max - priceRange.min)) * chartHeight;
+
+    const indexToX = (index: number) => 
+      padding.left + (index / (data.length - 1)) * chartWidth;
+
+    // Draw grid
+    ctx.strokeStyle = 'rgba(51, 225, 218, 0.1)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    
+    for (let i = 0; i <= 5; i++) {
+      const y = padding.top + (chartHeight / 5) * i;
+      ctx.moveTo(padding.left, y);
+      ctx.lineTo(width - padding.right, y);
+    }
+    ctx.stroke();
+
+    // Price labels
+    ctx.fillStyle = 'rgba(234, 242, 255, 0.8)';
+    ctx.font = '11px Inter, sans-serif';
+    ctx.textAlign = 'right';
+    
+    for (let i = 0; i <= 5; i++) {
+      const y = padding.top + (chartHeight / 5) * i;
+      const price = priceRange.max - (i / 5) * (priceRange.max - priceRange.min);
+      ctx.fillText(formatPrice(price), padding.left - 10, y + 4);
+    }
+
+    // Draw support/resistance levels
+    ctx.strokeStyle = 'rgba(255, 193, 7, 0.4)';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([4, 4]);
+    ctx.beginPath();
+    
+    [...supportResistance.support, ...supportResistance.resistance].forEach(level => {
+      const y = priceToY(level);
+      ctx.moveTo(padding.left, y);
+      ctx.lineTo(width - padding.right, y);
+    });
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Draw main price line
+    ctx.strokeStyle = '#33e1da';
+    ctx.lineWidth = 3;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.beginPath();
+    
+    data.forEach((candle, index) => {
+      const x = indexToX(index);
+      const y = priceToY(candle.close);
+      
+      if (index === 0) {
+        ctx.moveTo(x, y);
+      } else {
+        ctx.lineTo(x, y);
+      }
+    });
+    ctx.stroke();
+
+    // Draw hover point
+    if (hoveredIndex !== null) {
+      const x = indexToX(hoveredIndex);
+      const y = priceToY(data[hoveredIndex].close);
+      
+      ctx.fillStyle = '#33e1da';
+      ctx.beginPath();
+      ctx.arc(x, y, 6, 0, 2 * Math.PI);
+      ctx.fill();
+      
+      ctx.strokeStyle = '#0a0f1f';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+    }
+
+    // Draw technical indicators (SMA20)
+    if (data.length > 20) {
+      ctx.strokeStyle = 'rgba(59, 130, 246, 0.7)';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      
+      let smaStarted = false;
+      data.forEach((_, index) => {
+        if (index >= 19) {
+          const indicators = getTechnicalIndicators(index);
+          const x = indexToX(index);
+          const y = priceToY(indicators.sma20);
+          
+          if (!smaStarted) {
+            ctx.moveTo(x, y);
+            smaStarted = true;
+          } else {
+            ctx.lineTo(x, y);
+          }
+        }
+      });
+      ctx.stroke();
+    }
+
+    // Time labels
+    ctx.fillStyle = 'rgba(234, 242, 255, 0.7)';
+    ctx.font = '10px Inter, sans-serif';
+    ctx.textAlign = 'center';
+    
+    const labelCount = Math.min(6, data.length);
+    for (let i = 0; i < labelCount; i++) {
+      const index = Math.floor((i / (labelCount - 1)) * (data.length - 1));
+      const x = indexToX(index);
+      const date = new Date(data[index].timestamp);
+      
+      ctx.fillText(
+        date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        x,
+        height - 10
+      );
+    }
+  }, [data, width, height, priceRange, hoveredIndex, supportResistance, chartWidth, chartHeight, getTechnicalIndicators]);
+
+  // Animation loop
+  useEffect(() => {
+    const animate = () => {
+      drawChart();
+      animationRef.current = requestAnimationFrame(animate);
+    };
+    
+    animationRef.current = requestAnimationFrame(animate);
+    
+    return () => {
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+      }
+    };
+  }, [drawChart]);
+
+  // Mouse handling
+  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLCanvasElement>) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const rect = canvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    if (x >= padding.left && x <= width - padding.right && 
+        y >= padding.top && y <= height - padding.bottom) {
+      
+      const dataIndex = Math.round(((x - padding.left) / chartWidth) * (data.length - 1));
+      const clampedIndex = Math.max(0, Math.min(data.length - 1, dataIndex));
+      
+      if (clampedIndex !== hoveredIndex) {
+        setHoveredIndex(clampedIndex);
+        
+        const candle = data[clampedIndex];
+        const indicators = getTechnicalIndicators(clampedIndex);
+        
+        const tooltipData: TooltipData = {
+          ...candle,
+          indicators,
+          supportResistance
+        };
+        
+        onHover(tooltipData, e.clientX, e.clientY);
+      }
+    } else {
+      if (hoveredIndex !== null) {
+        setHoveredIndex(null);
+        onHover(null, 0, 0);
+      }
+    }
+  }, [data, width, height, chartWidth, padding, hoveredIndex, getTechnicalIndicators, supportResistance, onHover]);
+
+  const handleMouseLeave = useCallback(() => {
+    setHoveredIndex(null);
+    onHover(null, 0, 0);
+  }, [onHover]);
+
+  return (
+    <canvas
+      ref={canvasRef}
+      width={width}
+      height={height}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      className="cursor-crosshair rounded-lg"
+      style={{ 
+        background: 'transparent',
+        willChange: 'transform',
+        transform: 'translateZ(0)'
+      }}
+    />
+  );
+};
+
+// Optimized Area Chart Component
+const OptimizedAreaChart: React.FC<{
+  data: CandlestickData[];
+  width: number;
+  height: number;
+  onHover: (data: TooltipData | null, x: number, y: number) => void;
+  getTechnicalIndicators: (index: number) => TechnicalIndicators;
+  getSupportResistanceLevels: () => SupportResistance;
+}> = ({ data, width, height, onHover, getTechnicalIndicators, getSupportResistanceLevels }) => {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  const animationRef = useRef<number>();
+  const lastDrawTime = useRef<number>(0);
+  
+  const padding = { top: 20, right: 80, bottom: 40, left: 80 };
+  const chartWidth = width - padding.left - padding.right;
+  const chartHeight = height - padding.top - padding.bottom;
+
+  // Memoize expensive calculations
+  const { priceRange, supportResistance } = useMemo(() => {
+    if (data.length === 0) return { priceRange: { min: 0, max: 0 }, supportResistance: { support: [], resistance: [] } };
+    
+    const allPrices = data.map(d => d.close);
+    const range = {
+      min: Math.min(...allPrices) * 0.995,
+      max: Math.max(...allPrices) * 1.005
+    };
+    
+    return {
+      priceRange: range,
+      supportResistance: getSupportResistanceLevels()
+    };
+  }, [data, getSupportResistanceLevels]);
+
+  // Optimized drawing function for area chart
+  const drawChart = useCallback(() => {
+    const now = performance.now();
+    if (now - lastDrawTime.current < 16.67) return; // Limit to 60fps
+    lastDrawTime.current = now;
+
+    const canvas = canvasRef.current;
+    if (!canvas || data.length === 0) return;
+
+    const ctx = canvas.getContext('2d', { 
+      alpha: false,
+      desynchronized: true,
+      willReadFrequently: false
+    });
+    if (!ctx) return;
+
+    // Optimized DPI handling
+    const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+    const canvasWidth = width * dpr;
+    const canvasHeight = height * dpr;
+    
+    if (canvas.width !== canvasWidth || canvas.height !== canvasHeight) {
+      canvas.width = canvasWidth;
+      canvas.height = canvasHeight;
+      ctx.scale(dpr, dpr);
+    }
+    
+    canvas.style.width = `${width}px`;
+    canvas.style.height = `${height}px`;
+
+    // Clear with solid background
+    ctx.fillStyle = '#0a0f1f';
+    ctx.fillRect(0, 0, width, height);
+
+    const priceToY = (price: number) => 
+      padding.top + chartHeight - ((price - priceRange.min) / (priceRange.max - priceRange.min)) * chartHeight;
+
+    const indexToX = (index: number) => 
+      padding.left + (index / (data.length - 1)) * chartWidth;
+
+    // Draw grid
+    ctx.strokeStyle = 'rgba(51, 225, 218, 0.1)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    
+    for (let i = 0; i <= 5; i++) {
+      const y = padding.top + (chartHeight / 5) * i;
+      ctx.moveTo(padding.left, y);
+      ctx.lineTo(width - padding.right, y);
+    }
+    ctx.stroke();
+
+    // Price labels
+    ctx.fillStyle = 'rgba(234, 242, 255, 0.8)';
+    ctx.font = '11px Inter, sans-serif';
+    ctx.textAlign = 'right';
+    
+    for (let i = 0; i <= 5; i++) {
+      const y = padding.top + (chartHeight / 5) * i;
+      const price = priceRange.max - (i / 5) * (priceRange.max - priceRange.min);
+      ctx.fillText(formatPrice(price), padding.left - 10, y + 4);
+    }
+
+    // Draw support/resistance levels
+    ctx.strokeStyle = 'rgba(255, 193, 7, 0.4)';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([4, 4]);
+    ctx.beginPath();
+    
+    [...supportResistance.support, ...supportResistance.resistance].forEach(level => {
+      const y = priceToY(level);
+      ctx.moveTo(padding.left, y);
+      ctx.lineTo(width - padding.right, y);
+    });
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Create gradient for area fill
+    const gradient = ctx.createLinearGradient(0, padding.top, 0, height - padding.bottom);
+    gradient.addColorStop(0, 'rgba(51, 225, 218, 0.3)');
+    gradient.addColorStop(0.5, 'rgba(51, 225, 218, 0.1)');
+    gradient.addColorStop(1, 'rgba(51, 225, 218, 0.02)');
+
+    // Draw area fill
+    ctx.fillStyle = gradient;
+    ctx.beginPath();
+    
+    // Start from bottom left
+    const firstX = indexToX(0);
+    const bottomY = height - padding.bottom;
+    ctx.moveTo(firstX, bottomY);
+    
+    // Draw the price line
+    data.forEach((candle, index) => {
+      const x = indexToX(index);
+      const y = priceToY(candle.close);
+      ctx.lineTo(x, y);
+    });
+    
+    // Close the area by going to bottom right and back to start
+    const lastX = indexToX(data.length - 1);
+    ctx.lineTo(lastX, bottomY);
+    ctx.lineTo(firstX, bottomY);
+    ctx.fill();
+
+    // Draw main price line on top
+    ctx.strokeStyle = '#33e1da';
+    ctx.lineWidth = 3;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.beginPath();
+    
+    data.forEach((candle, index) => {
+      const x = indexToX(index);
+      const y = priceToY(candle.close);
+      
+      if (index === 0) {
+        ctx.moveTo(x, y);
+      } else {
+        ctx.lineTo(x, y);
+      }
+    });
+    ctx.stroke();
+
+    // Draw hover point
+    if (hoveredIndex !== null) {
+      const x = indexToX(hoveredIndex);
+      const y = priceToY(data[hoveredIndex].close);
+      
+      ctx.fillStyle = '#33e1da';
+      ctx.beginPath();
+      ctx.arc(x, y, 6, 0, 2 * Math.PI);
+      ctx.fill();
+      
+      ctx.strokeStyle = '#0a0f1f';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+    }
+
+    // Draw technical indicators (SMA20)
+    if (data.length > 20) {
+      ctx.strokeStyle = 'rgba(59, 130, 246, 0.7)';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      
+      let smaStarted = false;
+      data.forEach((_, index) => {
+        if (index >= 19) {
+          const indicators = getTechnicalIndicators(index);
+          const x = indexToX(index);
+          const y = priceToY(indicators.sma20);
+          
+          if (!smaStarted) {
+            ctx.moveTo(x, y);
+            smaStarted = true;
+          } else {
+            ctx.lineTo(x, y);
+          }
+        }
+      });
+      ctx.stroke();
+    }
+
+    // Time labels
+    ctx.fillStyle = 'rgba(234, 242, 255, 0.7)';
+    ctx.font = '10px Inter, sans-serif';
+    ctx.textAlign = 'center';
+    
+    const labelCount = Math.min(6, data.length);
+    for (let i = 0; i < labelCount; i++) {
+      const index = Math.floor((i / (labelCount - 1)) * (data.length - 1));
+      const x = indexToX(index);
+      const date = new Date(data[index].timestamp);
+      
+      ctx.fillText(
+        date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        x,
+        height - 10
+      );
+    }
+  }, [data, width, height, priceRange, hoveredIndex, supportResistance, chartWidth, chartHeight, getTechnicalIndicators]);
+
+  // Animation loop
+  useEffect(() => {
+    const animate = () => {
+      drawChart();
+      animationRef.current = requestAnimationFrame(animate);
+    };
+    
+    animationRef.current = requestAnimationFrame(animate);
+    
+    return () => {
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+      }
+    };
+  }, [drawChart]);
+
+  // Mouse handling
+  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLCanvasElement>) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const rect = canvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    if (x >= padding.left && x <= width - padding.right && 
+        y >= padding.top && y <= height - padding.bottom) {
+      
+      const dataIndex = Math.round(((x - padding.left) / chartWidth) * (data.length - 1));
+      const clampedIndex = Math.max(0, Math.min(data.length - 1, dataIndex));
+      
+      if (clampedIndex !== hoveredIndex) {
+        setHoveredIndex(clampedIndex);
+        
+        const candle = data[clampedIndex];
+        const indicators = getTechnicalIndicators(clampedIndex);
+        
+        const tooltipData: TooltipData = {
+          ...candle,
+          indicators,
+          supportResistance
+        };
+        
+        onHover(tooltipData, e.clientX, e.clientY);
+      }
+    } else {
+      if (hoveredIndex !== null) {
+        setHoveredIndex(null);
+        onHover(null, 0, 0);
+      }
+    }
+  }, [data, width, height, chartWidth, padding, hoveredIndex, getTechnicalIndicators, supportResistance, onHover]);
+
+  const handleMouseLeave = useCallback(() => {
+    setHoveredIndex(null);
+    onHover(null, 0, 0);
+  }, [onHover]);
+
+  return (
+    <canvas
+      ref={canvasRef}
+      width={width}
+      height={height}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      className="cursor-crosshair rounded-lg"
+      style={{ 
+        background: 'transparent',
+        willChange: 'transform',
+        transform: 'translateZ(0)'
+      }}
+    />
+  );
+};
+
 // Enhanced tooltip with better performance
 const EnhancedTooltip: React.FC<{
   data: TooltipData | null;
@@ -633,14 +1187,38 @@ export const OptimizedTradingChart: React.FC = () => {
               </div>
             ) : (
               <div className="relative">
-                <OptimizedCandlestickChart
-                  data={candlestickData}
-                  width={chartDimensions.width}
-                  height={chartDimensions.height}
-                  onHover={handleTooltipHover}
-                  getTechnicalIndicators={getTechnicalIndicators}
-                  getSupportResistanceLevels={getSupportResistanceLevels}
-                />
+                {chartType === 'candlestick' && (
+                  <OptimizedCandlestickChart
+                    data={candlestickData}
+                    width={chartDimensions.width}
+                    height={chartDimensions.height}
+                    onHover={handleTooltipHover}
+                    getTechnicalIndicators={getTechnicalIndicators}
+                    getSupportResistanceLevels={getSupportResistanceLevels}
+                  />
+                )}
+                
+                {chartType === 'line' && (
+                  <OptimizedLineChart
+                    data={candlestickData}
+                    width={chartDimensions.width}
+                    height={chartDimensions.height}
+                    onHover={handleTooltipHover}
+                    getTechnicalIndicators={getTechnicalIndicators}
+                    getSupportResistanceLevels={getSupportResistanceLevels}
+                  />
+                )}
+                
+                {chartType === 'area' && (
+                  <OptimizedAreaChart
+                    data={candlestickData}
+                    width={chartDimensions.width}
+                    height={chartDimensions.height}
+                    onHover={handleTooltipHover}
+                    getTechnicalIndicators={getTechnicalIndicators}
+                    getSupportResistanceLevels={getSupportResistanceLevels}
+                  />
+                )}
                 
                 <AnimatePresence>
                   <EnhancedTooltip
