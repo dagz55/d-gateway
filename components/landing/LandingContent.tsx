@@ -38,7 +38,28 @@ const PriceConverter = dynamic(() => import('./PriceConverter').then(mod => ({ d
 });
 
 const CryptoPriceCard = dynamic(() => import('./CryptoPriceCard').then(mod => ({ default: mod.CryptoPriceCard })), {
-  ssr: false
+  ssr: false,
+  loading: () => (
+    <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10 animate-pulse">
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center space-x-3">
+          <div className="w-10 h-10 bg-white/10 rounded-full"></div>
+          <div>
+            <div className="h-4 w-16 bg-white/10 rounded mb-2"></div>
+            <div className="h-3 w-12 bg-white/10 rounded"></div>
+          </div>
+        </div>
+        <div className="h-6 w-16 bg-white/10 rounded-full"></div>
+      </div>
+      <div className="space-y-3">
+        <div className="h-6 w-24 bg-white/10 rounded"></div>
+        <div className="flex justify-between">
+          <div className="h-3 w-20 bg-white/10 rounded"></div>
+          <div className="h-3 w-16 bg-white/10 rounded"></div>
+        </div>
+      </div>
+    </div>
+  )
 });
 
 const FeatureHighlights = dynamic(() => import('./FeatureHighlights').then(mod => ({ default: mod.FeatureHighlights })), {

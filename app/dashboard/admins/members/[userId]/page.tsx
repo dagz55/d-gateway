@@ -120,7 +120,7 @@ async function getMemberDetails(userId: string): Promise<MemberDetailsData | nul
       return null;
     }
 
-    // Get user stats (mock data for now - replace with real queries)
+    // TODO: Implement real queries to fetch user stats from Supabase
     const stats = {
       total_trades: 0,
       active_trades: 0,
@@ -132,13 +132,13 @@ async function getMemberDetails(userId: string): Promise<MemberDetailsData | nul
       signals_received: 0
     };
 
-    // Get trades (mock data for now - replace with real queries)
+    // TODO: Implement real queries to fetch user trades from Supabase
     const trades: Trade[] = [];
 
-    // Get transactions (mock data for now - replace with real queries)
+    // TODO: Implement real queries to fetch user transactions from Supabase
     const transactions: Transaction[] = [];
 
-    // Get signals (mock data for now - replace with real queries)
+    // TODO: Implement real queries to fetch user signals from Supabase
     const signals: Signal[] = [];
 
     return {

@@ -15,6 +15,7 @@ const isPublicRoute = createRouteMatcher([
   "/auth/forgot-password", // Password reset
   "/auth/reset-password", // Password reset
   "/auth/signup", // Legacy signup
+  "/admin-setup", // Admin setup page
   "/api/webhooks(.*)",
   "/market", // Public market page
 ]);
@@ -167,7 +168,10 @@ export default clerkMiddleware(async (auth, req) => {
           if (process.env.NODE_ENV === 'development') {
             console.log('🚫 Non-admin accessing admin route, redirecting to member dashboard');
           }
-          return NextResponse.redirect(new URL("/dashboard/members", req.url));
+          // Add a query parameter to indicate the user tried to access admin area
+          const memberUrl = new URL("/dashboard/members", req.url);
+          memberUrl.searchParams.set("admin_access_denied", "true");
+          return NextResponse.redirect(memberUrl);
         }
       }
     }

@@ -2,11 +2,22 @@
   "mcpServers": {
     "reactbits": {
       "command": "npx",
-      "args": ["reactbits-dev-mcp-server"],
+      "args": [
+        "reactbits-dev-mcp-server"
+      ],
       "description": "ReactBits MCP Server - Access to 135+ animated React components",
       "env": {
         "NODE_ENV": "development"
       }
+    },
+    "filesystem": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-filesystem",
+        "."
+      ],
+      "description": "Local filesystem access for the current workspace. Set WORKSPACE_PATH environment variable to override the default current directory."
     }
   }
 }

@@ -2,19 +2,20 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(request: NextRequest) {
   try {
-    // Return demo stats without authentication
-    const defaultStats = {
-      balance: 10000,  // Demo balance
-      pnlToday: 250.50,
-      openSignals: 3,
-      totalTrades: 42,
-      winRate: 68.5,
-      lastDeposit: 1000,
+    // Return empty stats - integrate with real user data from Supabase
+    const emptyStats = {
+      balance: 0,
+      pnlToday: 0,
+      openSignals: 0,
+      totalTrades: 0,
+      winRate: 0,
+      lastDeposit: 0,
     };
 
     return NextResponse.json({
       success: true,
-      data: defaultStats,
+      data: emptyStats,
+      message: 'Connect your trading account to view real stats'
     });
   } catch (error) {
     console.error('Dashboard stats error:', error);

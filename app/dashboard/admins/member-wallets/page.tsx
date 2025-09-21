@@ -39,7 +39,7 @@ export default function MemberWalletsPage() {
     async function fetchData() {
       try {
         // Note: In a real implementation, you'd fetch this data from an API route
-        // For now, using mock data structure
+        // TODO: Implement real wallet data structure from Supabase
         setMemberWallets([]);
         setRecentTransactions([]);
       } catch (error) {

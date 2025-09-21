@@ -45,20 +45,20 @@ async function getWalletData(userId: string) {
     const tradingBalance = tradingTransactions.reduce((sum, t) => sum + t.amount, 0) - 
                           withdrawalTransactions.reduce((sum, t) => sum + t.amount, 0);
     
-    // Mock income balance calculation (replace with real logic)
-    const incomeBalance = tradingBalance * 0.25; // 25% of trading balance as income
+    // TODO: Calculate real income balance from trading profits/commissions
+    const incomeBalance = 0; // Will be calculated from actual trading performance
     
     const totalPortfolio = tradingBalance + incomeBalance;
     
-    // Calculate changes (mock data for now - replace with real historical data)
-    const tradingChange = tradingBalance * 0.14; // 14% gain
-    const tradingChangePercent = 14.0;
+    // TODO: Calculate real changes from historical data
+    const tradingChange = 0; // Will be calculated from trading history
+    const tradingChangePercent = 0;
     
-    const incomeChange = incomeBalance * 0.187; // 18.7% gain
-    const incomeChangePercent = 18.7;
+    const incomeChange = 0; // Will be calculated from income history
+    const incomeChangePercent = 0;
     
     const totalChange = tradingChange + incomeChange;
-    const totalChangePercent = 14.9;
+    const totalChangePercent = 0;
 
     return {
       tradingBalance,
