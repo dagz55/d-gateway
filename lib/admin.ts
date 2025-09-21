@@ -163,11 +163,11 @@ export async function hasAdminPermission(permission: string): Promise<boolean> {
  */
 export async function requireAdmin(): Promise<AdminUser> {
   const adminUser = await getAdminUser();
-  
+
   if (!adminUser) {
-    redirect('/');
+    redirect('/dashboard/members');
   }
-  
+
   return adminUser;
 }
 
@@ -176,12 +176,12 @@ export async function requireAdmin(): Promise<AdminUser> {
  */
 export async function requireAdminPermission(permission: string): Promise<AdminUser> {
   const adminUser = await requireAdmin();
-  
-  if (!adminUser.admin_permissions.includes(permission) && 
+
+  if (!adminUser.admin_permissions.includes(permission) &&
       !adminUser.admin_permissions.includes('system')) {
-    redirect('/admin');
+    redirect('/dashboard/admins');
   }
-  
+
   return adminUser;
 }
 

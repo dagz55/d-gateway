@@ -7,7 +7,9 @@ const isPublicRoute = createRouteMatcher([
   "/", // Root path for landing page
   "/sign-in(.*)",
   "/sign-up(.*)",
+  "/auth(.*)", // All auth routes including OAuth callbacks
   "/api/webhooks(.*)",
+  "/market", // Public market page
 ]);
 
 // Define admin routes that require admin role
@@ -133,8 +135,8 @@ export default clerkMiddleware(async (auth, req) => {
       if (process.env.NODE_ENV === 'development') {
         console.log('🔄 Admin accessing member route, redirecting to admin dashboard');
       }
-      // Prevent redirect loop - only redirect if not already on admin dashboard
-      if (req.nextUrl.pathname !== "/dashboard/admins") {
+      // Prevent redirect loop - only redirect if not already on admin dashboard or admin routes
+      if (!req.nextUrl.pathname.startsWith("/dashboard/admins")) {
         return NextResponse.redirect(new URL("/dashboard/admins", req.url));
       }
     }

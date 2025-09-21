@@ -32,7 +32,7 @@ export async function requireAdmin() {
   const isAdmin = user.publicMetadata?.role === 'admin';
 
   if (!isAdmin) {
-    redirect('/dashboard');
+    redirect('/dashboard/members');
   }
 
   return user;
