@@ -23,6 +23,13 @@ async function getWalletData(userId: string) {
       .eq('user_id', userId)
       .order('created_at', { ascending: false });
 
+    // Fetch user's trading history for income calculations
+    const { data: trades, error: tradesError } = await supabase
+      .from('trades')
+      .select('*')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false });
+
     if (error) {
       console.error('Error fetching wallet data:', error);
       return {
@@ -45,31 +52,60 @@ async function getWalletData(userId: string) {
     const tradingBalance = tradingTransactions.reduce((sum, t) => sum + t.amount, 0) - 
                           withdrawalTransactions.reduce((sum, t) => sum + t.amount, 0);
     
-    // TODO: Calculate real income balance from trading profits/commissions
-    const incomeBalance = 0; // Will be calculated from actual trading performance
+    // ZIG-001: Calculate real income balance from trading profits/commissions
+    const completedTrades = trades?.filter(t => t.status === 'COMPLETED') || [];
+    const incomeBalance = completedTrades.reduce((sum, trade) => {
+      const profit = trade.exit_price && trade.entry_price ? 
+        (trade.exit_price - trade.entry_price) * trade.quantity : 0;
+      return sum + Math.max(0, profit); // Only count positive profits
+    }, 0);
     
     const totalPortfolio = tradingBalance + incomeBalance;
     
-    // TODO: Calculate real changes from historical data
-    const tradingChange = 0; // Will be calculated from trading history
-    const tradingChangePercent = 0;
+    // ZIG-002: Calculate real changes from historical data (last 24 hours)
+    const now = new Date();
+    const yesterday = new Date(now.getTime() - 24 * 60 * 60 * 1000);
     
-    const incomeChange = 0; // Will be calculated from income history
-    const incomeChangePercent = 0;
+    const recentTradingTransactions = tradingTransactions.filter(t => 
+      new Date(t.created_at) >= yesterday
+    );
+    const recentWithdrawals = withdrawalTransactions.filter(t => 
+      new Date(t.created_at) >= yesterday
+    );
+    
+    const tradingChange = recentTradingTransactions.reduce((sum, t) => sum + t.amount, 0) - 
+                         recentWithdrawals.reduce((sum, t) => sum + t.amount, 0);
+    
+    // ZIG-003: Calculate percent with division by zero protection
+    const tradingChangePercent = tradingBalance > 0 ? 
+      (tradingChange / tradingBalance) * 100 : 0;
+    
+    const recentTrades = completedTrades.filter(t => 
+      new Date(t.updated_at) >= yesterday
+    );
+    const incomeChange = recentTrades.reduce((sum, trade) => {
+      const profit = trade.exit_price && trade.entry_price ? 
+        (trade.exit_price - trade.entry_price) * trade.quantity : 0;
+      return sum + Math.max(0, profit);
+    }, 0);
+    
+    const incomeChangePercent = incomeBalance > 0 ? 
+      (incomeChange / incomeBalance) * 100 : 0;
     
     const totalChange = tradingChange + incomeChange;
-    const totalChangePercent = 0;
+    const totalChangePercent = totalPortfolio > 0 ? 
+      (totalChange / totalPortfolio) * 100 : 0;
 
     return {
       tradingBalance,
       incomeBalance,
       totalPortfolio,
       tradingChange,
-      tradingChangePercent,
+      tradingChangePercent: Math.round(tradingChangePercent * 100) / 100, // Round to 2 decimal places
       incomeChange,
-      incomeChangePercent,
+      incomeChangePercent: Math.round(incomeChangePercent * 100) / 100,
       totalChange,
-      totalChangePercent,
+      totalChangePercent: Math.round(totalChangePercent * 100) / 100,
     };
   } catch (error) {
     console.error('Error calculating wallet data:', error);

@@ -16,8 +16,8 @@ export default function SophisticatedLandingPage() {
         <button 
           className="px-6 py-3 bg-gradient-to-r from-[#33E1DA] to-[#1A7FB3] text-[#0A0F1F] font-semibold rounded-xl hover:scale-105 transition-all duration-300 shadow-lg"
           onClick={() => {
-            // Could trigger a modal or navigate to auth page
-            router.push('/auth');
+            // Navigate to sign-in page
+            router.push('/sign-in');
           }}
         >
           Login / Sign Up

@@ -12,8 +12,8 @@ export default function EnterprisePage() {
         >
           ← Original
         </Link>
-        <Link 
-          href="/auth"
+        <Link
+          href="/sign-in"
           className="px-4 py-2 text-sm bg-brand-600 text-white rounded-lg shadow-sm hover:bg-brand-700 hover:shadow-md transition-all duration-200"
         >
           Sign In

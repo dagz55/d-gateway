@@ -5,19 +5,13 @@ import { NextResponse } from "next/server";
 // Define public routes that don't require authentication
 const isPublicRoute = createRouteMatcher([
   "/", // Root path for landing page
-  "/sign-in(.*)",
-  "/sign-up(.*)",
-  "/auth/callback(.*)", // OAuth callbacks only
-  "/auth/oauth-success(.*)", // OAuth success handling
-  "/auth/oauth-timeout", // OAuth timeout page
-  "/auth/clean-session", // Session cleanup
-  "/auth/auth-code-error", // Auth errors
-  "/auth/forgot-password", // Password reset
-  "/auth/reset-password", // Password reset
-  "/auth/signup", // Legacy signup
+  "/sign-in(.*)", // Clerk sign-in pages
+  "/sign-up(.*)", // Clerk sign-up pages
   "/admin-setup", // Admin setup page
-  "/api/webhooks(.*)",
+  "/api/webhooks(.*)", // Webhook endpoints
   "/market", // Public market page
+  "/enterprise", // Public enterprise page
+  "/help", // Public help page
 ]);
 
 // Define admin routes that require admin role
@@ -62,30 +56,14 @@ export default clerkMiddleware(async (auth, req) => {
     const referrer = req.headers.get('referer');
     const currentPath = req.nextUrl.pathname;
 
-    // Check for specific problematic redirect patterns
-    if (referrer) {
-      const referrerUrl = new URL(referrer);
-      const referrerPath = referrerUrl.pathname;
-
-      // Detect bouncing pattern: admin->member or member->admin
-      if ((referrerPath.includes('/admin') && currentPath.includes('/member')) ||
-          (referrerPath.includes('/member') && currentPath.includes('/admin'))) {
-        if (process.env.NODE_ENV === 'development') {
-          console.log('🚨 Redirect loop detected, forcing safe redirect');
-        }
-        // Force redirect to OAuth success page to re-evaluate role
-        return NextResponse.redirect(new URL("/auth/oauth-success", req.url));
-      }
-    }
-
     // EMERGENCY: Prevent specific infinite redirect pattern
     // If accessing /admin or /member directly, and coming from those same routes, break the cycle
     if ((currentPath === '/admin' || currentPath === '/member') && referrer) {
       try {
         const referrerUrl = new URL(referrer);
         if (referrerUrl.pathname === currentPath) {
-          console.log('🚨 Emergency: Same-route loop detected, redirecting to OAuth success');
-          return NextResponse.redirect(new URL("/auth/oauth-success", req.url));
+          console.log('🚨 Emergency: Same-route loop detected, redirecting to admin setup');
+          return NextResponse.redirect(new URL("/admin-setup", req.url));
         }
       } catch (e) {
         // Invalid referrer URL, continue

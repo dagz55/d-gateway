@@ -1,5 +1,5 @@
 "use client";
-import React, { useMemo } from "react";
+import React, { useMemo, useCallback } from "react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
@@ -21,9 +21,10 @@ export const BoxesCore = ({ className, ...rest }: { className?: string }) => {
     "rgb(196 181 253)", // violet-300
   ], []);
 
-  const getRandomColor = () => {
+  // ZIG-005: Memoize getRandomColor to prevent unnecessary re-renders
+  const getRandomColor = useCallback(() => {
     return colors[Math.floor(Math.random() * colors.length)];
-  };
+  }, [colors]);
 
   return (
     <div
