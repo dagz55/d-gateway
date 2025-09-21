@@ -15,12 +15,14 @@ const isPublicRoute = createRouteMatcher([
 // Define admin routes that require admin role
 const isAdminRoute = createRouteMatcher([
   "/dashboard/admins(.*)", // Admin dashboard structure
+  "/admin(.*)", // Legacy admin routes
   "/api/admin(.*)",
 ]);
 
 // Define member routes
 const isMemberRoute = createRouteMatcher([
   "/dashboard/members(.*)", // Member dashboard structure
+  "/member(.*)", // Legacy member routes
 ]);
 
 // Define legacy dashboard routes that need to be redirected
@@ -48,6 +50,25 @@ export default clerkMiddleware(async (auth, req) => {
   }
 
   if (userId) {
+    // CRITICAL: Prevent redirect loops by checking referrer
+    const referrer = req.headers.get('referer');
+    const currentPath = req.nextUrl.pathname;
+
+    // If user is bouncing between admin and member routes, force them to a safe default
+    if (referrer) {
+      const referrerUrl = new URL(referrer);
+      const referrerPath = referrerUrl.pathname;
+
+      // Detect bouncing pattern: admin->member or member->admin
+      if ((referrerPath.includes('/admin') && currentPath.includes('/member')) ||
+          (referrerPath.includes('/member') && currentPath.includes('/admin'))) {
+        if (process.env.NODE_ENV === 'development') {
+          console.log('🚨 Redirect loop detected, forcing safe redirect');
+        }
+        // Force redirect to OAuth success page to re-evaluate role
+        return NextResponse.redirect(new URL("/auth/oauth-success", req.url));
+      }
+    }
     // Debug current path and user
     if (process.env.NODE_ENV === 'development') {
       console.log('🔍 Middleware Debug - Request Info:', {
@@ -120,8 +141,8 @@ export default clerkMiddleware(async (auth, req) => {
       }
 
       if (!isUserAdmin) {
-        // Prevent redirect loop - only redirect if not already on member dashboard
-        if (req.nextUrl.pathname !== "/dashboard/members") {
+        // Prevent redirect loop - only redirect if not already on member routes
+        if (!req.nextUrl.pathname.startsWith("/dashboard/members") && !req.nextUrl.pathname.startsWith("/member")) {
           if (process.env.NODE_ENV === 'development') {
             console.log('🚫 Non-admin accessing admin route, redirecting to member dashboard');
           }
@@ -135,8 +156,8 @@ export default clerkMiddleware(async (auth, req) => {
       if (process.env.NODE_ENV === 'development') {
         console.log('🔄 Admin accessing member route, redirecting to admin dashboard');
       }
-      // Prevent redirect loop - only redirect if not already on admin dashboard or admin routes
-      if (!req.nextUrl.pathname.startsWith("/dashboard/admins")) {
+      // Prevent redirect loop - only redirect if not already on admin routes
+      if (!req.nextUrl.pathname.startsWith("/dashboard/admins") && !req.nextUrl.pathname.startsWith("/admin")) {
         return NextResponse.redirect(new URL("/dashboard/admins", req.url));
       }
     }
