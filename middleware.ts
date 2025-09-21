@@ -12,6 +12,7 @@ const isPublicRoute = createRouteMatcher([
   "/market", // Public market page
   "/enterprise", // Public enterprise page
   "/help", // Public help page
+  "/auth/oauth-success", // Temporary OAuth redirect handler
 ]);
 
 // Define admin routes that require admin role
