@@ -1,16 +1,10 @@
 import { redirect } from 'next/navigation';
-import { currentUser } from '@clerk/nextjs/server';
 
 // Force dynamic rendering since this route uses authentication
 export const dynamic = 'force-dynamic';
 
 export default async function LegacyMemberPage() {
-  const user = await currentUser();
-
-  if (!user) {
-    redirect('/sign-in');
-  }
-
-  // Redirect legacy /member route to new /dashboard/members
+  // Middleware handles authentication - just redirect to new member path
+  // This prevents conflicts between page-level auth and middleware auth
   redirect('/dashboard/members');
 }

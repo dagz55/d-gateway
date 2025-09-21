@@ -17,13 +17,34 @@ export default function OAuthSuccessPage() {
       return;
     }
 
-    // Check if user is admin
-    const isAdmin = user.publicMetadata?.role === 'admin';
+    // Check if user is admin (matching middleware logic)
+    const isAdmin =
+      user.publicMetadata?.role === 'admin' ||
+      (user as any)?.metadata?.role === 'admin' ||
+      (user as any)?.role === 'admin' ||
+      (user as any)?.org_role === 'admin' ||
+      (user as any)?.orgMetadata?.role === 'admin';
+
+    console.log('OAuth Success - User role check:', {
+      userId: user.id,
+      email: user.emailAddresses[0]?.emailAddress,
+      publicMetadata: user.publicMetadata,
+      isAdmin,
+      allMetadata: {
+        publicMetadata: user.publicMetadata,
+        metadata: (user as any)?.metadata,
+        role: (user as any)?.role,
+        org_role: (user as any)?.org_role,
+        orgMetadata: (user as any)?.orgMetadata
+      }
+    });
 
     // Redirect based on role
     if (isAdmin) {
+      console.log('Redirecting admin to /dashboard/admins');
       router.replace('/dashboard/admins');
     } else {
+      console.log('Redirecting member to /dashboard/members');
       router.replace('/dashboard/members');
     }
   }, [user, isLoaded, router]);

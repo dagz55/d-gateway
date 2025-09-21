@@ -50,11 +50,11 @@ export default clerkMiddleware(async (auth, req) => {
   }
 
   if (userId) {
-    // CRITICAL: Prevent redirect loops by checking referrer
+    // CRITICAL: Prevent redirect loops by checking referrer and patterns
     const referrer = req.headers.get('referer');
     const currentPath = req.nextUrl.pathname;
 
-    // If user is bouncing between admin and member routes, force them to a safe default
+    // Check for specific problematic redirect patterns
     if (referrer) {
       const referrerUrl = new URL(referrer);
       const referrerPath = referrerUrl.pathname;
@@ -67,6 +67,20 @@ export default clerkMiddleware(async (auth, req) => {
         }
         // Force redirect to OAuth success page to re-evaluate role
         return NextResponse.redirect(new URL("/auth/oauth-success", req.url));
+      }
+    }
+
+    // EMERGENCY: Prevent specific infinite redirect pattern
+    // If accessing /admin or /member directly, and coming from those same routes, break the cycle
+    if ((currentPath === '/admin' || currentPath === '/member') && referrer) {
+      try {
+        const referrerUrl = new URL(referrer);
+        if (referrerUrl.pathname === currentPath) {
+          console.log('🚨 Emergency: Same-route loop detected, redirecting to OAuth success');
+          return NextResponse.redirect(new URL("/auth/oauth-success", req.url));
+        }
+      } catch (e) {
+        // Invalid referrer URL, continue
       }
     }
     // Debug current path and user
