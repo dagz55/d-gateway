@@ -90,6 +90,7 @@ export default clerkMiddleware(async (auth, req) => {
       publicMetadataRole === "admin" ||
       metadataRole === "admin" ||
       (sessionClaims?.publicMetadata as any)?.role === "admin" ||
+      (sessionClaims?.publicMetadata as any)?.is_admin === true ||
       directRole === "admin" ||
       organizationRole === "admin" ||
       orgMetadataRole === "admin";
@@ -102,6 +103,8 @@ export default clerkMiddleware(async (auth, req) => {
         directRole,
         organizationRole,
         orgMetadataRole,
+        isAdminFlag: (sessionClaims?.publicMetadata as any)?.is_admin,
+        fullPublicMetadata: sessionClaims?.publicMetadata,
         currentPath: req.nextUrl.pathname
       });
     }
@@ -142,12 +145,23 @@ export default clerkMiddleware(async (auth, req) => {
       }
 
       if (!isUserAdmin) {
-        // Prevent redirect loop - only redirect if not already on member routes
+        // EMERGENCY BREAK: Prevent infinite redirect loops
+        const hasRedirectParam = req.nextUrl.searchParams.has("admin_access_denied");
+        const referrer = req.headers.get('referer');
+
+        // If we already redirected them once, send them to a safe landing page
+        if (hasRedirectParam || (referrer && referrer.includes("admin_access_denied"))) {
+          if (process.env.NODE_ENV === 'development') {
+            console.log('🚨 LOOP PREVENTION: Sending to admin setup page');
+          }
+          return NextResponse.redirect(new URL("/admin-setup", req.url));
+        }
+
+        // First-time redirect to member dashboard
         if (!req.nextUrl.pathname.startsWith("/dashboard/members") && !req.nextUrl.pathname.startsWith("/member")) {
           if (process.env.NODE_ENV === 'development') {
             console.log('🚫 Non-admin accessing admin route, redirecting to member dashboard');
           }
-          // Add a query parameter to indicate the user tried to access admin area
           const memberUrl = new URL("/dashboard/members", req.url);
           memberUrl.searchParams.set("admin_access_denied", "true");
           return NextResponse.redirect(memberUrl);
