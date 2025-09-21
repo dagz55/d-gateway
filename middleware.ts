@@ -152,9 +152,9 @@ export default clerkMiddleware(async (auth, req) => {
         // If we already redirected them once, send them to a safe landing page
         if (hasRedirectParam || (referrer && referrer.includes("admin_access_denied"))) {
           if (process.env.NODE_ENV === 'development') {
-            console.log('🚨 LOOP PREVENTION: Sending to admin setup page');
+            console.log('🚨 LOOP PREVENTION: Sending to landing page');
           }
-          return NextResponse.redirect(new URL("/admin-setup", req.url));
+          return NextResponse.redirect(new URL("/", req.url));
         }
 
         // First-time redirect to member dashboard
@@ -196,7 +196,18 @@ export default clerkMiddleware(async (auth, req) => {
 
     // Redirect root path based on user role - but only for authenticated users
     // Keep the landing page accessible for unauthenticated users
-    if (req.nextUrl.pathname === "/" && userId) {
+    // IMPORTANT: Skip redirect if coming from admin_access_denied to prevent loops
+    if (req.nextUrl.pathname === "/" && userId && !req.nextUrl.searchParams.has("admin_access_denied")) {
+      const referrer = req.headers.get('referer');
+
+      // Skip redirect if we just came from a redirect loop scenario
+      if (referrer && (referrer.includes("admin_access_denied") || referrer.includes("admin-setup"))) {
+        if (process.env.NODE_ENV === 'development') {
+          console.log('🛑 Skipping root redirect due to loop prevention');
+        }
+        return NextResponse.next();
+      }
+
       if (process.env.NODE_ENV === 'development') {
         console.log('🏠 Root path redirect:', { isUserAdmin });
       }
