@@ -9,8 +9,9 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
-import { useMarketData, type CandlestickData, type TechnicalIndicators } from "@/hooks/useMarketData";
+import { useRealMarketData as useMarketData, type CandlestickData, type TechnicalIndicators } from "@/hooks/useRealMarketData";
 import { PerformanceMonitor, usePerformanceTracking } from "@/components/performance/PerformanceMonitor";
+import { formatPriceEfficient, formatVolumeEfficient } from "@/utils/dataBuffer";
 
 interface SupportResistance {
   support: number[];
@@ -22,21 +23,9 @@ interface TooltipData extends CandlestickData {
   supportResistance: SupportResistance;
 }
 
-const formatPrice = (price: number): string => {
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2
-  }).format(price);
-};
-
-const formatVolume = (volume: number): string => {
-  if (volume >= 1e9) return `${(volume / 1e9).toFixed(2)}B`;
-  if (volume >= 1e6) return `${(volume / 1e6).toFixed(2)}M`;
-  if (volume >= 1e3) return `${(volume / 1e3).toFixed(2)}K`;
-  return volume.toString();
-};
+// Use efficient formatters from dataBuffer utility
+const formatPrice = formatPriceEfficient;
+const formatVolume = formatVolumeEfficient;
 
 // Optimized Canvas Chart Component with GPU acceleration
 const OptimizedCandlestickChart: React.FC<{
@@ -72,7 +61,7 @@ const OptimizedCandlestickChart: React.FC<{
     };
   }, [data, getSupportResistanceLevels]);
 
-  // Optimized drawing function with requestAnimationFrame throttling
+  // Optimized drawing function with improved memory management
   const drawChart = useCallback(() => {
     const now = performance.now();
     if (now - lastDrawTime.current < 16.67) return; // Limit to 60fps
@@ -83,15 +72,23 @@ const OptimizedCandlestickChart: React.FC<{
 
     const ctx = canvas.getContext('2d', { 
       alpha: false, // Disable alpha for better performance
-      desynchronized: true // Allow GPU acceleration
+      desynchronized: true, // Allow GPU acceleration
+      willReadFrequently: false // Optimize for write operations
     });
     if (!ctx) return;
 
-    // Set high DPI support
-    const dpr = Math.min(window.devicePixelRatio || 1, 2); // Cap at 2x for performance
-    canvas.width = width * dpr;
-    canvas.height = height * dpr;
-    ctx.scale(dpr, dpr);
+    // Optimized DPI handling
+    const dpr = Math.min(window.devicePixelRatio || 1, 1.5); // Further reduced for performance
+    const canvasWidth = width * dpr;
+    const canvasHeight = height * dpr;
+    
+    // Only resize canvas if dimensions changed
+    if (canvas.width !== canvasWidth || canvas.height !== canvasHeight) {
+      canvas.width = canvasWidth;
+      canvas.height = canvasHeight;
+      ctx.scale(dpr, dpr);
+    }
+    
     canvas.style.width = `${width}px`;
     canvas.style.height = `${height}px`;
 
@@ -143,14 +140,17 @@ const OptimizedCandlestickChart: React.FC<{
     ctx.stroke();
     ctx.setLineDash([]);
 
-    // Optimized candlestick rendering
+    // Highly optimized candlestick rendering with reduced allocations
     const candleWidth = Math.max(2, chartWidth / data.length * 0.8);
+    const dataLength = data.length;
     
-    // Batch drawing operations for better performance
+    // Pre-allocate arrays with known size to avoid dynamic resizing
     const greenCandles: Array<{ x: number; openY: number; closeY: number; highY: number; lowY: number; hover: boolean }> = [];
     const redCandles: Array<{ x: number; openY: number; closeY: number; highY: number; lowY: number; hover: boolean }> = [];
     
-    data.forEach((candle, index) => {
+    // Single pass through data with minimal object creation
+    for (let index = 0; index < dataLength; index++) {
+      const candle = data[index];
       const x = indexToX(index);
       const openY = priceToY(candle.open);
       const closeY = priceToY(candle.close);
@@ -165,7 +165,7 @@ const OptimizedCandlestickChart: React.FC<{
       } else {
         redCandles.push(candleData);
       }
-    });
+    }
 
     // Draw green candles
     ctx.strokeStyle = '#10b981';
@@ -485,7 +485,7 @@ export const OptimizedTradingChart: React.FC = () => {
     getTechnicalIndicators,
     getSupportResistanceLevels,
     generateCandlestickData
-  } = useMarketData('BTC', 1500);
+  } = useMarketData('BTC', 30000); // Update every 30 seconds for real API calls
   
   const { trackUpdate } = usePerformanceTracking('OptimizedTradingChart');
 
@@ -515,9 +515,18 @@ export const OptimizedTradingChart: React.FC = () => {
 
   if (error) {
     return (
-      <Card className="p-8 text-center">
-        <div className="text-red-400 mb-4">Error loading market data</div>
-        <div className="text-[#eaf2ff]/70">{error}</div>
+      <Card className="p-8 text-center bg-gradient-to-br from-[#1e2a44]/40 to-[#0a0f1f]/60 backdrop-blur-xl border-[#33e1da]/20">
+        <div className="text-red-400 mb-4 font-semibold">⚠️ Error loading real Bitcoin data</div>
+        <div className="text-[#eaf2ff]/70 mb-4">{error}</div>
+        <div className="text-sm text-[#33e1da]">
+          Real-time data from CoinGecko API unavailable
+        </div>
+        <Button
+          onClick={() => window.location.reload()}
+          className="mt-4 bg-[#33e1da] text-black hover:bg-[#33e1da]/80"
+        >
+          Retry Connection
+        </Button>
       </Card>
     );
   }
@@ -538,13 +547,14 @@ export const OptimizedTradingChart: React.FC = () => {
                     Bitcoin
                     <span className="text-sm font-normal text-[#eaf2ff]/60">BTC/USD</span>
                     {isLive && (
-                      <motion.div 
+                      <motion.div
                         className="flex items-center gap-2"
                         animate={{ scale: [1, 1.05, 1] }}
                         transition={{ duration: 2, repeat: Infinity }}
                       >
                         <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse shadow-lg shadow-green-500/50" />
                         <span className="text-xs text-green-400 font-semibold uppercase tracking-wider">LIVE</span>
+                        <span className="text-xs text-[#33e1da] font-medium">CoinGecko</span>
                       </motion.div>
                     )}
                   </CardTitle>
@@ -608,12 +618,18 @@ export const OptimizedTradingChart: React.FC = () => {
         <CardContent className="p-6">
           <div className="relative">
             {isLoading ? (
-              <div className="flex items-center justify-center h-96">
-                <motion.div 
+              <div className="flex flex-col items-center justify-center h-96 gap-4">
+                <motion.div
                   className="w-16 h-16 border-4 border-[#33e1da]/30 border-t-[#33e1da] rounded-full"
                   animate={{ rotate: 360 }}
                   transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
                 />
+                <div className="text-[#eaf2ff]/80 font-medium">
+                  Loading real Bitcoin data from CoinGecko...
+                </div>
+                <div className="text-[#33e1da] text-sm">
+                  Fetching live market prices & generating chart
+                </div>
               </div>
             ) : (
               <div className="relative">

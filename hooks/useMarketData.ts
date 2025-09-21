@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { CandlestickDataBuffer, TechnicalIndicatorCalculator } from '@/utils/dataBuffer';
 
 export interface MarketData {
   symbol: string;
@@ -64,63 +65,68 @@ const generateRealisticMarketData = (symbol: string): MarketData => {
   };
 };
 
-// Generate realistic candlestick data with proper OHLC relationships
-const generateRealisticCandlestickData = (
+// Optimized data generation with reduced memory footprint
+const generateOptimizedCandlestickData = (
   timeframe: string, 
-  count: number = 100,
+  count: number = 50, // Reduced default count
   basePrice: number = 65000
 ): CandlestickData[] => {
-  const data: CandlestickData[] = [];
+  // Use smaller arrays and more efficient generation
+  const data: CandlestickData[] = new Array(count);
   let currentPrice = basePrice;
   const now = Date.now();
   
   const timeMultipliers = {
-    '1m': 60 * 1000,
-    '5m': 5 * 60 * 1000,
-    '15m': 15 * 60 * 1000,
-    '1h': 60 * 60 * 1000,
-    '4h': 4 * 60 * 60 * 1000,
-    '1d': 24 * 60 * 60 * 1000
+    '1m': 60000,
+    '5m': 300000,
+    '15m': 900000,
+    '1h': 3600000,
+    '4h': 14400000,
+    '1d': 86400000
   };
   
-  const timeMultiplier = timeMultipliers[timeframe as keyof typeof timeMultipliers] || timeMultipliers['1h'];
+  const timeMultiplier = timeMultipliers[timeframe as keyof typeof timeMultipliers] || 3600000;
+  const volatility = 0.015; // Slightly reduced volatility
   
-  for (let i = count; i >= 0; i--) {
-    const timestamp = now - (i * timeMultiplier);
+  // Pre-calculate some values to reduce computation
+  const baseVolume = 1500000;
+  const volumeVariance = 3000000;
+  
+  for (let i = 0; i < count; i++) {
+    const timestamp = now - ((count - 1 - i) * timeMultiplier);
     
-    // Generate realistic price movement
-    const volatility = 0.02;
-    const trendComponent = Math.sin(i * 0.1) * 0.005;
+    // Simplified price movement calculation
+    const trendComponent = Math.sin(i * 0.08) * 0.003;
     const randomWalk = (Math.random() - 0.5) * volatility;
     const priceChange = currentPrice * (trendComponent + randomWalk);
     
     const open = currentPrice;
-    const close = open + priceChange;
+    const close = Math.max(0.01, open + priceChange); // Ensure positive price
     
-    // Generate high and low with realistic relationships
+    // Optimized high/low calculation
+    const spread = Math.abs(close - open);
     const maxPrice = Math.max(open, close);
     const minPrice = Math.min(open, close);
-    const high = maxPrice + (Math.random() * currentPrice * 0.01);
-    const low = minPrice - (Math.random() * currentPrice * 0.01);
+    const high = maxPrice + (spread * Math.random() * 0.5);
+    const low = Math.max(0.01, minPrice - (spread * Math.random() * 0.5));
     
-    // Generate volume with some correlation to price movement
+    // Simplified volume calculation
     const volatilityFactor = Math.abs(priceChange) / currentPrice;
-    const baseVolume = 1000000 + Math.random() * 5000000;
-    const volume = baseVolume * (1 + volatilityFactor * 10);
+    const volume = baseVolume + (Math.random() * volumeVariance * (1 + volatilityFactor * 5));
     
-    data.push({
+    data[i] = {
       timestamp,
       open,
       high,
       low,
       close,
       volume
-    });
+    };
     
     currentPrice = close;
   }
   
-  return data.reverse();
+  return data;
 };
 
 // Optimized technical indicator calculations
@@ -193,6 +199,7 @@ export const useMarketData = (symbol: string = 'BTC', updateInterval: number = 2
   
   const intervalRef = useRef<NodeJS.Timeout>();
   const lastUpdateRef = useRef<number>(0);
+  const dataBufferRef = useRef<CandlestickDataBuffer>(new CandlestickDataBuffer(50));
   
   const fetchMarketData = useCallback(async () => {
     try {
@@ -207,8 +214,15 @@ export const useMarketData = (symbol: string = 'BTC', updateInterval: number = 2
   }, [symbol]);
   
   const generateCandlestickData = useCallback((timeframe: string) => {
-    const data = generateRealisticCandlestickData(timeframe, 100);
-    setCandlestickData(data);
+    const buffer = dataBufferRef.current;
+    buffer.clear();
+    
+    const data = generateOptimizedCandlestickData(timeframe, 50);
+    data.forEach(candle => {
+      buffer.add(candle.timestamp, candle.open, candle.high, candle.low, candle.close, candle.volume);
+    });
+    
+    setCandlestickData(buffer.getData());
   }, []);
   
   const updateLiveData = useCallback(() => {
@@ -217,25 +231,25 @@ export const useMarketData = (symbol: string = 'BTC', updateInterval: number = 2
     
     lastUpdateRef.current = now;
     
-    setCandlestickData(prevData => {
-      if (prevData.length === 0) return prevData;
-      
-      const lastCandle = { ...prevData[prevData.length - 1] };
+    const buffer = dataBufferRef.current;
+    const lastItem = buffer.getItem(buffer.length() - 1);
+    
+    if (lastItem) {
       const volatility = 0.001;
-      const change = lastCandle.close * (Math.random() - 0.5) * volatility;
-      const newClose = Math.max(0, lastCandle.close + change);
+      const change = lastItem.close * (Math.random() - 0.5) * volatility;
+      const newClose = Math.max(0.01, lastItem.close + change);
       
-      const updatedCandle: CandlestickData = {
-        ...lastCandle,
-        close: newClose,
-        high: Math.max(lastCandle.high, newClose),
-        low: Math.min(lastCandle.low, newClose),
-        volume: lastCandle.volume + Math.random() * 100000,
-        timestamp: now
-      };
+      buffer.updateLast(
+        now,
+        lastItem.open,
+        Math.max(lastItem.high, newClose),
+        Math.min(lastItem.low, newClose),
+        newClose,
+        lastItem.volume + Math.random() * 100000
+      );
       
-      return [...prevData.slice(0, -1), updatedCandle];
-    });
+      setCandlestickData(buffer.getData());
+    }
     
     // Update market data
     fetchMarketData();
@@ -265,7 +279,8 @@ export const useMarketData = (symbol: string = 'BTC', updateInterval: number = 2
   }, [updateLiveData, updateInterval]);
   
   const getTechnicalIndicators = useCallback((index: number): TechnicalIndicators => {
-    if (candlestickData.length === 0 || index >= candlestickData.length) {
+    const buffer = dataBufferRef.current;
+    if (buffer.length() === 0 || index >= buffer.length()) {
       return {
         rsi: 50,
         macd: 0,
@@ -275,8 +290,45 @@ export const useMarketData = (symbol: string = 'BTC', updateInterval: number = 2
       };
     }
     
-    return calculateOptimizedTechnicalIndicators(candlestickData, index);
-  }, [candlestickData]);
+    // Get prices efficiently from buffer
+    const prices: number[] = [];
+    const startIndex = Math.max(0, index - 50);
+    for (let i = startIndex; i <= index; i++) {
+      const item = buffer.getItem(i);
+      if (item) prices.push(item.close);
+    }
+    
+    if (prices.length === 0) {
+      return {
+        rsi: 50,
+        macd: 0,
+        sma20: 0,
+        sma50: 0,
+        bollinger: { upper: 0, middle: 0, lower: 0 }
+      };
+    }
+    
+    // Use efficient calculator
+    const rsi = TechnicalIndicatorCalculator.calculateRSI(prices);
+    const macd = TechnicalIndicatorCalculator.calculateMACD(prices);
+    const bollinger = TechnicalIndicatorCalculator.calculateBollingerBands(prices);
+    
+    const sma20 = prices.length >= 20 ? 
+      prices.slice(-20).reduce((a, b) => a + b) / 20 : 
+      prices[prices.length - 1];
+    
+    const sma50 = prices.length >= 50 ? 
+      prices.slice(-50).reduce((a, b) => a + b) / 50 : 
+      prices[prices.length - 1];
+    
+    return {
+      rsi,
+      macd,
+      sma20,
+      sma50,
+      bollinger
+    };
+  }, []);
   
   const getSupportResistanceLevels = useCallback(() => {
     if (candlestickData.length === 0) return { support: [], resistance: [] };

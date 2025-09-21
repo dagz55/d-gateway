@@ -5,6 +5,7 @@ import { redirect } from 'next/navigation';
 export const dynamic = 'force-dynamic';
 
 import ClientFallback from './ClientFallback';
+import { ErrorBoundary } from './ErrorBoundary';
 
 export default async function OAuthSuccessPage() {
   try {
@@ -49,9 +50,17 @@ export default async function OAuthSuccessPage() {
   } catch (error) {
     console.error('OAuth Success error:', error);
     // Fallback to client-side handling if server-side fails
-    return <ClientFallback />;
+    return (
+      <ErrorBoundary>
+        <ClientFallback />
+      </ErrorBoundary>
+    );
   }
 
   // This should never be reached, but provide fallback just in case
-  return <ClientFallback />;
+  return (
+    <ErrorBoundary>
+      <ClientFallback />
+    </ErrorBoundary>
+  );
 }
