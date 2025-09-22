@@ -38,9 +38,9 @@ export default function SignUpPage() {
             />
           </div>
           
-<SignUp
+          <SignUp
             routing="virtual"
-            afterSignUpUrl="/"
+            fallbackRedirectUrl="/"
             signInUrl="/sign-in"
             appearance={{
               elements: {

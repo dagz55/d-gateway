@@ -93,6 +93,10 @@ export const OptimizedWallpaperBackground = memo(({
     const img = new window.Image();
     img.src = '/login_background_wallpaper_zignals04.png';
     img.onload = () => setIsLoaded(true);
+    img.onerror = () => {
+      console.warn('Background image failed to preload');
+      setIsLoaded(true); // Still show component even if image fails
+    };
   }, []);
 
   return (

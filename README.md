@@ -4,6 +4,35 @@ Zignal is a comprehensive crypto trading platform built with [Next.js 15.5.3](ht
 
 ## 🚀 Features
 
+### Latest Improvements (v2.11.11)
+- 🔧 **Clerk Deprecated Props Fixed**: Updated deprecated Clerk authentication props
+  - Replaced `afterSignInUrl` with `fallbackRedirectUrl` in SignIn component
+  - Replaced `afterSignUpUrl` with `fallbackRedirectUrl` in SignUp component
+  - Updated ClerkProvider configuration to use modern redirect URL props
+  - Eliminated console warnings about deprecated Clerk props
+  - Improved compatibility with latest Clerk v5 API
+
+- 🚫 **Organization Creation 403 Error Fixed**: Disabled Clerk organization features
+  - Added `allowOrganizationCreation={false}` to ClerkProvider
+  - Added `allowOrganizationInvitation={false}` to ClerkProvider
+  - Prevented automatic organization creation attempts during sign-in
+  - Eliminated 403 Forbidden errors when users try to create organizations
+  - Simplified authentication flow by removing unnecessary organization prompts
+
+- ⚡ **Resource Preloading Optimization**: Fixed preload resource warnings
+  - Removed unused image preloads from layout.tsx
+  - Optimized preload strategy to only load critical resources
+  - Added proper error handling for background image preloading
+  - Eliminated browser warnings about unused preloaded resources
+  - Improved page load performance by reducing unnecessary preloads
+
+- 📚 **Production Deployment Guide**: Added comprehensive Clerk production setup
+  - Created `CLERK_PRODUCTION_SETUP.md` with step-by-step production configuration
+  - Added guidance for switching from development to production Clerk keys
+  - Documented organization settings and security configurations
+  - Provided troubleshooting guide for common production issues
+  - Updated environment template with production key examples
+
 ### Recent Improvements (v2.11.9)
 - 📊 **Advanced Mini Charts**: Completely redesigned cryptocurrency cards with sophisticated trading charts
 - 🎯 **Interactive Data Points**: Hover over charts to see precise date, time, and value information

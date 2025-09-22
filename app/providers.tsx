@@ -12,7 +12,14 @@ import { LoadingProvider } from '@/contexts/LoadingContext';
 // Simplified Clerk provider with fixed dark theme to prevent hooks issues
 function ClerkProviderWrapper({ children }: { children: React.ReactNode }) {
   return (
-    <ClerkProvider appearance={clerkAppearance}>
+    <ClerkProvider 
+      appearance={clerkAppearance}
+      signInFallbackRedirectUrl="/"
+      signUpFallbackRedirectUrl="/"
+      // Disable organization features to prevent 403 errors
+      allowOrganizationCreation={false}
+      allowOrganizationInvitation={false}
+    >
       {children}
     </ClerkProvider>
   );

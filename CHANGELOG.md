@@ -5,6 +5,46 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.11.11] - 2025-01-27
+
+### Fixed
+- **🔧 Clerk Deprecated Props**: Updated deprecated Clerk authentication props
+  - Replaced `afterSignInUrl` with `fallbackRedirectUrl` in SignIn component
+  - Replaced `afterSignUpUrl` with `fallbackRedirectUrl` in SignUp component
+  - Updated ClerkProvider configuration to use modern redirect URL props
+  - Eliminated console warnings about deprecated Clerk props
+  - Improved compatibility with latest Clerk v5 API
+
+- **🚫 Organization Creation 403 Error**: Disabled Clerk organization features
+  - Added `allowOrganizationCreation={false}` to ClerkProvider
+  - Added `allowOrganizationInvitation={false}` to ClerkProvider
+  - Prevented automatic organization creation attempts during sign-in
+  - Eliminated 403 Forbidden errors when users try to create organizations
+  - Simplified authentication flow by removing unnecessary organization prompts
+
+- **⚡ Resource Preloading Optimization**: Fixed preload resource warnings
+  - Removed unused image preloads from layout.tsx
+  - Optimized preload strategy to only load critical resources
+  - Added proper error handling for background image preloading
+  - Eliminated browser warnings about unused preloaded resources
+  - Improved page load performance by reducing unnecessary preloads
+
+### Enhanced
+- **📚 Production Deployment Guide**: Added comprehensive Clerk production setup
+  - Created `CLERK_PRODUCTION_SETUP.md` with step-by-step production configuration
+  - Added guidance for switching from development to production Clerk keys
+  - Documented organization settings and security configurations
+  - Provided troubleshooting guide for common production issues
+  - Updated environment template with production key examples
+
+### Technical
+- **🛠️ Console Error Cleanup**: Resolved multiple browser console warnings
+  - Fixed deprecated Clerk prop warnings
+  - Eliminated 403 organization creation errors
+  - Removed unused resource preload warnings
+  - Improved overall console cleanliness for better debugging
+  - Enhanced development experience with cleaner error logs
+
 ## [2.11.10] - 2025-09-22
 
 ### Added

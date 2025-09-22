@@ -30,8 +30,8 @@ export default function RootLayout({
         {/* Resource hints for better performance */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://api.coingecko.com" />
-        <link rel="preload" href="/logo-zgnls.png" as="image" />
-        <link rel="preload" href="/login_background_wallpaper_zignals04.png" as="image" />
+        {/* Only preload critical images that are used immediately */}
+        <link rel="preload" href="/logo-zgnls.png" as="image" type="image/png" />
       </head>
       <body className={`font-sans ${GeistSans.variable} ${GeistMono.variable} antialiased`}>
         <Providers>
