@@ -73,14 +73,11 @@ const fetchRealBitcoinData = async (): Promise<MarketData> => {
 
 // Fetch historical data for more accurate high/low
 const fetchBitcoinMarketData = async (): Promise<MarketData> => {
-  const response = await fetch(
-    'https://api.coingecko.com/api/v3/coins/bitcoin?localization=false&tickers=false&market_data=true&community_data=false&developer_data=false',
-    {
-      headers: {
-        'Accept': 'application/json',
-      },
-    }
-  );
+  const response = await fetch('/api/crypto/bitcoin', {
+    headers: {
+      'Accept': 'application/json',
+    },
+  });
 
   if (!response.ok) {
     throw new Error(`CoinGecko API error: ${response.status}`);

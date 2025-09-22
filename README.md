@@ -4,7 +4,14 @@ Zignal is a comprehensive crypto trading platform built with [Next.js 15.5.3](ht
 
 ## 🚀 Features
 
-### Recent Improvements (v2.11.2)
+### Recent Improvements (v2.11.6)
+- 🔧 **Authentication Flow Fixed**: Resolved critical sign-in page redirect issues by removing deprecated Clerk environment variables
+- 🎨 **Custom Authentication Pages**: Beautiful split-layout sign-in and sign-up pages with Zignals wallpaper and animated logo
+- 🚀 **Stable User Experience**: Eliminated automatic redirects and page bouncing issues
+- ⚡ **Performance**: Fixed CORS issues with CoinGecko API using server-side proxy
+- 🎯 **Professional Branding**: Added animated Zignals logo with glow effects and hover animations
+
+### Previous Improvements (v2.11.2)
 - 🗃️ **Database Enhancement**: Added `clerk_user_id` column to user_profiles for seamless photo upload management
 - 🔧 **Clerk Integration**: Complete TypeScript utilities for Clerk-Supabase user profile synchronization
 - 📚 **Documentation**: Comprehensive migration guide and usage examples for photo upload functionality
@@ -148,12 +155,23 @@ The application uses role-based routing to provide different experiences for dif
 - `/admin/signals` - Trading signals management
 - `/admin/test-errors` - Development error testing (dev only)
 
+#### Authentication Pages
+- **Custom Sign-in (`/signin`)**: Beautiful split-layout page with Zignals wallpaper and animated logo
+- **Custom Sign-up (`/signup`)**: Matching design for user registration
+- **Legacy Redirect (`/sign-in`)**: Automatically redirects to `/signin` for consistent experience
+- **Features**: 
+  - Split layout design (wallpaper left, form right)
+  - Animated Zignals logo with glow effects
+  - Responsive design for all screen sizes
+  - Professional branding with Zignals colors
+  - Loading states and error handling
+
 #### Smart Redirects
 - **Root (`/`)**: Automatically redirects based on user role
   - Admins → `/admin/dashboard`
   - Members → `/member/dashboard`
 - **Legacy (`/dashboard`)**: Redirects to appropriate role-based dashboard
-- **Authentication**: Sign-in/sign-up pages redirect to role-appropriate dashboard after login
+- **Authentication Flow**: After successful login, users are redirected to their role-appropriate dashboard
 
 ### Setup
 See [CLERK_SETUP_GUIDE.md](./CLERK_SETUP_GUIDE.md) for detailed configuration instructions.

@@ -5,6 +5,39 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.11.6] - 2025-09-22
+
+### Fixed
+- **🔧 Authentication Flow**: Resolved sign-in page redirect issues
+  - Removed deprecated Clerk environment variables (`NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL`, `NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL`)
+  - Temporarily disabled problematic middleware to prevent redirect loops
+  - Fixed CORS issues with CoinGecko API by implementing proxy endpoint at `/api/crypto/bitcoin`
+  - Resolved Clerk middleware detection errors
+
+### Added
+- **🎨 Custom Authentication Pages**: Beautiful split-layout sign-in and sign-up pages
+  - Created custom `/signin` page with split layout (wallpaper left, form right)
+  - Created custom `/signup` page with matching design
+  - Added animated Zignals logo with glow effects and hover animations
+  - Implemented responsive design for mobile and desktop
+  - Added loading states and error handling
+  - Used Zignals brand colors (#33E1DA) throughout
+
+### Enhanced
+- **🚀 User Experience**: Improved authentication flow stability
+  - Eliminated automatic redirects that were causing page bouncing
+  - Added proper client-side rendering with hydration protection
+  - Created role-based dashboard redirect system
+  - Added custom CSS animations for professional branding
+  - Improved error messaging and user feedback
+
+### Technical
+- **⚡ Performance**: Optimized image loading and API calls
+  - Added priority loading for wallpaper images
+  - Implemented server-side proxy for external API calls
+  - Fixed resource preloading warnings
+  - Optimized component rendering and state management
+
 ## [2.11.2] - 2025-09-20
 
 ### Added
