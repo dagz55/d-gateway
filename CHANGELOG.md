@@ -29,6 +29,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Eliminated browser warnings about unused preloaded resources
   - Improved page load performance by reducing unnecessary preloads
 
+- **🔧 Build Errors**: Fixed React Client Component issues
+  - Added `'use client'` directive to `app/signin/page.tsx`
+  - Added `'use client'` directive to `app/signup/page.tsx`
+  - Removed duplicate redirect code causing build conflicts
+  - Fixed `useState` usage in server components
+  - Ensured proper client-side rendering for interactive components
+
 ### Enhanced
 - **📚 Production Deployment Guide**: Added comprehensive Clerk production setup
   - Created `CLERK_PRODUCTION_SETUP.md` with step-by-step production configuration
@@ -36,6 +43,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Documented organization settings and security configurations
   - Provided troubleshooting guide for common production issues
   - Updated environment template with production key examples
+
+- **🐍 Script Conversion**: Converted bash script to Python
+  - Created `push_to_github.py` equivalent of `push_to_github.sh`
+  - Fixed repository URL to point to correct `zignal-login.git`
+  - Maintained all original functionality with improved error handling
+  - Added type hints and better code structure
+  - Enhanced deployment automation with Python implementation
 
 ### Technical
 - **🛠️ Console Error Cleanup**: Resolved multiple browser console warnings

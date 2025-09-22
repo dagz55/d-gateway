@@ -33,6 +33,19 @@ Zignal is a comprehensive crypto trading platform built with [Next.js 15.5.3](ht
   - Provided troubleshooting guide for common production issues
   - Updated environment template with production key examples
 
+- 🔧 **Build Errors Fixed**: Resolved React Client Component issues
+  - Added `'use client'` directive to signin/signup pages
+  - Fixed `useState` usage in server components
+  - Removed duplicate redirect code causing build conflicts
+  - Ensured proper client-side rendering for interactive components
+  - Build now compiles successfully without errors
+
+- 🐍 **Script Enhancement**: Converted bash script to Python
+  - Created `push_to_github.py` equivalent of `push_to_github.sh`
+  - Fixed repository URL to point to correct `zignal-login.git`
+  - Enhanced error handling and code structure with type hints
+  - Improved deployment automation with Python implementation
+
 ### Recent Improvements (v2.11.9)
 - 📊 **Advanced Mini Charts**: Completely redesigned cryptocurrency cards with sophisticated trading charts
 - 🎯 **Interactive Data Points**: Hover over charts to see precise date, time, and value information
