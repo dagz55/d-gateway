@@ -10,14 +10,24 @@ interface FAQItem {
 
 const faqItems: FAQItem[] = [
   {
+    question: 'What are Zignals package prices?',
+    answer:
+      'Package pricing information is currently being finalized. Please contact our customer service representatives for the most up-to-date pricing details and to discuss which package best fits your trading needs.',
+  },
+  {
+    question: 'What is the minimum deposit amount?',
+    answer:
+      'For a mere $10.00 deposit, you may be granted access to our platform. This low entry barrier ensures that traders of all levels can experience our institutional-grade signals and guided strategy.',
+  },
+  {
+    question: 'What payment methods do you accept?',
+    answer:
+      'We have multiple payment channels available. Payments can be made through the following: Crypto wallet transfers, Local Bank transfers, E-wallet transfers are also accepted.',
+  },
+  {
     question: 'How do I get started with crypto trading?',
     answer:
       'Create your Zignal account, complete the quick verification flow, and you can immediately access live signals in the demo workspace. Upgrade whenever you want to unlock automated execution and portfolio syncing.',
-  },
-  {
-    question: 'What are the trading fees?',
-    answer:
-      'Signal delivery is included in your plan. Execution fees start from 0.1% maker / 0.2% taker, with automatic volume discounts and additional reductions when you hold a Zignal premium subscription.',
   },
   {
     question: 'Is my crypto safe on the platform?',
@@ -25,19 +35,9 @@ const faqItems: FAQItem[] = [
       'Security is our first priority. 95% of assets sit in cold storage, multi-signature approvals are required for major actions, and every account can enable hardware-backed MFA to keep attackers out.',
   },
   {
-    question: 'What payment methods do you accept?',
-    answer:
-      'Support spans bank transfer (ACH, SEPA, wire), debit/credit card, Apple Pay, Google Pay, and direct crypto deposits. Most fiat deposits post instantly and are fee-free on standard plans.',
-  },
-  {
     question: 'Can I trade on mobile?',
     answer:
       'Yes. The Zignal iOS and Android apps mirror the desktop desk so you can trigger automations, approve trades, and monitor alerts on the go.',
-  },
-  {
-    question: 'What is the minimum deposit amount?',
-    answer:
-      'Crypto deposits have no minimums. Fiat minimums start at $25 depending on region and payment rail, and there are no penalties for withdrawing whenever you need.',
   },
 ];
 

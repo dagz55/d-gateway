@@ -17,6 +17,10 @@ import {
   ShieldAlert,
   Fingerprint,
   HeartHandshake,
+  MessageCircle,
+  Users,
+  UserCheck,
+  LifeBuoy,
 } from 'lucide-react';
 import Logo from '@/components/ui/Logo';
 import { PromotionalBanner } from './PromotionalBanner';
@@ -86,7 +90,7 @@ const navLinks = [
   { label: 'About Us', href: '#mission' },
   { label: 'Pricing', href: '#pricing' },
   { label: 'Security', href: '#security' },
-  { label: 'Support', href: '#support' },
+  { label: 'Support', href: '#customer-service' },
 ];
 
 const heroStats = [
@@ -225,9 +229,7 @@ export function LandingContent() {
           }`}
         >
           <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4">
-            <Link href="/" className="flex items-center gap-3">
-              <Logo size="lg" textClassName="gradient-text font-semibold" enableAnimations asLink={false} />
-            </Link>
+            <Logo size="lg" textClassName="gradient-text font-semibold" enableAnimations={true} asLink={true} href="/" />
 
             <div className="hidden items-center gap-8 md:flex">
               {navLinks.map((link) => (
@@ -746,6 +748,109 @@ export function LandingContent() {
           </div>
         </motion.section>
 
+        {/* Customer Service Section */}
+        <motion.section
+          id="customer-service"
+          className="relative py-24 bg-gradient-to-b from-[#010308] via-[#040f25] to-[#010308]"
+          initial={{ opacity: 0, y: 50 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          viewport={{ once: true, amount: 0.3 }}
+        >
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(51,225,218,0.12)_0%,transparent_70%)]" />
+          <div className="relative mx-auto max-w-7xl px-4">
+            <div className="mx-auto mb-16 max-w-3xl text-center">
+              <span className="inline-flex items-center gap-2 rounded-full border border-[#33E1DA]/30 bg-[#33E1DA]/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-[#33E1DA]">
+                <HeartHandshake className="h-4 w-4" />
+                Real Human Support
+              </span>
+              <h2 className="mt-6 text-4xl font-semibold sm:text-5xl">Always here when you need us</h2>
+              <p className="mt-4 text-lg text-white/70">
+                Our Zignals customer service representatives (not AI bots) are available 24/7 for account questions, live trade checks, and onboarding help.
+              </p>
+            </div>
+
+            <div className="grid gap-8 lg:grid-cols-3">
+              {/* 24/7 Support */}
+              <div className="relative group">
+                <div className="rounded-3xl border border-white/10 bg-white/[0.04] p-8 backdrop-blur transition hover:border-[#33E1DA]/40 hover:bg-white/[0.06]">
+                  <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-[#33E1DA]/20 to-[#0577DA]/20 border border-[#33E1DA]/30">
+                    <MessageCircle className="h-8 w-8 text-[#33E1DA]" />
+                  </div>
+                  <h3 className="text-2xl font-semibold text-white mb-4">24/7 Live Support</h3>
+                  <p className="text-white/80 leading-relaxed">
+                    Connect instantly with our experienced trading support team. No waiting, no bots—just real people who understand your trading needs.
+                  </p>
+                  <div className="mt-6 flex items-center gap-3">
+                    <div className="h-2 w-2 animate-pulse rounded-full bg-emerald-400"></div>
+                    <span className="text-sm text-emerald-400 font-semibold">Online Now</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Account Questions */}
+              <div className="relative group">
+                <div className="rounded-3xl border border-white/10 bg-white/[0.04] p-8 backdrop-blur transition hover:border-[#33E1DA]/40 hover:bg-white/[0.06]">
+                  <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-[#1199FA]/20 to-[#0577DA]/20 border border-[#1199FA]/30">
+                    <LifeBuoy className="h-8 w-8 text-[#1199FA]" />
+                  </div>
+                  <h3 className="text-2xl font-semibold text-white mb-4">Account Assistance</h3>
+                  <p className="text-white/80 leading-relaxed">
+                    Get help with deposits, withdrawals, account verification, security settings, and platform navigation from our dedicated team.
+                  </p>
+                  <div className="mt-6 flex items-center gap-3">
+                    <div className="h-1 w-12 bg-gradient-to-r from-[#1199FA] to-[#0577DA] rounded-full"></div>
+                    <span className="text-xs uppercase tracking-[0.3em] text-[#1199FA] font-semibold">Expert Help</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Onboarding Help */}
+              <div className="relative group">
+                <div className="rounded-3xl border border-white/10 bg-white/[0.04] p-8 backdrop-blur transition hover:border-[#33E1DA]/40 hover:bg-white/[0.06]">
+                  <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-[#6d5efc]/20 to-[#1199FA]/20 border border-[#6d5efc]/30">
+                    <Sparkles className="h-8 w-8 text-[#6d5efc]" />
+                  </div>
+                  <h3 className="text-2xl font-semibold text-white mb-4">Onboarding Support</h3>
+                  <p className="text-white/80 leading-relaxed">
+                    Personal guidance to get you started with signals, strategy setup, risk management, and making your first successful trades.
+                  </p>
+                  <div className="mt-6 flex items-center gap-3">
+                    <div className="h-1 w-12 bg-gradient-to-r from-[#6d5efc] to-[#1199FA] rounded-full"></div>
+                    <span className="text-xs uppercase tracking-[0.3em] text-[#6d5efc] font-semibold">Personal Guide</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Contact CTA */}
+            <div className="mt-16 text-center">
+              <div className="mx-auto max-w-2xl rounded-3xl border border-[#33E1DA]/20 bg-gradient-to-br from-[#0577DA]/10 via-[#33E1DA]/5 to-[#1199FA]/10 p-8 backdrop-blur">
+                <h3 className="text-2xl font-semibold text-white mb-4">Need help right now?</h3>
+                <p className="text-white/70 mb-6">
+                  Our support team is standing by to assist you with any questions about our platform, signals, or trading strategies.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                  <a
+                    href="mailto:support@zignals.org"
+                    className="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#0577DA] to-[#1199FA] px-6 py-3 text-base font-semibold text-white shadow-lg shadow-[#0577DA]/20 transition hover:from-[#0a8ae8] hover:to-[#22a9ff]"
+                  >
+                    <MessageCircle className="h-5 w-5" />
+                    Contact Support
+                  </a>
+                  <a
+                    href="#support"
+                    className="inline-flex items-center justify-center gap-2 rounded-xl border border-white/15 px-6 py-3 text-base font-semibold text-white/80 transition hover:border-white/30 hover:text-white"
+                  >
+                    <LifeBuoy className="h-5 w-5 text-[#33E1DA]" />
+                    Browse FAQ
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </motion.section>
+
         <motion.section
           id="support"
           className="relative"
@@ -765,9 +870,7 @@ export function LandingContent() {
       <footer className="border-t border-white/10 bg-[#02060f]">
         <div className="mx-auto grid max-w-7xl gap-12 px-4 py-16 md:grid-cols-2 lg:grid-cols-4">
           <div>
-            <Link href="/" className="inline-flex items-center gap-3">
-              <Logo size="md" textClassName="font-semibold text-white" enableAnimations={false} asLink={false} />
-            </Link>
+            <Logo size="md" textClassName="font-semibold text-white" enableAnimations={true} asLink={true} href="/" />
             <p className="mt-4 text-sm text-white/60">
               Professional-grade crypto signals, actionable insights, and automation built for fast-moving teams.
             </p>

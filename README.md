@@ -4,7 +4,22 @@ Zignal is a comprehensive crypto trading platform built with [Next.js 15.5.3](ht
 
 ## 🚀 Features
 
-### Recent Improvements (v2.11.6)
+### Recent Improvements (v2.11.8)
+- 🎯 **Logo-Based Loading System**: Animated loading spinner featuring rotating Zignal logo with signal effects
+- 🚀 **Smooth Page Transitions**: Integrated loading states for all navigation with contextual messages
+- ✨ **Global Loading Management**: Complete loading infrastructure with overlay and state management
+- 🌟 **Enhanced User Experience**: Loading animations during logo clicks and sidebar navigation
+- ⚡ **Performance Optimized**: Proper loading state cleanup and smooth transitions
+
+### Previous Improvements (v2.11.7)
+- 🎨 **Enhanced Logo Component**: Official Zignal logo with advanced signal effect animations
+- ✨ **Interactive Animations**: Smooth hover zoom (150% scale) and click fade animations
+- 🌟 **Signal Effects**: Continuous pulsing rings with Zignal brand colors (#33E1DA, #0577DA, #1199FA)
+- 🔗 **Homepage Integration**: All logos now properly link to homepage with enhanced user experience
+- ♿ **Accessibility**: Added `prefers-reduced-motion` support for inclusive design
+- ⚡ **Performance**: Optimized animations with proper cleanup and memory management
+
+### Previous Improvements (v2.11.6)
 - 🔧 **Authentication Flow Fixed**: Resolved critical sign-in page redirect issues by removing deprecated Clerk environment variables
 - 🎨 **Custom Authentication Pages**: Beautiful split-layout sign-in and sign-up pages with Zignals wallpaper and animated logo
 - 🚀 **Stable User Experience**: Eliminated automatic redirects and page bouncing issues

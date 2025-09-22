@@ -7,6 +7,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import { ThemeProvider } from '@/components/theme-provider';
 import { clerkAppearance } from '@/lib/clerk-theme';
+import { LoadingProvider } from '@/contexts/LoadingContext';
 
 // Simplified Clerk provider with fixed dark theme to prevent hooks issues
 function ClerkProviderWrapper({ children }: { children: React.ReactNode }) {
@@ -41,8 +42,10 @@ export function Providers({ children }: { children: React.ReactNode }) {
     >
       <ClerkProviderWrapper>
         <QueryClientProvider client={queryClient}>
-          {children}
-          <Toaster />
+          <LoadingProvider>
+            {children}
+            <Toaster />
+          </LoadingProvider>
         </QueryClientProvider>
       </ClerkProviderWrapper>
     </ThemeProvider>

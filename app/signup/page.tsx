@@ -249,7 +249,7 @@ export default function CustomSignUpPage() {
                 <Button
                   type="button"
                   variant="outline"
-                  className="w-full border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-900 dark:text-white rounded-lg py-3 px-4 font-medium transition-colors"
+                  className="w-full border border-gray-300 dark:border-gray-600 hover:bg-gradient-to-r hover:from-[#4285F4] hover:via-[#EA4335] hover:to-[#FBBC05] hover:text-white text-gray-900 dark:text-white rounded-lg py-3 px-4 font-medium transition-all duration-300"
                   onClick={() => setError('Google sign-up not implemented yet')}
                 >
                   <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">

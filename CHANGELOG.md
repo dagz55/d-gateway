@@ -5,6 +5,57 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.11.8] - 2025-01-27
+
+### Added
+- **🎯 Logo-Based Loading System**: Animated loading spinner based on Zignal logo
+  - Created `LoadingSpinner` component with rotating logo and signal effects
+  - Implemented `GlobalLoadingOverlay` for full-screen loading states
+  - Added `LoadingContext` for global loading state management
+  - Created `useNavigationLoading` hook for smooth page transitions
+  - Integrated loading states into logo clicks and sidebar navigation
+
+### Enhanced
+- **🚀 Page Transition System**: Smooth loading animations during navigation
+  - Logo clicks now show "Returning home..." loading state
+  - Sidebar navigation displays contextual loading messages
+  - Added loading overlay with Zignal brand colors and animations
+  - Implemented proper loading state cleanup and memory management
+
+### Technical
+- **⚡ Loading Infrastructure**: Complete loading system implementation
+  - Added `LoadingProvider` to app providers for global state management
+  - Created reusable loading components with consistent branding
+  - Integrated Framer Motion for smooth loading animations
+  - Added TypeScript support with proper loading state interfaces
+  - Optimized loading performance with proper cleanup and timing
+
+## [2.11.7] - 2025-01-27
+
+### Added
+- **🎨 Enhanced Logo Component**: Official Zignal logo with advanced animations
+  - Added continuous signal effect animations with pulsing rings and glow effects
+  - Implemented smooth hover zoom animation with transform scale (150% on hover)
+  - Added fade out animation after click with smooth transition (1.5s duration)
+  - Enhanced logo with Zignal brand colors (#33E1DA, #0577DA, #1199FA)
+  - Added accessibility support with `prefers-reduced-motion` media queries
+  - Optimized performance with proper cleanup and memory management
+
+### Enhanced
+- **🚀 Logo Integration**: Updated logo usage across the application
+  - Header logo now links to homepage with full animations enabled
+  - Landing page logo (header and footer) with animations and homepage linking
+  - Sidebar logo with animations (non-link as appropriate for dashboard context)
+  - All logos maintain consistent branding and user experience
+
+### Technical
+- **⚡ Performance & Accessibility**: Optimized logo animations
+  - Added proper `useEffect` cleanup to prevent memory leaks
+  - Implemented `motion-safe` and `motion-reduce` classes for accessibility
+  - Added TypeScript improvements with proper timeout management
+  - Enhanced image loading with priority flags for above-the-fold logos
+  - Reduced animation frequency to every 12 seconds for better performance
+
 ## [2.11.6] - 2025-09-22
 
 ### Fixed

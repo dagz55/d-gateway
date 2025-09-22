@@ -119,7 +119,7 @@ export default function Header({ className }: HeaderProps) {
         {/* Logo Section */}
         <div className="flex items-center md:ml-0 ml-14 z-10">
           <div className="flex items-center space-x-3">
-            <Logo size="md" showText={false} asLink={false} />
+            <Logo size="md" showText={false} asLink={true} href="/" enableAnimations={true} />
             <h1 className="text-xl font-bold gradient-text hidden sm:block">Zignal Dashboard</h1>
           </div>
         </div>

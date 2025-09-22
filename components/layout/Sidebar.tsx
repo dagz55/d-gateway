@@ -27,6 +27,7 @@ import { useState, useEffect } from 'react';
 import ProfileSection from './ProfileSection';
 import { useUser } from '@clerk/nextjs';
 import { checkAdminStatus } from '@/lib/admin-utils';
+import { useNavigationLoading } from '@/hooks/useNavigationLoading';
 
 const navigation = [
   {
@@ -81,6 +82,7 @@ export default function Sidebar({ className }: SidebarProps) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const { user } = useUser();
+  const { navigateWithLoading } = useNavigationLoading();
   
   const { isAdmin } = checkAdminStatus(user);
 
@@ -191,6 +193,7 @@ export default function Sidebar({ className }: SidebarProps) {
                 size={isCollapsed ? 'sm' : 'md'}
                 showText={false} // Never show text, logo only
                 asLink={false} // Disable link in sidebar since we're already in dashboard
+                enableAnimations={true} // Enable animations for visual appeal
               />
             </div>
             
@@ -245,10 +248,12 @@ export default function Sidebar({ className }: SidebarProps) {
                 const isAdminItem = item.isAdmin;
 
                 return (
-                  <Link
+                  <button
                     key={item.name}
-                    href={item.href}
-                    onClick={() => setIsOpen(false)}
+                    onClick={async () => {
+                      setIsOpen(false);
+                      await navigateWithLoading(item.href, `Loading ${item.name}...`);
+                    }}
                     className={cn(
                       'flex items-center text-sm font-medium rounded-xl transition-all duration-300 relative group',
                       // Desktop layout
@@ -285,7 +290,7 @@ export default function Sidebar({ className }: SidebarProps) {
                         {item.name}
                       </div>
                     )}
-                  </Link>
+                  </button>
                 );
               })}
             </nav>
