@@ -1,85 +1,131 @@
 import { NextResponse } from 'next/server';
 import { CryptoPrice } from '@/types';
 
+// In-memory cache with a Time-To-Live (TTL) of 2 minutes
+let cachedData: { prices: CryptoPrice[], stats: any, timestamp: number } | null = null;
+const CACHE_TTL = 2 * 60 * 1000; // 2 minutes
+
+// Simple rate limiting
+let lastRequestTimestamp = 0;
+const RATE_LIMIT_MS = 2000; // 2 seconds
+
+// Function to generate fallback data
+const generateFallbackData = () => {
+  const fallbackData: CryptoPrice[] = [];
+  const now = Date.now();
+  let price = 50000 + Math.random() * 10000;
+
+  for (let i = 0; i < 24; i++) {
+    const timestamp = now - (23 - i) * 60 * 60 * 1000;
+    const change = (Math.random() - 0.5) * 0.02;
+    price = price * (1 + change);
+    
+    fallbackData.push({
+      t: timestamp.toString(),
+      close: price,
+    });
+  }
+
+  const currentPrice = fallbackData[fallbackData.length - 1]?.close || 0;
+  const previousPrice = fallbackData[fallbackData.length - 2]?.close || currentPrice;
+  const priceChange = ((currentPrice - previousPrice) / previousPrice) * 100;
+
+  return {
+    success: true,
+    data: fallbackData,
+    stats: {
+      currentPrice,
+      priceChange: priceChange.toFixed(2),
+      volatility: (Math.random() * 5 + 1).toFixed(2),
+      lastUpdate: new Date().toISOString()
+    },
+    isFallback: true,
+  };
+};
+
+
+const fetchWithRetry = async (url: string, options: RequestInit, retries = 3, backoff = 300) => {
+  for (let i = 0; i < retries; i++) {
+    try {
+      const response = await fetch(url, options);
+      if (response.ok) {
+        return response;
+      }
+      throw new Error(`API Error: ${response.status} ${response.statusText}`);
+    } catch (error) {
+      if (i === retries - 1) throw error;
+      await new Promise(resolve => setTimeout(resolve, backoff * Math.pow(2, i)));
+    }
+  }
+  throw new Error("Failed to fetch after multiple retries");
+};
+
 export async function GET() {
+  const now = Date.now();
+
+  // 1. Rate Limiting
+  if (now - lastRequestTimestamp < RATE_LIMIT_MS) {
+    return new NextResponse(JSON.stringify({ success: false, message: 'Rate limit exceeded. Please try again later.' }), {
+      status: 429,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
+  lastRequestTimestamp = now;
+
+  // 2. Caching
+  if (cachedData && (now - cachedData.timestamp < CACHE_TTL)) {
+    return NextResponse.json({
+      success: true,
+      data: cachedData.prices,
+      stats: cachedData.stats,
+      fromCache: true,
+    });
+  }
+
   try {
-    // Use a faster endpoint with fewer data points
-    const response = await fetch(
+    // 3. Fetch with Retry
+    const response = await fetchWithRetry(
       'https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=1&interval=hourly',
       {
-        headers: {
-          'Accept': 'application/json',
-        },
-        // Add timeout to prevent hanging
-        signal: AbortSignal.timeout(5000),
+        headers: { 'Accept': 'application/json' },
+        signal: AbortSignal.timeout(8000), // Increased timeout for retries
       }
     );
 
-    if (!response.ok) {
-      throw new Error(`CoinGecko API error: ${response.status}`);
-    }
-
     const data = await response.json();
     
-    // Transform the data to match our CryptoPrice interface
     const prices: CryptoPrice[] = data.prices.map((price: [number, number]) => ({
       t: price[0].toString(),
       close: price[1],
     }));
 
-    // Calculate some basic stats for P&L and risk
     const currentPrice = prices[prices.length - 1]?.close || 0;
     const previousPrice = prices[prices.length - 2]?.close || currentPrice;
-    const priceChange = ((currentPrice - previousPrice) / previousPrice) * 100;
+    const priceChange = previousPrice === 0 ? 0 : ((currentPrice - previousPrice) / previousPrice) * 100;
     
-    // Calculate volatility as risk
     const priceValues = prices.map(p => p.close);
     const mean = priceValues.reduce((a, b) => a + b, 0) / priceValues.length;
     const variance = priceValues.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / priceValues.length;
-    const volatility = Math.sqrt(variance) / mean * 100;
+    const volatility = mean === 0 ? 0 : Math.sqrt(variance) / mean * 100;
+
+    const stats = {
+      currentPrice,
+      priceChange: priceChange.toFixed(2),
+      volatility: volatility.toFixed(2),
+      lastUpdate: new Date().toISOString()
+    };
+
+    // Update cache
+    cachedData = { prices, stats, timestamp: now };
 
     return NextResponse.json({
       success: true,
       data: prices,
-      stats: {
-        currentPrice,
-        priceChange: priceChange.toFixed(2),
-        volatility: volatility.toFixed(2),
-        lastUpdate: new Date().toISOString()
-      }
+      stats: stats
     });
   } catch (error) {
-    console.error('Error fetching crypto prices:', error);
-    
-    // Fallback to generated data if API fails
-    const fallbackData: CryptoPrice[] = [];
-    const now = Date.now();
-    let price = 50000 + Math.random() * 10000;
-    
-    for (let i = 0; i < 24; i++) {
-      const timestamp = now - (23 - i) * 60 * 60 * 1000;
-      const change = (Math.random() - 0.5) * 0.02;
-      price = price * (1 + change);
-      
-      fallbackData.push({
-        t: timestamp.toString(),
-        close: price,
-      });
-    }
-    
-    const currentPrice = fallbackData[fallbackData.length - 1]?.close || 0;
-    const previousPrice = fallbackData[fallbackData.length - 2]?.close || currentPrice;
-    const priceChange = ((currentPrice - previousPrice) / previousPrice) * 100;
-    
-    return NextResponse.json({
-      success: true,
-      data: fallbackData,
-      stats: {
-        currentPrice,
-        priceChange: priceChange.toFixed(2),
-        volatility: (Math.random() * 5 + 1).toFixed(2),
-        lastUpdate: new Date().toISOString()
-      }
-    });
+    console.error('Error fetching crypto prices after retries:', error);
+    // Return fallback data if all retries fail
+    return NextResponse.json(generateFallbackData());
   }
 }

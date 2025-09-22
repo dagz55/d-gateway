@@ -20,6 +20,7 @@ import {
   AlertTriangle
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { CryptoIcon } from "@/components/icons/crypto/CryptoIcon";
 
 // Types
 interface CryptoDataPoint {
@@ -32,6 +33,7 @@ interface CryptoDataPoint {
   resistance: number;
   volatility: number;
 }
+
 
 interface TooltipData {
   x: number;
@@ -286,8 +288,8 @@ const MiniChart = ({
     return () => window.removeEventListener('resize', updateDimensions);
   }, []);
 
-  const { pathData, volumeData, supportLine, resistanceLine, gridLines } = useMemo(() => {
-    if (!data.length) return { pathData: '', volumeData: [], supportLine: '', resistanceLine: '', gridLines: [] };
+  const { pathData, volumeData, supportLine, resistanceLine, gridLines, plottedPoints } = useMemo(() => {
+    if (!data.length) return { pathData: '', volumeData: [], supportLine: '', resistanceLine: '', gridLines: [], plottedPoints: [] };
 
     const prices = data.map(d => d.price);
     const volumes = data.map(d => d.volume);
@@ -299,12 +301,14 @@ const MiniChart = ({
     const chartWidth = dimensions.width - padding.left - padding.right;
     const chartHeight = dimensions.height - padding.top - padding.bottom;
 
-    // Price line path
-    const pathCommands = data.map((point, index) => {
+    // Plotted points and Price line path
+    const points = data.map((point, index) => {
       const x = padding.left + (index / (data.length - 1)) * chartWidth;
       const y = padding.top + (1 - (point.price - minPrice) / (maxPrice - minPrice)) * chartHeight;
-      return `${index === 0 ? 'M' : 'L'} ${x} ${y}`;
-    }).join(' ');
+      return { x, y, point };
+    });
+    
+    const pathCommands = points.map((p, index) => `${index === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ');
 
     // Volume bars
     const volumeBars = data.map((point, index) => {
@@ -346,7 +350,8 @@ const MiniChart = ({
       volumeData: volumeBars,
       supportLine: supportPath,
       resistanceLine: resistancePath,
-      gridLines: [...horizontalLines, ...verticalLines]
+      gridLines: [...horizontalLines, ...verticalLines],
+      plottedPoints: points
     };
   }, [data, dimensions]);
 
@@ -446,32 +451,20 @@ const MiniChart = ({
         />
 
         {/* Data points */}
-        {data.map((point, index) => {
-          const padding = { left: 20, right: 10, top: 10, bottom: 20 };
-          const chartWidth = dimensions.width - padding.left - padding.right;
-          const chartHeight = dimensions.height - padding.top - padding.bottom;
-          const prices = data.map(d => d.price);
-          const minPrice = Math.min(...prices);
-          const maxPrice = Math.max(...prices);
-          
-          const x = padding.left + (index / (data.length - 1)) * chartWidth;
-          const y = padding.top + (1 - (point.price - minPrice) / (maxPrice - minPrice)) * chartHeight;
-          
-          return (
-            <motion.circle
-              key={index}
-              cx={x}
-              cy={y}
-              r="1.5"
-              fill={isPositive ? "#34d399" : "#f87171"}
-              opacity="0.6"
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ duration: 0.3, delay: index * 0.05 }}
-              className="hover:opacity-100 transition-opacity"
-            />
-          );
-        })}
+        {plottedPoints.map((point, index) => (
+          <motion.circle
+            key={index}
+            cx={point.x}
+            cy={point.y}
+            r="1.5"
+            fill={isPositive ? "#34d399" : "#f87171"}
+            opacity="0.6"
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ duration: 0.3, delay: index * 0.05 }}
+            className="hover:opacity-100 transition-opacity"
+          />
+        ))}
 
         {/* Gradients */}
         <defs>
@@ -535,9 +528,7 @@ export function AdvancedMiniChart({
       <div className="group relative flex h-full flex-col overflow-hidden rounded-3xl border border-white/10 bg-white/[0.05] p-6 backdrop-blur transition duration-300">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-[#0577DA] to-[#1199FA] text-sm font-semibold text-white">
-              {symbol.slice(0, 2)}
-            </div>
+        <CryptoIcon symbol={symbol} size={44} />
             <div>
               <h3 className="text-base font-semibold text-white">{name}</h3>
               <p className="text-xs text-white/50">{symbol}</p>
@@ -572,9 +563,7 @@ export function AdvancedMiniChart({
 
       <div className="relative flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-[#0577DA] to-[#1199FA] text-sm font-semibold text-white">
-            {symbol.slice(0, 2)}
-          </div>
+        <CryptoIcon symbol={symbol} size={44} />
           <div>
             <h3 className="text-base font-semibold text-white">{name}</h3>
             <p className="text-xs text-white/50">{symbol}</p>

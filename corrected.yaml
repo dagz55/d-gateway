@@ -1,0 +1,7 @@
+enhanced_cleanup:
+  - '`src/` (main source code)'
+  - '`config/` (configuration files)'
+  - '`logs/` (log files)'
+  - '`backups/` (backup data)'
+  - '`tests/` (test files)'
+  - '`reports/` (generated reports)'
