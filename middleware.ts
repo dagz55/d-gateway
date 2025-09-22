@@ -215,19 +215,6 @@ const pathname = request.nextUrl.pathname;
       }
     }
 
-    // Redirect authenticated users from sign-in/sign-up pages based on role
-    // But only if they're not in the middle of an auth flow
-    if ((request.nextUrl.pathname === "/sign-in" || request.nextUrl.pathname === "/sign-up") &&
-        !request.nextUrl.searchParams.has('redirect_url')) {
-      if (process.env.NODE_ENV === 'production') {
-        console.log('🔄 Auth page redirect:', { isUserAdmin });
-      }
-      if (isUserAdmin) {
-        return NextResponse.redirect(new URL("/dashboard/admins", request.url));
-      } else {
-        return NextResponse.redirect(new URL("/dashboard/members", request.url));
-      }
-    }
 
   }
   return NextResponse.next();
