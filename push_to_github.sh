@@ -1,9 +1,9 @@
 #!/bin/bash
 
 # Script to push your project to GitHub
-# Target repository: dagz55/gotrykeph.git
+# Target repository: dagz55/zignal-login.git
 
-REPO_URL="https://github.com/dagz55/gotrykeph.git"
+REPO_URL="https://github.com/dagz55/zignal-login.git"
 BRANCH_NAME="main"
 
 # Check if git is installed

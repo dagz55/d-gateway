@@ -20,6 +20,7 @@ import {
   ChevronRight,
   Shield,
   TrendingUp,
+  Rocket,
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
@@ -29,7 +30,14 @@ import { useUser } from '@clerk/nextjs';
 import { checkAdminStatus } from '@/lib/admin-utils';
 import { useNavigationLoading } from '@/hooks/useNavigationLoading';
 
-const navigation = [
+type NavItem = {
+  name: string;
+  href: string;
+  icon: React.ElementType;
+  isAdmin?: boolean;
+};
+
+const navigation: NavItem[] = [
   {
     name: 'Dashboard',
     href: '/dashboard',
@@ -111,6 +119,12 @@ export default function Sidebar({ className }: SidebarProps) {
       icon: Shield,
       isAdmin: true,
     },
+    {
+      name: 'Deployment',
+      href: '/deployment',
+      icon: Rocket,
+      isAdmin: true,
+    }
   ] : [];
 
   const allNavigation = [...navigation, ...adminNavigation];
@@ -129,7 +143,7 @@ export default function Sidebar({ className }: SidebarProps) {
     }
     
     // Handle exact matches for non-dashboard routes
-    if (href === '/settings' || href === '/admin' || href === '/market' || href === '/wallet') {
+    if (href === '/settings' || href === '/admin' || href === '/market' || href === '/wallet' || href === '/deployment') {
       return pathname === href;
     }
     
