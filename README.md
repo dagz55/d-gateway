@@ -4,7 +4,15 @@ Zignal is a comprehensive crypto trading platform built with [Next.js 15.5.3](ht
 
 ## 🚀 Features
 
-### Recent Improvements (v2.11.8)
+### Recent Improvements (v2.11.9)
+- 📊 **Enhanced Crypto Charts**: Added grid lines and detailed tooltips to mini cryptocurrency charts
+- 🎯 **Interactive Data Points**: Hover over charts to see precise date, time, and value information
+- 📈 **Real-time Time Series**: 24-hour realistic data with proper timestamps for all crypto cards
+- ✨ **Visual Grid System**: Both horizontal and vertical grid lines for better data visualization
+- 🌟 **Professional Tooltips**: Detailed hover information showing crypto name, price, date, and time
+- ⚡ **Performance Optimized**: Smooth hover interactions with proper event handling
+
+### Previous Improvements (v2.11.8)
 - 🎯 **Logo-Based Loading System**: Animated loading spinner featuring rotating Zignal logo with signal effects
 - 🚀 **Smooth Page Transitions**: Integrated loading states for all navigation with contextual messages
 - ✨ **Global Loading Management**: Complete loading infrastructure with overlay and state management

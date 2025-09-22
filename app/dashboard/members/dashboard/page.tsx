@@ -3,6 +3,7 @@ import Spark from '@/components/charts/Spark';
 import OpenPositions from '@/components/Tables/OpenPositions';
 import StatusDot from '@/components/ui/StatusDot';
 import ZigTradesWorkflow from '@/components/dashboard/ZigTradesWorkflow';
+import BitcoinTradingChart from '@/components/dashboard/BitcoinTradingChart';
 import { currentUser } from '@clerk/nextjs/server';
 import { redirect } from 'next/navigation';
 
@@ -111,6 +112,11 @@ export default async function MemberDashboardPage() {
             </div>
           </CardContent>
         </Card>
+      </div>
+
+      {/* Bitcoin Trading Chart - Full Width */}
+      <div className="space-y-6">
+        <BitcoinTradingChart />
       </div>
 
       {/* Main Content Grid */}
