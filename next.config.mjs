@@ -1,4 +1,5 @@
 import path from 'path';
+import webpack from 'next/dist/compiled/webpack/webpack-lib.js';
 
 // Load global polyfill for SSR compatibility
 if (typeof global !== 'undefined' && !global.self) {
@@ -67,23 +68,16 @@ const nextConfig = {
         "self": false
       };
 
-      // Add polyfill to all server entries using absolute path
-      const originalEntry = config.entry;
-      config.entry = async () => {
-        const entries = await originalEntry();
-        const polyfillPath = path.resolve(process.cwd(), 'global-polyfill.js');
+      // Ensure Webpack uses a Node-safe global object in server bundles
+      config.output = config.output || {};
+      config.output.globalObject = 'globalThis';
 
-        // Add polyfill to beginning of all entry arrays
-        Object.keys(entries).forEach(key => {
-          if (Array.isArray(entries[key])) {
-            entries[key].unshift(polyfillPath);
-          } else if (typeof entries[key] === 'string') {
-            entries[key] = [polyfillPath, entries[key]];
-          }
-        });
+      // Ensure "self" resolves to globalThis in server bundles to avoid SSR ReferenceError
+      config.plugins = config.plugins || [];
+      config.plugins.push(new webpack.DefinePlugin({
+        self: 'globalThis',
+      }));
 
-        return entries;
-      };
     }
 
     // Client-side configuration
@@ -106,33 +100,42 @@ const nextConfig = {
     // config.devtool =
     //   process.env.NODE_ENV === "production" ? "hidden-source-map" : "eval-source-map";
     if (process.env.NODE_ENV === "production") {
-      config.optimization = {
-        ...config.optimization,
-        minimize: true,
-        splitChunks: {
-          chunks: 'all',
-          cacheGroups: {
-            vendor: {
-              test: /[\\/]node_modules[\\/]/,
-              name: 'vendors',
-              chunks: 'all',
-              priority: 10,
-            },
-            animations: {
-              test: /[\\/]node_modules[\\/](framer-motion|@react-spring)[\\/]/,
-              name: 'animations',
-              chunks: 'all',
-              priority: 20,
-            },
-            ui: {
-              test: /[\\/]node_modules[\\/](@radix-ui|@clerk)[\\/]/,
-              name: 'ui',
-              chunks: 'all',
-              priority: 15,
+      // Always allow Next to control server chunking/runtime format. Only customize client-side.
+      if (!options.isServer) {
+        config.optimization = {
+          ...config.optimization,
+          minimize: true,
+          splitChunks: {
+            chunks: 'all',
+            cacheGroups: {
+              vendor: {
+                test: /[\\/]node_modules[\\/]/,
+                name: 'vendors',
+                chunks: 'all',
+                priority: 10,
+              },
+              animations: {
+                test: /[\\/]node_modules[\\/](framer-motion|@react-spring)[\\/]/,
+                name: 'animations',
+                chunks: 'all',
+                priority: 20,
+              },
+              ui: {
+                test: /[\\/]node_modules[\\/](@radix-ui|@clerk)[\\/]/,
+                name: 'ui',
+                chunks: 'all',
+                priority: 15,
+              },
             },
           },
-        },
-      };
+        };
+      } else {
+        // Preserve server defaults; optionally keep minimization
+        config.optimization = {
+          ...config.optimization,
+          minimize: true,
+        };
+      }
     }
     config.plugins = config.plugins || [];
     config.module = config.module || { rules: [] };
