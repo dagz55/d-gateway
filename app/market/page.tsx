@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -249,14 +250,15 @@ export default function MarketPage() {
                     <div key={crypto.id} className="p-4 rounded-lg bg-white/5 border border-white/10">
                       <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center gap-2">
-                          <img 
-                            src={crypto.image} 
-                            alt={crypto.name} 
+                          <Image
+                            src={crypto.image}
+                            alt={crypto.name}
+                            width={24}
+                            height={24}
                             className="w-6 h-6 rounded-full"
                             onError={(e) => {
                               e.currentTarget.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiByeD0iMTIiIGZpbGw9IiMzM0UxREEiLz4KPHN2ZyB3aWR0aD0iMTIiIGhlaWdodD0iMTIiIHZpZXdCb3g9IjAgMCAxMiAxMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4PSI2IiB5PSI2Ij4KPHBhdGggZD0iTTYgMEMyLjY4NjMgMCAwIDIuNjg2MyAwIDZDMCA5LjMxMzcgMi42ODYzIDEyIDYgMTJDOS4zMTM3IDEyIDEyIDkuMzEzNyAxMiA2QzEyIDIuNjg2MyA5LjMxMzcgMCA2IDBaIiBmaWxsPSIjMDAwMDAwIi8+CjxwYXRoIGQ9Ik02IDNDNC4zNDMxNSAzIDMgNC4zNDMxNSAzIDZDNy42NTY4NSA2IDkgNC4zNDMxNSA5IDZDNi4zNDMxNSA2IDYgNy42NTY4NSA2IDlDNiA2LjM0MzE1IDcuNjU2ODUgNSA5IDVDNi4zNDMxNSA1IDUgNi4zNDMxNSA1IDhDNSA5LjY1Njg1IDYuMzQzMTUgMTEgOCAxMUM5LjY1Njg1IDExIDExIDkuNjU2ODUgMTEgOEMxMSA2LjM0MzE1IDkuNjU2ODUgNSA4IDVaIiBmaWxsPSIjMzNFMURBIi8+Cjwvc3ZnPgo8L3N2Zz4K';
                             }}
-                            loading="lazy"
                           />
                           <span className="font-semibold text-white">{crypto.symbol.toUpperCase()}</span>
                         </div>
@@ -336,9 +338,11 @@ export default function MarketPage() {
                         
                         <td className="py-4 px-2">
                           <div className="flex items-center gap-3">
-                            <img 
-                              src={crypto.image} 
-                              alt={crypto.name} 
+                            <Image
+                              src={crypto.image}
+                              alt={crypto.name}
+                              width={32}
+                              height={32}
                               className="w-8 h-8 rounded-full"
                             />
                             <div>

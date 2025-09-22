@@ -156,6 +156,8 @@ export function LandingContent() {
   const featuresY = useTransform(scrollY, [0, 2000], [0, -100]);
 
   useEffect(() => {
+    if (typeof window === 'undefined') return;
+    
     let ticking = false;
 
     const handleScroll = () => {

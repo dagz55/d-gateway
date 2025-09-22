@@ -1,5 +1,5 @@
-/// <reference types="@clerk/types" />
-import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
+import { auth, clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
+import { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
 // Define public routes that don't require authentication
@@ -41,8 +41,14 @@ const isDashboardRoute = createRouteMatcher([
   "/wallet(.*)",
 ]);
 
-export default clerkMiddleware(async (auth, req) => {
-  const pathname = req.nextUrl.pathname;
+export default async function middleware(request: NextRequest) {
+interface SessionClaims {
+  // Define the properties of SessionClaims here
+  [key: string]: any; // Example placeholder for dynamic properties
+}
+
+// Ensure req is passed as a parameter to the middleware function
+const pathname = request.nextUrl.pathname;
   
   // Early return for landing page - no middleware processing needed
   if (pathname === "/") {
@@ -62,7 +68,7 @@ export default clerkMiddleware(async (auth, req) => {
   }
 
   // Early return for other public routes that don't need auth processing
-  if (isPublicRoute(req)) {
+  if (isPublicRoute(request)) {
     if (process.env.NODE_ENV === 'production') {
       console.log('📍 Public route - early return:', pathname);
     }
@@ -74,15 +80,15 @@ export default clerkMiddleware(async (auth, req) => {
   // Protect all routes except public ones
   if (!userId) {
     // Redirect to sign-in page if not authenticated
-    const signInUrl = new URL("/sign-in", req.url);
-    signInUrl.searchParams.set("redirect_url", req.url);
+    const signInUrl = new URL("/sign-in", request.url);
+    signInUrl.searchParams.set("redirect_url", request.url);
     return NextResponse.redirect(signInUrl);
   }
 
   if (userId) {
     // CRITICAL: Prevent redirect loops by checking referrer and patterns
-    const referrer = req.headers.get('referer');
-    const currentPath = req.nextUrl.pathname;
+    const referrer = request.headers.get('referer');
+    const currentPath = request.nextUrl.pathname;
 
     // EMERGENCY: Prevent specific infinite redirect pattern
     // If accessing /admin or /member directly, and coming from those same routes, break the cycle
@@ -91,7 +97,7 @@ export default clerkMiddleware(async (auth, req) => {
         const referrerUrl = new URL(referrer);
         if (referrerUrl.pathname === currentPath) {
           console.log('🚨 Emergency: Same-route loop detected, redirecting to admin setup');
-          return NextResponse.redirect(new URL("/admin-setup", req.url));
+          return NextResponse.redirect(new URL("/admin-setup", request.url));
         }
       } catch (e) {
         // Invalid referrer URL, continue
@@ -101,8 +107,8 @@ export default clerkMiddleware(async (auth, req) => {
     if (process.env.NODE_ENV === 'production') {
       console.log('🔍 Middleware Debug - Request Info:', {
         userId,
-        pathname: req.nextUrl.pathname,
-        url: req.url
+        pathname: request.nextUrl.pathname,
+        url: request.url
       });
     }
     
@@ -134,39 +140,39 @@ export default clerkMiddleware(async (auth, req) => {
         organizationRole,
         orgMetadataRole,
         fullPublicMetadata: publicMetadata,
-        currentPath: req.nextUrl.pathname
+        currentPath: request.nextUrl.pathname
       });
     }
 
     // Handle legacy dashboard route redirects
-    if (isLegacyDashboardRoute(req)) {
+    if (isLegacyDashboardRoute(request)) {
       if (process.env.NODE_ENV === 'production') {
-        console.log('🔄 Legacy Dashboard Redirect:', { isUserAdmin, currentPath: req.nextUrl.pathname });
+        console.log('🔄 Legacy Dashboard Redirect:', { isUserAdmin, currentPath: request.nextUrl.pathname });
       }
       if (isUserAdmin) {
-        return NextResponse.redirect(new URL("/dashboard/admins", req.url));
+        return NextResponse.redirect(new URL("/dashboard/admins", request.url));
       } else {
-        return NextResponse.redirect(new URL("/dashboard/members", req.url));
+        return NextResponse.redirect(new URL("/dashboard/members", request.url));
       }
     }
 
     // Handle dashboard routes - these are accessible to all authenticated users
-    if (isDashboardRoute(req)) {
+    if (isDashboardRoute(request)) {
       if (process.env.NODE_ENV === 'production') {
-        console.log('🏠 Dashboard Route Access:', { isUserAdmin, currentPath: req.nextUrl.pathname });
+        console.log('🏠 Dashboard Route Access:', { isUserAdmin, currentPath: request.nextUrl.pathname });
       }
       // Dashboard routes are accessible to all authenticated users
       return NextResponse.next();
     }
 
     // Check admin access for admin routes
-    if (isAdminRoute(req)) {
+    if (isAdminRoute(request)) {
       if (process.env.NODE_ENV === 'production') {
-        console.log('🔐 Admin Route Check:', { isUserAdmin, currentPath: req.nextUrl.pathname });
+        console.log('🔐 Admin Route Check:', { isUserAdmin, currentPath: request.nextUrl.pathname });
       }
 
       // Allow access to make-first-admin endpoint for any authenticated user
-      if (req.nextUrl.pathname === "/api/admin/make-first-admin") {
+      if (request.nextUrl.pathname === "/api/admin/make-first-admin") {
         if (process.env.NODE_ENV === 'production') {
           console.log('🔑 Allowing access to make-first-admin endpoint');
         }
@@ -175,23 +181,23 @@ export default clerkMiddleware(async (auth, req) => {
 
       if (!isUserAdmin) {
         // EMERGENCY BREAK: Prevent infinite redirect loops
-        const hasRedirectParam = req.nextUrl.searchParams.has("admin_access_denied");
-        const referrer = req.headers.get('referer');
+        const hasRedirectParam = request.nextUrl.searchParams.has("admin_access_denied");
+        const referrer = request.headers.get('referer');
 
         // If we already redirected them once, send them to a safe landing page
         if (hasRedirectParam || (referrer && referrer.includes("admin_access_denied"))) {
           if (process.env.NODE_ENV === 'production') {
             console.log('🚨 LOOP PREVENTION: Sending to landing page');
           }
-          return NextResponse.redirect(new URL("/", req.url));
+          return NextResponse.redirect(new URL("/", request.url));
         }
 
         // First-time redirect to member dashboard
-        if (!req.nextUrl.pathname.startsWith("/dashboard/members") && !req.nextUrl.pathname.startsWith("/member")) {
+        if (!request.nextUrl.pathname.startsWith("/dashboard/members") && !request.nextUrl.pathname.startsWith("/member")) {
           if (process.env.NODE_ENV === 'production') {
             console.log('🚫 Non-admin accessing admin route, redirecting to member dashboard');
           }
-          const memberUrl = new URL("/dashboard/members", req.url);
+          const memberUrl = new URL("/dashboard/members", request.url);
           memberUrl.searchParams.set("admin_access_denied", "true");
           return NextResponse.redirect(memberUrl);
         }
@@ -199,34 +205,33 @@ export default clerkMiddleware(async (auth, req) => {
     }
 
     // Check member access for member routes (prevent admins from accessing member routes)
-    if (isMemberRoute(req) && isUserAdmin) {
+    if (isMemberRoute(request) && isUserAdmin) {
       if (process.env.NODE_ENV === 'production') {
         console.log('🔄 Admin accessing member route, redirecting to admin dashboard');
       }
       // Prevent redirect loop - only redirect if not already on admin routes
-      if (!req.nextUrl.pathname.startsWith("/dashboard/admins") && !req.nextUrl.pathname.startsWith("/admin")) {
-        return NextResponse.redirect(new URL("/dashboard/admins", req.url));
+      if (!request.nextUrl.pathname.startsWith("/dashboard/admins") && !request.nextUrl.pathname.startsWith("/admin")) {
+        return NextResponse.redirect(new URL("/dashboard/admins", request.url));
       }
     }
 
     // Redirect authenticated users from sign-in/sign-up pages based on role
     // But only if they're not in the middle of an auth flow
-    if ((req.nextUrl.pathname === "/sign-in" || req.nextUrl.pathname === "/sign-up") &&
-        !req.nextUrl.searchParams.has('redirect_url')) {
+    if ((request.nextUrl.pathname === "/sign-in" || request.nextUrl.pathname === "/sign-up") &&
+        !request.nextUrl.searchParams.has('redirect_url')) {
       if (process.env.NODE_ENV === 'production') {
         console.log('🔄 Auth page redirect:', { isUserAdmin });
       }
       if (isUserAdmin) {
-        return NextResponse.redirect(new URL("/dashboard/admins", req.url));
+        return NextResponse.redirect(new URL("/dashboard/admins", request.url));
       } else {
-        return NextResponse.redirect(new URL("/dashboard/members", req.url));
+        return NextResponse.redirect(new URL("/dashboard/members", request.url));
       }
     }
 
   }
-
   return NextResponse.next();
-});
+}
 
 export const config = {
   matcher: [

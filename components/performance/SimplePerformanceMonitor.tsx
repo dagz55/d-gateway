@@ -14,6 +14,8 @@ export function SimplePerformanceMonitor({ showUI = false }: { showUI?: boolean 
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    if (typeof window === 'undefined' || typeof document === 'undefined') return;
+    
     const measurePerformance = () => {
       try {
         const navigation = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;

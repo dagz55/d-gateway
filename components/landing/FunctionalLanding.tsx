@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect, useRef } from 'react'
+import Image from 'next/image'
 import { ChevronLeft, ChevronRight, Shield, Target, Eye, Star, ArrowRight, CheckCircle, TrendingUp, Users, Globe, BarChart3, Play } from 'lucide-react'
 import { Button } from '@/components/enterprise/Button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/enterprise/Card'
@@ -354,7 +355,7 @@ const TestimonialsSection = () => {
               What Our Traders Say
             </h2>
             <p className="text-xl text-[#EAF2FF]/70 max-w-3xl mx-auto">
-              Join successful traders who trust <img src="/zignal_logo.png" alt="Zignal" className="inline h-6 w-auto" /> for their cryptocurrency trading decisions
+              Join successful traders who trust <Image src="/zignal_logo.png" alt="Zignal" width={24} height={24} className="inline h-6 w-auto" /> for their cryptocurrency trading decisions
             </p>
           </div>
 

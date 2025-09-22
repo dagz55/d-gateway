@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { motion, useScroll, useTransform, useSpring, useReducedMotion } from 'framer-motion';
 
 // Throttle function for performance optimization
-const throttle = (func: Function, delay: number) => {
+const throttle = (func: (...args: any[]) => void, delay: number) => {
   let timeoutId: NodeJS.Timeout;
   let lastExecTime = 0;
   

@@ -1,7 +1,13 @@
 import path from 'path';
 
+// Load global polyfill for SSR compatibility
+if (typeof global !== 'undefined' && !global.self) {
+  global.self = global;
+}
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+
   // Fix lockfile warning by setting the correct project root
   outputFileTracingRoot: path.resolve(process.cwd()),
   
@@ -53,6 +59,33 @@ const nextConfig = {
   compress: true,
   poweredByHeader: false, // Remove X-Powered-By header for security and performance
   webpack: (config, options) => {
+    // Fix 'self is not defined' error in server-side rendering
+    if (options.isServer) {
+      config.resolve = config.resolve || {};
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        "self": false
+      };
+
+      // Add polyfill to all server entries using absolute path
+      const originalEntry = config.entry;
+      config.entry = async () => {
+        const entries = await originalEntry();
+        const polyfillPath = path.resolve(process.cwd(), 'global-polyfill.js');
+
+        // Add polyfill to beginning of all entry arrays
+        Object.keys(entries).forEach(key => {
+          if (Array.isArray(entries[key])) {
+            entries[key].unshift(polyfillPath);
+          } else if (typeof entries[key] === 'string') {
+            entries[key] = [polyfillPath, entries[key]];
+          }
+        });
+
+        return entries;
+      };
+    }
+
     // Client-side configuration
     if (!options.isServer) {
       config.resolve = config.resolve || {};
@@ -65,7 +98,7 @@ const nextConfig = {
         "buffer": "buffer",
         "util": "util",
       };
-      
+
     }
 
     // Remove devtool override to use Next.js default settings

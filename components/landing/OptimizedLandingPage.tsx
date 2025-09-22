@@ -25,10 +25,12 @@ const BackgroundFallback = memo(() => (
     <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(17,153,250,0.3)_0%,transparent_60%)] opacity-50" />
   </div>
 ));
+BackgroundFallback.displayName = 'BackgroundFallback';
 
 const RippleFallback = memo(() => (
   <div className="absolute inset-0 bg-gradient-to-br from-transparent via-[#33E1DA]/5 to-transparent" />
 ));
+RippleFallback.displayName = 'RippleFallback';
 
 // Performance-optimized landing page
 export const OptimizedLandingPage = memo(() => {

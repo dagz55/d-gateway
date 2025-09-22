@@ -7,6 +7,8 @@ export function useReducedMotion(): boolean {
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false)
 
   useEffect(() => {
+    if (typeof window === 'undefined') return;
+    
     const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
     setPrefersReducedMotion(mediaQuery.matches)
 
@@ -33,6 +35,8 @@ export function useDeviceCapabilities() {
   })
 
   useEffect(() => {
+    if (typeof window === 'undefined' || typeof document === 'undefined') return;
+    
     const checkCapabilities = () => {
       // Check for 3D transforms
       const supportsTransform3D = (() => {
@@ -84,6 +88,8 @@ export function useIntersectionObserver(
   const observerRef = useRef<IntersectionObserver | null>(null)
 
   useEffect(() => {
+    if (typeof window === 'undefined' || typeof IntersectionObserver === 'undefined') return;
+    
     const element = ref.current
     if (!element) return
 
@@ -185,6 +191,8 @@ export function useParallax(speed: number = 0.5) {
   const elementRef = useRef<HTMLElement>(null)
 
   useEffect(() => {
+    if (typeof window === 'undefined') return;
+    
     const handleScroll = () => {
       if (!elementRef.current) return
       
