@@ -124,3 +124,4 @@ reports/
 .cursor/
 .env.example
 .kilocodemodes
+qa/

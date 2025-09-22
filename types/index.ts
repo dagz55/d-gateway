@@ -71,6 +71,12 @@ export interface ApiResponse<T> {
   data: T;
   message?: string;
   success: boolean;
+  stats?: {
+    currentPrice: number;
+    priceChange: string;
+    volatility: string;
+    lastUpdate: string;
+  };
 }
 
 export interface PaginatedResponse<T> {

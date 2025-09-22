@@ -5,6 +5,43 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.11.10] - 2025-09-22
+
+### Added
+- **🎯 Premium Feature Teasers**: Conversion-focused flash card teasers to replace Bitcoin chart
+  - Created comprehensive `PremiumFeatureTeasers.tsx` component with four premium features
+  - Implemented Live Trading Signals, Professional Charts, Risk Management, and Portfolio Insights teasers
+  - Added smooth Framer Motion animations with staggered loading and hover effects
+  - Integrated compelling CTAs with "Unlock Premium Features" buttons and conversion copy
+  - Designed gradient backgrounds and hover animations for visual appeal
+  - Added social proof elements (4.9/5 stars, 50,000+ traders, testimonials)
+  - Implemented "Most Popular" badge for Live Trading Signals feature
+  - Created bottom CTA section with free trial and demo options
+
+### Enhanced
+- **🚀 Dashboard Conversion Optimization**: Replaced functional Bitcoin chart with marketing teasers
+  - Transformed member dashboard from tool-focused to conversion-focused
+  - Replaced Bitcoin trading chart component with premium feature marketing cards
+  - Optimized for user acquisition and subscription conversions
+  - Maintained consistent design language with existing dashboard components
+  - Enhanced user journey toward premium plan sign-ups
+
+### Fixed
+- **⚙️ Clerk Middleware Authentication**: Resolved authentication errors in development
+  - Fixed deprecated `auth().protect()` API usage in middleware
+  - Updated to modern Clerk v5 middleware syntax with `publicRoutes` configuration
+  - Resolved development server authentication errors for protected routes
+  - Cleaned up middleware configuration for better compatibility
+  - Enabled proper authentication flow for dashboard routes
+
+### Technical
+- **🔧 Development Environment**: Improved build stability and error handling
+  - Cleaned up Next.js build cache and resolved compilation errors
+  - Fixed middleware configuration for consistent authentication
+  - Improved development server startup and hot reload performance
+  - Successfully tested production build compilation
+  - Resolved authentication API compatibility issues
+
 ## [2.11.9] - 2025-01-27
 
 ### Added
@@ -33,6 +70,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Implemented proper data normalization and scaling for chart display
   - Added loading states and error handling for live data fetching
   - Enhanced chart responsiveness with real-time data updates
+  - Fixed loading performance issues with timeout and fallback data
+  - Removed static mock values (18.4% P&L, 1.2% risk) with real calculations
+  - Added real-time P&L and volatility risk calculations from live data
 
 ### Technical
 - **⚡ Chart Performance**: Optimized chart rendering and interactions

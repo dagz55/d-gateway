@@ -1,4 +1,8 @@
-'use client';
+import { redirect } from 'next/navigation';
+
+export default function Page() {
+  redirect('/sign-up');
+}
 
 import Image from 'next/image';
 import { useState } from 'react';

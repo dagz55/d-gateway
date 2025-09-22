@@ -1,6 +1,6 @@
 {
   "name": "zignal",
-  "version": "2.11.5",
+  "version": "2.11.10",
   "private": true,
   "description": "Zignal - Advanced Trading Signals & Analytics Platform",
   "author": "dagzsuarez",
@@ -13,6 +13,7 @@
   ],
   "scripts": {
     "dev": "next dev -p 3000",
+    "dev:qa": "next dev -p 3002",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
@@ -28,7 +29,8 @@
     "test:all": "npm run test:supabase && npm run test:clerk",
     "analyze": "ANALYZE=true npm run build",
     "analyze:server": "BUNDLE_ANALYZE=server npm run build",
-    "analyze:browser": "BUNDLE_ANALYZE=browser npm run build"
+    "analyze:browser": "BUNDLE_ANALYZE=browser npm run build",
+    "qa:auth": "node qa/agents/auth_catchall_monitor.js"
   },
   "dependencies": {
     "@adyen/adyen-web": "^6.21.0",

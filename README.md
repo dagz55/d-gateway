@@ -14,6 +14,8 @@ Zignal is a comprehensive crypto trading platform built with [Next.js 15.5.3](ht
 - 🚀 **Live Signal Workspace**: Enhanced main trading chart with live Bitcoin data from CoinGecko API
 - 📊 **Interactive Trading Chart**: Grid lines, tooltips, and live data for the Pro momentum strategy chart
 - 🔄 **Real-time Data Integration**: Replaced mock data with live cryptocurrency price data
+- ⚡ **Performance Optimized**: Fixed loading issues and removed static mock values
+- 📈 **Live P&L Calculation**: Real-time profit/loss and volatility risk calculations
 - 🎨 **Advanced Technical Analysis**: RSI, MACD, support/resistance levels, and volatility indicators
 - 📊 **Volume Analysis**: Volume bars and comprehensive market data visualization
 - 🎭 **Smooth Animations**: Framer Motion powered animations for professional user experience

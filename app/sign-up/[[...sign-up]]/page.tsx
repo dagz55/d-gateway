@@ -38,7 +38,10 @@ export default function SignUpPage() {
             />
           </div>
           
-          <SignUp
+<SignUp
+            routing="virtual"
+            afterSignUpUrl="/"
+            signInUrl="/sign-in"
             appearance={{
               elements: {
                 rootBox: 'w-full',

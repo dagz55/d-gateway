@@ -112,8 +112,11 @@ export default function AuthLayout({ defaultMode = 'sign-in' }: AuthLayoutProps)
 
           {/* Auth Form */}
           <div className="transition-all duration-300 ease-in-out">
-            {mode === 'sign-in' ? (
+{mode === 'sign-in' ? (
               <SignIn
+                routing="virtual"
+                afterSignInUrl="/"
+                signUpUrl="/sign-up"
                 appearance={{
                   elements: {
                     rootBox: 'w-full',
@@ -145,6 +148,9 @@ export default function AuthLayout({ defaultMode = 'sign-in' }: AuthLayoutProps)
               />
             ) : (
               <SignUp
+                routing="virtual"
+                afterSignUpUrl="/"
+                signInUrl="/sign-in"
                 appearance={{
                   elements: {
                     rootBox: 'w-full',

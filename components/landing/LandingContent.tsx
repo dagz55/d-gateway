@@ -157,7 +157,9 @@ export function LandingContent() {
   const [hoveredPoint, setHoveredPoint] = useState<{x: number, y: number, value: number, date: string, time: string} | null>(null);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const { scrollY } = useScroll();
-  const { data: cryptoData, isLoading: isCryptoLoading } = useCryptoPrices();
+  const { data: cryptoResponse, isLoading: isCryptoLoading } = useCryptoPrices();
+  const cryptoData = cryptoResponse?.data || [];
+  const cryptoStats = cryptoResponse?.stats;
 
   // Parallax effects
   const heroY = useTransform(scrollY, [0, 1000], [0, -200]);
@@ -205,16 +207,18 @@ export function LandingContent() {
   const chartData = useMemo(() => {
     if (!cryptoData || cryptoData.length === 0) return [];
     
-    const prices = cryptoData.map(item => item.close);
+    // Take only the last 24 points for better performance
+    const recentData = cryptoData.slice(-24);
+    const prices = recentData.map(item => item.close);
     const minPrice = Math.min(...prices);
     const maxPrice = Math.max(...prices);
     const priceRange = maxPrice - minPrice || 1;
     
-    return cryptoData.map((item, index) => {
+    return recentData.map((item, index) => {
       const normalizedPrice = ((item.close - minPrice) / priceRange) * 100 + 20; // Scale to 20-120 range
       const date = new Date(parseInt(item.t));
       return {
-        x: (index / (cryptoData.length - 1)) * 260,
+        x: (index / (recentData.length - 1)) * 260,
         y: 140 - normalizedPrice,
         value: item.close,
         date: date.toLocaleDateString(),
@@ -408,7 +412,7 @@ export function LandingContent() {
                   </span>
                 </div>
                 <p className="mt-2 text-sm text-white/50">
-                  {isCryptoLoading ? 'Loading live data...' : 'Last synced 2 minutes ago'}
+                  {isCryptoLoading ? 'Loading live data...' : `Last synced ${cryptoStats ? new Date(cryptoStats.lastUpdate).toLocaleTimeString() : '2 minutes ago'}`}
                 </p>
                 <div 
                   className="mt-8 h-36 rounded-2xl border border-white/10 bg-white/[0.04] p-4 relative"
@@ -525,11 +529,15 @@ export function LandingContent() {
                 <div className="mt-6 flex items-center justify-between">
                   <div>
                     <p className="text-xs text-white/50">Running P&amp;L</p>
-                    <p className="text-lg font-semibold text-emerald-300">+18.4%</p>
+                    <p className={`text-lg font-semibold ${cryptoStats && parseFloat(cryptoStats.priceChange) >= 0 ? 'text-emerald-300' : 'text-red-400'}`}>
+                      {cryptoStats ? `${cryptoStats.priceChange >= 0 ? '+' : ''}${cryptoStats.priceChange}%` : 'Loading...'}
+                    </p>
                   </div>
                   <div className="text-right">
-                    <p className="text-xs text-white/50">Risk per trade</p>
-                    <p className="text-lg font-semibold text-white">1.2%</p>
+                    <p className="text-xs text-white/50">Volatility Risk</p>
+                    <p className="text-lg font-semibold text-white">
+                      {cryptoStats ? `${cryptoStats.volatility}%` : 'Loading...'}
+                    </p>
                   </div>
                 </div>
                 <div className="mt-6 space-y-3">
