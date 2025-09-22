@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState, Suspense, useRef } from 'react';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import { motion, useScroll, useTransform } from 'framer-motion';
+import { useCryptoPrices } from '@/hooks/api/useCryptoPrices';
 import {
   Menu,
   X,
@@ -42,7 +43,7 @@ const PriceConverter = dynamic(() => import('./PriceConverter').then(mod => ({ d
   )
 });
 
-const CryptoPriceCard = dynamic(() => import('./CryptoPriceCard').then(mod => ({ default: mod.CryptoPriceCard })), {
+const AdvancedMiniChart = dynamic(() => import('@/components/charts/AdvancedMiniChart').then(mod => ({ default: mod.AdvancedMiniChart })), {
   ssr: false,
   loading: () => (
     <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10 animate-pulse">
@@ -106,7 +107,7 @@ const heroChecklist = [
   'Personalised onboarding',
 ];
 
-const heroSparklinePoints = [48, 52, 47, 59, 64, 61, 68, 72, 66, 74, 82, 78];
+// This will be replaced with live data
 
 const heroPairs = [
   { pair: 'BTC/USDT', direction: 'Long', change: '+4.2%', confidence: 'High' },
@@ -153,7 +154,10 @@ const cryptoPrices = [
 export function LandingContent() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [hoveredPoint, setHoveredPoint] = useState<{x: number, y: number, value: number, date: string, time: string} | null>(null);
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const { scrollY } = useScroll();
+  const { data: cryptoData, isLoading: isCryptoLoading } = useCryptoPrices();
 
   // Parallax effects
   const heroY = useTransform(scrollY, [0, 1000], [0, -200]);
@@ -197,22 +201,41 @@ export function LandingContent() {
     };
   }, [menuOpen]);
 
+  // Process live crypto data for the chart
+  const chartData = useMemo(() => {
+    if (!cryptoData || cryptoData.length === 0) return [];
+    
+    const prices = cryptoData.map(item => item.close);
+    const minPrice = Math.min(...prices);
+    const maxPrice = Math.max(...prices);
+    const priceRange = maxPrice - minPrice || 1;
+    
+    return cryptoData.map((item, index) => {
+      const normalizedPrice = ((item.close - minPrice) / priceRange) * 100 + 20; // Scale to 20-120 range
+      const date = new Date(parseInt(item.t));
+      return {
+        x: (index / (cryptoData.length - 1)) * 260,
+        y: 140 - normalizedPrice,
+        value: item.close,
+        date: date.toLocaleDateString(),
+        time: date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        timestamp: item.t
+      };
+    });
+  }, [cryptoData]);
+
   const heroSparklinePath = useMemo(
     () =>
-      heroSparklinePoints.length > 1
-        ? heroSparklinePoints
-            .map((point, index) => {
-              const x = (index / (heroSparklinePoints.length - 1)) * 260;
-              const y = 140 - point;
-              return `${x},${y}`;
-            })
+      chartData.length > 1
+        ? chartData
+            .map((point) => `${point.x},${point.y}`)
             .join(' ')
         : '',
-    [heroSparklinePoints]
+    [chartData]
   );
 
-  const lastSparkX = heroSparklinePoints.length > 1 ? 260 : 0;
-  const lastSparkY = heroSparklinePoints.length > 0 ? 140 - heroSparklinePoints[heroSparklinePoints.length - 1] : 0;
+  const lastSparkX = chartData.length > 1 ? 260 : 0;
+  const lastSparkY = chartData.length > 0 ? chartData[chartData.length - 1].y : 0;
 
   const closeMenu = () => setMenuOpen(false);
 
@@ -384,15 +407,76 @@ export function LandingContent() {
                     Live
                   </span>
                 </div>
-                <p className="mt-2 text-sm text-white/50">Last synced 2 minutes ago</p>
-                <div className="mt-8 h-36 rounded-2xl border border-white/10 bg-white/[0.04] p-4">
+                <p className="mt-2 text-sm text-white/50">
+                  {isCryptoLoading ? 'Loading live data...' : 'Last synced 2 minutes ago'}
+                </p>
+                <div 
+                  className="mt-8 h-36 rounded-2xl border border-white/10 bg-white/[0.04] p-4 relative"
+                  onMouseMove={(e) => {
+                    if (!chartData || chartData.length === 0) return;
+                    
+                    const rect = e.currentTarget.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    setMousePosition({ x: e.clientX, y: e.clientY });
+                    
+                    // Find the closest data point
+                    const pointIndex = Math.round((x / rect.width) * (chartData.length - 1));
+                    const clampedIndex = Math.max(0, Math.min(pointIndex, chartData.length - 1));
+                    const point = chartData[clampedIndex];
+                    setHoveredPoint({
+                      x: point.x,
+                      y: point.y,
+                      value: point.value,
+                      date: point.date,
+                      time: point.time
+                    });
+                  }}
+                  onMouseLeave={() => {
+                    setHoveredPoint(null);
+                  }}
+                >
                   <svg width="100%" height="100%" viewBox="0 0 260 140">
                     <defs>
                       <linearGradient id="heroLine" x1="0%" y1="0%" x2="100%" y2="100%">
                         <stop offset="0%" stopColor="#57c8ff" stopOpacity="0.9" />
                         <stop offset="100%" stopColor="#34d399" stopOpacity="0.9" />
                       </linearGradient>
+                      <pattern id="heroGrid" width="26" height="28" patternUnits="userSpaceOnUse">
+                        <path d="M 26 0 L 0 0 0 28" fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth="0.5"/>
+                      </pattern>
                     </defs>
+                    
+                    {/* Grid background */}
+                    <rect width="260" height="140" fill="url(#heroGrid)" />
+                    
+                    {/* Horizontal grid lines */}
+                    {[0, 28, 56, 84, 112, 140].map((y) => (
+                      <line
+                        key={y}
+                        x1="0"
+                        y1={y}
+                        x2="260"
+                        y2={y}
+                        stroke="rgba(255,255,255,0.08)"
+                        strokeWidth="0.5"
+                      />
+                    ))}
+                    
+                    {/* Vertical grid lines */}
+                    {[0, 52, 104, 156, 208, 260].map((x) => (
+                      <line
+                        key={x}
+                        x1={x}
+                        y1="0"
+                        x2={x}
+                        y2="140"
+                        stroke="rgba(255,255,255,0.08)"
+                        strokeWidth="0.5"
+                      />
+                    ))}
+                    
+                    {/* Chart line */}
                     {heroSparklinePath && (
                       <polyline
                         points={heroSparklinePath}
@@ -403,8 +487,40 @@ export function LandingContent() {
                         strokeLinejoin="round"
                       />
                     )}
-                    {heroSparklinePath && <circle cx={lastSparkX} cy={lastSparkY} r={4} fill="#34d399" />}
+                    
+                    {/* Data points */}
+                    {chartData.map((point, index) => (
+                      <circle
+                        key={index}
+                        cx={point.x}
+                        cy={point.y}
+                        r="2"
+                        fill="#34d399"
+                        opacity="0.6"
+                        className="hover:opacity-100 transition-opacity"
+                      />
+                    ))}
+                    
+                    {/* Last point highlight */}
+                    {heroSparklinePath && <circle cx={lastSparkX} cy={lastSparkY} r="4" fill="#34d399" />}
                   </svg>
+                  
+                  {/* Tooltip */}
+                  {hoveredPoint && (
+                    <div
+                      className="absolute z-10 rounded-lg bg-black/90 border border-white/20 px-3 py-2 text-xs text-white backdrop-blur-sm pointer-events-none"
+                      style={{
+                        left: `${Math.min(Math.max(mousePosition.x - 100, 10), 160)}px`,
+                        top: `${Math.max(mousePosition.y - 100, 10)}px`,
+                        transform: 'translateX(-50%)'
+                      }}
+                    >
+                      <div className="font-semibold text-white">BTC/USDT</div>
+                      <div className="text-white/80">${hoveredPoint.value.toLocaleString()}</div>
+                      <div className="text-white/60">{hoveredPoint.date}</div>
+                      <div className="text-white/60">{hoveredPoint.time}</div>
+                    </div>
+                  )}
                 </div>
                 <div className="mt-6 flex items-center justify-between">
                   <div>
@@ -659,7 +775,11 @@ export function LandingContent() {
             </div>
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-5">
               {cryptoPrices.map((crypto) => (
-                <CryptoPriceCard key={crypto.symbol} {...crypto} />
+                <AdvancedMiniChart 
+                  key={crypto.symbol} 
+                  {...crypto} 
+                  isPositive={!crypto.change.startsWith('-')}
+                />
               ))}
             </div>
           </div>
