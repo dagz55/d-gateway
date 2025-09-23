@@ -40,7 +40,7 @@ export default function CustomSignUpPage() {
       }
 
       // For now, just simulate authentication
-      console.log('Sign up attempt:', formData);
+      // Sign up attempt - removed console.log to reduce console noise
       
       // Add your authentication logic here
       setError('Sign up not implemented yet - this is just the UI');

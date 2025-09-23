@@ -120,7 +120,7 @@ export async function GET(request: NextRequest) {
       message: 'Real user stats retrieved successfully'
     });
   } catch (error) {
-    console.error('Dashboard stats error:', error);
+    // Dashboard stats error - removed console.error to reduce noise
     
     // Return fallback zeros on error
     const fallbackStats = {

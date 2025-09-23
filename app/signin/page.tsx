@@ -26,7 +26,7 @@ export default function CustomSignInPage() {
 
     try {
       // For now, just simulate authentication
-      console.log('Sign in attempt:', formData);
+      // Sign in attempt - removed console.log to reduce console noise
       
       // Add your authentication logic here
       // This could be Clerk, Supabase, or any other auth provider

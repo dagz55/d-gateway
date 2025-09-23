@@ -94,7 +94,7 @@ export const OptimizedWallpaperBackground = memo(({
     img.src = '/login_background_wallpaper_zignals04.png';
     img.onload = () => setIsLoaded(true);
     img.onerror = () => {
-      console.warn('Background image failed to preload');
+      // Background image failed to preload - continuing without console warning
       setIsLoaded(true); // Still show component even if image fails
     };
   }, []);
@@ -127,7 +127,7 @@ export const OptimizedWallpaperBackground = memo(({
           placeholder="blur"
           blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
           onLoad={() => setIsLoaded(true)}
-          onError={() => console.warn('Background image failed to load')}
+          onError={() => setIsLoaded(true)} // Silently handle load failure
         />
       </motion.div>
 

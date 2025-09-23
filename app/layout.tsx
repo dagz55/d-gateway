@@ -31,7 +31,7 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://api.coingecko.com" />
         {/* Only preload critical images that are used immediately */}
-        <link rel="preload" href="/logo-zgnls.png" as="image" type="image/png" />
+        <link rel="preload" href="/zignal-logo.png" as="image" type="image/png" />
       </head>
       <body className={`font-sans ${GeistSans.variable} ${GeistMono.variable} antialiased`}>
         <Providers>
