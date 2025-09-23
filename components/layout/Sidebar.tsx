@@ -24,7 +24,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import ProfileSection from './ProfileSection';
 import { useUser } from '@clerk/nextjs';
 import { useNavigationLoading } from '@/hooks/useNavigationLoading';
@@ -37,7 +37,7 @@ type NavItem = {
   isAdmin?: boolean;
 };
 
-const navigation: NavItem[] = [
+const BASE_NAVIGATION: NavItem[] = [
   {
     name: 'Dashboard',
     href: '/dashboard',
@@ -97,7 +97,7 @@ export default function Sidebar({ className }: SidebarProps) {
 
 
   // Add admin navigation if user is admin
-  const adminNavigation = isAdmin ? [
+  const ADMIN_NAVIGATION: NavItem[] = [
     {
       name: 'Admin Panel',
       href: '/admin',
@@ -110,35 +110,52 @@ export default function Sidebar({ className }: SidebarProps) {
       icon: Rocket,
       isAdmin: true,
     }
-  ] : [];
+  ];
 
-  const allNavigation = [...navigation, ...adminNavigation];
+  const allNavigation = useMemo(
+    () => [...BASE_NAVIGATION, ...(isAdmin ? ADMIN_NAVIGATION : [])],
+    [isAdmin]
+  );
 
-  const isActive = (href: string) => {
-    // Handle dashboard tab navigation
-    if (href.includes('?tab=')) {
-      const url = new URL(href, 'http://localhost:3000');
-      const tab = url.searchParams.get('tab');
-      const currentTab = searchParams.get('tab');
-      
-      // If we're on dashboard and the tab matches
-      if (pathname === '/dashboard' && tab === currentTab) {
-        return true;
+  const isActive = useCallback(
+    (href: string) => {
+      if (!href) return false;
+
+      if (href.includes("?tab=")) {
+        const url = new URL(href, "http://localhost:3000");
+        const tab = url.searchParams.get("tab");
+        return pathname === "/dashboard" && tab === searchParams.get("tab");
       }
-    }
-    
-    // Handle exact matches for non-dashboard routes
-    if (href === '/settings' || href === '/admin' || href === '/market' || href === '/wallet' || href === '/deployment') {
-      return pathname === href;
-    }
-    
-    // Handle dashboard base route (no tab)
-    if (href === '/dashboard') {
-      return pathname === '/dashboard' && !searchParams.get('tab');
-    }
-    
-    return pathname.startsWith(href);
-  };
+
+      if (href === "/dashboard") {
+        return pathname === "/dashboard" && !searchParams.get("tab");
+      }
+
+      const exactPaths = ["/settings", "/admin", "/market", "/wallet", "/deployment"];
+      if (exactPaths.includes(href)) {
+        return pathname === href;
+      }
+
+      return pathname.startsWith(href);
+    },
+    [pathname, searchParams]
+  );
+
+  const getNavItemClasses = useCallback(
+    (isActiveLink: boolean, isCollapsed: boolean, isAdminItem?: boolean) =>
+      cn(
+        "flex items-center text-sm font-medium rounded-xl transition-all duration-300 relative group",
+        isCollapsed ? "md:px-2 md:py-3 md:justify-center" : "md:px-3 md:py-3",
+        "max-md:px-2 max-md:py-3 max-md:justify-center",
+        isActiveLink
+          ? "bg-accent/20 text-accent shadow-lg border border-accent/30 card-glow"
+          : "text-foreground/70 hover:bg-muted hover:text-foreground hover:shadow-md hover:border hover:border-border",
+        isAdminItem &&
+          !isActiveLink &&
+          "hover:bg-yellow-500/10 hover:text-yellow-600 hover:border-yellow-500/30 dark:hover:text-yellow-400"
+      ),
+    []
+  );
 
   return (
     <>
@@ -147,13 +164,11 @@ export default function Sidebar({ className }: SidebarProps) {
       {/* Sidebar */}
       <div
         className={cn(
-          'fixed left-0 z-40 glass border-r border-border transform transition-all duration-300 ease-in-out',
-          'top-0 h-full',
-          // Desktop behavior
-          'md:w-64 md:translate-x-0',
-          isCollapsed && 'md:w-16',
-          // Mobile behavior - always visible but compact
-          'max-md:w-16 max-md:translate-x-0',
+          "fixed left-0 z-40 glass border-r border-border transform transition-all duration-300 ease-in-out",
+          "top-0 h-full",
+          "md:w-64 md:translate-x-0", // Desktop expanded
+          isCollapsed && "md:w-16", // Desktop collapsed
+          "max-md:w-16 max-md:translate-x-0", // Mobile always compact
           className
         )}
       >
@@ -220,18 +235,7 @@ export default function Sidebar({ className }: SidebarProps) {
                     onClick={async () => {
                       await navigateWithLoading(item.href, `Loading ${item.name}...`);
                     }}
-                    className={cn(
-                      'flex items-center text-sm font-medium rounded-xl transition-all duration-300 relative group',
-                      // Desktop layout
-                      isCollapsed ? 'md:px-2 md:py-3 md:justify-center' : 'md:px-3 md:py-3',
-                      // Mobile layout - always compact/centered
-                      'max-md:px-2 max-md:py-3 max-md:justify-center',
-                      isActiveLink
-                        ? 'bg-accent/20 text-accent shadow-lg border border-accent/30 card-glow'
-                        : 'text-foreground/70 hover:bg-muted hover:text-foreground hover:shadow-md hover:border hover:border-border',
-                      // Special admin panel hover styling
-                      isAdminItem && !isActiveLink && 'hover:bg-yellow-500/10 hover:text-yellow-600 hover:border-yellow-500/30 dark:hover:text-yellow-400'
-                    )}
+                    className={getNavItemClasses(isActiveLink, isCollapsed, isAdminItem)}
                   >
                     <Icon className={cn(
                       "h-5 w-5 transition-transform duration-200",
@@ -249,7 +253,7 @@ export default function Sidebar({ className }: SidebarProps) {
                     )}
 
                     {/* Tooltip for collapsed state or mobile */}
-                    {(isCollapsed || true) && ( // Always show tooltip potential for mobile
+                    {isCollapsed && (
                       <div className="absolute left-full ml-2 px-2 py-1 bg-popover text-popover-foreground text-xs rounded-md shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50">
                         {item.name}
                       </div>
