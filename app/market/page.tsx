@@ -250,16 +250,29 @@ export default function MarketPage() {
                     <div key={crypto.id} className="p-4 rounded-lg bg-white/5 border border-white/10">
                       <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center gap-2">
-                          <Image
-                            src={crypto.image}
-                            alt={crypto.name}
-                            width={24}
-                            height={24}
-                            className="w-6 h-6 rounded-full"
-                            onError={(e) => {
-                              e.currentTarget.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiByeD0iMTIiIGZpbGw9IiMzM0UxREEiLz4KPHN2ZyB3aWR0aD0iMTIiIGhlaWdodD0iMTIiIHZpZXdCb3g9IjAgMCAxMiAxMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4PSI2IiB5PSI2Ij4KPHBhdGggZD0iTTYgMEMyLjY4NjMgMCAwIDIuNjg2MyAwIDZDMCA5LjMxMzcgMi42ODYzIDEyIDYgMTJDOS4zMTM3IDEyIDEyIDkuMzEzNyAxMiA2QzEyIDIuNjg2MyA5LjMxMzcgMCA2IDBaIiBmaWxsPSIjMDAwMDAwIi8+CjxwYXRoIGQ9Ik02IDNDNC4zNDMxNSAzIDMgNC4zNDMxNSAzIDZDNy42NTY4NSA2IDkgNC4zNDMxNSA5IDZDNi4zNDMxNSA2IDYgNy42NTY4NSA2IDlDNiA2LjM0MzE1IDcuNjU2ODUgNSA5IDVDNi4zNDMxNSA1IDUgNi4zNDMxNSA1IDhDNSA5LjY1Njg1IDYuMzQzMTUgMTEgOCAxMUM5LjY1Njg1IDExIDExIDkuNjU2ODUgMTEgOEMxMSA2LjM0MzE1IDkuNjU2ODUgNSA4IDVaIiBmaWxsPSIjMzNFMURBIi8+Cjwvc3ZnPgo8L3N2Zz4K';
-                            }}
-                          />
+                          <div className="relative w-6 h-6">
+                            <Image
+                              src={crypto.image}
+                              alt={crypto.name}
+                              width={24}
+                              height={24}
+                              className="w-6 h-6 rounded-full"
+                              onError={(e) => {
+                                const target = e.currentTarget;
+                                target.style.display = 'none';
+                                const placeholder = target.nextElementSibling as HTMLElement;
+                                if (placeholder) placeholder.style.display = 'flex';
+                              }}
+                            />
+                            <div
+                              className="absolute inset-0 bg-[#33E1DA]/20 rounded-full flex items-center justify-center"
+                              style={{ display: 'none' }}
+                            >
+                              <span className="text-[#33E1DA] text-xs font-bold">
+                                {crypto.symbol.charAt(0).toUpperCase()}
+                              </span>
+                            </div>
+                          </div>
                           <span className="font-semibold text-white">{crypto.symbol.toUpperCase()}</span>
                         </div>
                         <div className="text-right">
@@ -310,14 +323,14 @@ export default function MarketPage() {
               <table className="w-full">
                 <thead>
                   <tr className="border-b border-white/10">
-                    <th className="text-left py-3 px-2 text-white/70 font-medium text-sm">Rank</th>
-                    <th className="text-left py-3 px-2 text-white/70 font-medium text-sm">Name</th>
-                    <th className="text-right py-3 px-2 text-white/70 font-medium text-sm">Price</th>
-                    <th className="text-right py-3 px-2 text-white/70 font-medium text-sm">24h Change</th>
-                    <th className="text-right py-3 px-2 text-white/70 font-medium text-sm">Market Cap</th>
-                    <th className="text-right py-3 px-2 text-white/70 font-medium text-sm">Volume</th>
-                    <th className="text-center py-3 px-2 text-white/70 font-medium text-sm">7d Chart</th>
-                    <th className="text-center py-3 px-2 text-white/70 font-medium text-sm">Watch</th>
+                    <th className="text-left py-3 px-3 text-white/70 font-medium text-sm w-16">Rank</th>
+                    <th className="text-left py-3 px-3 text-white/70 font-medium text-sm min-w-[200px]">Name</th>
+                    <th className="text-right py-3 px-3 text-white/70 font-medium text-sm w-24">Price</th>
+                    <th className="text-right py-3 px-3 text-white/70 font-medium text-sm w-28">24h Change</th>
+                    <th className="text-right py-3 px-3 text-white/70 font-medium text-sm w-32">Market Cap</th>
+                    <th className="text-right py-3 px-3 text-white/70 font-medium text-sm w-28">Volume</th>
+                    <th className="text-center py-3 px-3 text-white/70 font-medium text-sm w-20">7d Chart</th>
+                    <th className="text-center py-3 px-3 text-white/70 font-medium text-sm w-16">Watch</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -330,76 +343,92 @@ export default function MarketPage() {
                         key={crypto.id} 
                         className="border-b border-white/5 hover:bg-white/5 transition-colors"
                       >
-                        <td className="py-4 px-2">
+                        <td className="py-4 px-3 align-middle">
                           <span className="text-white/60 text-sm font-medium">
                             #{crypto.market_cap_rank || index + 1}
                           </span>
                         </td>
-                        
-                        <td className="py-4 px-2">
+
+                        <td className="py-4 px-3 align-middle">
                           <div className="flex items-center gap-3">
-                            <Image
-                              src={crypto.image}
-                              alt={crypto.name}
-                              width={32}
-                              height={32}
-                              className="w-8 h-8 rounded-full"
-                            />
-                            <div>
-                              <p className="text-white font-semibold">{crypto.name}</p>
+                            <div className="relative w-8 h-8 flex-shrink-0">
+                              <Image
+                                src={crypto.image}
+                                alt={crypto.name}
+                                width={32}
+                                height={32}
+                                className="w-8 h-8 rounded-full"
+                                onError={(e) => {
+                                  const target = e.currentTarget;
+                                  target.style.display = 'none';
+                                  const placeholder = target.nextElementSibling as HTMLElement;
+                                  if (placeholder) placeholder.style.display = 'flex';
+                                }}
+                              />
+                              <div
+                                className="absolute inset-0 bg-[#33E1DA]/20 rounded-full flex items-center justify-center"
+                                style={{ display: 'none' }}
+                              >
+                                <span className="text-[#33E1DA] text-sm font-bold">
+                                  {crypto.symbol.charAt(0).toUpperCase()}
+                                </span>
+                              </div>
+                            </div>
+                            <div className="min-w-0">
+                              <p className="text-white font-semibold truncate">{crypto.name}</p>
                               <p className="text-white/60 text-sm">{crypto.symbol.toUpperCase()}</p>
                             </div>
                           </div>
                         </td>
                         
-                        <td className="py-4 px-2 text-right">
-                          <p className="text-white font-bold">{formatPrice(crypto.current_price)}</p>
+                        <td className="py-4 px-3 text-right align-middle">
+                          <p className="text-white font-bold whitespace-nowrap">{formatPrice(crypto.current_price)}</p>
                         </td>
-                        
-                        <td className="py-4 px-2 text-right">
+
+                        <td className="py-4 px-3 text-right align-middle">
                           <div className="flex items-center justify-end gap-1">
                             {isPositive ? (
-                              <TrendingUp className="w-4 h-4 text-green-400" />
+                              <TrendingUp className="w-4 h-4 text-green-400 flex-shrink-0" />
                             ) : (
-                              <TrendingDown className="w-4 h-4 text-red-400" />
+                              <TrendingDown className="w-4 h-4 text-red-400 flex-shrink-0" />
                             )}
                             <span className={cn(
-                              "font-semibold",
+                              "font-semibold whitespace-nowrap",
                               isPositive ? "text-green-400" : "text-red-400"
                             )}>
                               {formatPercentage(crypto.price_change_percentage_24h || 0)}
                             </span>
                           </div>
-                          <p className="text-white/60 text-sm">
+                          <p className="text-white/60 text-sm whitespace-nowrap">
                             {isPositive ? '+' : ''}{formatPrice(Math.abs(crypto.price_change_24h || 0))}
                           </p>
                         </td>
-                        
-                        <td className="py-4 px-2 text-right">
-                          <p className="text-white font-medium">{formatMarketCap(crypto.market_cap)}</p>
+
+                        <td className="py-4 px-3 text-right align-middle">
+                          <p className="text-white font-medium whitespace-nowrap">{formatMarketCap(crypto.market_cap)}</p>
                         </td>
-                        
-                        <td className="py-4 px-2 text-right">
-                          <p className="text-white/70">{formatVolume(crypto.volume_24h)}</p>
+
+                        <td className="py-4 px-3 text-right align-middle">
+                          <p className="text-white/70 whitespace-nowrap">{formatVolume(crypto.volume_24h)}</p>
                         </td>
-                        
-                        <td className="py-4 px-2 text-center">
+
+                        <td className="py-4 px-3 text-center align-middle">
                           {crypto.sparkline_in_7d && (
                             <div className="flex justify-center">
-                              <MiniSparkline 
-                                data={crypto.sparkline_in_7d.price} 
+                              <MiniSparkline
+                                data={crypto.sparkline_in_7d.price}
                                 isPositive={isPositive}
                               />
                             </div>
                           )}
                         </td>
-                        
-                        <td className="py-4 px-2 text-center">
+
+                        <td className="py-4 px-3 text-center align-middle">
                           <Button
                             variant="ghost"
                             size="sm"
                             onClick={() => toggleFavorite(crypto.id)}
-                            className="p-1 h-8 w-8"
+                            className="p-1 h-8 w-8 hover:bg-white/10"
                           >
                             {isFavorite ? (
                               <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />

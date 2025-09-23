@@ -81,7 +81,7 @@ export function useMarketData() {
     } catch (err: any) {
       if (err.name !== 'AbortError') {
         setError(err instanceof Error ? err.message : 'Failed to fetch market data');
-        console.error('Error fetching market data:', err);
+        // Removed console.error to reduce console noise
       }
     } finally {
       setLoading(false);
