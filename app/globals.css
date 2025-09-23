@@ -108,7 +108,7 @@
     @apply border-gray-200;
   }
   body {
-    @apply bg-[#0a0f1f] text-[#eaf2ff] font-sans;
+    @apply bg-[var(--color-background)] text-[var(--color-foreground)] font-sans;
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
   }
   

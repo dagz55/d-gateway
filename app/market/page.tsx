@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -24,16 +24,55 @@ import { cn } from '@/lib/utils';
 import { useMarketData, formatPrice, formatMarketCap, formatVolume, formatPercentage } from '@/hooks/useLegacyMarketData';
 import { useUser } from '@clerk/nextjs';
 import AppLayout from '@/components/layout/AppLayout';
+import { supabase } from '@/lib/supabase/browserClient';
+import { useUser } from '@clerk/nextjs';
 
 export default function MarketPage() {
-  const { isSignedIn } = useUser();
+  const { isSignedIn, user } = useUser();
   const { cryptoData, marketStats, loading, error, lastUpdated, refetch } = useMarketData();
   const [searchTerm, setSearchTerm] = useState('');
-  const [favorites, setFavorites] = useState<string[]>(['bitcoin', 'ethereum', 'binancecoin']);
+  const [favorites, setFavorites] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState<'market_cap' | 'price_change_percentage_24h' | 'volume_24h'>('market_cap');
 
-  // Filter and sort data
-  const filteredData = cryptoData
+  // Load favorites from Supabase
+  useEffect(() => {
+    const loadFavorites = async () => {
+      if (!user) return;
+      try {
+        const client = supabase();
+        const { data, error } = await client
+          .from('watchlist')
+          .select('symbol')
+          .eq('user_id', user.id);
+
+        if (error) {
+          console.error('Error fetching favorites:', error.message);
+          return;
+        }
+        if (data) {
+          setFavorites(data.map((d: any) => d.symbol));
+        }
+      } catch (e) {
+        console.error('Failed to load favorites', e);
+      }
+    };
+    loadFavorites();
+  }, [user]);
+
+  // Persist favorites change to Supabase
+  const updateFavorite = async (cryptoId: string, add: boolean) => {
+    if (!user) return;
+    const client = supabase();
+    try {
+      if (add) {
+        await client.from('watchlist').insert({ user_id: user.id, symbol: cryptoId });
+      } else {
+        await client.from('watchlist').delete().eq('user_id', user.id).eq('symbol', cryptoId);
+      }
+    } catch (e) {
+      console.error('Failed to update favorite:', e);
+    }
+  };
     .filter(crypto => 
       crypto.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       crypto.symbol.toLowerCase().includes(searchTerm.toLowerCase())
@@ -50,11 +89,12 @@ export default function MarketPage() {
     });
 
   const toggleFavorite = (cryptoId: string) => {
-    setFavorites(prev => 
-      prev.includes(cryptoId) 
-        ? prev.filter(id => id !== cryptoId)
-        : [...prev, cryptoId]
-    );
+    setFavorites(prev => {
+      const add = !prev.includes(cryptoId);
+      const updated = add ? [...prev, cryptoId] : prev.filter(id => id !== cryptoId);
+      updateFavorite(cryptoId, add);
+      return updated;
+    });
   };
 
   // Mini sparkline component

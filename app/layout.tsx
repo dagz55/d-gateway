@@ -25,7 +25,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" data-scroll-behavior="smooth" className="bg-[#0a0f1f] text-[#eaf2ff]">
+    <html lang="en" data-scroll-behavior="smooth" className="bg-background text-foreground">
       <head>
         {/* Resource hints for better performance */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
