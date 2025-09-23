@@ -30,6 +30,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Improved page load performance by reducing unnecessary preloads
 
 - **🔧 Build Errors**: Fixed React Client Component issues
+
   - Added `'use client'` directive to `app/signin/page.tsx`
   - Added `'use client'` directive to `app/signup/page.tsx`
   - Removed duplicate redirect code causing build conflicts

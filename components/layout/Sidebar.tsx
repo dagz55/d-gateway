@@ -33,7 +33,7 @@ import { useNavigationLoading } from '@/hooks/useNavigationLoading';
 type NavItem = {
   name: string;
   href: string;
-  icon: React.ElementType;
+  icon: React.ComponentType<{ className?: string }>;
   isAdmin?: boolean;
 };
 
@@ -92,7 +92,7 @@ export default function Sidebar({ className }: SidebarProps) {
   const { user } = useUser();
   const { navigateWithLoading } = useNavigationLoading();
   
-  const { isAdmin } = checkAdminStatus(user);
+  const { isAdmin } = checkAdminStatus(user || null);
 
   // Close mobile menu when screen size changes to desktop
   useEffect(() => {
@@ -282,11 +282,9 @@ export default function Sidebar({ className }: SidebarProps) {
                     )}
                   >
                     <Icon className={cn(
-                      "h-5 w-5 transition-transform duration-200", // Slightly larger icons
-                      isActiveLink && "scale-110",
-                      // Desktop text spacing
-                      !isCollapsed && "md:mr-3",
-                      // Mobile never has text spacing since always icon-only
+                      "h-5 w-5 transition-transform duration-200",
+                      isActiveLink ? "scale-110" : "",
+                      !isCollapsed ? "md:mr-3" : ""
                     )} />
                     {/* Desktop text - only show when not collapsed */}
                     {!isCollapsed && (

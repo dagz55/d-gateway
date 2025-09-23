@@ -1,8 +1,4 @@
-import { redirect } from 'next/navigation';
-
-export default function Page() {
-  redirect('/sign-in');
-}
+'use client';
 
 import Image from 'next/image';
 import { useState } from 'react';
