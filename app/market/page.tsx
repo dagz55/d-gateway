@@ -25,7 +25,7 @@ import { useMarketData, formatPrice, formatMarketCap, formatVolume, formatPercen
 import { useUser } from '@clerk/nextjs';
 import AppLayout from '@/components/layout/AppLayout';
 import { supabase } from '@/lib/supabase/browserClient';
-import { useUser } from '@clerk/nextjs';
+import { toast } from '@/components/ui/use-toast';
 
 export default function MarketPage() {
   const { isSignedIn, user } = useUser();
@@ -37,7 +37,14 @@ export default function MarketPage() {
   // Load favorites from Supabase
   useEffect(() => {
     const loadFavorites = async () => {
-      if (!user) return;
+      if (!user) {
+        setFavorites([]);
+        toast({
+          title: "Sign in required",
+          description: "Sign in to save and view your favorites.",
+        });
+        return;
+      }
       try {
         const client = supabase();
         const { data, error } = await client
@@ -65,12 +72,31 @@ export default function MarketPage() {
     const client = supabase();
     try {
       if (add) {
-        await client.from('watchlist').insert({ user_id: user.id, symbol: cryptoId });
+        const { error } = await client.from('watchlist').insert({ user_id: user.id, symbol: cryptoId });
+        if (error) throw error;
       } else {
-        await client.from('watchlist').delete().eq('user_id', user.id).eq('symbol', cryptoId);
+        const { error } = await client
+          .from('watchlist')
+          .delete()
+          .eq('user_id', user.id)
+          .eq('symbol', cryptoId);
+        if (error) throw error;
       }
-    } catch (e) {
+    } catch (e: any) {
       console.error('Failed to update favorite:', e);
+      toast({
+        title: "Error",
+        description: "Failed to update favorites. Please try again.",
+        variant: "destructive",
+      });
+      setFavorites(prev => {
+        // revert optimistic update
+        if (add) {
+          return prev.filter(id => id !== cryptoId);
+        } else {
+          return [...prev, cryptoId];
+        }
+      });
     }
   };
     .filter(crypto => 
@@ -271,6 +297,13 @@ export default function MarketPage() {
       </div>
 
       {/* Favorites Section */}
+      {!isSignedIn && (
+        <Card className="bg-yellow-500/10 border-yellow-500/20 mb-6">
+          <CardContent className="p-4 text-yellow-400 text-sm">
+            Sign in to save favorites
+          </CardContent>
+        </Card>
+      )}
       {favorites.length > 0 && (
         <Card className="bg-white/5 border-white/10 mb-6">
           <CardHeader>
@@ -469,6 +502,7 @@ export default function MarketPage() {
                             size="sm"
                             onClick={() => toggleFavorite(crypto.id)}
                             className="p-1 h-8 w-8 hover:bg-white/10"
+                            disabled={!isSignedIn}
                           >
                             {isFavorite ? (
                               <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
