@@ -125,3 +125,6 @@ reports/
 .env.example
 .kilocodemodes
 qa/
+
+# Kilocode configuration files
+.kilocode/

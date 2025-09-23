@@ -42,6 +42,16 @@
         "--browser=chromium",
         "--headless=true",
         "--viewport-size=1280x720"
+      ],
+      "disabled": true,
+      "alwaysAllow": []
+    },
+    "codegen": {
+      "command": "uvx",
+      "args": [
+        "--from",
+        "git+https://github.com/codegen-sh/codegen-sdk.git#egg=codegen-mcp-server&subdirectory=codegen-examples/examples/codegen-mcp-server",
+        "codegen-mcp-server"
       ]
     }
   }

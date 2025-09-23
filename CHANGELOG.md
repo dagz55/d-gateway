@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.11.13] - 2025-09-23
+
+### Improved
+- **🧹 Sidebar Refactor & Navigation Enhancements**
+  - Extracted navigation array into `BASE_NAVIGATION` constant for clarity
+  - Defined `ADMIN_NAVIGATION` constant for admin-only items
+  - Added `isActive` utility for reliable active state detection across routes and tabs
+  - Simplified className composition for active/hover states
+  - Enhanced responsive behavior for collapsed vs expanded sidebar
+  - Updated tooltip logic: now only shown when sidebar is collapsed, hidden on mobile
+  - Reorganized imports into logical groups (UI, hooks, icons, utils, context)
+  - Leveraged React `useMemo` and `useCallback` to optimize performance
+  - Verified correct rendering and behavior across desktop/mobile and admin/non-admin users
+
 ## [2.11.12] - 2025-01-27
 
 ### Fixed
