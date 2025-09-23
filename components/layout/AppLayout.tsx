@@ -8,7 +8,6 @@ import { cn } from '@/lib/utils';
 
 interface AppLayoutProps {
   children: ReactNode;
-  userId?: string;
 }
 
 function AppLayoutContent({ children }: { children: ReactNode }) {
@@ -38,7 +37,7 @@ function AppLayoutContent({ children }: { children: ReactNode }) {
   );
 }
 
-export default function AppLayout({ children, userId }: AppLayoutProps) {
+export default function AppLayout({ children }: AppLayoutProps) {
   return (
     <SidebarProvider>
       <AppLayoutContent>{children}</AppLayoutContent>

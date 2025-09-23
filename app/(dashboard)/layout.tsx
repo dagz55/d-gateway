@@ -15,6 +15,5 @@ export default async function DashboardLayout({
     redirect('/sign-in');
   }
 
-  // Pass userId to avoid duplicate auth calls in child components
-  return <AppLayout userId={userId}>{children}</AppLayout>;
+  return <AppLayout>{children}</AppLayout>;
 }
