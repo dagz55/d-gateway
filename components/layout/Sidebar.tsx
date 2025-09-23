@@ -24,11 +24,11 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import ProfileSection from './ProfileSection';
 import { useUser } from '@clerk/nextjs';
-import { checkAdminStatus } from '@/lib/admin-utils';
 import { useNavigationLoading } from '@/hooks/useNavigationLoading';
+import { useSidebar } from '@/contexts/SidebarContext';
 
 type NavItem = {
   name: string;
@@ -85,31 +85,16 @@ interface SidebarProps {
 }
 
 export default function Sidebar({ className }: SidebarProps) {
-  const [isOpen, setIsOpen] = useState(false);
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const { isCollapsed, setIsCollapsed, isMobileOpen, setIsMobileOpen } = useSidebar();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const { user } = useUser();
   const { navigateWithLoading } = useNavigationLoading();
   
-  const { isAdmin } = checkAdminStatus(user || null);
+  // Check if user is admin using client-side user object
+  const isAdmin = user?.publicMetadata?.isAdmin === true || user?.publicMetadata?.role === 'admin';
 
-  // Close mobile menu when screen size changes to desktop
-  useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth >= 768) { // md breakpoint
-        setIsOpen(false);
-      }
-    };
 
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
-  // Close mobile menu when route changes
-  useEffect(() => {
-    setIsOpen(false);
-  }, [pathname]);
 
   // Add admin navigation if user is admin
   const adminNavigation = isAdmin ? [
@@ -157,38 +142,18 @@ export default function Sidebar({ className }: SidebarProps) {
 
   return (
     <>
-      {/* Mobile menu button - Only show when sidebar is closed */}
-      {!isOpen && (
-        <Button
-          variant="ghost"
-          size="sm"
-          className="md:hidden fixed top-4 left-4 z-50 bg-background/80 backdrop-blur-sm border border-border/50 hover:bg-accent/20"
-          onClick={() => setIsOpen(true)}
-        >
-          <Menu className="h-5 w-5" />
-        </Button>
-      )}
 
-      {/* Mobile overlay */}
-      {isOpen && (
-        <div
-          className="fixed inset-0 bg-black/50 z-40 md:hidden max-md:top-16"
-          onClick={() => setIsOpen(false)}
-        />
-      )}
 
       {/* Sidebar */}
       <div
         className={cn(
-          'fixed left-0 z-40 glass border-r border-border transform transition-all duration-300 ease-in-out md:translate-x-0',
-          'top-0 h-full md:top-0 md:h-full', // Desktop: full height from top
-          'max-md:top-16 max-md:h-[calc(100vh-4rem)]', // Mobile: start below header (64px/4rem)
-          // Desktop width behavior
-          'md:w-64', // Desktop expanded
-          isCollapsed && 'md:w-16', // Desktop collapsed
-          // Mobile width behavior - always compact/narrow
-          'max-md:w-16', // Mobile always narrow like collapsed state
-          isOpen ? 'translate-x-0' : '-translate-x-full',
+          'fixed left-0 z-40 glass border-r border-border transform transition-all duration-300 ease-in-out',
+          'top-0 h-full',
+          // Desktop behavior
+          'md:w-64 md:translate-x-0',
+          isCollapsed && 'md:w-16',
+          // Mobile behavior - always visible but compact
+          'max-md:w-16 max-md:translate-x-0',
           className
         )}
       >
@@ -225,18 +190,6 @@ export default function Sidebar({ className }: SidebarProps) {
               )}
             </div>
 
-            {/* Mobile buttons - only close button since mobile is always compact */}
-            <div className="md:hidden absolute top-2 right-2">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="p-1 h-6 w-6 hover:bg-accent/20"
-                onClick={() => setIsOpen(false)}
-                title="Close sidebar"
-              >
-                <X className="h-3 w-3" />
-              </Button>
-            </div>
           </div>
 
           {/* Expand button when collapsed - Desktop only */}
@@ -265,7 +218,6 @@ export default function Sidebar({ className }: SidebarProps) {
                   <button
                     key={item.name}
                     onClick={async () => {
-                      setIsOpen(false);
                       await navigateWithLoading(item.href, `Loading ${item.name}...`);
                     }}
                     className={cn(
@@ -311,7 +263,7 @@ export default function Sidebar({ className }: SidebarProps) {
           {/* Enhanced Profile Section */}
           <ProfileSection 
             isCollapsed={isCollapsed} 
-            onNavigate={() => setIsOpen(false)} 
+            onNavigate={() => {}} 
           />
         </div>
       </div>

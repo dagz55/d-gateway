@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.11.12] - 2025-01-27
+
+### Fixed
+- **📱 Mobile Layout Overlapping**: Fixed mobile sidebar overlapping main content
+  - Sidebar now always visible on mobile in compact mode (64px wide)
+  - Main content properly indented with 64px left margin to prevent overlap
+  - Removed mobile overlay and menu button complexity
+  - Simplified mobile navigation - sidebar icons always accessible
+  - Improved mobile responsive grid layouts for admin components
+  - Enhanced mobile user experience with consistent sidebar access
+
+### Improved
+- **🎨 Admin Panel Mobile Responsiveness**: Enhanced mobile layout for admin components
+  - Admin stats cards now stack properly on mobile (1 column → 2 columns → 4 columns)
+  - Member stats grid improved for mobile devices
+  - Quick actions layout optimized for mobile screens
+  - Better mobile spacing and padding throughout admin interface
+
 ## [2.11.11] - 2025-01-27
 
 ### Fixed

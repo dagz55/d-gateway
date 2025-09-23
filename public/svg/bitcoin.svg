@@ -1,0 +1,10 @@
+<svg width="204" height="204" viewBox="0 0 204 204" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="btBadge" x1="0" y1="0" x2="204" y2="204" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#4F46E5"/>
+      <stop offset="1" stop-color="#22D3EE"/>
+    </linearGradient>
+  </defs>
+  <circle cx="102" cy="102" r="90" fill="url(#btBadge)"/>
+  <text x="102" y="122" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif" font-size="84" font-weight="700" fill="#FFFFFF">BT</text>
+</svg>

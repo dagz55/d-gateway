@@ -1,4 +1,4 @@
-import { User } from '@clerk/nextjs';
+import { User } from '@clerk/nextjs/server';
 
 /**
  * Type-safe utility functions for admin-related operations

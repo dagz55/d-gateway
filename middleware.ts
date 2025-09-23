@@ -5,6 +5,9 @@ const publicRoutes = [
   "/",
   "/sign-in(.*)",
   "/sign-up(.*)",
+  // Legacy aliases that we redirect to the canonical routes
+  "/signin(.*)",
+  "/signup(.*)",
   "/admin-setup",
   "/api/webhooks(.*)",
   "/market",

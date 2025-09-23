@@ -4,7 +4,23 @@ Zignal is a comprehensive crypto trading platform built with [Next.js 15.5.3](ht
 
 ## 🚀 Features
 
-### Latest Improvements (v2.11.11)
+### Latest Improvements (v2.11.12)
+
+- 📱 **Mobile Layout Overlapping Fixed**: Resolved mobile sidebar overlapping main content
+  - Sidebar now always visible on mobile in compact mode (64px wide)
+  - Main content properly indented with 64px left margin to prevent overlap
+  - Removed mobile overlay and menu button complexity
+  - Simplified mobile navigation - sidebar icons always accessible
+  - Improved mobile responsive grid layouts for admin components
+  - Enhanced mobile user experience with consistent sidebar access
+
+- 🎨 **Admin Panel Mobile Responsiveness Enhanced**: Improved mobile layout for admin components
+  - Admin stats cards now stack properly on mobile (1 column → 2 columns → 4 columns)
+  - Member stats grid improved for mobile devices
+  - Quick actions layout optimized for mobile screens
+  - Better mobile spacing and padding throughout admin interface
+
+### Previous Improvements (v2.11.11)
 - 🔧 **Clerk Deprecated Props Fixed**: Updated deprecated Clerk authentication props
   - Replaced `afterSignInUrl` with `fallbackRedirectUrl` in SignIn component
   - Replaced `afterSignUpUrl` with `fallbackRedirectUrl` in SignUp component

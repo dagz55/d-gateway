@@ -47,7 +47,7 @@ export default async function AdminMemberStats() {
     : 0;
 
   return (
-    <div className="grid gap-6 lg:grid-cols-5 md:grid-cols-3 grid-cols-2">
+    <div className="grid gap-4 md:gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
       
       {/* Total Members */}
       <Card className="glass glass-hover card-glow-hover border-border/50">
