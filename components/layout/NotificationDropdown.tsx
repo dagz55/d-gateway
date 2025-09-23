@@ -182,25 +182,51 @@ export default function NotificationDropdown() {
   useEffect(() => {
     if (!user) return;
 
-    const channel = supabase
-      .channel('notifications_realtime')
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'notifications',
-          filter: `user_id=eq.${user.id}`,
-        },
-        (payload) => {
-          const newNotification = payload.new as Notification;
-          setNotifications(prev => [newNotification, ...prev]);
-        }
-      )
-      .subscribe();
+    let channel: any = null;
+
+    try {
+      channel = supabase
+        .channel('notifications_realtime', {
+          config: {
+            presence: {
+              key: user.id,
+            },
+          },
+        })
+        .on(
+          'postgres_changes',
+          {
+            event: 'INSERT',
+            schema: 'public',
+            table: 'notifications',
+            filter: `user_id=eq.${user.id}`,
+          },
+          (payload) => {
+            const newNotification = payload.new as Notification;
+            setNotifications(prev => [newNotification, ...prev]);
+          }
+        )
+        .subscribe((status) => {
+          if (status === 'SUBSCRIBED') {
+            console.log('Notifications realtime subscription active');
+          } else if (status === 'CHANNEL_ERROR') {
+            console.warn('Notifications realtime subscription error');
+          } else if (status === 'TIMED_OUT') {
+            console.warn('Notifications realtime subscription timed out');
+          }
+        });
+    } catch (error) {
+      console.warn('Failed to set up notifications realtime subscription:', error);
+    }
 
     return () => {
-      supabase.removeChannel(channel);
+      if (channel) {
+        try {
+          supabase.removeChannel(channel);
+        } catch (error) {
+          console.warn('Error removing notifications channel:', error);
+        }
+      }
     };
   }, [user, supabase]);
 
