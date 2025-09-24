@@ -45,7 +45,7 @@ const BASE_NAVIGATION: NavItem[] = [
   },
   {
     name: 'Market',
-    href: '/market',
+    href: '/dashboard/market',
     icon: TrendingUp,
   },
   {
@@ -131,7 +131,7 @@ export default function Sidebar({ className }: SidebarProps) {
         return pathname === "/dashboard" && !searchParams.get("tab");
       }
 
-      const exactPaths = ["/settings", "/admin", "/market", "/wallet", "/deployment"];
+      const exactPaths = ["/settings", "/admin", "/dashboard/market", "/wallet", "/deployment"];
       if (exactPaths.includes(href)) {
         return pathname === href;
       }

@@ -1,14 +1,11 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Link from 'next/link';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import Logo from '@/components/ui/Logo';
 import {
   TrendingUp,
   TrendingDown,
@@ -27,18 +24,10 @@ import { useUser } from '@clerk/nextjs';
 import { supabase } from '@/lib/supabase/browserClient';
 import { toast } from 'sonner';
 
-export default function MarketPage() {
-  const router = useRouter();
+export default function MarketDashboardPage() {
   const { isSignedIn, user } = useUser();
   const { cryptoData, marketStats, loading, error, lastUpdated, refetch } = useMarketData();
   const [searchTerm, setSearchTerm] = useState('');
-
-  // If signed in, redirect to the authenticated dashboard market
-  useEffect(() => {
-    if (isSignedIn) {
-      router.replace('/dashboard/market');
-    }
-  }, [isSignedIn, router]);
   const [favorites, setFavorites] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState<'market_cap' | 'price_change_percentage_24h' | 'volume_24h'>('market_cap');
 
@@ -47,13 +36,6 @@ export default function MarketPage() {
     const loadFavorites = async () => {
       if (!user) {
         setFavorites([]);
-        if (typeof window !== "undefined" && !sessionStorage.getItem("marketSignInToastShown")) {
-          toast({
-            title: "Sign in required",
-            description: "Sign in to save and view your favorites.",
-          });
-          sessionStorage.setItem("marketSignInToastShown", "true");
-        }
         return;
       }
       try {
@@ -96,9 +78,9 @@ export default function MarketPage() {
     } catch (e: any) {
       console.error('Failed to update favorite:', e);
       toast({
-        title: "Error",
-        description: "Failed to update favorites. Please try again.",
-        variant: "destructive",
+        title: 'Error',
+        description: 'Failed to update favorites. Please try again.',
+        variant: 'destructive',
       });
       setFavorites(prev => {
         // revert optimistic update
@@ -154,7 +136,7 @@ export default function MarketPage() {
             y1="10"
             x2="60"
             y2="10"
-            stroke={isPositive ? "#10b981" : "#ef4444"}
+            stroke={isPositive ? '#10b981' : '#ef4444'}
             strokeWidth="1.5"
             vectorEffect="non-scaling-stroke"
           />
@@ -172,7 +154,7 @@ export default function MarketPage() {
       <svg width="60" height="20" className="overflow-visible">
         <polyline
           fill="none"
-          stroke={isPositive ? "#10b981" : "#ef4444"}
+          stroke={isPositive ? '#10b981' : '#ef4444'}
           strokeWidth="1.5"
           points={points}
           vectorEffect="non-scaling-stroke"
@@ -181,8 +163,8 @@ export default function MarketPage() {
     );
   };
 
-  const MarketContent = () => (
-    <>
+  return (
+    <div className="p-6">
       {/* Page Header */}
       <div className="flex items-center justify-between mb-8">
         <div>
@@ -197,7 +179,7 @@ export default function MarketPage() {
             disabled={loading}
             className="bg-[#33E1DA] hover:bg-[#33E1DA]/80 text-black"
           >
-            <RefreshCw className={cn("w-4 h-4 mr-2", loading && "animate-spin")} />
+            <RefreshCw className={cn('w-4 h-4 mr-2', loading && 'animate-spin')} />
             Refresh
           </Button>
         </div>
@@ -311,13 +293,6 @@ export default function MarketPage() {
       </div>
 
       {/* Favorites Section */}
-      {!isSignedIn && (
-        <Card className="bg-yellow-500/10 border-yellow-500/20 mb-6">
-          <CardContent className="p-4 text-yellow-400 text-sm">
-            Sign in to save favorites
-          </CardContent>
-        </Card>
-      )}
       {favorites.length > 0 && (
         <Card className="bg-white/5 border-white/10 mb-6">
           <CardHeader>
@@ -345,7 +320,7 @@ export default function MarketPage() {
                               height={24}
                               className="w-6 h-6 rounded-full"
                               onError={(e) => {
-                                const target = e.currentTarget;
+                                const target = e.currentTarget as HTMLImageElement;
                                 target.style.display = 'none';
                                 const placeholder = target.nextElementSibling as HTMLElement;
                                 if (placeholder) placeholder.style.display = 'flex';
@@ -365,8 +340,8 @@ export default function MarketPage() {
                         <div className="text-right">
                           <p className="text-white font-bold">{formatPrice(crypto.current_price)}</p>
                           <p className={cn(
-                            "text-sm font-medium",
-                            isPositive ? "text-green-400" : "text-red-400"
+                            'text-sm font-medium',
+                            isPositive ? 'text-green-400' : 'text-red-400'
                           )}>
                             {formatPercentage(crypto.price_change_percentage_24h || 0)}
                           </p>
@@ -446,7 +421,7 @@ export default function MarketPage() {
                                 height={32}
                                 className="w-8 h-8 rounded-full"
                                 onError={(e) => {
-                                  const target = e.currentTarget;
+                                  const target = e.currentTarget as HTMLImageElement;
                                   target.style.display = 'none';
                                   const placeholder = target.nextElementSibling as HTMLElement;
                                   if (placeholder) placeholder.style.display = 'flex';
@@ -480,8 +455,8 @@ export default function MarketPage() {
                               <TrendingDown className="w-4 h-4 text-red-400 flex-shrink-0" />
                             )}
                             <span className={cn(
-                              "font-semibold whitespace-nowrap",
-                              isPositive ? "text-green-400" : "text-red-400"
+                              'font-semibold whitespace-nowrap',
+                              isPositive ? 'text-green-400' : 'text-red-400'
                             )}>
                               {formatPercentage(crypto.price_change_percentage_24h || 0)}
                             </span>
@@ -516,7 +491,6 @@ export default function MarketPage() {
                             size="sm"
                             onClick={() => toggleFavorite(crypto.id)}
                             className="p-1 h-8 w-8 hover:bg-white/10"
-                            disabled={!isSignedIn}
                           >
                             {isFavorite ? (
                               <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
@@ -541,59 +515,6 @@ export default function MarketPage() {
         <p className="mt-1">
           Showing {filteredData.length} of {cryptoData.length} cryptocurrencies
         </p>
-      </div>
-    </>
-  );
-
-  // If signed in, we immediately redirect above; avoid double render here
-  if (isSignedIn) {
-    return null;
-  }
-
-  // Public view with standalone header
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0A0F1F] via-[#1A1F35] to-[#0A0F1F]">
-      {/* Navigation Header */}
-      <nav className="relative z-20 bg-black/20 backdrop-blur-sm border-b border-white/10">
-        <div className="max-w-7xl mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            {/* Logo */}
-            <div className="flex items-center">
-              <Logo size="lg" textClassName="gradient-text font-semibold" enableAnimations={true} />
-            </div>
-
-            {/* Navigation Links */}
-            <div className="hidden md:flex items-center space-x-8">
-              <Link href="/" className="text-gray-300 hover:text-white transition-colors">Home</Link>
-              <Link href="/market" className="text-white font-medium">Market</Link>
-              <a href="#features" className="text-gray-300 hover:text-white transition-colors">Features</a>
-              <a href="#about" className="text-gray-300 hover:text-white transition-colors">About</a>
-            </div>
-
-            {/* Auth Buttons */}
-            <div className="flex items-center space-x-4">
-              <Link
-                href="/sign-in"
-                className="text-gray-300 hover:text-white font-medium transition-colors"
-              >
-                Sign In
-              </Link>
-              <Link
-                href="/sign-up"
-                className="bg-gradient-to-r from-[#0577DA] to-[#1199FA] hover:from-[#0466c4] hover:to-[#0e8ae6] text-white font-semibold px-6 py-2 rounded-lg transition-all duration-300"
-              >
-                Get Started
-              </Link>
-            </div>
-          </div>
-        </div>
-      </nav>
-
-      {/* Main Content */}
-      <div className="p-6">
-        <div className="max-w-7xl mx-auto">
-          <MarketContent />
-        </div>
       </div>
     </div>
   );
