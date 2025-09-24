@@ -25,7 +25,7 @@ import { useMarketData, formatPrice, formatMarketCap, formatVolume, formatPercen
 import { useUser } from '@clerk/nextjs';
 import AppLayout from '@/components/layout/AppLayout';
 import { supabase } from '@/lib/supabase/browserClient';
-import { toast } from '@/components/ui/use-toast';
+import { toast } from 'sonner';
 
 export default function MarketPage() {
   const { isSignedIn, user } = useUser();
@@ -102,6 +102,9 @@ export default function MarketPage() {
       });
     }
   };
+
+  // Filter and sort crypto data
+  const filteredData = cryptoData
     .filter(crypto => 
       crypto.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       crypto.symbol.toLowerCase().includes(searchTerm.toLowerCase())
