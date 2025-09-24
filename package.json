@@ -34,7 +34,9 @@
   },
   "dependencies": {
     "@adyen/adyen-web": "^6.21.0",
+    "@anthropic-ai/claude-code": "^1.0.123",
     "@clerk/backend": "^1.21.0",
+    "@clerk/mcp-tools": "^0.3.1",
     "@clerk/nextjs": "^6.32.2",
     "@clerk/themes": "^2.4.19",
     "@google-pay/button-react": "^3.2.1",

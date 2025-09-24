@@ -6,7 +6,7 @@
  */
 
 import { createClientSupabaseClient } from './client';
-import { createServerSupabaseClient } from './server';
+import { createServerSupabaseClient } from './serverClient';
 
 export interface UserProfileWithClerk {
   id: string;

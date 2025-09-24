@@ -228,7 +228,7 @@ export default function ProfileSection({ isCollapsed = false, onNavigate }: Prof
               </Badge>
             )}
           </div>
-          <p className="text-xs leading-none text-gray-300 dark:text-gray-300 truncate mt-1 font-medium">{email}</p>
+          <p className="text-xs leading-none text-white/80 dark:text-white/80 truncate mt-1 font-medium">{email}</p>
         </div>
       </div>
 
@@ -240,8 +240,8 @@ export default function ProfileSection({ isCollapsed = false, onNavigate }: Prof
               <Crown className="h-3 w-3 text-white" />
             </div>
             <div>
-              <p className="text-xs font-bold text-slate-800 dark:text-white">{subscriptionStatus.planName}</p>
-              <p className="text-xs text-slate-700 dark:text-gray-200 font-semibold">{subscriptionStatus.status}</p>
+              <p className="text-xs font-bold text-slate-900 dark:text-white">{subscriptionStatus.planName}</p>
+              <p className="text-xs text-slate-800 dark:text-white/90 font-semibold">{subscriptionStatus.status}</p>
             </div>
           </div>
           <Badge className={`${subscriptionStatus.isPremium ? 'bg-gradient-to-r from-blue-500 to-purple-600' : 'bg-gradient-to-r from-gray-500 to-gray-600'} text-white border-0 text-xs font-semibold`}>

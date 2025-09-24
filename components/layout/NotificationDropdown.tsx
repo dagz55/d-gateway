@@ -248,14 +248,14 @@ export default function NotificationDropdown() {
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-80 p-0" align="end">
-        <div className="flex items-center justify-between p-4 border-b border-slate-600/50">
+        <div className="flex items-center justify-between p-4 border-b border-slate-500/60">
           <h3 className="font-semibold text-white">Notifications</h3>
           {unreadCount > 0 && (
             <Button
               variant="ghost"
               size="sm"
               onClick={markAllAsRead}
-              className="text-xs text-slate-300 hover:text-white hover:bg-slate-700/50"
+              className="text-xs text-white/90 hover:text-white hover:bg-slate-700/60"
             >
               Mark all read
             </Button>
@@ -269,9 +269,9 @@ export default function NotificationDropdown() {
             </div>
           ) : notifications.length === 0 ? (
             <div className="flex flex-col items-center justify-center p-8 text-center">
-              <Bell className="h-8 w-8 text-slate-400 mb-2" />
-              <p className="text-sm text-slate-300">No notifications yet</p>
-              <p className="text-xs text-slate-400 mt-1">
+              <Bell className="h-8 w-8 text-white/60 mb-2" />
+              <p className="text-sm text-white/90">No notifications yet</p>
+              <p className="text-xs text-white/70 mt-1">
                 You'll see notifications about trades, market updates, and system alerts here
               </p>
             </div>
@@ -296,7 +296,7 @@ export default function NotificationDropdown() {
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between">
                           <p className={`text-sm font-medium truncate ${
-                            !notification.is_read ? 'text-white' : 'text-slate-300'
+                            !notification.is_read ? 'text-white' : 'text-white/90'
                           }`}>
                             {notification.title}
                           </p>
@@ -305,11 +305,11 @@ export default function NotificationDropdown() {
                           )}
                         </div>
                         <p className={`text-xs mt-1 line-clamp-2 ${
-                          !notification.is_read ? 'text-slate-200' : 'text-slate-400'
+                          !notification.is_read ? 'text-white/90' : 'text-white/70'
                         }`}>
                           {notification.message}
                         </p>
-                        <p className="text-xs text-slate-400 mt-2">
+                        <p className="text-xs text-white/60 mt-2">
                           {timeAgo(notification.created_at)}
                         </p>
                       </div>
@@ -329,7 +329,7 @@ export default function NotificationDropdown() {
               <Button
                 variant="ghost"
                 size="sm"
-                className="w-full text-xs text-slate-300 hover:text-white hover:bg-slate-700/50"
+                className="w-full text-xs text-white/90 hover:text-white hover:bg-slate-700/60"
                 onClick={() => {
                   setIsOpen(false);
                   // Could navigate to a full notifications page here

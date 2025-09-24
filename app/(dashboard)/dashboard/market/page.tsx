@@ -169,7 +169,7 @@ export default function MarketDashboardPage() {
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-3xl font-bold text-white mb-2">Cryptocurrency Market</h1>
-          <p className="text-white/70">
+          <p className="text-white/90">
             Live market data • Updated {lastUpdated ? lastUpdated.toLocaleTimeString() : 'Loading...'}
           </p>
         </div>
@@ -188,33 +188,33 @@ export default function MarketDashboardPage() {
       {/* Controls */}
       <div className="flex flex-col sm:flex-row gap-4 mb-6">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white/40 w-4 h-4" />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white/70 w-4 h-4" />
           <Input
             placeholder="Search cryptocurrencies..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10 bg-white/10 border-white/20 text-white placeholder:text-white/50"
+            className="pl-10 bg-white/10 border-white/30 text-white placeholder:text-white/70"
           />
         </div>
         <div className="flex gap-2">
           <Button
             variant={sortBy === 'market_cap' ? 'default' : 'outline'}
             onClick={() => setSortBy('market_cap')}
-            className="text-xs"
+            className="text-xs bg-white/20 border-white/30 text-white hover:bg-white/30"
           >
             Market Cap
           </Button>
           <Button
             variant={sortBy === 'price_change_percentage_24h' ? 'default' : 'outline'}
             onClick={() => setSortBy('price_change_percentage_24h')}
-            className="text-xs"
+            className="text-xs bg-white/20 border-white/30 text-white hover:bg-white/30"
           >
             24h Change
           </Button>
           <Button
             variant={sortBy === 'volume_24h' ? 'default' : 'outline'}
             onClick={() => setSortBy('volume_24h')}
-            className="text-xs"
+            className="text-xs bg-white/20 border-white/30 text-white hover:bg-white/30"
           >
             Volume
           </Button>
@@ -239,7 +239,7 @@ export default function MarketDashboardPage() {
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-white/60 text-sm">Total Market Cap</p>
+                <p className="text-white/80 text-sm">Total Market Cap</p>
                 <p className="text-2xl font-bold text-white">
                   {marketStats ? formatMarketCap(marketStats.totalMarketCap) : '--'}
                 </p>
@@ -253,7 +253,7 @@ export default function MarketDashboardPage() {
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-white/60 text-sm">24h Volume</p>
+                <p className="text-white/80 text-sm">24h Volume</p>
                 <p className="text-2xl font-bold text-white">
                   {marketStats ? formatVolume(marketStats.total24hVolume) : '--'}
                 </p>
@@ -370,7 +370,7 @@ export default function MarketDashboardPage() {
               Live Data
             </Badge>
           </div>
-          <CardDescription className="text-white/60">
+          <CardDescription className="text-white/80">
             Real-time cryptocurrency prices and market data
           </CardDescription>
         </CardHeader>
@@ -378,21 +378,21 @@ export default function MarketDashboardPage() {
           {loading ? (
             <div className="flex items-center justify-center py-12">
               <div className="animate-spin h-8 w-8 border-2 border-[#33E1DA] border-t-transparent rounded-full"></div>
-              <span className="ml-3 text-white/70">Loading market data...</span>
+              <span className="ml-3 text-white/90">Loading market data...</span>
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
                   <tr className="border-b border-white/10">
-                    <th className="text-left py-3 px-3 text-white/70 font-medium text-sm w-16">Rank</th>
-                    <th className="text-left py-3 px-3 text-white/70 font-medium text-sm min-w-[200px]">Name</th>
-                    <th className="text-right py-3 px-3 text-white/70 font-medium text-sm w-24">Price</th>
-                    <th className="text-right py-3 px-3 text-white/70 font-medium text-sm w-28">24h Change</th>
-                    <th className="text-right py-3 px-3 text-white/70 font-medium text-sm w-32">Market Cap</th>
-                    <th className="text-right py-3 px-3 text-white/70 font-medium text-sm w-28">Volume</th>
-                    <th className="text-center py-3 px-3 text-white/70 font-medium text-sm w-20">7d Chart</th>
-                    <th className="text-center py-3 px-3 text-white/70 font-medium text-sm w-16">Watch</th>
+                    <th className="text-left py-3 px-3 text-white/90 font-medium text-sm w-16">Rank</th>
+                    <th className="text-left py-3 px-3 text-white/90 font-medium text-sm min-w-[200px]">Name</th>
+                    <th className="text-right py-3 px-3 text-white/90 font-medium text-sm w-24">Price</th>
+                    <th className="text-right py-3 px-3 text-white/90 font-medium text-sm w-28">24h Change</th>
+                    <th className="text-right py-3 px-3 text-white/90 font-medium text-sm w-32">Market Cap</th>
+                    <th className="text-right py-3 px-3 text-white/90 font-medium text-sm w-28">Volume</th>
+                    <th className="text-center py-3 px-3 text-white/90 font-medium text-sm w-20">7d Chart</th>
+                    <th className="text-center py-3 px-3 text-white/90 font-medium text-sm w-16">Watch</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -406,7 +406,7 @@ export default function MarketDashboardPage() {
                         className="border-b border-white/5 hover:bg-white/5 transition-colors"
                       >
                         <td className="py-4 px-3 align-middle">
-                          <span className="text-white/60 text-sm font-medium">
+                          <span className="text-white/80 text-sm font-medium">
                             #{crypto.market_cap_rank || index + 1}
                           </span>
                         </td>
@@ -438,7 +438,7 @@ export default function MarketDashboardPage() {
                             </div>
                             <div className="min-w-0">
                               <p className="text-white font-semibold truncate">{crypto.name}</p>
-                              <p className="text-white/60 text-sm">{crypto.symbol.toUpperCase()}</p>
+                              <p className="text-white/80 text-sm">{crypto.symbol.toUpperCase()}</p>
                             </div>
                           </div>
                         </td>
@@ -461,7 +461,7 @@ export default function MarketDashboardPage() {
                               {formatPercentage(crypto.price_change_percentage_24h || 0)}
                             </span>
                           </div>
-                          <p className="text-white/60 text-sm whitespace-nowrap">
+                          <p className="text-white/80 text-sm whitespace-nowrap">
                             {isPositive ? '+' : ''}{formatPrice(Math.abs(crypto.price_change_24h || 0))}
                           </p>
                         </td>
@@ -471,7 +471,7 @@ export default function MarketDashboardPage() {
                         </td>
 
                         <td className="py-4 px-3 text-right align-middle">
-                          <p className="text-white/70 whitespace-nowrap">{formatVolume(crypto.volume_24h)}</p>
+                          <p className="text-white/90 whitespace-nowrap">{formatVolume(crypto.volume_24h)}</p>
                         </td>
 
                         <td className="py-4 px-3 text-center align-middle">
@@ -510,7 +510,7 @@ export default function MarketDashboardPage() {
       </Card>
 
       {/* Market Stats Footer */}
-      <div className="mt-6 text-center text-white/60 text-sm">
+      <div className="mt-6 text-center text-white/80 text-sm">
         <p>Data provided by CoinGecko API • Updates every 30 seconds</p>
         <p className="mt-1">
           Showing {filteredData.length} of {cryptoData.length} cryptocurrencies

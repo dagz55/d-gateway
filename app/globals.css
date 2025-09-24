@@ -29,23 +29,23 @@
 
   /* Enhanced theme colors for Zignal dashboard - DARK THEME ONLY */
   --background: #0a0f1f;
-  --foreground: #eaf2ff;
-  --card: rgba(30, 42, 68, 0.4);
-  --card-foreground: #eaf2ff;
-  --popover: rgba(30, 42, 68, 0.9);
-  --popover-foreground: #eaf2ff;
+  --foreground: #ffffff; /* Improved contrast - pure white */
+  --card: rgba(30, 42, 68, 0.6); /* Increased opacity for better contrast */
+  --card-foreground: #ffffff; /* Pure white for better contrast */
+  --popover: rgba(30, 42, 68, 0.95); /* Increased opacity */
+  --popover-foreground: #ffffff; /* Pure white */
   --primary: #1a7fb3;
-  --primary-foreground: #eaf2ff;
-  --secondary: rgba(30, 42, 68, 0.6);
-  --secondary-foreground: #eaf2ff;
-  --muted: rgba(234, 242, 255, 0.1);
-  --muted-foreground: rgba(234, 242, 255, 0.7);
+  --primary-foreground: #ffffff; /* Pure white for better contrast */
+  --secondary: rgba(30, 42, 68, 0.8); /* Increased opacity */
+  --secondary-foreground: #ffffff; /* Pure white */
+  --muted: rgba(255, 255, 255, 0.15); /* Increased opacity */
+  --muted-foreground: rgba(255, 255, 255, 0.85); /* Much better contrast */
   --accent: #33e1da;
   --accent-foreground: #0a0f1f;
   --destructive: #ef4444;
-  --destructive-foreground: #eaf2ff;
-  --border: rgba(51, 225, 218, 0.2);
-  --input: rgba(30, 42, 68, 0.5);
+  --destructive-foreground: #ffffff; /* Pure white */
+  --border: rgba(51, 225, 218, 0.3); /* Increased opacity */
+  --input: rgba(30, 42, 68, 0.7); /* Increased opacity */
   --ring: #33e1da;
   --chart-1: #33e1da;
   --chart-2: #1a7fb3;
@@ -53,13 +53,13 @@
   --chart-4: #f59e0b;
   --chart-5: #ef4444;
   --radius: 12px;
-  --sidebar: rgba(21, 33, 54, 0.8);
-  --sidebar-foreground: #eaf2ff;
+  --sidebar: rgba(21, 33, 54, 0.9); /* Increased opacity */
+  --sidebar-foreground: #ffffff; /* Pure white for better contrast */
   --sidebar-primary: #33e1da;
   --sidebar-primary-foreground: #0a0f1f;
-  --sidebar-accent: rgba(51, 225, 218, 0.1);
-  --sidebar-accent-foreground: #eaf2ff;
-  --sidebar-border: rgba(51, 225, 218, 0.2);
+  --sidebar-accent: rgba(51, 225, 218, 0.2); /* Increased opacity */
+  --sidebar-accent-foreground: #ffffff; /* Pure white */
+  --sidebar-border: rgba(51, 225, 218, 0.3); /* Increased opacity */
   --sidebar-ring: #33e1da;
 }
 

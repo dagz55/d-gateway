@@ -118,7 +118,7 @@ export default function Header({ className }: HeaderProps) {
       <header className={`relative flex h-16 items-center justify-between px-6 glass border-b border-border overflow-hidden ${className}`}>
         {/* Logo Section - Removed redundant logo, keeping only the title */}
         <div className="flex items-center z-10">
-          <h1 className="text-xl font-bold gradient-text hidden sm:block">Zignal Dashboard</h1>
+          <h1 className="text-xl font-bold text-white hidden sm:block">Zignal Dashboard</h1>
         </div>
 
         {/* Animated Banner Section */}

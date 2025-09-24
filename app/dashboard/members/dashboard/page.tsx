@@ -27,7 +27,7 @@ export default async function MemberDashboardPage() {
             <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-foreground mb-2">
               Welcome back, <span className="gradient-text">{firstName}</span>
             </h1>
-            <p className="text-xl text-muted-foreground">
+            <p className="text-xl text-white/90">
               Live <span className="gradient-text font-semibold">signals</span>, portfolio insights, and market alerts
             </p>
           </div>
@@ -44,10 +44,10 @@ export default async function MemberDashboardPage() {
                 />
               ))}
             </div>
-            <div className="text-sm font-mono">
-              <div className="text-accent font-semibold">--</div>
-              <div className="text-muted-foreground">Live Signals</div>
-            </div>
+              <div className="text-sm font-mono">
+                <div className="text-accent font-semibold">--</div>
+                <div className="text-white/80">Live Signals</div>
+              </div>
           </div>
         </div>
       </div>
@@ -64,9 +64,9 @@ export default async function MemberDashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">$0.00</div>
-            <p className="text-xs text-muted-foreground mt-1">Connect your trading account to view portfolio</p>
+            <p className="text-xs text-white/80 mt-1">Connect your trading account to view portfolio</p>
             <div className="h-20 mt-3 flex items-center justify-center">
-              <p className="text-xs text-muted-foreground">No data available</p>
+              <p className="text-xs text-white/70">No data available</p>
             </div>
           </CardContent>
         </Card>
@@ -78,9 +78,9 @@ export default async function MemberDashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">$0.00</div>
-            <p className="text-xs text-muted-foreground mt-1">Start trading to track profits</p>
+            <p className="text-xs text-white/80 mt-1">Start trading to track profits</p>
             <div className="h-20 mt-3 flex items-center justify-center">
-              <p className="text-xs text-muted-foreground">No data available</p>
+              <p className="text-xs text-white/70">No data available</p>
             </div>
           </CardContent>
         </Card>
@@ -92,9 +92,9 @@ export default async function MemberDashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">--</div>
-            <p className="text-xs text-muted-foreground mt-1">No trades completed yet</p>
+            <p className="text-xs text-white/80 mt-1">No trades completed yet</p>
             <div className="h-20 mt-3 flex items-center justify-center">
-              <p className="text-xs text-muted-foreground">No data available</p>
+              <p className="text-xs text-white/70">No data available</p>
             </div>
           </CardContent>
         </Card>
@@ -106,9 +106,9 @@ export default async function MemberDashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">0</div>
-            <p className="text-xs text-muted-foreground mt-1">Subscribe to receive signals</p>
+            <p className="text-xs text-white/80 mt-1">Subscribe to receive signals</p>
             <div className="h-20 mt-3 flex items-center justify-center">
-              <p className="text-xs text-muted-foreground">No data available</p>
+              <p className="text-xs text-white/70">No data available</p>
             </div>
           </CardContent>
         </Card>
@@ -145,8 +145,8 @@ export default async function MemberDashboardPage() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="text-center py-8">
-                <p className="text-muted-foreground mb-2">No trading data available</p>
-                <p className="text-sm text-muted-foreground">Connect your trading account to view performance</p>
+                <p className="text-white/80 mb-2">No trading data available</p>
+                <p className="text-sm text-white/70">Connect your trading account to view performance</p>
               </div>
             </CardContent>
           </Card>
@@ -158,8 +158,8 @@ export default async function MemberDashboardPage() {
             </CardHeader>
             <CardContent className="space-y-3">
               <div className="text-center py-8">
-                <p className="text-muted-foreground mb-2">No signals available</p>
-                <p className="text-sm text-muted-foreground">Subscribe to our premium plans to receive trading signals</p>
+                <p className="text-white/80 mb-2">No signals available</p>
+                <p className="text-sm text-white/70">Subscribe to our premium plans to receive trading signals</p>
               </div>
             </CardContent>
           </Card>

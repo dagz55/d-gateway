@@ -1,5 +1,6 @@
 import { SignUp } from '@clerk/nextjs';
 import Image from 'next/image';
+import Logo from '@/components/ui/Logo';
 
 export default function SignUpPage() {
   return (
@@ -14,7 +15,19 @@ export default function SignUpPage() {
           priority
         />
         {/* Overlay with branding */}
-        <div className="absolute inset-0 bg-black/20 flex flex-col justify-end p-8">
+        <div className="absolute inset-0 bg-black/20 flex flex-col justify-between p-8">
+          {/* Top logo */}
+          <div className="flex justify-center pt-8">
+            <Logo
+              size="xl"
+              showText={false}
+              enableAnimations={true}
+              className="justify-center"
+              variant="high-quality"
+            />
+          </div>
+          
+          {/* Bottom content */}
           <div className="text-white">
             <h1 className="text-4xl font-bold mb-4">Join Zignals</h1>
             <p className="text-xl opacity-90">
@@ -29,19 +42,20 @@ export default function SignUpPage() {
         <div className="w-full max-w-md">
           {/* Mobile logo for small screens */}
           <div className="lg:hidden mb-8 text-center">
-            <Image
-              src="/official_zignals_logo.png"
-              alt="Zignals"
-              width={120}
-              height={40}
-              className="mx-auto"
+            <Logo
+              size="lg"
+              showText={false}
+              enableAnimations={true}
+              className="justify-center"
             />
           </div>
           
           <SignUp
             routing="virtual"
-            fallbackRedirectUrl="/"
+            fallbackRedirectUrl="/dashboard"
             signInUrl="/sign-in"
+            // Disable organization features
+            skipOrganizationCreation={true}
             appearance={{
               elements: {
                 rootBox: 'w-full',

@@ -16,9 +16,17 @@ function ClerkProviderWrapper({ children }: { children: React.ReactNode }) {
       appearance={clerkAppearance}
       signInFallbackRedirectUrl="/dashboard"
       signUpFallbackRedirectUrl="/dashboard"
-      // Disable organization features to prevent 403 errors
+      // Completely disable organization features
       allowOrganizationCreation={false}
       allowOrganizationInvitation={false}
+      // Disable organization switching and creation
+      organizationSwitcherProps={{
+        hidePersonal: true,
+        createOrganizationMode: 'modal',
+        organizationProfileMode: 'modal',
+      }}
+      // Skip organization setup after sign-up
+      // Note: afterSignUpUrl and afterSignInUrl are deprecated, using fallbackRedirectUrl instead
     >
       {children}
     </ClerkProvider>

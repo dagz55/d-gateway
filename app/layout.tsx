@@ -25,15 +25,15 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" data-scroll-behavior="smooth" className="bg-background text-foreground">
+    <html lang="en" data-scroll-behavior="smooth" className="bg-background text-foreground" suppressHydrationWarning>
       <head>
         {/* Resource hints for better performance */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://api.coingecko.com" />
-        {/* Only preload critical images that are used immediately */}
-        <link rel="preload" href="/zignal-logo.png" as="image" type="image/png" />
+        {/* Only preload critical images that are used immediately on the landing page */}
+        <link rel="preload" href="/zignal-logo.png" as="image" type="image/png" media="(min-width: 1024px)" />
       </head>
-      <body className={`font-sans ${GeistSans.variable} ${GeistMono.variable} antialiased`}>
+      <body className={`font-sans ${GeistSans.variable} ${GeistMono.variable} antialiased`} suppressHydrationWarning>
         <Providers>
           <Suspense fallback={null}>{children}</Suspense>
         </Providers>

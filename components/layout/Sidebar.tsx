@@ -149,10 +149,10 @@ export default function Sidebar({ className }: SidebarProps) {
         "max-md:px-2 max-md:py-3 max-md:justify-center",
         isActiveLink
           ? "bg-accent/20 text-accent shadow-lg border border-accent/30 card-glow"
-          : "text-foreground/70 hover:bg-muted hover:text-foreground hover:shadow-md hover:border hover:border-border",
+          : "text-white/90 hover:bg-muted hover:text-white hover:shadow-md hover:border hover:border-border", // Improved contrast
         isAdminItem &&
           !isActiveLink &&
-          "hover:bg-yellow-500/10 hover:text-yellow-600 hover:border-yellow-500/30 dark:hover:text-yellow-400"
+          "hover:bg-yellow-500/10 hover:text-yellow-300 hover:border-yellow-500/30 dark:hover:text-yellow-300" // Better contrast for admin items
       ),
     []
   );
