@@ -25,6 +25,7 @@ import {
 } from 'lucide-react';
 import Logo from '@/components/ui/Logo';
 import { PromotionalBanner } from './PromotionalBanner';
+import { SignedIn, SignedOut, useUser, UserButton } from '@clerk/nextjs';
 
 // Lazy load heavy components for better performance with preload hints
 const OptimizedTradingChart = dynamic(() => import('@/components/trading/OptimizedTradingChart').then(mod => ({ default: mod.OptimizedTradingChart })), {
@@ -271,19 +272,37 @@ export function LandingContent() {
             </div>
 
             <div className="hidden items-center gap-4 md:flex">
-              <Link
-                href="/sign-in"
-                className="text-sm font-medium text-white/70 transition-colors hover:text-white"
-              >
-                Sign In
-              </Link>
-              <Link
-                href="/sign-up"
-                className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-[#0577DA] to-[#1199FA] px-5 py-2 text-sm font-semibold text-white shadow-lg shadow-[#0577DA]/20 transition hover:from-[#0a8ae8] hover:to-[#22a9ff]"
-              >
-                Join Free
-                <ArrowRight className="h-4 w-4" />
-              </Link>
+              <SignedOut>
+                <Link
+                  href="/sign-in"
+                  className="text-sm font-medium text-white/70 transition-colors hover:text-white"
+                >
+                  Sign In
+                </Link>
+                <Link
+                  href="/sign-up"
+                  className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-[#0577DA] to-[#1199FA] px-5 py-2 text-sm font-semibold text-white shadow-lg shadow-[#0577DA]/20 transition hover:from-[#0a8ae8] hover:to-[#22a9ff]"
+                >
+                  Join Free
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
+              </SignedOut>
+              <SignedIn>
+                <div className="flex items-center gap-3 rounded-xl border border-white/15 bg-white/5 px-3 py-2">
+                  <UserButton afterSignOutUrl="/" />
+                  <div className="flex flex-col">
+                    <p className="text-sm font-medium text-white">
+                      {useUser().user?.fullName || 'Signed in'}
+                    </p>
+                    <Link
+                      href="/profile"
+                      className="text-xs text-white/60 hover:text-white"
+                    >
+                      Account Settings
+                    </Link>
+                  </div>
+                </div>
+              </SignedIn>
             </div>
 
             <button
