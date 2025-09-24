@@ -5,9 +5,11 @@ import { CryptoPrice } from '@/types';
 let cachedData: { prices: CryptoPrice[], stats: any, timestamp: number } | null = null;
 const CACHE_TTL = 2 * 60 * 1000; // 2 minutes
 
-// Simple rate limiting
+// Enhanced rate limiting with exponential backoff
 let lastRequestTimestamp = 0;
-const RATE_LIMIT_MS = 2000; // 2 seconds
+let requestCount = 0;
+const RATE_LIMIT_MS = 5000; // 5 seconds between requests
+const MAX_REQUESTS_PER_HOUR = 50; // CoinGecko free tier limit
 
 // Function to generate fallback data
 const generateFallbackData = () => {
@@ -44,17 +46,42 @@ const generateFallbackData = () => {
 };
 
 
-const fetchWithRetry = async (url: string, options: RequestInit, retries = 3, backoff = 300) => {
+const fetchWithRetry = async (url: string, options: RequestInit, retries = 3, backoff = 1000) => {
   for (let i = 0; i < retries; i++) {
     try {
-      const response = await fetch(url, options);
+      const response = await fetch(url, {
+        ...options,
+        headers: {
+          'Accept': 'application/json',
+          'User-Agent': 'Zignal-Dashboard/1.0',
+          ...options.headers,
+        },
+      });
+      
       if (response.ok) {
         return response;
       }
+      
+      // Handle specific error cases
+      if (response.status === 401) {
+        console.warn('CoinGecko API: Unauthorized - API key may be required');
+        throw new Error(`API Error: ${response.status} ${response.statusText}`);
+      }
+      
+      if (response.status === 429) {
+        console.warn('CoinGecko API: Rate limited - backing off');
+        const retryAfter = response.headers.get('Retry-After');
+        const delay = retryAfter ? parseInt(retryAfter) * 1000 : backoff * Math.pow(2, i);
+        await new Promise(resolve => setTimeout(resolve, delay));
+        continue;
+      }
+      
       throw new Error(`API Error: ${response.status} ${response.statusText}`);
     } catch (error) {
       if (i === retries - 1) throw error;
-      await new Promise(resolve => setTimeout(resolve, backoff * Math.pow(2, i)));
+      const delay = backoff * Math.pow(2, i);
+      console.log(`Retry ${i + 1}/${retries} in ${delay}ms...`);
+      await new Promise(resolve => setTimeout(resolve, delay));
     }
   }
   throw new Error("Failed to fetch after multiple retries");
@@ -63,14 +90,33 @@ const fetchWithRetry = async (url: string, options: RequestInit, retries = 3, ba
 export async function GET() {
   const now = Date.now();
 
-  // 1. Rate Limiting
+  // 1. Enhanced Rate Limiting
   if (now - lastRequestTimestamp < RATE_LIMIT_MS) {
-    return new NextResponse(JSON.stringify({ success: false, message: 'Rate limit exceeded. Please try again later.' }), {
-      status: 429,
-      headers: { 'Content-Type': 'application/json' },
-    });
+    console.log('Rate limit: Too many requests, using cached data or fallback');
+    if (cachedData && (now - cachedData.timestamp < CACHE_TTL * 2)) {
+      return NextResponse.json({
+        success: true,
+        data: cachedData.prices,
+        stats: cachedData.stats,
+        fromCache: true,
+        rateLimited: true,
+      });
+    }
+    return NextResponse.json(generateFallbackData());
   }
+  
+  // Reset request count every hour
+  if (now - lastRequestTimestamp > 60 * 60 * 1000) {
+    requestCount = 0;
+  }
+  
+  if (requestCount >= MAX_REQUESTS_PER_HOUR) {
+    console.warn('Hourly rate limit exceeded, using fallback data');
+    return NextResponse.json(generateFallbackData());
+  }
+  
   lastRequestTimestamp = now;
+  requestCount++;
 
   // 2. Caching
   if (cachedData && (now - cachedData.timestamp < CACHE_TTL)) {
@@ -83,12 +129,15 @@ export async function GET() {
   }
 
   try {
-    // 3. Fetch with Retry
+    // 3. Fetch with Retry and better error handling
     const response = await fetchWithRetry(
       'https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=1&interval=hourly',
       {
-        headers: { 'Accept': 'application/json' },
-        signal: AbortSignal.timeout(8000), // Increased timeout for retries
+        headers: { 
+          'Accept': 'application/json',
+          'User-Agent': 'Zignal-Dashboard/1.0',
+        },
+        signal: AbortSignal.timeout(10000), // Increased timeout for retries
       }
     );
 

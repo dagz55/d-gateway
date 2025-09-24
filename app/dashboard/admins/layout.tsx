@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation';
-import { requireAdmin } from '@/lib/admin';
+import { getAdminUser } from '@/lib/admin';
 import AdminLayoutClient from '@/components/admin/AdminLayoutClient';
 import AdminErrorBoundary from '@/components/admin/AdminErrorBoundary';
 
@@ -11,8 +11,12 @@ export default async function AdminLayout({
   children: React.ReactNode;
 }) {
   try {
-    // Require admin authentication
-    const adminUser = await requireAdmin();
+    // Check admin authentication without redirect
+    const adminUser = await getAdminUser();
+    
+    if (!adminUser) {
+      redirect('/dashboard/members');
+    }
     
     return (
       <AdminErrorBoundary 
@@ -24,7 +28,11 @@ export default async function AdminLayout({
       </AdminErrorBoundary>
     );
   } catch (error) {
+    // Handle NEXT_REDIRECT errors properly
+    if (error instanceof Error && error.message.includes('NEXT_REDIRECT')) {
+      throw error; // Re-throw redirect errors to let Next.js handle them
+    }
     console.warn('Admin auth error in layout:', error);
-    redirect('/');
+    redirect('/dashboard/members');
   }
 }

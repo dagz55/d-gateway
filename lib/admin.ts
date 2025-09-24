@@ -58,21 +58,34 @@ export async function isAdmin(): Promise<boolean> {
   }
 }
 
+// Cache for admin user to reduce repeated checks
+let adminUserCache: { user: AdminUser | null; timestamp: number } | null = null;
+const ADMIN_CACHE_TTL = 30 * 1000; // 30 seconds cache
+
 /**
- * Get current admin user with permissions
+ * Get current admin user with permissions (with caching to reduce excessive checks)
  */
 export async function getAdminUser(): Promise<AdminUser | null> {
   try {
+    // Check cache first
+    const now = Date.now();
+    if (adminUserCache && (now - adminUserCache.timestamp < ADMIN_CACHE_TTL)) {
+      return adminUserCache.user;
+    }
+
     // Use auth() to get session claims (same as middleware) and get user data
     const { userId, sessionClaims } = await auth();
     const user = await currentUser();
     
     if (!userId || !user) {
-      console.log('getAdminUser: No Clerk user found');
+      adminUserCache = { user: null, timestamp: now };
       return null;
     }
     
-    console.log(`getAdminUser: Checking admin status for Clerk user ${user.emailAddresses[0]?.emailAddress} (ID: ${userId})`);
+    // Only log on first check or when debugging
+    if (process.env.NODE_ENV === 'development' && !adminUserCache) {
+      console.log(`getAdminUser: Checking admin status for Clerk user ${user.emailAddresses[0]?.emailAddress} (ID: ${userId})`);
+    }
     
     // Check multiple possible locations for admin role (matching middleware logic exactly)
     const isClerkAdmin = 
@@ -90,32 +103,40 @@ export async function getAdminUser(): Promise<AdminUser | null> {
     const clerkPermissions = (sessionClaims as any)?.publicMetadata?.admin_permissions as string[] || 
                             user.publicMetadata?.admin_permissions as string[] || [];
     
-    console.log('getAdminUser: Clerk admin check details:', {
-      publicMetadataRole: (sessionClaims as any)?.publicMetadata?.role,
-      metadataRole: (sessionClaims as any)?.metadata?.role,
-      directRole: (sessionClaims as any)?.role,
-      organizationRole: (sessionClaims as any)?.o?.rol,
-      userPublicMetadataRole: user.publicMetadata?.role,
-      sessionClaimsKeys: Object.keys(sessionClaims || {}),
-      isClerkAdmin
-    });
+    // Only log detailed info in development and on first check
+    if (process.env.NODE_ENV === 'development' && !adminUserCache) {
+      console.log('getAdminUser: Clerk admin check details:', {
+        publicMetadataRole: (sessionClaims as any)?.publicMetadata?.role,
+        metadataRole: (sessionClaims as any)?.metadata?.role,
+        directRole: (sessionClaims as any)?.role,
+        organizationRole: (sessionClaims as any)?.o?.rol,
+        userPublicMetadataRole: user.publicMetadata?.role,
+        sessionClaimsKeys: Object.keys(sessionClaims || {}),
+        isClerkAdmin
+      });
+    }
     
     if (isClerkAdmin) {
-      console.log(`getAdminUser: Admin user found via Clerk session claims: ${user.emailAddresses[0]?.emailAddress}`);
-      
-      return {
+      const adminUser = {
         id: userId,
         email: user.emailAddresses[0]?.emailAddress || '',
         full_name: `${user.firstName || ''} ${user.lastName || ''}`.trim() || 'Admin User',
         display_name: user.firstName || 'Admin',
-        role: 'admin',
+        role: 'admin' as const,
         is_admin: true,
         admin_permissions: clerkPermissions.length > 0 ? clerkPermissions : ['users', 'signals', 'finances', 'payments', 'system']
       };
+      
+      adminUserCache = { user: adminUser, timestamp: now };
+      
+      if (process.env.NODE_ENV === 'development' && !adminUserCache) {
+        console.log(`getAdminUser: Admin user found via Clerk session claims: ${user.emailAddresses[0]?.emailAddress}`);
+      }
+      
+      return adminUser;
     }
     
     // Fallback to Supabase profile check
-    console.log('getAdminUser: Checking Supabase profile...');
     const supabase = await createServerSupabaseClient();
     const { data: profile, error } = await supabase
       .from('user_profiles')
@@ -123,16 +144,12 @@ export async function getAdminUser(): Promise<AdminUser | null> {
       .eq('clerk_user_id', userId)
       .single();
       
-    console.log(`getAdminUser: Profile query result:`, { profile, error });
-    
     if (!profile || !profile.is_admin) {
-      console.log(`getAdminUser: User is not admin - Clerk: ${isClerkAdmin}, Supabase: ${profile?.is_admin || false}`);
+      adminUserCache = { user: null, timestamp: now };
       return null;
     }
     
-    console.log(`getAdminUser: Admin user found via Supabase: ${profile.email}`);
-    
-    return {
+    const adminUser = {
       id: profile.clerk_user_id || userId,
       email: profile.email,
       full_name: profile.full_name,
@@ -141,8 +158,17 @@ export async function getAdminUser(): Promise<AdminUser | null> {
       is_admin: profile.is_admin,
       admin_permissions: profile.admin_permissions || []
     };
+    
+    adminUserCache = { user: adminUser, timestamp: now };
+    
+    if (process.env.NODE_ENV === 'development' && !adminUserCache) {
+      console.log(`getAdminUser: Admin user found via Supabase: ${profile.email}`);
+    }
+    
+    return adminUser;
   } catch (error) {
     console.error('Error getting admin user:', error);
+    adminUserCache = { user: null, timestamp: Date.now() };
     return null;
   }
 }
