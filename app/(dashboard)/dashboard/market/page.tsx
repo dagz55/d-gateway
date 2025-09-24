@@ -7,6 +7,13 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import {
   TrendingUp,
   TrendingDown,
   Search,
@@ -17,6 +24,7 @@ import {
   Activity,
   ArrowUpRight,
   ArrowDownRight,
+  Settings,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useMarketData, formatPrice, formatMarketCap, formatVolume, formatPercentage } from '@/hooks/useLegacyMarketData';
@@ -30,6 +38,25 @@ export default function MarketDashboardPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [favorites, setFavorites] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState<'market_cap' | 'price_change_percentage_24h' | 'volume_24h'>('market_cap');
+  const [displayCount, setDisplayCount] = useState<number>(10);
+
+  // Load display count preference from localStorage
+  useEffect(() => {
+    const savedDisplayCount = localStorage.getItem('market-display-count');
+    if (savedDisplayCount) {
+      const count = parseInt(savedDisplayCount, 10);
+      if ([10, 20, 30, 50, 100].includes(count)) {
+        setDisplayCount(count);
+      }
+    }
+  }, []);
+
+  // Save display count preference to localStorage
+  const handleDisplayCountChange = (value: string) => {
+    const count = parseInt(value, 10);
+    setDisplayCount(count);
+    localStorage.setItem('market-display-count', value);
+  };
 
   // Load favorites from Supabase
   useEffect(() => {
@@ -108,7 +135,8 @@ export default function MarketDashboardPage() {
         default:
           return (b.market_cap || 0) - (a.market_cap || 0);
       }
-    });
+    })
+    .slice(0, displayCount); // Limit to selected display count
 
   const toggleFavorite = (cryptoId: string) => {
     setFavorites(prev => {
@@ -197,6 +225,21 @@ export default function MarketDashboardPage() {
           />
         </div>
         <div className="flex gap-2">
+          <div className="flex items-center gap-2">
+            <Settings className="w-4 h-4 text-white/70" />
+            <Select value={displayCount.toString()} onValueChange={handleDisplayCountChange}>
+              <SelectTrigger className="w-20 bg-white/10 border-white/30 text-white">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent className="bg-gray-900 border-gray-700">
+                <SelectItem value="10" className="text-white hover:bg-gray-800">10</SelectItem>
+                <SelectItem value="20" className="text-white hover:bg-gray-800">20</SelectItem>
+                <SelectItem value="30" className="text-white hover:bg-gray-800">30</SelectItem>
+                <SelectItem value="50" className="text-white hover:bg-gray-800">50</SelectItem>
+                <SelectItem value="100" className="text-white hover:bg-gray-800">100</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
           <Button
             variant={sortBy === 'market_cap' ? 'default' : 'outline'}
             onClick={() => setSortBy('market_cap')}
@@ -513,7 +556,7 @@ export default function MarketDashboardPage() {
       <div className="mt-6 text-center text-white/80 text-sm">
         <p>Data provided by CoinGecko API • Updates every 30 seconds</p>
         <p className="mt-1">
-          Showing {filteredData.length} of {cryptoData.length} cryptocurrencies
+          Showing {filteredData.length} of {cryptoData.length} cryptocurrencies • Display limit: {displayCount}
         </p>
       </div>
     </div>

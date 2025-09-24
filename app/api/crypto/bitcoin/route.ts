@@ -2,13 +2,21 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(request: NextRequest) {
   try {
+    const apiKey = process.env.COINGECKO_API_KEY;
+    const headers: Record<string, string> = {
+      'Accept': 'application/json',
+      'User-Agent': 'Zignal-App/1.0',
+    };
+
+    // Add API key to headers if available
+    if (apiKey && apiKey.trim() !== '') {
+      headers['x-cg-demo-api-key'] = apiKey;
+    }
+
     const response = await fetch(
       'https://api.coingecko.com/api/v3/coins/bitcoin?localization=false&tickers=false&market_data=true&community_data=false&developer_data=false',
       {
-        headers: {
-          'Accept': 'application/json',
-          'User-Agent': 'Zignal-App/1.0',
-        },
+        headers,
         next: { revalidate: 60 }, // Cache for 1 minute
       }
     );

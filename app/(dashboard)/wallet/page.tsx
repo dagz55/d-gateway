@@ -280,15 +280,32 @@ export default async function WalletPage() {
     }
 
     // Get user profile from Supabase to get the correct user_id for transactions
-    const userProfile = await getUserProfileByClerkIdServer(clerkUserId);
+    let userProfile = await getUserProfileByClerkIdServer(clerkUserId);
 
     if (!userProfile) {
-      console.error('User profile not found in Supabase for Clerk ID:', clerkUserId);
-      // Fall back to using Clerk ID directly (for backward compatibility)
-      const walletData = await getWalletData(clerkUserId);
-      const firstName = user.firstName || 'Trader';
+      console.log('User profile not found in Supabase for Clerk ID:', clerkUserId, '- Creating new profile');
+      
+      // Create a new user profile in Supabase
+      const { syncClerkUserWithProfile } = await import('@/lib/supabase/clerk-integration');
+      
+      const clerkUserData = {
+        email: user.emailAddresses[0]?.emailAddress || '',
+        firstName: user.firstName || '',
+        lastName: user.lastName || '',
+        username: user.username || user.emailAddresses[0]?.emailAddress?.split('@')[0] || 'user',
+        imageUrl: user.imageUrl || null,
+      };
+      
+      userProfile = await syncClerkUserWithProfile(clerkUserId, clerkUserData);
+      
+      if (!userProfile) {
+        console.error('Failed to create user profile for Clerk ID:', clerkUserId);
+        // Fall back to using Clerk ID directly (for backward compatibility)
+        const walletData = await getWalletData(clerkUserId);
+        const firstName = user.firstName || 'Trader';
 
-      return renderWalletPage(walletData, firstName);
+        return renderWalletPage(walletData, firstName);
+      }
     }
 
     const firstName = user.firstName || 'Trader';

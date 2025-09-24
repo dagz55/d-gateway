@@ -4,15 +4,23 @@ export async function GET(request: NextRequest) {
   try {
     const url = new URL(request.url);
     const days = url.searchParams.get('days') || '1';
+    const apiKey = process.env.COINGECKO_API_KEY;
+
+    const headers: Record<string, string> = {
+      'Accept': 'application/json',
+      'User-Agent': 'Zignal-App/1.0',
+    };
+
+    // Add API key to headers if available
+    if (apiKey && apiKey.trim() !== '') {
+      headers['x-cg-demo-api-key'] = apiKey;
+    }
 
     // Fetch OHLC data from CoinGecko
     const response = await fetch(
       `https://api.coingecko.com/api/v3/coins/bitcoin/ohlc?vs_currency=usd&days=${days}`,
       {
-        headers: {
-          'Accept': 'application/json',
-          'User-Agent': 'Zignal-App/1.0',
-        },
+        headers,
         next: { revalidate: 60 }, // Cache for 1 minute
       }
     );
@@ -27,10 +35,7 @@ export async function GET(request: NextRequest) {
     const priceResponse = await fetch(
       'https://api.coingecko.com/api/v3/coins/bitcoin?localization=false&tickers=false&market_data=true&community_data=false&developer_data=false',
       {
-        headers: {
-          'Accept': 'application/json',
-          'User-Agent': 'Zignal-App/1.0',
-        },
+        headers,
         next: { revalidate: 60 },
       }
     );

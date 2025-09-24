@@ -1,5 +1,10 @@
 import path from 'path';
 import webpack from 'next/dist/compiled/webpack/webpack-lib.js';
+import { fileURLToPath } from 'url';
+
+// ES Module compatibility
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Load global polyfill for SSR compatibility
 if (typeof global !== 'undefined' && !global.self) {
@@ -28,7 +33,7 @@ const nextConfig = {
       bodySizeLimit: '10mb', // Increase from default 1mb to 10mb
     },
     optimizePackageImports: [
-      'lucide-react', 
+      'lucide-react',
       '@radix-ui/react-icons',
       'framer-motion',
       '@clerk/nextjs',
@@ -37,6 +42,15 @@ const nextConfig = {
     webVitalsAttribution: ['CLS', 'LCP'], // Track Core Web Vitals
     optimizeCss: true, // Enable CSS optimization
     scrollRestoration: true, // Optimize scroll restoration
+  },
+  // Turbopack configuration (moved from experimental.turbo)
+  turbopack: {
+    rules: {
+      '*.svg': {
+        loaders: ['@svgr/webpack'],
+        as: '*.js',
+      },
+    },
   },
   // Image optimization settings
   images: {
@@ -64,6 +78,43 @@ const nextConfig = {
   compress: true,
   poweredByHeader: false, // Remove X-Powered-By header for security and performance
   webpack: (config, options) => {
+    // Fix Webpack cache performance warning for large strings
+    config.cache = config.cache || {};
+    if (typeof config.cache === 'object' && config.cache.type === 'filesystem') {
+      config.cache.buildDependencies = config.cache.buildDependencies || {};
+      config.cache.buildDependencies.config = [__filename];
+
+      // Advanced cache optimization to prevent large string serialization
+      config.cache.compression = 'gzip';
+      config.cache.maxMemoryGenerations = 1;
+      config.cache.maxAge = 1000 * 60 * 60 * 24; // 24 hours
+
+      // Override pack file cache strategy to use buffers instead of strings
+      const originalPackFileCacheStrategy = config.cache.store;
+      if (originalPackFileCacheStrategy) {
+        config.cache.profile = false; // Disable profiling to reduce serialization
+        config.cache.hashAlgorithm = 'xxhash64'; // Use faster hash algorithm
+      }
+    }
+
+    // Optimize module concatenation to reduce large string creation
+    if (process.env.NODE_ENV === 'development') {
+      config.optimization = config.optimization || {};
+      config.optimization.concatenateModules = false; // Reduce large string concatenation
+      config.optimization.providedExports = false; // Reduce exports analysis overhead
+      config.optimization.usedExports = false; // Reduce usage analysis overhead
+
+      // Suppress webpack cache warnings in development (Next.js 15.5.3 known issue)
+      const originalConsoleWarn = console.warn;
+      console.warn = (...args) => {
+        const message = args.join(' ');
+        if (message.includes('PackFileCacheStrategy') && message.includes('Serializing big strings')) {
+          return; // Suppress this specific warning
+        }
+        originalConsoleWarn.apply(console, args);
+      };
+    }
+
     // Fix 'self is not defined' error in server-side rendering
     if (options.isServer) {
       config.resolve = config.resolve || {};

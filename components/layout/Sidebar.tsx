@@ -4,81 +4,14 @@ import { Button } from '@/components/ui/button';
 import Logo from '@/components/ui/Logo';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
-import {
-  ArrowDownLeft,
-  ArrowUpRight,
-  Copy,
-  History,
-  LayoutDashboard,
-  Menu,
-  Newspaper,
-  Settings,
-  Signal,
-  Wallet,
-  X,
-  ChevronLeft,
-  ChevronRight,
-  Shield,
-  TrendingUp,
-  Rocket,
-} from 'lucide-react';
-import Link from 'next/link';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { usePathname, useSearchParams } from 'next/navigation';
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useMemo, useCallback } from 'react';
 import ProfileSection from './ProfileSection';
 import { useUser } from '@clerk/nextjs';
 import { useNavigationLoading } from '@/hooks/useNavigationLoading';
 import { useSidebar } from '@/contexts/SidebarContext';
-
-type NavItem = {
-  name: string;
-  href: string;
-  icon: React.ComponentType<{ className?: string }>;
-  isAdmin?: boolean;
-};
-
-const BASE_NAVIGATION: NavItem[] = [
-  {
-    name: 'Dashboard',
-    href: '/dashboard',
-    icon: LayoutDashboard,
-  },
-  {
-    name: 'Market',
-    href: '/dashboard/market',
-    icon: TrendingUp,
-  },
-  {
-    name: 'Trading History',
-    href: '/dashboard?tab=trades',
-    icon: History,
-  },
-  {
-    name: 'Trading Signals',
-    href: '/dashboard?tab=signals',
-    icon: Signal,
-  },
-  {
-    name: 'Wallet',
-    href: '/wallet',
-    icon: Wallet,
-  },
-  {
-    name: 'Crypto News',
-    href: '/dashboard?tab=news',
-    icon: Newspaper,
-  },
-  {
-    name: 'Copy Trading Signal',
-    href: '/dashboard?tab=copy-trading',
-    icon: Copy,
-  },
-  {
-    name: 'Settings',
-    href: '/settings',
-    icon: Settings,
-  },
-];
+import { BASE_NAVIGATION, ADMIN_NAVIGATION, NavItem } from './navigation-data';
 
 interface SidebarProps {
   className?: string;
@@ -93,24 +26,6 @@ export default function Sidebar({ className }: SidebarProps) {
   
   // Check if user is admin using client-side user object
   const isAdmin = user?.publicMetadata?.isAdmin === true || user?.publicMetadata?.role === 'admin';
-
-
-
-  // Add admin navigation if user is admin
-  const ADMIN_NAVIGATION: NavItem[] = [
-    {
-      name: 'Admin Panel',
-      href: '/admin',
-      icon: Shield,
-      isAdmin: true,
-    },
-    {
-      name: 'Deployment',
-      href: '/deployment',
-      icon: Rocket,
-      isAdmin: true,
-    }
-  ];
 
   const allNavigation = useMemo(
     () => [...BASE_NAVIGATION, ...(isAdmin ? ADMIN_NAVIGATION : [])],
@@ -168,19 +83,19 @@ export default function Sidebar({ className }: SidebarProps) {
           "top-0 h-full",
           "md:w-64 md:translate-x-0", // Desktop expanded
           isCollapsed && "md:w-16", // Desktop collapsed
-          "max-md:w-16 max-md:translate-x-0", // Mobile always compact
+          "max-md:w-12 max-md:translate-x-0", // Mobile always compact - reduced width
           className
         )}
       >
         <div className="flex h-full flex-col">
           {/* Logo */}
           <div className={cn(
-            "flex h-16 items-center border-b border-border transition-all duration-300",
+            "flex h-12 md:h-16 items-center border-b border-border transition-all duration-300",
             // Desktop layout
             "md:px-6",
             isCollapsed ? "md:justify-center md:px-2" : "md:justify-between",
             // Mobile layout - always centered and compact
-            "max-md:justify-center max-md:px-2"
+            "max-md:justify-center max-md:px-1"
           )}>
             <div className="flex items-center">
               <Logo
@@ -222,7 +137,7 @@ export default function Sidebar({ className }: SidebarProps) {
           )}
 
           {/* Navigation */}
-          <ScrollArea className="flex-1 px-2 py-4 max-md:px-1">
+          <ScrollArea className="flex-1 px-1 py-2 md:px-2 md:py-4">
             <nav className="space-y-2">
               {allNavigation.map((item) => {
                 const Icon = item.icon;
@@ -238,7 +153,7 @@ export default function Sidebar({ className }: SidebarProps) {
                     className={getNavItemClasses(isActiveLink, isCollapsed, isAdminItem)}
                   >
                     <Icon className={cn(
-                      "h-5 w-5 transition-transform duration-200",
+                      "h-4 w-4 md:h-5 md:w-5 transition-transform duration-200",
                       isActiveLink ? "scale-110" : "",
                       !isCollapsed ? "md:mr-3" : ""
                     )} />

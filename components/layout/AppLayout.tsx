@@ -23,11 +23,11 @@ function AppLayoutContent({ children }: { children: ReactNode }) {
         // Desktop margin adjustments based on sidebar state
         "md:ml-16", // Default collapsed margin (64px)
         !isCollapsed && "md:ml-64", // Expanded margin (256px)
-        // Mobile margin to account for visible compact sidebar
-        "max-md:ml-16"
+        // Mobile margin to account for visible compact sidebar - reduced for better space utilization
+        "max-md:ml-12"
       )}>
         <Header />
-        <main className="p-4 md:p-6 relative">
+        <main className="p-1 md:p-6 relative">
           <div className="max-w-7xl mx-auto">
             {children}
           </div>

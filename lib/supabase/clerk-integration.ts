@@ -5,7 +5,7 @@
  * with Supabase user profiles, especially for photo upload functionality.
  */
 
-import { createClientSupabaseClient } from './client';
+import { createClient } from './client';
 import { createServerSupabaseClient } from './serverClient';
 
 export interface UserProfileWithClerk {
@@ -38,7 +38,7 @@ export interface UserProfileWithClerk {
  * Get user profile by Clerk user ID (client-side)
  */
 export async function getUserProfileByClerkId(clerkUserId: string): Promise<UserProfileWithClerk | null> {
-  const supabase = createClientSupabaseClient();
+  const supabase = createClient();
   
   const { data, error } = await supabase
     .from('user_profiles')
@@ -81,7 +81,7 @@ export async function updateUserAvatarByClerkId(
   clerkUserId: string, 
   avatarUrl: string
 ): Promise<boolean> {
-  const supabase = createClientSupabaseClient();
+  const supabase = createClient();
   
   const { error } = await supabase
     .from('user_profiles')
@@ -106,7 +106,7 @@ export async function upsertUserProfileWithClerkId(
   clerkUserId: string,
   profileData: Partial<UserProfileWithClerk>
 ): Promise<UserProfileWithClerk | null> {
-  const supabase = createClientSupabaseClient();
+  const supabase = createClient();
   
   const { data, error } = await supabase
     .from('user_profiles')
@@ -136,7 +136,7 @@ export async function linkUserProfileToClerkId(
   userId: string,
   clerkUserId: string
 ): Promise<boolean> {
-  const supabase = createClientSupabaseClient();
+  const supabase = createClient();
   
   const { error } = await supabase
     .from('user_profiles')
@@ -158,7 +158,7 @@ export async function linkUserProfileToClerkId(
  * Check if Clerk user ID already exists in profiles
  */
 export async function clerkUserIdExists(clerkUserId: string): Promise<boolean> {
-  const supabase = createClientSupabaseClient();
+  const supabase = createClient();
   
   const { data, error } = await supabase
     .from('user_profiles')
@@ -178,7 +178,7 @@ export async function clerkUserIdExists(clerkUserId: string): Promise<boolean> {
  * Get all user profiles with Clerk integration
  */
 export async function getAllUserProfilesWithClerk(): Promise<UserProfileWithClerk[]> {
-  const supabase = createClientSupabaseClient();
+  const supabase = createClient();
   
   const { data, error } = await supabase
     .from('user_profiles')

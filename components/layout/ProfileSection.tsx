@@ -157,14 +157,14 @@ export default function ProfileSection({ isCollapsed = false, onNavigate }: Prof
 
   if (isCollapsed) {
     return (
-      <div className="p-2 border-t border-border">
+      <div className="p-1 md:p-2 border-t border-border">
         <Button
           variant="ghost"
           size="sm"
-          className="w-full p-2"
+          className="w-full p-1 md:p-2"
           onClick={() => setIsExpanded(!isExpanded)}
         >
-          <Avatar className="h-8 w-8">
+          <Avatar className="h-6 w-6 md:h-8 md:w-8">
             <AvatarImage src={user.imageUrl} alt={fullName} />
             <AvatarFallback className="text-xs font-medium bg-gradient-to-br from-blue-500 to-purple-600 text-white">
               {initials}
@@ -173,25 +173,25 @@ export default function ProfileSection({ isCollapsed = false, onNavigate }: Prof
         </Button>
 
         {isExpanded && (
-          <div className="mt-2 space-y-1">
+          <div className="mt-1 md:mt-2 space-y-1">
             {menuItems.map((item, index) => (
               <Button
                 key={index}
                 variant="ghost"
                 size="sm"
-                className="w-full p-2"
+                className="w-full p-1 md:p-2"
                 onClick={item.onClick}
               >
-                <item.icon className="h-4 w-4" />
+                <item.icon className="h-3 w-3 md:h-4 md:w-4" />
               </Button>
             ))}
             <Button
               variant="ghost"
               size="sm"
-              className="w-full p-2 text-red-600"
+              className="w-full p-1 md:p-2 text-red-600"
               onClick={handleSignOut}
             >
-              <LogOut className="h-4 w-4" />
+              <LogOut className="h-3 w-3 md:h-4 md:w-4" />
             </Button>
           </div>
         )}
