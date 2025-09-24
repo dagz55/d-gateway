@@ -1,7 +1,10 @@
 import { verifyClerkToken } from "@clerk/mcp-tools/next";
-import { createMcpHandler, experimental_withMcpAuth as withMcpAuth } from "@vercel/mcp-adapter";
 import { auth } from "@clerk/nextjs/server";
 import { getClerkUserById } from "@/lib/clerk-users";
+
+// Import MCP adapter functions
+import { createMcpHandler } from "@vercel/mcp-adapter";
+import { experimental_withMcpAuth as withMcpAuth } from "@vercel/mcp-adapter";
 
 export const runtime = "nodejs";
 
