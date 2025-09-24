@@ -21,6 +21,7 @@
     "clean:cache": "rm -rf .next/cache",
     "fresh": "npm run clean && npm install && npm run dev",
     "check-env": "node check-env.js",
+    "validate-env": "node scripts/validate-env.js",
     "generate-secrets": "node generate-secrets.js",
     "setup-clerk": "node setup-clerk-auth.js",
     "setup-db": "node apply-missing-tables.js",
