@@ -4,7 +4,40 @@ Zignal is a comprehensive crypto trading platform built with [Next.js 15.5.3](ht
 
 ## 🚀 Features
 
-### Latest Improvements (v2.11.13)
+### Latest Improvements (v2.11.14)
+
+- 🔧 **Vercel Deployment Fix**: Resolved critical build error for production deployment
+  - Fixed `Module not found: Can't resolve '@vercel/mcp-adapter'` error
+  - Separated combined import statements for better module resolution
+  - Ensured Vercel deployment compatibility while maintaining MCP functionality
+  - Verified successful builds both locally and on Vercel platform
+
+- 👤 **User Profile Integration**: Enhanced Clerk-Supabase user management
+  - Fixed "User profile not found in Supabase for Clerk ID" errors
+  - Added automatic profile creation for users existing in Clerk but not Supabase
+  - Updated wallet page and avatar upload routes with upsert operations
+  - Implemented graceful fallbacks and enhanced error handling
+  - Improved user onboarding experience with seamless profile creation
+
+- 📱 **Mobile Responsiveness**: Enhanced mobile user experience across dashboard
+  - Optimized sidebar width and spacing for mobile devices (reduced from 64px to 48px)
+  - Reduced padding and margins for better space utilization
+  - Scaled typography and form elements for mobile screens
+  - Enhanced profile settings page mobile layout
+  - Improved form component responsiveness across all settings pages
+
+- 🎛️ **Configurable Market Overview**: Enhanced market dashboard with user preferences
+  - Added display count selector (10, 20, 30, 50, 100 cryptocurrencies)
+  - Implemented localStorage persistence for user preferences
+  - Enhanced market data filtering and display options
+  - Added settings icon and improved UI controls
+
+- 🏠 **Landing Page Navigation**: Enhanced navigation for dashboard users
+  - Added "Dashboard" button to landing page navigation for signed-in users
+  - Implemented responsive design for both desktop and mobile
+  - Maintained consistent styling with landing page theme
+
+### Previous Improvements (v2.11.13)
 
 - 🔌 **MCP Gateway Integration**: Implemented comprehensive MCP (Model Context Protocol) gateway
   - Created centralized MCP gateway with Docker containerization

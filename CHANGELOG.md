@@ -5,6 +5,48 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.11.14] - 2025-01-27
+
+### Fixed
+- **🔧 Vercel Deployment Build Error**: Resolved critical build failure with MCP adapter imports
+  - Fixed `Module not found: Can't resolve '@vercel/mcp-adapter'` error
+  - Separated combined import statements into individual imports for better module resolution
+  - Ensured Vercel deployment compatibility while maintaining all MCP functionality
+  - Verified build success both locally and for Vercel deployment
+
+### Fixed
+- **👤 User Profile Integration**: Resolved Supabase profile creation issues for Clerk users
+  - Fixed "User profile not found in Supabase for Clerk ID" errors
+  - Added automatic profile creation when users exist in Clerk but not in Supabase
+  - Updated wallet page to auto-create profiles using Clerk user data
+  - Modified avatar upload routes to use upsert operations for missing profiles
+  - Implemented graceful fallbacks for profile creation failures
+  - Enhanced error handling and logging for better debugging
+
+### Enhanced
+- **📱 Mobile Responsiveness**: Improved mobile user experience across dashboard
+  - Optimized sidebar width and spacing for mobile devices
+  - Reduced padding and margins for better space utilization
+  - Scaled typography and form elements for mobile screens
+  - Enhanced profile settings page mobile layout
+  - Improved form component responsiveness (ChangePasswordForm, ChangeUsernameForm, ProfileForm)
+  - Better mobile navigation and user interface elements
+
+### Added
+- **🎛️ Configurable Market Overview**: Enhanced market dashboard with user preferences
+  - Added display count selector (10, 20, 30, 50, 100 cryptocurrencies)
+  - Implemented localStorage persistence for user preferences
+  - Enhanced market data filtering and display options
+  - Added settings icon and improved UI controls
+  - Updated footer to show current display limits
+
+### Added
+- **🏠 Landing Page Navigation**: Enhanced navigation for dashboard users
+  - Added "Dashboard" button to landing page navigation for signed-in users
+  - Implemented responsive design for both desktop and mobile
+  - Maintained consistent styling with landing page theme
+  - Added proper Clerk authentication checks for navigation visibility
+
 ## [2.11.13] - 2025-09-24
 
 ### Added
