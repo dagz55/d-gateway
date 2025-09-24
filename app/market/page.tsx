@@ -39,10 +39,13 @@ export default function MarketPage() {
     const loadFavorites = async () => {
       if (!user) {
         setFavorites([]);
-        toast({
-          title: "Sign in required",
-          description: "Sign in to save and view your favorites.",
-        });
+        if (typeof window !== "undefined" && !sessionStorage.getItem("marketSignInToastShown")) {
+          toast({
+            title: "Sign in required",
+            description: "Sign in to save and view your favorites.",
+          });
+          sessionStorage.setItem("marketSignInToastShown", "true");
+        }
         return;
       }
       try {
