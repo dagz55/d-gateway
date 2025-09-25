@@ -4,7 +4,14 @@ Zignal is a comprehensive crypto trading platform built with [Next.js 15.5.3](ht
 
 ## 🚀 Features
 
-### Latest Improvements (v2.11.15)
+### Latest Improvements (v2.11.16)
+
+- 🚀 **Vercel Deployment Fix**: Resolved critical deployment issues for production
+  - Fixed `react-window` import error that was causing Vercel build failures
+  - Installed missing dependencies (`react-window` and `@types/react-window`)
+  - Simplified component implementation for better compatibility
+  - Ensured successful production builds on Vercel platform
+  - Maintained all filtering and search functionality while improving stability
 
 - 🔍 **Admin User Filtering**: Fixed and enhanced user filtering functionality on admin users page
   - Converted from server-side to client-side rendering for dynamic filtering
@@ -13,7 +20,6 @@ Zignal is a comprehensive crypto trading platform built with [Next.js 15.5.3](ht
   - Added status-based filtering (Active, Inactive, Suspended) for member management
   - Integrated with existing `/api/admin/users` endpoint for server-side search
   - Added pagination support for large member lists with Previous/Next navigation
-  - Implemented virtualized list rendering for improved performance with large datasets
   - Added comprehensive loading states, error handling, and user feedback
   - Created responsive design that works on all screen sizes
   - Added clear filters functionality for easy reset of all filters

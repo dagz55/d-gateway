@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.11.16] - 2025-09-25
+
+### Fixed
+- **🚀 Vercel Deployment Error**: Resolved critical build failure with react-window import
+  - Fixed `FixedSizeList` import error from `react-window` package
+  - Installed missing dependencies: `react-window` and `@types/react-window`
+  - Simplified component implementation by removing virtualized list rendering
+  - Ensured successful production builds on Vercel platform
+  - Maintained all filtering and search functionality while improving stability
+  - Resolved webpack cache warnings and build optimization issues
+
 ## [2.11.15] - 2025-09-25
 
 ### Added
