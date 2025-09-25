@@ -71,8 +71,22 @@ export class ConnectionDiagnostics {
   private performanceMetrics: PerformanceMetrics;
 
   constructor() {
-    this.capabilities = this.detectCapabilities();
+    // Initialize with safe defaults for SSR compatibility
+    this.capabilities = {
+      onLine: false,
+      serviceWorker: false,
+      localStorage: false,
+      indexedDB: false,
+      webSocket: false,
+      fetch: false,
+      streams: false
+    };
     this.performanceMetrics = this.initializePerformanceMetrics();
+
+    // Only detect capabilities if in browser environment
+    if (typeof window !== 'undefined' && typeof navigator !== 'undefined') {
+      this.capabilities = this.detectCapabilities();
+    }
   }
 
   /**
@@ -80,6 +94,12 @@ export class ConnectionDiagnostics {
    */
   public async initialize(): Promise<void> {
     console.log('Initializing Connection Diagnostics...');
+
+    // Return early if not in browser environment
+    if (typeof window === 'undefined' || typeof navigator === 'undefined') {
+      console.log('Connection Diagnostics: Skipping browser-only initialization (SSR environment)');
+      return;
+    }
 
     try {
       // Detect browser capabilities

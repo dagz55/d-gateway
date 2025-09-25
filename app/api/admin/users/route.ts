@@ -1,3 +1,10 @@
+// Debug flag for PII logging
+const DEBUG_ADMIN_LOGS = process.env.NODE_ENV !== 'production' || process.env.DEBUG_ADMIN_LOGS === 'true';
+
+import { NextRequest, NextResponse } from 'next/server'
+import { getCurrentUser } from '@/lib/clerk-auth'
+import { createServerSupabaseClient } from '@/lib/supabase/serverClient'
+import { createAdminClient } from '@/lib/supabase/adminClient'
 import { NextRequest, NextResponse } from 'next/server'
 import { getCurrentUser } from '@/lib/clerk-auth'
 import { createServerSupabaseClient } from '@/lib/supabase/serverClient'
@@ -31,15 +38,17 @@ async function assertAdmin(request?: NextRequest) {
     
     const isAdminUser = Object.values(adminChecks).some(Boolean);
 
-    // Always log in production for debugging
-    console.log('Admin API: User check result', {
-      userId: user.id,
-      email: user.emailAddresses?.[0]?.emailAddress,
-      isAdmin: isAdminUser,
-      checks: adminChecks,
-      publicMetadata,
-      organizationMemberships: organizationMemberships.length
-    });
+    // Log admin check result only in debug mode
+    if (DEBUG_ADMIN_LOGS) {
+      console.log('Admin API: User check result', {
+        userId: user.id,
+        email: user.emailAddresses?.[0]?.emailAddress,
+        isAdmin: isAdminUser,
+        checks: adminChecks,
+        publicMetadata,
+        organizationMemberships: organizationMemberships.length
+      });
+    }
 
     return { user, isAdmin: isAdminUser }
   } catch (error) {
@@ -67,26 +76,30 @@ export async function GET(request: NextRequest) {
     }
     
     if (!isAdmin) {
-      console.log('Admin API: User is not admin', { 
-        userId: user.id,
-        email: user.emailAddresses?.[0]?.emailAddress,
-        publicMetadata: user.publicMetadata,
-        organizationMemberships: (user as any)?.organizationMemberships?.length || 0
-      });
+      if (DEBUG_ADMIN_LOGS) {
+        console.log('Admin API: User is not admin', {
+          userId: user.id,
+          email: user.emailAddresses?.[0]?.emailAddress,
+          publicMetadata: user.publicMetadata,
+          organizationMemberships: (user as any)?.organizationMemberships?.length || 0
+        });
+      }
       
       const responseBody: { success: boolean; message: string; debug?: any } = {
         success: false,
         message: 'Forbidden - Admin access required'
       };
 
-      // Always include debug info in production for troubleshooting
-      responseBody.debug = {
-        userId: user.id,
-        email: user.emailAddresses?.[0]?.emailAddress,
-        publicMetadata: user.publicMetadata,
-        organizationMemberships: (user as any)?.organizationMemberships?.length || 0,
-        timestamp: new Date().toISOString()
-      };
+      // Include debug info only in debug mode
+      if (DEBUG_ADMIN_LOGS) {
+        responseBody.debug = {
+          userId: user.id,
+          email: user.emailAddresses?.[0]?.emailAddress,
+          publicMetadata: user.publicMetadata,
+          organizationMemberships: (user as any)?.organizationMemberships?.length || 0,
+          timestamp: new Date().toISOString()
+        };
+      }
 
       return NextResponse.json(responseBody, { status: 403 })
     }

@@ -18,9 +18,17 @@ export function createRealtimeClient() {
   }
 
   // Validate URL format
-  if (!supabaseUrl.startsWith('https://') || !supabaseUrl.includes('supabase.co')) {
-    console.error('Invalid Supabase URL format:', supabaseUrl);
-    throw new Error('Invalid Supabase URL format. Should be https://your-project.supabase.co');
+  try {
+    const url = new URL(supabaseUrl);
+    if (url.protocol !== 'https:' && url.protocol !== 'http:') {
+      throw new Error('Invalid protocol');
+    }
+    if (!url.hostname) {
+      throw new Error('Missing hostname');
+    }
+  } catch (error) {
+    console.error('Invalid Supabase URL format:', supabaseUrl, error);
+    throw new Error('Invalid Supabase URL format. Must be a valid HTTPS URL with hostname');
   }
 
   // Validate API key format (should not contain newlines or whitespace)

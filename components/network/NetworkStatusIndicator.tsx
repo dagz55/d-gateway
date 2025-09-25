@@ -274,7 +274,7 @@ export function NetworkStatusIndicator({
                         </div>
                       </div>
                       <div>
-                        <div className="text-gray-600">Success Rate</div>
+                        <div className="text-gray-600">Error Rate</div>
                         <div className="font-medium">
                           {healthReport.metrics.performance.errorRate.toFixed(1)}%
                         </div>

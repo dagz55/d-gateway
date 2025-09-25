@@ -48,7 +48,7 @@ CREATE POLICY "Public profile view for copy trading" ON public.user_profiles
 
 -- Users can manage their own trading accounts
 CREATE POLICY "Users can manage own trading accounts" ON public.trading_accounts
-    FOR ALL USING (auth.uid()::text = user_id);
+    FOR ALL USING (auth.uid()::uuid = user_id);
 
 -- =====================================================
 -- TRADING SIGNALS POLICIES
@@ -68,7 +68,7 @@ CREATE POLICY "Providers can manage own signals" ON public.trading_signals
 
 -- Users can manage their own trades
 CREATE POLICY "Users can manage own trades" ON public.trades
-    FOR ALL USING (auth.uid()::text = user_id);
+    FOR ALL USING (auth.uid()::uuid = user_id);
 
 -- Copy trading followers can view trader's trades (with restrictions)
 CREATE POLICY "Copy trading view access" ON public.trades
@@ -87,7 +87,7 @@ CREATE POLICY "Copy trading view access" ON public.trades
 
 -- Users can manage their own portfolio
 CREATE POLICY "Users can manage own portfolio" ON public.portfolio_holdings
-    FOR ALL USING (auth.uid()::text = user_id);
+    FOR ALL USING (auth.uid()::uuid = user_id);
 
 -- =====================================================
 -- WATCHLIST POLICIES
@@ -95,7 +95,7 @@ CREATE POLICY "Users can manage own portfolio" ON public.portfolio_holdings
 
 -- Users can manage their own watchlist
 CREATE POLICY "Users can manage own watchlist" ON public.watchlist
-    FOR ALL USING (auth.uid()::text = user_id);
+    FOR ALL USING (auth.uid()::uuid = user_id);
 
 -- =====================================================
 -- CRYPTO PRICES POLICIES
@@ -127,7 +127,7 @@ CREATE POLICY "Service role can manage news" ON public.news_articles
 
 -- Users can manage their own notifications
 CREATE POLICY "Users can manage own notifications" ON public.notifications
-    FOR ALL USING (auth.uid()::text = user_id);
+    FOR ALL USING (auth.uid()::uuid = user_id);
 
 -- =====================================================
 -- TRANSACTIONS POLICIES
@@ -135,7 +135,7 @@ CREATE POLICY "Users can manage own notifications" ON public.notifications
 
 -- Users can manage their own transactions
 CREATE POLICY "Users can manage own transactions" ON public.transactions
-    FOR ALL USING (auth.uid()::text = user_id);
+    FOR ALL USING (auth.uid()::uuid = user_id);
 
 -- =====================================================
 -- COPY TRADING POLICIES

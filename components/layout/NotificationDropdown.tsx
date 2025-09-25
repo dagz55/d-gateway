@@ -312,9 +312,9 @@ export default function NotificationDropdown() {
   
     const handleSubscriptionError = () => {
       if (isDestroyed) return;
-      
+
       isConnected = false;
-      
+
       if (channel) {
         try {
           supabase.removeChannel(channel);
@@ -323,11 +323,16 @@ export default function NotificationDropdown() {
         }
         channel = null;
       }
-  
+
       if (retryCount < maxRetries) {
         retryCount++;
         const delay = Math.min(Math.pow(2, retryCount) * 1000, 10000); // Cap at 10 seconds
         console.log(`🔄 Retrying notifications subscription in ${delay}ms (attempt ${retryCount}/${maxRetries})`);
+        // DEBUG: Check if retryTimeout is already set
+        if (retryTimeout) {
+          console.warn("⚠️ retryTimeout already set, clearing previous timeout to prevent overlap");
+        }
+        if (retryTimeout) clearTimeout(retryTimeout);
         retryTimeout = setTimeout(setupSubscription, delay);
       } else {
         console.warn("⚠️ Max retries reached for subscription. Falling back to polling.");

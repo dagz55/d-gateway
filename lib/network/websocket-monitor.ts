@@ -567,8 +567,31 @@ export class WebSocketMonitor {
       this.tradingWs = null;
     }
 
-    // Supabase client handles its own cleanup
-    // Just update connection status
+    // Explicitly tear down Supabase realtime connection
+    if (this.supabaseClient) {
+      try {
+        const realtime = (this.supabaseClient as any).realtime;
+        if (realtime && realtime.disconnect) {
+          // Remove/unsubscribe all channels
+          if (realtime.channels) {
+            realtime.channels.forEach((channel: any) => {
+              if (channel.unsubscribe) {
+                channel.unsubscribe();
+              }
+            });
+          }
+          // Call the realtime/socket disconnect method
+          realtime.disconnect();
+          console.log('Supabase realtime connection disconnected');
+        }
+      } catch (error) {
+        console.warn('Error disconnecting Supabase realtime:', error);
+      }
+      // Clear the stored client reference
+      this.supabaseClient = null;
+    }
+
+    // Update connection status
     for (const connection of this.connections.values()) {
       connection.status = 'disconnected';
       connection.disconnectedAt = new Date().toISOString();

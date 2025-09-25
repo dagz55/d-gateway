@@ -479,7 +479,7 @@ export class NetworkAgent {
           }
           break;
 
-        case 'api':
+        case 'api': {
           // Retry failed API endpoints
           const endpoint = this.extractEndpointFromIssue(issue);
           if (endpoint) {
@@ -487,6 +487,7 @@ export class NetworkAgent {
             healed = true;
           }
           break;
+        }
 
         case 'connectivity':
           // Run diagnostics to refresh connectivity status
