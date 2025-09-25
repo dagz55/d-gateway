@@ -1,14 +1,10 @@
+import { NextRequest, NextResponse } from 'next/server'
+import { getCurrentUser } from '@/lib/clerk-auth'
+import { createServerSupabaseClient } from '@/lib/supabase/serverClient'
+import { createAdminClient } from '@/lib/supabase/adminClient'
+
 // Debug flag for PII logging
 const DEBUG_ADMIN_LOGS = process.env.NODE_ENV !== 'production' || process.env.DEBUG_ADMIN_LOGS === 'true';
-
-import { NextRequest, NextResponse } from 'next/server'
-import { getCurrentUser } from '@/lib/clerk-auth'
-import { createServerSupabaseClient } from '@/lib/supabase/serverClient'
-import { createAdminClient } from '@/lib/supabase/adminClient'
-import { NextRequest, NextResponse } from 'next/server'
-import { getCurrentUser } from '@/lib/clerk-auth'
-import { createServerSupabaseClient } from '@/lib/supabase/serverClient'
-import { createAdminClient } from '@/lib/supabase/adminClient'
 
 async function assertAdmin(request?: NextRequest) {
   // Skip authentication during build time
