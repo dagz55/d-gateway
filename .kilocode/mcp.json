@@ -43,7 +43,7 @@
         "--headless=true",
         "--viewport-size=1280x720"
       ],
-      "disabled": true,
+      "disabled": false,
       "alwaysAllow": []
     },
     "codegen": {

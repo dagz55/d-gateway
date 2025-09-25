@@ -9,7 +9,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { useUser } from '@clerk/nextjs';
 import { cn } from '@/lib/utils';
-import { supabase as createSupabaseClient } from '@/lib/supabase/browserClient';
+import { createRealtimeClient, getRealtimeStatus, reconnectRealtime } from '@/lib/supabase/realtime-client';
 
 interface Notification {
   id: string;
@@ -77,7 +77,7 @@ export default function NotificationDropdown() {
   const [loading, setLoading] = useState(true);
   const [isOpen, setIsOpen] = useState(false);
   const { user } = useUser();
-  const supabase = createSupabaseClient();
+  const supabase = createRealtimeClient();
 
   const unreadCount = notifications.filter(n => !n.is_read).length;
 
