@@ -23,13 +23,15 @@ SUPABASE_SERVICE_ROLE_KEY=your_service_role_key  # For admin operations
 ## Architecture Overview
 
 ### Core Stack
-- **Framework**: Next.js 15.5.3 with App Router and React 19
+- **Framework**: Next.js 15.5.4 with App Router and React 19.1.1
 - **Authentication**: Clerk with App Router integration
 - **Database**: Supabase with Row Level Security
 - **Styling**: Tailwind CSS with shadcn/ui component library
 - **State Management**: TanStack Query + Zustand
 - **Charts**: Recharts for data visualization
 - **Animations**: Framer Motion
+- **MCP Integration**: Model Context Protocol gateway with 6 services
+- **Development**: Turbopack for faster builds
 
 ### Key Architecture Patterns
 
@@ -211,6 +213,64 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
 ## Recent Changes & Version History
 
+### v2.11.14 - Vercel Deployment & User Profile Integration (January 2025)
+- **🔧 Vercel Deployment Fix**: Resolved critical build error with MCP adapter imports
+  - Fixed `Module not found: Can't resolve '@vercel/mcp-adapter'` error
+  - Separated combined import statements into individual imports for better module resolution
+  - Ensured Vercel deployment compatibility while maintaining all MCP functionality
+  - Verified build success both locally and for Vercel deployment
+
+- **👤 User Profile Integration**: Resolved Supabase profile creation issues for Clerk users
+  - Fixed "User profile not found in Supabase for Clerk ID" errors
+  - Added automatic profile creation when users exist in Clerk but not in Supabase
+  - Updated wallet page to auto-create profiles using Clerk user data
+  - Modified avatar upload routes to use upsert operations for missing profiles
+  - Implemented graceful fallbacks for profile creation failures
+  - Enhanced error handling and logging for better debugging
+
+- **📱 Mobile Responsiveness**: Enhanced mobile user experience across dashboard
+  - Optimized sidebar width and spacing for mobile devices (reduced from 64px to 48px)
+  - Reduced padding and margins for better space utilization
+  - Scaled typography and form elements for mobile screens
+  - Enhanced profile settings page mobile layout
+  - Improved form component responsiveness across all settings pages
+
+- **🎛️ Configurable Market Overview**: Enhanced market dashboard with user preferences
+  - Added display count selector (10, 20, 30, 50, 100 cryptocurrencies)
+  - Implemented localStorage persistence for user preferences
+  - Enhanced market data filtering and display options
+  - Added settings icon and improved UI controls
+
+- **🏠 Landing Page Navigation**: Enhanced navigation for dashboard users
+  - Added "Dashboard" button to landing page navigation for signed-in users
+  - Implemented responsive design for both desktop and mobile
+  - Maintained consistent styling with landing page theme
+
+- **🔌 MCP Gateway Integration**: Comprehensive Model Context Protocol gateway implementation
+  - Created centralized MCP gateway with Docker containerization
+  - Added Clerk OAuth token authentication for MCP requests
+  - Implemented metadata validation and response enhancement
+  - Added environment variable override functionality in containers
+  - Created comprehensive test suite for MCP gateway functionality
+  - Added NextJS API integration at `/api/mcp/nextjs`
+  - Implemented service discovery and health monitoring
+  - Added support for multiple MCP services (filesystem, supabase, memory, puppeteer, context7, reactbits)
+  - Created Docker Compose configurations for testing and production
+  - Added comprehensive documentation and test results
+
+### v2.11.13 - MCP Gateway Integration (September 2025)
+- **🔌 MCP Gateway Integration**: Comprehensive Model Context Protocol gateway implementation
+  - Created centralized MCP gateway with Docker containerization
+  - Added Clerk OAuth token authentication for MCP requests
+  - Implemented metadata validation and response enhancement
+  - Added environment variable override functionality in containers
+  - Created comprehensive test suite for MCP gateway functionality
+  - Added NextJS API integration at `/api/mcp/nextjs`
+  - Implemented service discovery and health monitoring
+  - Added support for multiple MCP services (filesystem, supabase, memory, puppeteer, context7, reactbits)
+  - Created Docker Compose configurations for testing and production
+  - Added comprehensive documentation and test results
+
 ### v2.11.6 - OAuth Redirect Fix (September 2025)
 - **HOTFIX**: Added temporary `/auth/oauth-success` redirect handler for Clerk compatibility
 - **Fixed**: 404 errors during OAuth login flow that broke user authentication
@@ -226,7 +286,207 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 - **Performance**: Optimized landing page with lazy loading and image optimization
 - **Build**: Resolved "Cannot find module for page: /dashboard" error
 
+## MCP Gateway Integration
+
+### Available MCP Services
+The project includes a comprehensive MCP (Model Context Protocol) gateway with the following services:
+
+#### 1. Filesystem Service (`/mcp/filesystem`)
+- **Tools**: `read_text_file`, `write_file`, `edit_file`, `list_directory`, `search_files`, `get_file_info`
+- **Use Case**: File operations, CSS analysis, code inspection
+- **Endpoint**: `http://localhost:8080/mcp/filesystem`
+
+#### 2. Memory Service (`/mcp/memory`)
+- **Tools**: `store`, `retrieve`, `delete`, `list`
+- **Use Case**: Data caching, session management
+- **Endpoint**: `http://localhost:8080/mcp/memory`
+
+#### 3. Supabase Service (`/mcp/supabase`)
+- **Tools**: `query`, `insert`, `update`, `delete`, `get_schema`
+- **Use Case**: Database operations, user management
+- **Endpoint**: `http://localhost:8080/mcp/supabase`
+
+#### 4. ReactBits Service (`/mcp/reactbits`)
+- **Tools**: `analyze_component`, `generate_component`, `optimize_component`
+- **Use Case**: React component analysis and optimization
+- **Endpoint**: `http://localhost:8080/mcp/reactbits`
+
+#### 5. Puppeteer Service (`/mcp/puppeteer`)
+- **Tools**: `navigate`, `screenshot`, `extract_data`, `click_element`, `fill_form`
+- **Use Case**: Browser automation, web scraping, testing
+- **Endpoint**: `http://localhost:8080/mcp/puppeteer`
+
+#### 6. Context7 Service (`/mcp/context7`)
+- **Tools**: `search_docs`, `get_context`, `summarize`
+- **Use Case**: Documentation search, knowledge retrieval
+- **Endpoint**: `http://localhost:8080/mcp/context7`
+
+### MCP Gateway Setup
+```bash
+# Start MCP Gateway and all services
+docker-compose -f docker-compose.mcp.yml up -d
+
+# Start all services
+curl -X POST http://localhost:8080/services/start-all
+
+# Check gateway health
+curl -s http://localhost:8080/health
+```
+
+### MCP Usage Examples
+```bash
+# Read file using filesystem service
+curl -X POST http://localhost:8080/mcp/filesystem \
+  -H "Content-Type: application/json" \
+  -d '{
+    "jsonrpc": "2.0",
+    "id": 1,
+    "method": "tools/call",
+    "params": {
+      "name": "read_text_file",
+      "arguments": {"path": "app/globals.css"}
+    }
+  }'
+
+# Query database using Supabase service
+curl -X POST http://localhost:8080/mcp/supabase \
+  -H "Content-Type: application/json" \
+  -d '{
+    "jsonrpc": "2.0",
+    "id": 1,
+    "method": "tools/call",
+    "params": {
+      "name": "query",
+      "arguments": {"sql": "SELECT COUNT(*) FROM user_profiles"}
+    }
+  }'
+```
+
+## Environment Variables & Deployment
+
+### Required Environment Variables for Vercel
+```bash
+# Clerk Authentication (Required)
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_your_clerk_publishable_key_here
+CLERK_SECRET_KEY=sk_test_your_clerk_secret_key_here
+
+# Supabase Database (Required)
+NEXT_PUBLIC_SUPABASE_URL=https://your-project-ref.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key_here
+SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key_here
+
+# Site Configuration (Required)
+NEXT_PUBLIC_SITE_URL=https://your-production-domain.example.com
+JWT_SECRET=your_jwt_secret_here
+NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in
+NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
+
+# Optional API Keys
+COINGECKO_API_KEY=your_coingecko_api_key_here
+ALLOWED_ADMIN_EMAILS=admin1@example.com,admin2@example.com
+```
+
+### Vercel Deployment Configuration
+- **Environment Variables**: Must be configured in Vercel dashboard (Settings → Environment Variables)
+- **Build Command**: `next build`
+- **Output Directory**: `.next`
+- **Node.js Version**: 18.x or higher
+- **Framework**: Next.js
+
 ### Production URLs
 - **Sign In**: `https://account.zignals.org/sign-in`
 - **Sign Up**: `https://account.zignals.org/sign-up`
 - **Development**: Local `/sign-in` and `/sign-up` routes via Clerk
+
+## Development Tools & Scripts
+
+### Available NPM Scripts
+```bash
+npm run dev              # Start development server with Turbopack
+npm run dev:qa           # Start QA development server on port 3002
+npm run build            # Build production bundle
+npm run start            # Start production server
+npm run lint             # Run ESLint
+npm run clean            # Clean build cache and node_modules
+npm run fresh            # Clean, install, and start dev server
+npm run check-env        # Check environment variables
+npm run validate-env     # Validate environment variables for deployment
+npm run generate-secrets # Generate JWT secrets
+npm run setup-clerk      # Setup Clerk authentication
+npm run setup-db         # Setup database tables
+npm run test:clerk       # Test Clerk integration
+npm run test:supabase    # Test Supabase connection
+npm run test:all         # Run all tests
+```
+
+### MCP Gateway Scripts
+```bash
+# Start MCP Gateway
+docker-compose -f docker-compose.mcp.yml up -d
+
+# Start specific service
+curl -X POST http://localhost:8080/services/filesystem/start
+
+# Check service status
+curl -s http://localhost:8080/health | jq '.services'
+
+# Stop all services
+curl -X POST http://localhost:8080/services/stop-all
+```
+
+## Troubleshooting
+
+### Common Issues
+
+#### 1. Vercel Deployment Failures
+- **Issue**: `Module not found: Can't resolve '@vercel/mcp-adapter'`
+- **Solution**: Ensure environment variables are configured in Vercel dashboard
+- **Check**: Run `npm run validate-env` locally before deployment
+
+#### 2. User Profile Errors
+- **Issue**: "User profile not found in Supabase for Clerk ID"
+- **Solution**: Profiles are now auto-created when missing
+- **Check**: Verify Supabase connection and RLS policies
+
+#### 3. MCP Gateway Issues
+- **Issue**: Services not starting
+- **Solution**: Check Docker containers and restart gateway
+- **Check**: `docker logs zignal-login-mcp-gateway-1`
+
+#### 4. CSS Build Errors
+- **Issue**: CSS parsing errors with square brackets
+- **Solution**: Ensure proper Tailwind CSS syntax
+- **Check**: Run `npm run build` to verify CSS compilation
+
+### Debug Commands
+```bash
+# Check environment variables
+npm run validate-env
+
+# Test database connection
+npm run test:supabase
+
+# Test Clerk integration
+npm run test:clerk
+
+# Check MCP gateway health
+curl -s http://localhost:8080/health
+
+# View build logs
+npm run build 2>&1 | grep -i error
+```
+
+## Documentation Files
+
+### Key Documentation
+- **CLAUDE.md**: This file - comprehensive development guide
+- **VERCEL_DEPLOYMENT_FIX.md**: Vercel deployment troubleshooting guide
+- **KILO_CODE_MCP_PROMPT.md**: MCP gateway integration for Kilo Code
+- **KILO_CODE_QUICK_START.md**: Quick start guide for MCP tools
+- **README.md**: Project overview and setup instructions
+- **CHANGELOG.md**: Detailed version history and changes
+
+### MCP Documentation
+- **mcp-config.json**: MCP gateway configuration
+- **docker-compose.mcp.yml**: MCP services Docker configuration
+- **scripts/validate-env.js**: Environment variable validation script
