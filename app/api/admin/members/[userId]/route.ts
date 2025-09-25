@@ -61,9 +61,9 @@ export async function GET(
 
     // Get profile from Supabase if exists
     const { data: profile, error: profileError } = await supabase
-      .from('profiles')
+      .from('user_profiles')
       .select('*')
-      .eq('id', userId)
+      .eq('clerk_user_id', userId)
       .single();
 
     if (profileError && profileError.code !== 'PGRST116') {
@@ -174,12 +174,12 @@ export async function PUT(
           }
         });
 
-        // Update in Supabase profiles if exists
+        // Update in Supabase user_profiles if exists
         const supabase = await createServerSupabaseClient();
         await supabase
-          .from('profiles')
+          .from('user_profiles')
           .upsert({
-            id: userId,
+            clerk_user_id: userId,
             is_admin: true,
             updated_at: new Date().toISOString()
           });
@@ -203,12 +203,12 @@ export async function PUT(
           }
         });
 
-        // Update in Supabase profiles if exists
+        // Update in Supabase user_profiles if exists
         const supabase2 = await createServerSupabaseClient();
         await supabase2
-          .from('profiles')
+          .from('user_profiles')
           .upsert({
-            id: userId,
+            clerk_user_id: userId,
             is_admin: false,
             updated_at: new Date().toISOString()
           });

@@ -41,7 +41,7 @@ export async function GET(request: NextRequest) {
     const q = (searchParams.get('q') || '').toLowerCase()
 
     let query = admin
-      .from('profiles')
+      .from('user_profiles')
       .select('id, email, username, full_name, is_admin, created_at', { count: 'exact' })
       .order('created_at', { ascending: false })
 
@@ -90,9 +90,9 @@ export async function PUT(request: NextRequest) {
 
     const admin = createAdminClient()
     const { data, error } = await (admin as any)
-      .from('profiles')
+      .from('user_profiles')
       .update({ is_admin: newValue })
-      .eq('id', targetId)
+      .eq('clerk_user_id', targetId)
       .select('id, email, username, full_name, is_admin')
       .single()
     if (error) throw error
