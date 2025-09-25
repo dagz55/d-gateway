@@ -9,12 +9,35 @@ async function assertAdmin(request?: NextRequest) {
     return { user: null, isAdmin: false, buildTime: true }
   }
 
-  const user = await getCurrentUser()
-  if (!user) return { user: null, isAdmin: false }
-  
-  // Check admin status using Clerk's publicMetadata instead of email patterns
-  const isAdminUser = user.publicMetadata?.isAdmin === true || user.publicMetadata?.role === 'admin'
-  return { user, isAdmin: isAdminUser }
+  try {
+    const user = await getCurrentUser()
+    if (!user) {
+      console.log('Admin API: No user found');
+      return { user: null, isAdmin: false }
+    }
+    
+    // Check admin status using multiple methods
+    const isAdminUser = 
+      user.publicMetadata?.isAdmin === true || 
+      user.publicMetadata?.role === 'admin' ||
+      user.publicMetadata?.role === 'super_admin' ||
+      // Check organization role if available
+      (user as any)?.organizationMemberships?.some((membership: any) => 
+        membership.role === 'admin' || membership.role === 'owner'
+      )
+
+    console.log('Admin API: User check result', {
+      userId: user.id,
+      email: user.emailAddresses[0]?.emailAddress,
+      publicMetadata: user.publicMetadata,
+      isAdmin: isAdminUser
+    });
+
+    return { user, isAdmin: isAdminUser }
+  } catch (error) {
+    console.error('Admin API: Error checking admin status:', error);
+    return { user: null, isAdmin: false }
+  }
 }
 
 export async function GET(request: NextRequest) {
@@ -30,8 +53,26 @@ export async function GET(request: NextRequest) {
     }
     
     const { user, isAdmin } = adminCheck
-    if (!user || !isAdmin) {
-      return NextResponse.json({ success: false, message: 'Forbidden' }, { status: 403 })
+    if (!user) {
+      console.log('Admin API: No user found, returning 401');
+      return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 })
+    }
+    
+    if (!isAdmin) {
+      console.log('Admin API: User is not admin', {
+        userId: user.id,
+        email: user.emailAddresses[0]?.emailAddress,
+        publicMetadata: user.publicMetadata
+      });
+      return NextResponse.json({ 
+        success: false, 
+        message: 'Forbidden - Admin access required',
+        debug: {
+          userId: user.id,
+          email: user.emailAddresses[0]?.emailAddress,
+          publicMetadata: user.publicMetadata
+        }
+      }, { status: 403 })
     }
 
     const admin = createAdminClient()
