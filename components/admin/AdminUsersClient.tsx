@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
-import { FixedSizeList as List } from 'react-window';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -338,18 +337,82 @@ export default function AdminUsersClient() {
                   <div className="col-span-1">Actions</div>
                 </div>
 
-                {/* Virtualized Members List */}
-                <div className="h-[600px] w-full">
-                  <List
-                    height={600}
-                    itemCount={filteredMembers.length}
-                    itemSize={90} // Adjust based on your row height
-                    width="100%"
-                    itemData={filteredMembers}
-                  >
-                    {Row}
-                  </List>
-                </div>
+                 {/* Members List */}
+                 <div className="space-y-2">
+                   {filteredMembers.map((member) => (
+                     <div
+                       key={member.user_id}
+                       className="grid grid-cols-12 gap-4 px-4 py-4 rounded-lg bg-card/30 hover:bg-card/50 transition-all duration-200 border border-border/20"
+                     >
+                       {/* Member Info */}
+                       <div className="col-span-3 flex items-center gap-3">
+                         <Avatar className="h-10 w-10">
+                           <AvatarImage src={member.avatar_url} alt={member.full_name || member.email} />
+                           <AvatarFallback className="bg-accent/10 text-accent">
+                             {(member.full_name || member.email).charAt(0).toUpperCase()}
+                           </AvatarFallback>
+                         </Avatar>
+                         <div>
+                           <div className="font-medium text-foreground">
+                             {member.full_name || 'No Name'}
+                           </div>
+                           <div className="text-sm text-muted-foreground">
+                             {member.display_name || 'No Display Name'}
+                           </div>
+                         </div>
+                       </div>
+
+                       {/* Registration Date */}
+                       <div className="col-span-2 flex items-center gap-2">
+                         <Calendar className="h-4 w-4 text-muted-foreground" />
+                         <div>
+                           <div className="text-sm font-medium text-foreground">
+                             {formatDate(member.created_at)}
+                           </div>
+                           <div className="text-xs text-muted-foreground">
+                             Registered
+                           </div>
+                         </div>
+                       </div>
+
+                       {/* Status */}
+                       <div className="col-span-2 flex items-center">
+                         {getStatusBadge(member)}
+                       </div>
+
+                       {/* Active Trades */}
+                       <div className="col-span-2 flex items-center gap-2">
+                         <Activity className="h-4 w-4 text-muted-foreground" />
+                         <div>
+                           <div className="text-sm font-medium text-foreground">
+                             {member.active_trades || 0}
+                           </div>
+                           <div className="text-xs text-muted-foreground">
+                             Active Trades
+                           </div>
+                         </div>
+                       </div>
+
+                       {/* Username/Email */}
+                       <div className="col-span-2 flex items-center gap-2">
+                         <Mail className="h-4 w-4 text-muted-foreground" />
+                         <div className="min-w-0">
+                           <div className="text-sm font-medium text-foreground truncate">
+                             {member.email}
+                           </div>
+                           <div className="text-xs text-muted-foreground">
+                             Email
+                           </div>
+                         </div>
+                       </div>
+
+                       {/* Actions */}
+                       <div className="col-span-1 flex items-center gap-1">
+                         <AdminMemberActions member={member} />
+                       </div>
+                     </div>
+                   ))}
+                 </div>
 
                 {/* Pagination */}
                 {totalPages > 1 && (
@@ -386,98 +449,3 @@ export default function AdminUsersClient() {
   );
 }
 
-// Row component for the virtualized list
-const Row = ({ index, style, data }: { index: number; style: React.CSSProperties; data: MemberData[] }) => {
-  const member = data[index];
-
-  const getStatusBadge = (member: MemberData) => {
-    if (member.is_admin) {
-      return <Badge className="bg-red-500/10 text-red-400 border-red-500/30">Admin</Badge>;
-    }
-    
-    const isActive = member.last_sign_in_at &&
-      new Date(member.last_sign_in_at) > new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
-    
-    if (isActive) {
-      return <Badge className="bg-green-500/10 text-green-400 border-green-500/30">Active</Badge>;
-    }
-    
-    return <Badge className="bg-gray-500/10 text-gray-400 border-gray-500/30">Inactive</Badge>;
-  };
-
-  return (
-    <div style={style}>
-      <div
-        key={member.user_id}
-        className="grid grid-cols-12 gap-4 px-4 py-4 rounded-lg bg-card/30 hover:bg-card/50 transition-all duration-200 border border-border/20"
-      >
-        {/* Member Info */}
-        <div className="col-span-3 flex items-center gap-3">
-          <Avatar className="h-10 w-10">
-            <AvatarImage src={member.avatar_url} alt={member.full_name || member.email} />
-            <AvatarFallback className="bg-accent/10 text-accent">
-              {(member.full_name || member.email).charAt(0).toUpperCase()}
-            </AvatarFallback>
-          </Avatar>
-          <div>
-            <div className="font-medium text-foreground">
-              {member.full_name || 'No Name'}
-            </div>
-            <div className="text-sm text-muted-foreground">
-              {member.display_name || 'No Display Name'}
-            </div>
-          </div>
-        </div>
-
-        {/* Registration Date */}
-        <div className="col-span-2 flex items-center gap-2">
-          <Calendar className="h-4 w-4 text-muted-foreground" />
-          <div>
-            <div className="text-sm font-medium text-foreground">
-              {formatDate(member.created_at)}
-            </div>
-            <div className="text-xs text-muted-foreground">
-              Registered
-            </div>
-          </div>
-        </div>
-
-        {/* Status */}
-        <div className="col-span-2 flex items-center">
-          {getStatusBadge(member)}
-        </div>
-
-        {/* Active Trades */}
-        <div className="col-span-2 flex items-center gap-2">
-          <Activity className="h-4 w-4 text-muted-foreground" />
-          <div>
-            <div className="text-sm font-medium text-foreground">
-              {member.active_trades || 0}
-            </div>
-            <div className="text-xs text-muted-foreground">
-              Active Trades
-            </div>
-          </div>
-        </div>
-
-        {/* Username/Email */}
-        <div className="col-span-2 flex items-center gap-2">
-          <Mail className="h-4 w-4 text-muted-foreground" />
-          <div className="min-w-0">
-            <div className="text-sm font-medium text-foreground truncate">
-              {member.email}
-            </div>
-            <div className="text-xs text-muted-foreground">
-              Email
-            </div>
-          </div>
-        </div>
-
-        {/* Actions */}
-        <div className="col-span-1 flex items-center gap-1">
-          <AdminMemberActions member={member} />
-        </div>
-      </div>
-    </div>
-  );
-};
