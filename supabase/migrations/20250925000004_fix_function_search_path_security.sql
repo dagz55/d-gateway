@@ -321,6 +321,7 @@ END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = '';
 
 -- Fix: get_user_balance
+DROP FUNCTION IF EXISTS public.get_user_balance(uuid);
 CREATE OR REPLACE FUNCTION public.get_user_balance(user_uuid UUID)
 RETURNS JSON AS $$
 DECLARE
@@ -328,11 +329,11 @@ DECLARE
     account_balance DECIMAL(20,8);
     portfolio_value DECIMAL(20,8);
 BEGIN
-    -- Get account balance
-    SELECT COALESCE(account_balance, 0)
+    -- Get account balance from trading_accounts
+    SELECT COALESCE(balance, 0)
     INTO account_balance
-    FROM public.user_profiles
-    WHERE user_id = user_uuid;
+    FROM public.trading_accounts
+    WHERE user_id = user_uuid::text;
 
     -- Get portfolio value
     SELECT public.calculate_portfolio_value(user_uuid) INTO portfolio_value;
@@ -349,6 +350,7 @@ END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = '';
 
 -- Fix: get_dashboard_stats
+DROP FUNCTION IF EXISTS public.get_dashboard_stats(uuid);
 CREATE OR REPLACE FUNCTION public.get_dashboard_stats(user_uuid UUID)
 RETURNS JSON AS $$
 DECLARE
@@ -384,11 +386,11 @@ BEGIN
     FROM public.trades
     WHERE user_id = user_uuid;
 
-    -- Get account balance
-    SELECT COALESCE(account_balance, 0)
+    -- Get account balance from trading_accounts
+    SELECT COALESCE(balance, 0)
     INTO account_balance
-    FROM public.user_profiles
-    WHERE user_id = user_uuid;
+    FROM public.trading_accounts
+    WHERE user_id = user_uuid::text;
 
     -- Build JSON result
     result := json_build_object(
@@ -506,15 +508,13 @@ VALUES (
 ) ON CONFLICT (config_key) DO NOTHING;
 
 CREATE OR REPLACE FUNCTION public.auto_set_admin_for_known_emails()
-RETURNS TRIGGER AS $
+RETURNS TRIGGER AS $$
 DECLARE
     known_admin_emails TEXT[];
 BEGIN
     -- Get admin emails from configuration table
     SELECT COALESCE(
-        (SELECT jsonb_array_to_text_array(config_value)
-         FROM public.admin_configuration
-         WHERE config_key = 'admin_emails'),
+        (SELECT array_agg(elem::text) FROM jsonb_array_elements_text((SELECT config_value FROM public.admin_configuration WHERE config_key = 'admin_emails')) elem),
         ARRAY[]::TEXT[]
     ) INTO known_admin_emails;
 
@@ -524,8 +524,6 @@ BEGIN
         UPDATE public.user_profiles
         SET
             is_admin = true,
-            role = 'admin',
-            admin_permissions = ARRAY['users', 'signals', 'finances', 'payments', 'system'],
             updated_at = NOW()
         WHERE user_id = NEW.id OR clerk_user_id = NEW.id::text;
 
@@ -535,9 +533,17 @@ BEGIN
 
     RETURN NEW;
 END;
-$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = '';
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = '';
+
+-- Create trigger for auto admin assignment
+DROP TRIGGER IF EXISTS auto_set_admin_for_known_emails_trigger ON public.user_profiles;
+CREATE TRIGGER auto_set_admin_for_known_emails_trigger
+    AFTER INSERT ON public.user_profiles
+    FOR EACH ROW
+    EXECUTE FUNCTION public.auto_set_admin_for_known_emails();
 
 -- Fix: update_user_avatar_by_clerk_id
+DROP FUNCTION IF EXISTS public.update_user_avatar_by_clerk_id(text,text);
 CREATE OR REPLACE FUNCTION public.update_user_avatar_by_clerk_id(
     clerk_id TEXT,
     avatar_url_param TEXT
