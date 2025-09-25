@@ -285,8 +285,8 @@ export default async function WalletPage() {
     if (!userProfile) {
       console.log('User profile not found in Supabase for Clerk ID:', clerkUserId, '- Creating new profile');
       
-      // Create a new user profile in Supabase
-      const { syncClerkUserWithProfile } = await import('@/lib/supabase/clerk-integration');
+      // Create a new user profile in Supabase using server-side function
+      const { syncClerkUserWithProfileServer } = await import('@/lib/supabase/clerk-integration');
       
       const clerkUserData = {
         email: user.emailAddresses[0]?.emailAddress || '',
@@ -296,7 +296,7 @@ export default async function WalletPage() {
         imageUrl: user.imageUrl || null,
       };
       
-      userProfile = await syncClerkUserWithProfile(clerkUserId, clerkUserData);
+      userProfile = await syncClerkUserWithProfileServer(clerkUserId, clerkUserData);
       
       if (!userProfile) {
         console.error('Failed to create user profile for Clerk ID:', clerkUserId);

@@ -67,6 +67,8 @@ services:
       - mcp-network
     environment:
       - NODE_ENV=production
+    ports:
+      - "3001"
     healthcheck:
       test: ["CMD", "ls", "/workspace"]
       interval: 30s
@@ -86,6 +88,8 @@ services:
       - NODE_ENV=production
     volumes:
       - mcp-memory-data:/app/data
+    ports:
+      - "3002"
     healthcheck:
       test: ["CMD", "test", "-f", "/app/data/memory.json"]
       interval: 30s
@@ -103,6 +107,8 @@ services:
       - .env
     networks:
       - mcp-network
+    ports:
+      - "3003"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
       interval: 30s
@@ -120,6 +126,8 @@ services:
       - mcp-network
     environment:
       - NODE_ENV=production
+    ports:
+      - "3004"
     healthcheck:
       test: ["CMD", "pgrep", "node"]
       interval: 30s
@@ -137,6 +145,8 @@ services:
       - mcp-network
     environment:
       - NODE_ENV=development
+    ports:
+      - "3005"
     healthcheck:
       test: ["CMD", "pgrep", "node"]
       interval: 30s
@@ -152,6 +162,8 @@ services:
     command: ["npx", "@agentdeskai/browser-tools-mcp@1.2.0"]
     networks:
       - mcp-network
+    ports:
+      - "3006"
     environment:
       - NODE_ENV=production
     healthcheck:
@@ -169,8 +181,6 @@ services:
     command: ["npx", "tavily-mcp@0.2.3"]
     networks:
       - mcp-network
-    ports:
-      - "3007"
     healthcheck:
       test: ["CMD", "pgrep", "node"]
       interval: 30s

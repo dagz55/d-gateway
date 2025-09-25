@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { currentUser } from '@clerk/nextjs/server';
-import { createClient } from '@/lib/supabase/client';
+import { createServerSupabaseClient } from '@/lib/supabase/serverClient';
 import { validateImageFile } from '@/lib/validation';
 
 // Type definitions
@@ -52,7 +52,7 @@ export async function POST(request: NextRequest) {
     }
 
     let avatarUrl: string;
-    const supabase = createClient();
+    const supabase = await createServerSupabaseClient();
 
     // Try Supabase storage first if file is provided
     if (file) {
@@ -179,7 +179,7 @@ export async function DELETE() {
       );
     }
 
-    const supabase = createClient();
+    const supabase = await createServerSupabaseClient();
 
     // Get current avatar URL
     const { data: profile } = await supabase
