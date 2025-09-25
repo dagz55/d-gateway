@@ -1,23 +1,7 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
-// Validate required environment variables
-const validateEnvironment = () => {
-  const requiredEnvVars = [
-    'NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY',
-    'CLERK_SECRET_KEY'
-  ];
-
-  const missingVars = requiredEnvVars.filter(varName => !process.env[varName]);
-  
-  if (missingVars.length > 0) {
-    console.error('Missing required environment variables:', missingVars);
-    console.error('Please configure these variables in Vercel dashboard: Settings → Environment Variables');
-  }
-};
-
-// Validate environment on middleware load
-validateEnvironment();
+// Environment validation is handled by scripts/validate-env.js (run via npm run check-env)
 
 // Public routes that are accessible without authentication
 const isPublicRoute = createRouteMatcher([

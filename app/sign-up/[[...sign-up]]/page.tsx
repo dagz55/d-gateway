@@ -68,7 +68,7 @@ export default function SignUpPage() {
                 formButtonPrimary:
                   'w-full bg-[#33E1DA] hover:bg-[#2BC4BE] text-gray-900 font-semibold py-3 px-4 rounded-lg transition-colors',
                 formFieldInput:
-                  'w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white text-gray-900 rounded-lg py-3 px-4 focus:ring-2 focus:ring-[#33E1DA] focus:border-transparent',
+                  'w-full border border-gray-300 dark:border-gray-600 bg-white text-gray-900 dark:bg-gray-700 dark:text-white rounded-lg py-3 px-4 transition-colors focus:ring-2 focus:ring-[#33E1DA] focus:border-transparent hover:bg-[#F5F7FA] focus:bg-[#F5F7FA] active:bg-[#E9EEF5] hover:text-gray-900 focus:text-gray-900 active:text-gray-900 dark:hover:bg-[#4B5563] dark:focus:bg-[#4B5563] dark:active:bg-[#4B5563] dark:hover:text-white dark:focus:text-white dark:active:text-white',
                 formFieldLabel: 'text-gray-700 dark:text-gray-200 font-medium mb-2 block',
                 footerActionLink:
                   'text-[#33E1DA] hover:text-[#2BC4BE] font-medium',

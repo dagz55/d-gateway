@@ -22,5 +22,5 @@ export default async function MemberLayout({
     redirect('/admin');
   }
 
-  return <AppLayout>{children}</AppLayout>;
+  return <AppLayout showTradingPanel={true}>{children}</AppLayout>;
 }

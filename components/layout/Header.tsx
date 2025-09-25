@@ -1,17 +1,24 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { TrendingUp } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import Logo from '@/components/ui/Logo';
 import ProfileDropdown from './ProfileDropdown';
 import NotificationDropdown from './NotificationDropdown';
 import { HEADER_BANNERS } from '@/config/header-banners';
+import { useTradingPanel } from '@/contexts/TradingPanelContext';
+import { cn } from '@/lib/utils';
 
 interface HeaderProps {
   className?: string;
+  showTradingToggle?: boolean;
 }
 
 
-export default function Header({ className }: HeaderProps) {
+export default function Header({ className, showTradingToggle = false }: HeaderProps) {
+  // Trading panel state (only used if showTradingToggle is true)
+  const tradingPanel = showTradingToggle ? useTradingPanel() : null;
   const [currentBanner, setCurrentBanner] = useState(0);
   const [animationPhase, setAnimationPhase] = useState<'entering' | 'paused' | 'exiting'>('entering');
   const [isHovered, setIsHovered] = useState(false);
@@ -154,6 +161,24 @@ export default function Header({ className }: HeaderProps) {
 
         {/* Notifications and Profile Section */}
         <div className="flex items-center space-x-2 z-10">
+          {/* Trading Panel Toggle - Only show if enabled */}
+          {showTradingToggle && tradingPanel && (
+            <Button
+              variant={tradingPanel.isOpen ? "default" : "outline"}
+              size="sm"
+              onClick={tradingPanel.toggle}
+              className={cn(
+                "transition-all duration-200",
+                tradingPanel.isOpen
+                  ? "bg-gradient-to-r from-[#33e1da] to-[#1e7fb8] hover:from-[#33e1da]/90 hover:to-[#1e7fb8]/90 shadow-lg"
+                  : "hover:bg-accent/20 border-[#33e1da]/30"
+              )}
+            >
+              <TrendingUp className="w-4 h-4 mr-1" />
+              <span className="hidden sm:inline">Trading</span>
+            </Button>
+          )}
+
           <NotificationDropdown />
           <ProfileDropdown />
         </div>

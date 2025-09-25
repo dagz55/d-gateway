@@ -197,7 +197,7 @@ export const useMarketData = (symbol: string = 'BTC', updateInterval: number = 2
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   
-  const intervalRef = useRef<NodeJS.Timeout>();
+  const intervalRef = useRef<NodeJS.Timeout>(undefined);
   const lastUpdateRef = useRef<number>(0);
   const dataBufferRef = useRef<CandlestickDataBuffer>(new CandlestickDataBuffer(50));
   

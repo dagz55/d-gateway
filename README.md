@@ -37,7 +37,7 @@ Zignal is a comprehensive crypto trading platform built with [Next.js 15.5.3](ht
   - Implemented responsive design for both desktop and mobile
   - Maintained consistent styling with landing page theme
 
-### Previous Improvements (v2.11.13)
+### Recent Improvements (v2.11.13)
 
 - 🔌 **MCP Gateway Integration**: Implemented comprehensive MCP (Model Context Protocol) gateway
   - Created centralized MCP gateway with Docker containerization
@@ -51,7 +51,7 @@ Zignal is a comprehensive crypto trading platform built with [Next.js 15.5.3](ht
   - Created Docker Compose configurations for testing and production
   - Added comprehensive documentation and test results
 
-### Previous Improvements (v2.11.12)
+### Recent Improvements (v2.11.12)
 
 - 📱 **Mobile Layout Overlapping Fixed**: Resolved mobile sidebar overlapping main content
   - Sidebar now always visible on mobile in compact mode (64px wide)

@@ -3,15 +3,19 @@
 import { ReactNode, Suspense } from 'react';
 import Header from './Header';
 import Sidebar from './Sidebar';
+import { TradingSidePanel } from './TradingSidePanel';
 import { SidebarProvider, useSidebar } from '@/contexts/SidebarContext';
+import { TradingPanelProvider, useTradingPanel } from '@/contexts/TradingPanelContext';
 import { cn } from '@/lib/utils';
 
 interface AppLayoutProps {
   children: ReactNode;
+  showTradingPanel?: boolean;
 }
 
-function AppLayoutContent({ children }: { children: ReactNode }) {
+function AppLayoutContent({ children, showTradingPanel = false }: { children: ReactNode; showTradingPanel?: boolean }) {
   const { isCollapsed } = useSidebar();
+  const tradingPanel = useTradingPanel();
 
   return (
     <div className="min-h-screen dashboard-bg">
@@ -24,23 +28,36 @@ function AppLayoutContent({ children }: { children: ReactNode }) {
         "md:ml-16", // Default collapsed margin (64px)
         !isCollapsed && "md:ml-64", // Expanded margin (256px)
         // Mobile margin to account for visible compact sidebar - reduced for better space utilization
-        "max-md:ml-12"
+        "max-md:ml-12",
+        // Right margin for trading panel when open
+        showTradingPanel && tradingPanel.isOpen && "md:mr-96 max-md:mr-0"
       )}>
-        <Header />
+        <Header showTradingToggle={showTradingPanel} />
         <main className="p-1 md:p-6 relative">
           <div className="max-w-7xl mx-auto">
             {children}
           </div>
         </main>
       </div>
+
+      {/* Trading Side Panel */}
+      {showTradingPanel && (
+        <TradingSidePanel
+          isOpen={tradingPanel.isOpen}
+          onClose={tradingPanel.close}
+          onToggle={tradingPanel.toggle}
+        />
+      )}
     </div>
   );
 }
 
-export default function AppLayout({ children }: AppLayoutProps) {
+export default function AppLayout({ children, showTradingPanel = false }: AppLayoutProps) {
   return (
     <SidebarProvider>
-      <AppLayoutContent>{children}</AppLayoutContent>
+      <TradingPanelProvider>
+        <AppLayoutContent showTradingPanel={showTradingPanel}>{children}</AppLayoutContent>
+      </TradingPanelProvider>
     </SidebarProvider>
   );
 }

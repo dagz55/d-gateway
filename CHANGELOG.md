@@ -13,8 +13,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Separated combined import statements into individual imports for better module resolution
   - Ensured Vercel deployment compatibility while maintaining all MCP functionality
   - Verified build success both locally and for Vercel deployment
-
-### Fixed
 - **👤 User Profile Integration**: Resolved Supabase profile creation issues for Clerk users
   - Fixed "User profile not found in Supabase for Clerk ID" errors
   - Added automatic profile creation when users exist in Clerk but not in Supabase
@@ -22,6 +20,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Modified avatar upload routes to use upsert operations for missing profiles
   - Implemented graceful fallbacks for profile creation failures
   - Enhanced error handling and logging for better debugging
+- **⚙️ Clerk Middleware Authentication**: Resolved authentication errors in development
+  - Fixed deprecated `auth().protect()` API usage in middleware
+  - Updated to modern Clerk v5 middleware syntax with `publicRoutes` configuration
+  - Resolved development server authentication errors for protected routes
+  - Cleaned up middleware configuration for better compatibility
+  - Enabled proper authentication flow for dashboard routes
 
 ### Enhanced
 - **📱 Mobile Responsiveness**: Improved mobile user experience across dashboard
@@ -168,13 +172,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Maintained consistent design language with existing dashboard components
   - Enhanced user journey toward premium plan sign-ups
 
-### Fixed
-- **⚙️ Clerk Middleware Authentication**: Resolved authentication errors in development
-  - Fixed deprecated `auth().protect()` API usage in middleware
-  - Updated to modern Clerk v5 middleware syntax with `publicRoutes` configuration
-  - Resolved development server authentication errors for protected routes
-  - Cleaned up middleware configuration for better compatibility
-  - Enabled proper authentication flow for dashboard routes
 
 ### Technical
 - **🔧 Development Environment**: Improved build stability and error handling

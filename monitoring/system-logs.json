@@ -1,0 +1,1017 @@
+{
+  "logs": [
+    {
+      "timestamp": "2025-09-25T03:57:19.858Z",
+      "level": "info",
+      "message": "🚀 System Monitor started",
+      "source": "monitor",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:57:19.858Z",
+      "level": "info",
+      "message": "🔨 Starting build process...",
+      "source": "build",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:57:20.324Z",
+      "level": "info",
+      "message": "> zignal@2.11.12 build",
+      "source": "build",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:57:20.325Z",
+      "level": "info",
+      "message": "> next build",
+      "source": "build",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:57:21.311Z",
+      "level": "info",
+      "message": "   ▲ Next.js 15.5.4",
+      "source": "build",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:57:21.313Z",
+      "level": "info",
+      "message": "   - Environments: .env.local, .env",
+      "source": "build",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:57:21.314Z",
+      "level": "info",
+      "message": "   - Experiments (use with caution):",
+      "source": "build",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:57:21.314Z",
+      "level": "info",
+      "message": "     ✓ optimizeCss",
+      "source": "build",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:57:21.314Z",
+      "level": "info",
+      "message": "     · serverActions",
+      "source": "build",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:57:21.314Z",
+      "level": "info",
+      "message": "     ✓ scrollRestoration",
+      "source": "build",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:57:21.317Z",
+      "level": "info",
+      "message": "     · webVitalsAttribution",
+      "source": "build",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:57:21.318Z",
+      "level": "info",
+      "message": "     · optimizePackageImports",
+      "source": "build",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:57:21.809Z",
+      "level": "info",
+      "message": "   Creating an optimized production build ...",
+      "source": "build",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:57:49.174Z",
+      "level": "error",
+      "message": "<w> [webpack.cache.PackFileCacheStrategy] Serializing big strings (192kiB) impacts deserialization performance (consider using Buffer instead and decode when needed)",
+      "source": "build",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:57:49.177Z",
+      "level": "warn",
+      "message": "Issue detected: performance (low)",
+      "source": "detector",
+      "metadata": {
+        "issue": {
+          "id": "issue_1758772669176_b4id5m5bw",
+          "timestamp": "2025-09-25T03:57:49.177Z",
+          "severity": "low",
+          "type": "performance",
+          "source": "build",
+          "message": "<w> [webpack.cache.PackFileCacheStrategy] Serializing big strings (192kiB) impacts deserialization performance (consider using Buffer instead and decode when needed)",
+          "status": "resolved",
+          "agentAssigned": "troubleshooter_issue_1758772669176_b4id5m5bw",
+          "solution": "Generic troubleshooting: check logs and restart",
+          "recommendedAction": "npm run dev"
+        }
+      }
+    },
+    {
+      "timestamp": "2025-09-25T03:57:49.178Z",
+      "level": "info",
+      "message": "Spawning troubleshooting agent for performance",
+      "source": "monitor",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:57:49.860Z",
+      "level": "info",
+      "message": "Report: 16 logs, 1 issues, [object Object] agents",
+      "source": "monitor",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:57:55.252Z",
+      "level": "info",
+      "message": "Issue issue_1758772669176_b4id5m5bw resolved by agent troubleshooter_issue_1758772669176_b4id5m5bw",
+      "source": "troubleshooter",
+      "metadata": {
+        "solution": "Generic troubleshooting: check logs and restart",
+        "action": "npm run dev"
+      }
+    },
+    {
+      "timestamp": "2025-09-25T03:58:01.932Z",
+      "level": "info",
+      "message": " ✓ Compiled successfully in 38.3s",
+      "source": "build",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:58:01.946Z",
+      "level": "info",
+      "message": "   Skipping validation of types",
+      "source": "build",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:58:01.947Z",
+      "level": "info",
+      "message": "   Skipping linting",
+      "source": "build",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:58:02.538Z",
+      "level": "info",
+      "message": "   Collecting page data ...",
+      "source": "build",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:58:11.129Z",
+      "level": "info",
+      "message": "   Generating static pages (0/40) ...",
+      "source": "build",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:58:12.152Z",
+      "level": "info",
+      "message": "   Generating static pages (10/40) \r",
+      "source": "build",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:58:12.152Z",
+      "level": "info",
+      "message": "   Generating static pages (20/40) \r",
+      "source": "build",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:58:12.299Z",
+      "level": "info",
+      "message": "   Generating static pages (30/40) \r",
+      "source": "build",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:58:12.339Z",
+      "level": "info",
+      "message": " ✓ Generating static pages (40/40)",
+      "source": "build",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:58:12.536Z",
+      "level": "info",
+      "message": "   Finalizing page optimization ...",
+      "source": "build",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:58:12.536Z",
+      "level": "info",
+      "message": "   Collecting build traces ...",
+      "source": "build",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:58:17.684Z",
+      "level": "info",
+      "message": "Route (app)                                       Size  First Load JS",
+      "source": "build",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:58:17.685Z",
+      "level": "info",
+      "message": "┌ ○ /                                            11 kB         481 kB",
+      "source": "build",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:58:17.685Z",
+      "level": "info",
+      "message": "├ ○ /_not-found                                  191 B         372 kB",
+      "source": "build",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:58:17.685Z",
+      "level": "info",
+      "message": "├ ƒ /.well-known/oauth-authorization-server      232 B         372 kB",
+      "source": "build",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:58:17.685Z",
+      "level": "info",
+      "message": "├ ƒ /.well-known/oauth-protected-resource/mcp    232 B         372 kB",
+      "source": "build",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:58:17.685Z",
+      "level": "info",
+      "message": "├ ƒ /admin                                       232 B         372 kB",
+      "source": "build",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:58:17.685Z",
+      "level": "info",
+      "message": "├ ○ /admin-setup                               2.58 kB         441 kB",
+      "source": "build",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:58:17.685Z",
+      "level": "info",
+      "message": "├ ƒ /admin/member-activity                       232 B         372 kB",
+      "source": "build",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:58:17.685Z",
+      "level": "info",
+      "message": "├ ○ /admin/member-wallets                        232 B         372 kB",
+      "source": "build",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:58:17.685Z",
+      "level": "info",
+      "message": "├ ƒ /admin/packages                              232 B         372 kB",
+      "source": "build",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:58:17.685Z",
+      "level": "info",
+      "message": "├ ƒ /admin/packages/create                       232 B         372 kB",
+      "source": "build",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:58:17.685Z",
+      "level": "info",
+      "message": "├ ƒ /admin/settings                              232 B         372 kB",
+      "source": "build",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:58:17.685Z",
+      "level": "info",
+      "message": "├ ƒ /admin/users                                 232 B         372 kB",
+      "source": "build",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:58:17.685Z",
+      "level": "info",
+      "message": "├ ƒ /api/admin/assign-role                       232 B         372 kB",
+      "source": "build",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:58:17.685Z",
+      "level": "info",
+      "message": "├ ƒ /api/admin/errors                            232 B         372 kB",
+      "source": "build",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:58:17.685Z",
+      "level": "warn",
+      "message": "Issue detected: error (high)",
+      "source": "detector",
+      "metadata": {
+        "issue": {
+          "id": "issue_1758772697685_98o58x5dz",
+          "timestamp": "2025-09-25T03:58:17.685Z",
+          "severity": "high",
+          "type": "error",
+          "source": "build",
+          "message": "├ ƒ /api/admin/errors                            232 B         372 kB",
+          "status": "resolved",
+          "agentAssigned": "troubleshooter_issue_1758772697685_98o58x5dz",
+          "solution": "Generic troubleshooting: check logs and restart",
+          "recommendedAction": "npm run dev"
+        }
+      }
+    },
+    {
+      "timestamp": "2025-09-25T03:58:17.685Z",
+      "level": "info",
+      "message": "Spawning troubleshooting agent for error",
+      "source": "monitor",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:58:17.686Z",
+      "level": "info",
+      "message": "├ ƒ /api/admin/health                            232 B         372 kB",
+      "source": "build",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:58:17.686Z",
+      "level": "info",
+      "message": "├ ƒ /api/admin/list-admins                       232 B         372 kB",
+      "source": "build",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:58:17.686Z",
+      "level": "info",
+      "message": "├ ƒ /api/admin/make-first-admin                  232 B         372 kB",
+      "source": "build",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:58:17.686Z",
+      "level": "info",
+      "message": "├ ƒ /api/admin/members/[userId]                  232 B         372 kB",
+      "source": "build",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:58:17.686Z",
+      "level": "info",
+      "message": "├ ƒ /api/admin/packages                          232 B         372 kB",
+      "source": "build",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:58:17.686Z",
+      "level": "info",
+      "message": "├ ƒ /api/admin/signals                           232 B         372 kB",
+      "source": "build",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:58:17.686Z",
+      "level": "info",
+      "message": "├ ƒ /api/admin/users                             232 B         372 kB",
+      "source": "build",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:58:17.686Z",
+      "level": "info",
+      "message": "├ ƒ /api/auth/supabase/me                        232 B         372 kB",
+      "source": "build",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:58:17.686Z",
+      "level": "info",
+      "message": "├ ƒ /api/crypto/bitcoin                          232 B         372 kB",
+      "source": "build",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:58:17.686Z",
+      "level": "info",
+      "message": "├ ƒ /api/crypto/bitcoin-chart                    232 B         372 kB",
+      "source": "build",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:58:17.686Z",
+      "level": "info",
+      "message": "├ ƒ /api/crypto/prices                           232 B         372 kB",
+      "source": "build",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:58:17.686Z",
+      "level": "info",
+      "message": "├ ƒ /api/dashboard/stats                         232 B         372 kB",
+      "source": "build",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:58:17.686Z",
+      "level": "info",
+      "message": "├ ƒ /api/deposits                                232 B         372 kB",
+      "source": "build",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:58:17.686Z",
+      "level": "info",
+      "message": "├ ƒ /api/mcp/nextjs                              232 B         372 kB",
+      "source": "build",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:58:17.691Z",
+      "level": "info",
+      "message": "├ ƒ /api/news                                    232 B         372 kB",
+      "source": "build",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:58:17.691Z",
+      "level": "info",
+      "message": "├ ƒ /api/signals                                 232 B         372 kB",
+      "source": "build",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:58:17.691Z",
+      "level": "info",
+      "message": "├ ƒ /api/test-notifications                      232 B         372 kB",
+      "source": "build",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:58:17.691Z",
+      "level": "info",
+      "message": "├ ƒ /api/trades                                  232 B         372 kB",
+      "source": "build",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:58:17.691Z",
+      "level": "info",
+      "message": "├ ƒ /api/upload/avatar                           232 B         372 kB",
+      "source": "build",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:58:17.691Z",
+      "level": "info",
+      "message": "├ ƒ /api/withdrawals                             232 B         372 kB",
+      "source": "build",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:58:17.691Z",
+      "level": "info",
+      "message": "├ ○ /auth/oauth-success                          232 B         372 kB",
+      "source": "build",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:58:17.691Z",
+      "level": "info",
+      "message": "├ ƒ /dashboard                                   232 B         372 kB",
+      "source": "build",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:58:17.691Z",
+      "level": "info",
+      "message": "├ ƒ /dashboard/admins                            232 B         372 kB",
+      "source": "build",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:58:17.691Z",
+      "level": "info",
+      "message": "├ ƒ /dashboard/admins/dashboard                  165 B         372 kB",
+      "source": "build",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:58:17.692Z",
+      "level": "info",
+      "message": "├ ƒ /dashboard/admins/fallback                  3.8 kB         442 kB",
+      "source": "build",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:58:17.692Z",
+      "level": "info",
+      "message": "├ ƒ /dashboard/admins/member-activity            165 B         372 kB",
+      "source": "build",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:58:17.692Z",
+      "level": "info",
+      "message": "├ ƒ /dashboard/admins/member-wallets           3.66 kB         442 kB",
+      "source": "build",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:58:17.692Z",
+      "level": "info",
+      "message": "├ ƒ /dashboard/admins/members/[userId]           994 B         440 kB",
+      "source": "build",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:58:17.692Z",
+      "level": "info",
+      "message": "├ ƒ /dashboard/admins/members/[userId]/edit    4.21 kB         443 kB",
+      "source": "build",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:58:17.692Z",
+      "level": "info",
+      "message": "├ ƒ /dashboard/admins/packages                 1.49 kB         440 kB",
+      "source": "build",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:58:17.692Z",
+      "level": "info",
+      "message": "├ ƒ /dashboard/admins/packages/create          4.37 kB         443 kB",
+      "source": "build",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:58:17.692Z",
+      "level": "info",
+      "message": "├ ƒ /dashboard/admins/settings                   232 B         372 kB",
+      "source": "build",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:58:17.692Z",
+      "level": "info",
+      "message": "├ ƒ /dashboard/admins/signals                  4.36 kB         443 kB",
+      "source": "build",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:58:17.692Z",
+      "level": "info",
+      "message": "├ ƒ /dashboard/admins/users                    4.26 kB         443 kB",
+      "source": "build",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:58:17.692Z",
+      "level": "info",
+      "message": "├ ƒ /dashboard/market                          6.98 kB         446 kB",
+      "source": "build",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:58:17.692Z",
+      "level": "info",
+      "message": "├ ƒ /dashboard/members                           232 B         372 kB",
+      "source": "build",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:58:17.692Z",
+      "level": "info",
+      "message": "├ ƒ /dashboard/members/dashboard               7.29 kB         475 kB",
+      "source": "build",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:58:17.692Z",
+      "level": "info",
+      "message": "├ ƒ /dashboard/members/profile                 3.34 kB         442 kB",
+      "source": "build",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:58:17.692Z",
+      "level": "info",
+      "message": "├ ƒ /dashboard/members/settings                  164 B         442 kB",
+      "source": "build",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:58:17.692Z",
+      "level": "info",
+      "message": "├ ƒ /dashboard/members/wallet                    232 B         372 kB",
+      "source": "build",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:58:17.692Z",
+      "level": "info",
+      "message": "├ ○ /dashboard/wallet                            232 B         372 kB",
+      "source": "build",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:58:17.692Z",
+      "level": "info",
+      "message": "├ ○ /deployment                                3.44 kB         471 kB",
+      "source": "build",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:58:17.692Z",
+      "level": "info",
+      "message": "├ ○ /enterprise                                8.31 kB         380 kB",
+      "source": "build",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:58:17.692Z",
+      "level": "info",
+      "message": "├ ○ /help                                       4.3 kB         443 kB",
+      "source": "build",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:58:17.692Z",
+      "level": "info",
+      "message": "├ ○ /market                                    6.36 kB         476 kB",
+      "source": "build",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:58:17.692Z",
+      "level": "info",
+      "message": "├ ƒ /mcp/[transport]                             232 B         372 kB",
+      "source": "build",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:58:17.692Z",
+      "level": "info",
+      "message": "├ ƒ /member                                      232 B         372 kB",
+      "source": "build",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:58:17.692Z",
+      "level": "info",
+      "message": "├ ƒ /profile                                   3.39 kB         448 kB",
+      "source": "build",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:58:17.692Z",
+      "level": "info",
+      "message": "├ ƒ /settings                                   1.9 kB         447 kB",
+      "source": "build",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:58:17.692Z",
+      "level": "info",
+      "message": "├ ƒ /sign-in/[[...sign-in]]                      421 B         470 kB",
+      "source": "build",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:58:17.692Z",
+      "level": "info",
+      "message": "├ ƒ /sign-up/[[...sign-up]]                      421 B         470 kB",
+      "source": "build",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:58:17.692Z",
+      "level": "info",
+      "message": "├ ○ /signin                                    3.47 kB         473 kB",
+      "source": "build",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:58:17.692Z",
+      "level": "info",
+      "message": "├ ○ /signup                                    3.73 kB         474 kB",
+      "source": "build",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:58:17.692Z",
+      "level": "info",
+      "message": "├ ƒ /test-notifications                          232 B         372 kB",
+      "source": "build",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:58:17.693Z",
+      "level": "info",
+      "message": "├ ○ /test-real-bitcoin                         6.04 kB         445 kB",
+      "source": "build",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:58:17.693Z",
+      "level": "info",
+      "message": "├ ○ /test-trading-panel                        1.13 kB         476 kB",
+      "source": "build",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:58:17.693Z",
+      "level": "info",
+      "message": "└ ƒ /wallet                                    7.79 kB         446 kB",
+      "source": "build",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:58:17.693Z",
+      "level": "info",
+      "message": "+ First Load JS shared by all                   372 kB",
+      "source": "build",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:58:17.693Z",
+      "level": "info",
+      "message": "  └ chunks/vendors-0bd638c9da519f09.js          369 kB",
+      "source": "build",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:58:17.693Z",
+      "level": "info",
+      "message": "  └ other shared chunks (total)                2.24 kB",
+      "source": "build",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:58:17.693Z",
+      "level": "info",
+      "message": "ƒ Middleware                                   81.8 kB",
+      "source": "build",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:58:17.693Z",
+      "level": "info",
+      "message": "○  (Static)   prerendered as static content",
+      "source": "build",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:58:17.693Z",
+      "level": "info",
+      "message": "ƒ  (Dynamic)  server-rendered on demand",
+      "source": "build",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:58:17.764Z",
+      "level": "warn",
+      "message": "Process build exited with code 0",
+      "source": "build",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:58:17.764Z",
+      "level": "info",
+      "message": "✅ Build completed successfully",
+      "source": "build",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:58:19.766Z",
+      "level": "info",
+      "message": "🚀 Starting production server...",
+      "source": "server",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:58:19.865Z",
+      "level": "info",
+      "message": "Report: 112 logs, 2 issues, [object Object],[object Object] agents",
+      "source": "monitor",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:58:20.360Z",
+      "level": "info",
+      "message": "> zignal@2.11.12 start",
+      "source": "server",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:58:20.361Z",
+      "level": "info",
+      "message": "> next start",
+      "source": "server",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:58:20.820Z",
+      "level": "info",
+      "message": "Issue issue_1758772697685_98o58x5dz resolved by agent troubleshooter_issue_1758772697685_98o58x5dz",
+      "source": "troubleshooter",
+      "metadata": {
+        "solution": "Generic troubleshooting: check logs and restart",
+        "action": "npm run dev"
+      }
+    },
+    {
+      "timestamp": "2025-09-25T03:58:21.062Z",
+      "level": "error",
+      "message": " ⨯ Failed to start server",
+      "source": "server",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:58:21.063Z",
+      "level": "warn",
+      "message": "Issue detected: failure (high)",
+      "source": "detector",
+      "metadata": {
+        "issue": {
+          "id": "issue_1758772701063_y9k58l1dv",
+          "timestamp": "2025-09-25T03:58:21.063Z",
+          "severity": "high",
+          "type": "failure",
+          "source": "server",
+          "message": "⨯ Failed to start server",
+          "status": "investigating",
+          "agentAssigned": "troubleshooter_issue_1758772701063_y9k58l1dv"
+        }
+      }
+    },
+    {
+      "timestamp": "2025-09-25T03:58:21.063Z",
+      "level": "info",
+      "message": "Spawning troubleshooting agent for failure",
+      "source": "monitor",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:58:21.065Z",
+      "level": "error",
+      "message": "Error: listen EADDRINUSE: address already in use :::3000",
+      "source": "server",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:58:21.065Z",
+      "level": "warn",
+      "message": "Issue detected: error (high)",
+      "source": "detector",
+      "metadata": {
+        "issue": {
+          "id": "issue_1758772701065_itzmb5ff2",
+          "timestamp": "2025-09-25T03:58:21.065Z",
+          "severity": "high",
+          "type": "error",
+          "source": "server",
+          "message": "Error: listen EADDRINUSE: address already in use :::3000",
+          "status": "investigating",
+          "agentAssigned": "troubleshooter_issue_1758772701065_itzmb5ff2"
+        }
+      }
+    },
+    {
+      "timestamp": "2025-09-25T03:58:21.066Z",
+      "level": "info",
+      "message": "Spawning troubleshooting agent for error",
+      "source": "monitor",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:58:21.066Z",
+      "level": "error",
+      "message": "    at <unknown> (Error: listen EADDRINUSE: address already in use :::3000)",
+      "source": "server",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:58:21.067Z",
+      "level": "warn",
+      "message": "Issue detected: error (high)",
+      "source": "detector",
+      "metadata": {
+        "issue": {
+          "id": "issue_1758772701066_zm3l1c995",
+          "timestamp": "2025-09-25T03:58:21.067Z",
+          "severity": "high",
+          "type": "error",
+          "source": "server",
+          "message": "at <unknown> (Error: listen EADDRINUSE: address already in use :::3000)",
+          "status": "investigating",
+          "agentAssigned": "troubleshooter_issue_1758772701066_zm3l1c995"
+        }
+      }
+    },
+    {
+      "timestamp": "2025-09-25T03:58:21.067Z",
+      "level": "info",
+      "message": "Spawning troubleshooting agent for error",
+      "source": "monitor",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:58:21.067Z",
+      "level": "error",
+      "message": "    at new Promise (<anonymous>) {",
+      "source": "server",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:58:21.068Z",
+      "level": "error",
+      "message": "  code: 'EADDRINUSE',",
+      "source": "server",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:58:21.068Z",
+      "level": "error",
+      "message": "  errno: -48,",
+      "source": "server",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:58:21.068Z",
+      "level": "error",
+      "message": "  syscall: 'listen',",
+      "source": "server",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:58:21.069Z",
+      "level": "error",
+      "message": "  address: '::',",
+      "source": "server",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:58:21.070Z",
+      "level": "error",
+      "message": "  port: 3000",
+      "source": "server",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:58:21.070Z",
+      "level": "error",
+      "message": "}",
+      "source": "server",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:58:21.083Z",
+      "level": "warn",
+      "message": "Process server exited with code 1",
+      "source": "server",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:58:21.086Z",
+      "level": "warn",
+      "message": "Server process exited with code 1",
+      "source": "server",
+      "metadata": {}
+    },
+    {
+      "timestamp": "2025-09-25T03:58:21.086Z",
+      "level": "critical",
+      "message": "System failure: Server failed with code 1",
+      "source": "system",
+      "metadata": {}
+    }
+  ],
+  "lastUpdated": "2025-09-25T03:58:21.086Z",
+  "totalLogs": 135,
+  "issues": 5
+}
