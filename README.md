@@ -4,7 +4,18 @@ Zignal is a comprehensive crypto trading platform built with [Next.js 15.5.3](ht
 
 ## 🚀 Features
 
-### Latest Improvements (v2.11.17)
+### Latest Improvements (v2.11.18)
+
+- 🚨 **Critical WebSocket & Admin Authentication Fixes**: Resolved persistent connection and authentication issues
+  - **WebSocket Connection Resilience**: Implemented immediate polling fallback with WebSocket retry logic
+  - **Admin Authentication Debugging**: Enhanced admin API with detailed logging and debug information
+  - **Connection Health Monitoring**: Added automatic connection health checks and recovery
+  - **Memory Leak Prevention**: Improved cleanup mechanisms to prevent memory leaks
+  - **Production Debugging**: Added comprehensive debug information for production troubleshooting
+  - **Faster Failure Recovery**: Reduced retry attempts to fail faster to polling fallback
+  - **Enhanced Error Handling**: Better error messages and debugging for WebSocket failures
+
+### Previous Improvements (v2.11.17)
 
 - 🔧 **Enhanced Database Connection Resilience**: Improved WebSocket and admin authentication handling
   - Enhanced WebSocket connection handling with proper cleanup and memory leak prevention

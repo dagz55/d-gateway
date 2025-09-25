@@ -5,6 +5,28 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.11.18] - 2025-09-25
+
+### Fixed
+- **🚨 Critical WebSocket Connection Failures**: Resolved persistent WebSocket connection issues
+  - Implemented immediate polling fallback with WebSocket retry logic
+  - Added connection health monitoring with automatic recovery
+  - Reduced retry attempts to fail faster to polling fallback
+  - Enhanced cleanup mechanisms to prevent memory leaks
+  - Added comprehensive debug logging for production troubleshooting
+
+- **🔐 Admin Authentication 403 Errors**: Fixed admin API authentication issues
+  - Enhanced admin status checking with detailed logging
+  - Added comprehensive debug information for production troubleshooting
+  - Improved error messages with user context and metadata
+  - Added organization membership checking for admin roles
+
+### Enhanced
+- **Connection Resilience**: Improved WebSocket connection handling with better fallback mechanisms
+- **Debug Information**: Added comprehensive debug information for production troubleshooting
+- **Error Handling**: Enhanced error handling and recovery mechanisms
+- **Memory Management**: Improved cleanup mechanisms to prevent memory leaks
+
 ## [2.11.17] - 2025-09-25
 
 ### Enhanced

@@ -195,19 +195,25 @@ export default function NotificationDropdown() {
     }
   }, [user]);
 
-  // Set up real-time subscription for new notifications with error handling
+  // Set up real-time subscription for new notifications with enhanced error handling
   useEffect(() => {
     if (!user) return;
   
     let channel: any = null;
     let retryTimeout: NodeJS.Timeout | null = null;
     let pollInterval: NodeJS.Timeout | null = null;
+    let connectionCheckInterval: NodeJS.Timeout | null = null;
     let retryCount = 0;
-    const maxRetries = 3;
+    const maxRetries = 3; // Reduced retry attempts to fail faster to polling
+    let isConnected = false;
+    let lastSuccessfulConnection = Date.now();
+    let isDestroyed = false;
   
     const cleanup = () => {
+      isDestroyed = true;
       if (retryTimeout) clearTimeout(retryTimeout);
       if (pollInterval) clearInterval(pollInterval);
+      if (connectionCheckInterval) clearInterval(connectionCheckInterval);
       if (channel) {
         try {
           supabase.removeChannel(channel);
@@ -216,15 +222,46 @@ export default function NotificationDropdown() {
         }
       }
     };
+
+    const startPollingFallback = () => {
+      if (isDestroyed) return;
+      console.log("🔄 Starting polling fallback for notifications");
+      if (pollInterval) clearInterval(pollInterval);
+      pollInterval = setInterval(() => {
+        if (!isDestroyed) {
+          fetchNotifications();
+        }
+      }, 30000); // Poll every 30 seconds
+    };
+
+    const checkConnectionHealth = () => {
+      if (isDestroyed) return;
+      const timeSinceLastConnection = Date.now() - lastSuccessfulConnection;
+      // If no successful connection for 2 minutes, force retry
+      if (timeSinceLastConnection > 120000 && !isConnected) {
+        console.log("🔍 Connection health check: Forcing retry due to long disconnection");
+        handleSubscriptionError();
+      }
+    };
   
     const setupSubscription = () => {
+      if (isDestroyed) return;
+      
       try {
         // Clear any existing polling interval when a new subscription is attempted
         if (pollInterval) clearInterval(pollInterval);
   
+        // Create a unique channel name to avoid conflicts
+        const channelName = `notifications_${user.id}_${Date.now()}`;
+        
+        console.log(`🔌 Setting up notifications subscription: ${channelName}`);
+        
         channel = supabase
-          .channel("notifications_realtime", {
-            config: { presence: { key: user.id } },
+          .channel(channelName, {
+            config: { 
+              presence: { key: user.id },
+              broadcast: { self: false }
+            },
           })
           .on(
             "postgres_changes",
@@ -235,26 +272,49 @@ export default function NotificationDropdown() {
               filter: `user_id=eq.${user.id}`,
             },
             (payload) => {
+              if (isDestroyed) return;
               const newNotification = payload.new as Notification;
               setNotifications((prev) => [newNotification, ...prev]);
+              lastSuccessfulConnection = Date.now();
             }
           )
+          .on('presence', { event: 'sync' }, () => {
+            if (isDestroyed) return;
+            console.log('👥 Presence synced for notifications');
+            lastSuccessfulConnection = Date.now();
+          })
           .subscribe((status) => {
+            if (isDestroyed) return;
+            console.log(`📡 Notifications subscription status: ${status}`);
+            
             if (status === "SUBSCRIBED") {
-              console.log("Notifications realtime subscription active");
+              console.log("✅ Notifications realtime subscription active");
+              isConnected = true;
               retryCount = 0; // Reset on success
-            } else if (status === "CHANNEL_ERROR" || status === "TIMED_OUT") {
-              console.warn(`Notifications realtime subscription ${status}`);
+              lastSuccessfulConnection = Date.now();
+              
+              // Start connection health monitoring
+              if (connectionCheckInterval) clearInterval(connectionCheckInterval);
+              connectionCheckInterval = setInterval(checkConnectionHealth, 60000); // Check every minute
+              
+            } else if (status === "CHANNEL_ERROR" || status === "TIMED_OUT" || status === "CLOSED") {
+              console.warn(`❌ Notifications realtime subscription ${status}`);
+              isConnected = false;
               handleSubscriptionError();
             }
           });
       } catch (error) {
         console.warn("Failed to set up notifications realtime subscription:", error);
+        isConnected = false;
         handleSubscriptionError();
       }
     };
   
     const handleSubscriptionError = () => {
+      if (isDestroyed) return;
+      
+      isConnected = false;
+      
       if (channel) {
         try {
           supabase.removeChannel(channel);
@@ -266,17 +326,24 @@ export default function NotificationDropdown() {
   
       if (retryCount < maxRetries) {
         retryCount++;
-        const delay = Math.pow(2, retryCount) * 1000;
-        console.log(`Retrying notifications subscription in ${delay}ms (attempt ${retryCount})`);
+        const delay = Math.min(Math.pow(2, retryCount) * 1000, 10000); // Cap at 10 seconds
+        console.log(`🔄 Retrying notifications subscription in ${delay}ms (attempt ${retryCount}/${maxRetries})`);
         retryTimeout = setTimeout(setupSubscription, delay);
       } else {
-        console.warn("Max retries for subscription. Falling back to polling.");
-        if (pollInterval) clearInterval(pollInterval); // Clear any old interval
-        pollInterval = setInterval(fetchNotifications, 30000);
+        console.warn("⚠️ Max retries reached for subscription. Falling back to polling.");
+        startPollingFallback();
       }
     };
-  
-    setupSubscription();
+
+    // Start with polling fallback immediately, then try WebSocket
+    startPollingFallback();
+    
+    // Try WebSocket connection after a short delay
+    setTimeout(() => {
+      if (!isDestroyed) {
+        setupSubscription();
+      }
+    }, 1000);
   
     return () => {
       cleanup();

@@ -16,22 +16,30 @@ async function assertAdmin(request?: NextRequest) {
       return { user: null, isAdmin: false }
     }
     
-    // Check admin status using multiple methods
-    const isAdminUser = 
-      user.publicMetadata?.isAdmin === true || 
-      user.publicMetadata?.role === 'admin' ||
-      user.publicMetadata?.role === 'super_admin' ||
-      // Check organization role if available
-      (user as any)?.organizationMemberships?.some((membership: any) => 
+    // Enhanced admin status checking with detailed logging
+    const publicMetadata = user.publicMetadata || {};
+    const organizationMemberships = (user as any)?.organizationMemberships || [];
+    
+    const adminChecks = {
+      isAdminFlag: publicMetadata.isAdmin === true,
+      adminRole: publicMetadata.role === 'admin',
+      superAdminRole: publicMetadata.role === 'super_admin',
+      organizationAdmin: organizationMemberships.some((membership: any) => 
         membership.role === 'admin' || membership.role === 'owner'
       )
+    };
+    
+    const isAdminUser = Object.values(adminChecks).some(Boolean);
 
-    if (process.env.NODE_ENV === 'development') {
-      console.log('Admin API: User check result', {
-        userId: user.id,
-        isAdmin: isAdminUser,
-      });
-    }
+    // Always log in production for debugging
+    console.log('Admin API: User check result', {
+      userId: user.id,
+      email: user.emailAddresses?.[0]?.emailAddress,
+      isAdmin: isAdminUser,
+      checks: adminChecks,
+      publicMetadata,
+      organizationMemberships: organizationMemberships.length
+    });
 
     return { user, isAdmin: isAdminUser }
   } catch (error) {
@@ -59,18 +67,26 @@ export async function GET(request: NextRequest) {
     }
     
     if (!isAdmin) {
-      console.log('Admin API: User is not admin', { userId: user.id });
+      console.log('Admin API: User is not admin', { 
+        userId: user.id,
+        email: user.emailAddresses?.[0]?.emailAddress,
+        publicMetadata: user.publicMetadata,
+        organizationMemberships: (user as any)?.organizationMemberships?.length || 0
+      });
+      
       const responseBody: { success: boolean; message: string; debug?: any } = {
         success: false,
         message: 'Forbidden - Admin access required'
       };
 
-      if (process.env.NODE_ENV === 'development') {
-        responseBody.debug = {
-          userId: user.id,
-          roles: user.publicMetadata,
-        };
-      }
+      // Always include debug info in production for troubleshooting
+      responseBody.debug = {
+        userId: user.id,
+        email: user.emailAddresses?.[0]?.emailAddress,
+        publicMetadata: user.publicMetadata,
+        organizationMemberships: (user as any)?.organizationMemberships?.length || 0,
+        timestamp: new Date().toISOString()
+      };
 
       return NextResponse.json(responseBody, { status: 403 })
     }
