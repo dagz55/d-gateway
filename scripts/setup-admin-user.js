@@ -10,37 +10,45 @@
 const { createClerkClient } = require('@clerk/backend');
 require('dotenv').config({ path: '.env.local' });
 
-const clerkClient = createClerkClient({ 
-  secretKey: process.env.CLERK_SECRET_KEY 
+const clerkClient = createClerkClient({
+  secretKey: process.env.CLERK_SECRET_KEY,
 });
+
+const ADMIN_PERMISSIONS = process.env.ADMIN_PERMISSIONS
+  ? process.env.ADMIN_PERMISSIONS.split(',')
+  : ['users', 'signals', 'finances', 'payments', 'system', 'reports'];
+
+// A simple validation to ensure no unknown permissions are added
+const VALID_PERMISSIONS = new Set(['users', 'signals', 'finances', 'payments', 'system', 'reports', 'audits']);
+ADMIN_PERMISSIONS.forEach(permission => {
+  if (!VALID_PERMISSIONS.has(permission)) {
+    console.warn(`⚠️ Unknown permission configured: "${permission}". Please check your ADMIN_PERMISSIONS environment variable.`);
+  }
+});
+
 
 async function setupAdminUser(email) {
   try {
     console.log(`Setting up admin user for: ${email}`);
-    
-    // Find user by email
-    const users = await clerkClient.users.getUserList({
-      emailAddress: [email]
-    });
-    
+
+    const users = await clerkClient.users.getUserList({ emailAddress: [email] });
+
     if (users.data.length === 0) {
-      console.error(`❌ User not found with email: ${email}`);
-      console.log('Please make sure the user has signed up first.');
+      console.error(`❌ User not found: ${email}. Please ensure they have an account.`);
       return;
     }
-    
+
     const user = users.data[0];
     console.log(`✅ Found user: ${user.emailAddresses[0]?.emailAddress} (ID: ${user.id})`);
-    
-    // Update user with admin metadata
+
     const updatedUser = await clerkClient.users.updateUser(user.id, {
       publicMetadata: {
         ...user.publicMetadata,
         isAdmin: true,
         role: 'admin',
-        adminPermissions: ['users', 'signals', 'finances', 'payments', 'system'],
-        setupDate: new Date().toISOString()
-      }
+        adminPermissions: ADMIN_PERMISSIONS, // Use the configurable permissions
+        setupDate: new Date().toISOString(),
+      },
     });
     
     console.log('✅ Admin user setup complete!');
@@ -60,10 +68,16 @@ async function setupAdminUser(email) {
 
 async function listUsers() {
   try {
-    console.log('📋 Listing all users...');
-    const users = await clerkClient.users.getUserList({
-      limit: 10
-    });
+    console.log('📋 Listing users...');
+    
+    // Make limit configurable, with a sensible default and validation
+    const limit = parseInt(process.env.USER_LIST_LIMIT || '10', 10);
+    if (isNaN(limit) || limit <= 0) {
+      console.error('❌ Invalid USER_LIST_LIMIT. Please provide a positive integer.');
+      return;
+    }
+
+    const users = await clerkClient.users.getUserList({ limit });
     
     console.log(`Found ${users.data.length} users:`);
     users.data.forEach((user, index) => {

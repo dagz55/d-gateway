@@ -26,12 +26,12 @@ async function assertAdmin(request?: NextRequest) {
         membership.role === 'admin' || membership.role === 'owner'
       )
 
-    console.log('Admin API: User check result', {
-      userId: user.id,
-      email: user.emailAddresses[0]?.emailAddress,
-      publicMetadata: user.publicMetadata,
-      isAdmin: isAdminUser
-    });
+    if (process.env.NODE_ENV === 'development') {
+      console.log('Admin API: User check result', {
+        userId: user.id,
+        isAdmin: isAdminUser,
+      });
+    }
 
     return { user, isAdmin: isAdminUser }
   } catch (error) {
@@ -59,20 +59,20 @@ export async function GET(request: NextRequest) {
     }
     
     if (!isAdmin) {
-      console.log('Admin API: User is not admin', {
-        userId: user.id,
-        email: user.emailAddresses[0]?.emailAddress,
-        publicMetadata: user.publicMetadata
-      });
-      return NextResponse.json({ 
-        success: false, 
-        message: 'Forbidden - Admin access required',
-        debug: {
+      console.log('Admin API: User is not admin', { userId: user.id });
+      const responseBody: { success: boolean; message: string; debug?: any } = {
+        success: false,
+        message: 'Forbidden - Admin access required'
+      };
+
+      if (process.env.NODE_ENV === 'development') {
+        responseBody.debug = {
           userId: user.id,
-          email: user.emailAddresses[0]?.emailAddress,
-          publicMetadata: user.publicMetadata
-        }
-      }, { status: 403 })
+          roles: user.publicMetadata,
+        };
+      }
+
+      return NextResponse.json(responseBody, { status: 403 })
     }
 
     const admin = createAdminClient()

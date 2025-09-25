@@ -198,99 +198,88 @@ export default function NotificationDropdown() {
   // Set up real-time subscription for new notifications with error handling
   useEffect(() => {
     if (!user) return;
-
+  
     let channel: any = null;
     let retryTimeout: NodeJS.Timeout | null = null;
+    let pollInterval: NodeJS.Timeout | null = null;
     let retryCount = 0;
     const maxRetries = 3;
-
+  
+    const cleanup = () => {
+      if (retryTimeout) clearTimeout(retryTimeout);
+      if (pollInterval) clearInterval(pollInterval);
+      if (channel) {
+        try {
+          supabase.removeChannel(channel);
+        } catch (error) {
+          console.warn("Error removing notifications channel:", error);
+        }
+      }
+    };
+  
     const setupSubscription = () => {
       try {
+        // Clear any existing polling interval when a new subscription is attempted
+        if (pollInterval) clearInterval(pollInterval);
+  
         channel = supabase
-          .channel('notifications_realtime', {
-            config: {
-              presence: {
-                key: user.id,
-              },
-            },
+          .channel("notifications_realtime", {
+            config: { presence: { key: user.id } },
           })
           .on(
-            'postgres_changes',
+            "postgres_changes",
             {
-              event: 'INSERT',
-              schema: 'public',
-              table: 'notifications',
+              event: "INSERT",
+              schema: "public",
+              table: "notifications",
               filter: `user_id=eq.${user.id}`,
             },
             (payload) => {
               const newNotification = payload.new as Notification;
-              setNotifications(prev => [newNotification, ...prev]);
+              setNotifications((prev) => [newNotification, ...prev]);
             }
           )
           .subscribe((status) => {
-            if (status === 'SUBSCRIBED') {
-              console.log('Notifications realtime subscription active');
-              retryCount = 0; // Reset retry count on successful connection
-            } else if (status === 'CHANNEL_ERROR') {
-              console.warn('Notifications realtime subscription error');
-              handleSubscriptionError();
-            } else if (status === 'TIMED_OUT') {
-              console.warn('Notifications realtime subscription timed out');
+            if (status === "SUBSCRIBED") {
+              console.log("Notifications realtime subscription active");
+              retryCount = 0; // Reset on success
+            } else if (status === "CHANNEL_ERROR" || status === "TIMED_OUT") {
+              console.warn(`Notifications realtime subscription ${status}`);
               handleSubscriptionError();
             }
           });
       } catch (error) {
-        console.warn('Failed to set up notifications realtime subscription:', error);
+        console.warn("Failed to set up notifications realtime subscription:", error);
         handleSubscriptionError();
       }
     };
-
+  
     const handleSubscriptionError = () => {
-      // Clean up existing channel
       if (channel) {
         try {
           supabase.removeChannel(channel);
         } catch (error) {
-          console.warn('Error removing notifications channel:', error);
+          console.warn("Error removing channel on error:", error);
         }
         channel = null;
       }
-
-      // Retry with exponential backoff
+  
       if (retryCount < maxRetries) {
         retryCount++;
-        const delay = Math.pow(2, retryCount) * 1000; // 2s, 4s, 8s
-        console.log(`Retrying notifications subscription in ${delay}ms (attempt ${retryCount}/${maxRetries})`);
-        
-        retryTimeout = setTimeout(() => {
-          setupSubscription();
-        }, delay);
+        const delay = Math.pow(2, retryCount) * 1000;
+        console.log(`Retrying notifications subscription in ${delay}ms (attempt ${retryCount})`);
+        retryTimeout = setTimeout(setupSubscription, delay);
       } else {
-        console.warn('Max retries reached for notifications subscription. Falling back to polling.');
-        // Fallback to polling every 30 seconds
-        const pollInterval = setInterval(() => {
-          fetchNotifications();
-        }, 30000);
-        
-        return () => {
-          clearInterval(pollInterval);
-        };
+        console.warn("Max retries for subscription. Falling back to polling.");
+        if (pollInterval) clearInterval(pollInterval); // Clear any old interval
+        pollInterval = setInterval(fetchNotifications, 30000);
       }
     };
-
+  
     setupSubscription();
-
+  
     return () => {
-      if (retryTimeout) {
-        clearTimeout(retryTimeout);
-      }
-      if (channel) {
-        try {
-          supabase.removeChannel(channel);
-        } catch (error) {
-          console.warn('Error removing notifications channel:', error);
-        }
-      }
+      cleanup();
     };
   }, [user, supabase]);
 

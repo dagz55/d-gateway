@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.11.17] - 2025-09-25
+
+### Enhanced
+- **🔧 Database Connection Resilience**: Improved WebSocket and admin authentication handling
+  - Enhanced WebSocket connection handling with proper cleanup and memory leak prevention
+  - Added configurable admin permissions via environment variables (`ADMIN_PERMISSIONS`)
+  - Improved error handling and retry logic for real-time subscriptions
+  - Added development vs production logging optimization for better performance
+  - Fixed memory leaks in notification subscriptions with proper cleanup
+  - Enhanced admin setup script with configurable permissions and user limits
+  - Better error messages and debugging information for production troubleshooting
+
+### Fixed
+- **Memory Leaks**: Fixed memory leaks in notification subscriptions with proper cleanup
+- **Logging Performance**: Optimized logging to only show debug info in development mode
+- **Admin Permissions**: Made admin permissions configurable via environment variables
+- **Error Handling**: Improved error handling in WebSocket connections and admin authentication
+
 ## [2.11.16] - 2025-09-25
 
 ### Fixed
