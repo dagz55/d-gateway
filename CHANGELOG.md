@@ -5,6 +5,28 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.11.15] - 2025-09-25
+
+### Added
+- **🔍 Admin User Filtering System**: Comprehensive filtering and search functionality for admin users page
+  - Real-time search with 500ms debouncing for optimal performance
+  - Role-based filtering dropdown (Admin, User, Moderator)
+  - Status-based filtering dropdown (Active, Inactive, Suspended)
+  - Server-side search integration with existing `/api/admin/users` endpoint
+  - Pagination support with Previous/Next navigation controls
+  - Virtualized list rendering for improved performance with large datasets
+  - Clear filters functionality for easy reset of all applied filters
+  - Comprehensive loading states and error handling
+  - Responsive design optimized for all screen sizes
+
+### Fixed
+- **🔍 User Filtering Functionality**: Resolved non-functional filtering on admin users page
+  - Converted from server-side rendering to client-side rendering for dynamic filtering
+  - Fixed disconnected UI components that weren't connected to filtering logic
+  - Integrated search component with actual API calls and data fetching
+  - Resolved mixed data sources by using consistent API endpoint
+  - Fixed pagination issues with proper server-side data handling
+
 ## [2.11.14] - 2025-01-27
 
 ### Fixed
