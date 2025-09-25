@@ -11,6 +11,11 @@ The Clerk environment variables are configured locally but not in Vercel's envir
 
 ## ✅ Solution
 
+### Step 0: Prepare Local Environment Template
+
+1. Copy the provided `.env.example` file to `.env.local` (or `.env.production`) and populate it with your real secrets.
+2. Keep these files out of version control—`.gitignore` already excludes `.env*` files.
+
 ### Step 1: Configure Environment Variables in Vercel Dashboard
 
 1. **Go to Vercel Dashboard**
@@ -19,33 +24,35 @@ The Clerk environment variables are configured locally but not in Vercel's envir
 
 2. **Add Environment Variables**
    - Go to **Settings** → **Environment Variables**
-   - Add the following variables:
+   - Add the following variables and replace the placeholders with your actual secrets inside Vercel:
 
 #### Required Clerk Variables:
 ```
-NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_Y3VycmVudC1taWRnZS04OS5jbGVyay5hY2NvdW50cy5kZXYk
-CLERK_SECRET_KEY=sk_test_Kw71Cyw7jeT88jbwTlDknDQAH0aSYootgDDra6MhX7
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=your_clerk_publishable_key_here
+CLERK_SECRET_KEY=your_clerk_secret_key_here
 ```
 
 #### Required Supabase Variables:
 ```
-NEXT_PUBLIC_SUPABASE_URL=https://dopttulmzbfurlsuepwq.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRvcHR0dWxtemJmdXJsc3VlcHdxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc0OTMyMDcsImV4cCI6MjA3MzA2OTIwN30.0Y3WWbOBgf9xjhxOGQy6r4-8qokU4j-jSrku4Y-no_o
-SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRvcHR0dWxtemJmdXJsc3VlcHdxIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1NzQ5MzIwNywiZXhwIjoyMDczMDY5MjA3fQ.Lo9hOhsA-tevo5tUYPkP1IChy8En9bXgc5AOW2CBuN0
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_url_here
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key_here
+SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key_here
 ```
 
 #### Required Site Configuration:
 ```
-NEXT_PUBLIC_SITE_URL=https://zignals.vercel.app
+NEXT_PUBLIC_SITE_URL=your_site_url_here
 NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in
 NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
-JWT_SECRET=a5f746bf4d8b9bc9a0c7582282204f8bcd7301470b946a784c489e980c47a89b
+JWT_SECRET=your_jwt_secret_here
+JWT_REFRESH_SECRET=your_jwt_refresh_secret_here
+SESSION_SECRET=your_session_secret_here
 ```
 
 #### Optional API Keys:
 ```
-COINGECKO_API_KEY=CG-1ZZvB99XTw4FDeez78oBMP1p
-ALLOWED_ADMIN_EMAILS=dagz55@gmail.com,admin@zignals.org
+COINGECKO_API_KEY=your_coingecko_api_key_here
+ALLOWED_ADMIN_EMAILS=admin@zignals.org,dagz55@gmail.com
 ```
 
 ### Step 2: Environment Variable Settings
@@ -62,6 +69,7 @@ After adding all environment variables:
 1. Go to **Deployments** tab
 2. Click **"Redeploy"** on the latest deployment
 3. Or push a new commit to trigger automatic deployment
+4. Run `npm run check-env` locally to validate the configuration before pushing new code
 
 ## 🛡️ Additional Safeguards
 
@@ -96,6 +104,17 @@ if (!clerkPublishableKey) {
    - Verify Supabase connections
    - Check API endpoints
 
+## 🔄 Key Rotation & Repository Cleanup
+
+1. Rotate the Clerk publishable and secret keys in the Clerk dashboard, then update Vercel with the new values.
+2. Regenerate the Supabase anon and service role keys from the Supabase project settings and update all environments.
+3. Invalidate any other exposed secrets (JWT, CoinGecko, etc.) and distribute replacements securely.
+4. Purge the leaked keys from git history using `git filter-repo` or BFG Repo-Cleaner, then force-push the sanitized history.
+5. Re-deploy the application and verify that the old keys are no longer accepted.
+6. Notify your security/operations team about the rotation for auditing purposes.
+
+> Until rotation is complete, assume the exposed keys are compromised.
+
 ## 📋 Environment Variables Checklist
 
 - [ ] `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`
@@ -108,7 +127,7 @@ if (!clerkPublishableKey) {
 - [ ] `NEXT_PUBLIC_CLERK_SIGN_UP_URL`
 - [ ] `JWT_SECRET`
 - [ ] `COINGECKO_API_KEY` (optional)
-- [ ] `ALLOWED_ADMIN_EMAILS` (optional)
+- [ ] `ALLOWED_ADMIN_EMAILS=admin@zignals.org,dagz55@gmail.com` (optional)
 
 ## 🚀 After Configuration
 

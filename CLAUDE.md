@@ -383,7 +383,7 @@ NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
 
 # Optional API Keys
 COINGECKO_API_KEY=your_coingecko_api_key_here
-ALLOWED_ADMIN_EMAILS=admin1@example.com,admin2@example.com
+ALLOWED_ADMIN_EMAILS=admin@zignals.org,dagz55@gmail.com
 ```
 
 ### Vercel Deployment Configuration
