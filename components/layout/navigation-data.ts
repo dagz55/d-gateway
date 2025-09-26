@@ -9,6 +9,15 @@ import {
   Settings,
   Shield,
   Rocket,
+  BarChart3,
+  Users,
+  Package,
+  Activity,
+  Database,
+  FileText,
+  Server,
+  Cog,
+  CreditCard,
 } from 'lucide-react';
 
 export type NavItem = {
@@ -66,6 +75,57 @@ export const ADMIN_NAVIGATION: NavItem[] = [
     name: 'Admin Panel',
     href: '/admin',
     icon: Shield,
+    isAdmin: true,
+  },
+  {
+    name: 'Deployment',
+    href: '/deployment',
+    icon: Rocket,
+    isAdmin: true,
+  },
+];
+
+export const ADMIN_ONLY_NAVIGATION: NavItem[] = [
+  {
+    name: 'Dashboard',
+    href: '/admin/dashboard',
+    icon: LayoutDashboard,
+    isAdmin: true,
+  },
+  {
+    name: 'System Statistics',
+    href: '/admin/dashboard/statistics',
+    icon: BarChart3,
+    isAdmin: true,
+  },
+  {
+    name: 'Manage Users',
+    href: '/admin/dashboard/users',
+    icon: Users,
+    isAdmin: true,
+  },
+  {
+    name: 'Manage Packages',
+    href: '/admin/dashboard/packages',
+    icon: Package,
+    isAdmin: true,
+  },
+  {
+    name: 'System Status',
+    href: '/admin/dashboard/system-status',
+    icon: Activity,
+    isAdmin: true,
+  },
+  {
+    name: 'PayPal Payments',
+    href: '/admin/dashboard/payments',
+    icon: CreditCard,
+    isAdmin: true,
+  },
+  {
+    name: 'System Settings',
+    href: '/admin/dashboard/settings',
+    icon: Cog,
     isAdmin: true,
   },
   {

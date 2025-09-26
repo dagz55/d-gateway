@@ -4,7 +4,19 @@ Zignal is a comprehensive crypto trading platform built with [Next.js 15.5.3](ht
 
 ## 🚀 Features
 
-### Latest Improvements (v2.11.18)
+### Latest Improvements (v2.11.19)
+
+- 💳 **PayPal Payment Integration**: Complete payment processing system with secure link generation
+  - **Payment Link Generator**: Create secure PayPal payment links for customers with account details collection
+  - **Admin Payment Management**: Comprehensive dashboard for managing all PayPal payments and transactions
+  - **Multi-Currency Support**: Support for USD, EUR, GBP, CAD, AUD currencies
+  - **Real-time Status Tracking**: Live payment status updates with PayPal integration
+  - **Customer Payment Portal**: Dedicated payment pages for customers to complete transactions
+  - **Secure Database Schema**: Complete PayPal payments table with RLS policies and indexes
+  - **API Endpoints**: Full REST API for payment creation, status updates, and management
+  - **Admin Integration**: Seamlessly integrated into existing admin panel with navigation and quick actions
+
+### Previous Improvements (v2.11.18)
 
 - 🚨 **Critical WebSocket & Admin Authentication Fixes**: Resolved persistent connection and authentication issues
   - **WebSocket Connection Resilience**: Implemented immediate polling fallback with WebSocket retry logic
