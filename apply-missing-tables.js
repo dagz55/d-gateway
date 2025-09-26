@@ -41,17 +41,17 @@ async function applyMigrations() {
       console.log('✅ Missing tables created successfully');
     }
 
-    // Read and apply the WorkOS user ID fix migration
-    const fixPath = path.join(__dirname, 'supabase/migrations/20250917000003_fix_workos_user_ids.sql');
+    // Read and apply the Clerk user ID fix migration
+    const fixPath = path.join(__dirname, 'supabase/migrations/20250917000003_fix_clerk_user_ids.sql');
     const fixSQL = fs.readFileSync(fixPath, 'utf8');
     
-    console.log('🔧 Fixing WorkOS user ID compatibility...');
+    console.log('🔧 Fixing Clerk user ID compatibility...');
     const { error: fixError } = await supabase.rpc('exec_sql', { sql: fixSQL });
     
     if (fixError) {
-      console.error('❌ Failed to apply WorkOS fixes:', fixError);
+      console.error('❌ Failed to apply Clerk fixes:', fixError);
     } else {
-      console.log('✅ WorkOS user ID compatibility fixed');
+      console.log('✅ Clerk user ID compatibility fixed');
     }
 
     console.log('\n🎉 Database migrations completed successfully!');
@@ -83,7 +83,7 @@ async function applyMigrationsAlternative() {
       console.log('   1. Go to your Supabase dashboard');
       console.log('   2. Navigate to SQL Editor');
       console.log('   3. Run the SQL from supabase/migrations/20250917000002_missing_tables.sql');
-      console.log('   4. Run the SQL from supabase/migrations/20250917000003_fix_workos_user_ids.sql');
+      console.log('   4. Run the SQL from supabase/migrations/20250917000003_fix_clerk_user_ids.sql');
     }
 
   } catch (error) {
@@ -96,5 +96,5 @@ applyMigrations().catch(() => {
   console.log('\n⚠️  Direct migration failed. Please apply manually:');
   console.log('1. Open your Supabase dashboard SQL Editor');
   console.log('2. Run: supabase/migrations/20250917000002_missing_tables.sql');
-  console.log('3. Run: supabase/migrations/20250917000003_fix_workos_user_ids.sql');
+  console.log('3. Run: supabase/migrations/20250917000003_fix_clerk_user_ids.sql');
 });

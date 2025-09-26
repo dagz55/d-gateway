@@ -58,8 +58,8 @@ if [ ! -f ".vercel/project.json" ]; then
 fi
 
 echo -e "\n${BLUE}📝 Please have the following information ready:${NC}"
-echo "1. WorkOS Production API Key (starts with sk_live_)"
-echo "2. WorkOS Production Client ID (starts with client_)"
+echo "1. Clerk Production Secret Key (starts with sk_live_)"
+echo "2. Clerk Production Publishable Key (starts with pk_live_)"
 echo "3. Your production domain (e.g., https://zignal.vercel.app)"
 echo "4. Supabase production credentials"
 echo "5. Admin email addresses"
@@ -67,20 +67,20 @@ echo ""
 
 read -p "Press Enter to continue when ready..."
 
-# WorkOS Configuration
-echo -e "\n${BLUE}🔐 WorkOS Configuration${NC}"
-prompt_for_env "WORKOS_API_KEY" "WorkOS Production API Key" "sk_live_..." true
-prompt_for_env "WORKOS_CLIENT_ID" "WorkOS Production Client ID" "client_..." true
+# Clerk Configuration
+echo -e "\n${BLUE}🔐 Clerk Configuration${NC}"
+prompt_for_env "CLERK_SECRET_KEY" "Clerk Production Secret Key" "sk_live_..." true
+prompt_for_env "NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY" "Clerk Production Publishable Key" "pk_live_..." true
 
 # Generate or prompt for secrets
 echo -e "\n${BLUE}🔑 Security Secrets${NC}"
 echo "Generating secure random secrets..."
 
-# Generate WORKOS_COOKIE_PASSWORD (exactly 32 characters)
-COOKIE_PASSWORD=$(node -e "console.log(require('crypto').randomBytes(16).toString('hex'))")
-echo "Generated WORKOS_COOKIE_PASSWORD: $COOKIE_PASSWORD"
-vercel env add "WORKOS_COOKIE_PASSWORD" production <<< "$COOKIE_PASSWORD"
-echo -e "${GREEN}✅ WORKOS_COOKIE_PASSWORD set${NC}"
+# Generate NEXTAUTH_SECRET (for any NextAuth usage)
+NEXTAUTH_SECRET=$(node -e "console.log(require('crypto').randomBytes(32).toString('base64'))")
+echo "Generated NEXTAUTH_SECRET: $NEXTAUTH_SECRET"
+vercel env add "NEXTAUTH_SECRET" production <<< "$NEXTAUTH_SECRET"
+echo -e "${GREEN}✅ NEXTAUTH_SECRET set${NC}"
 
 # Generate JWT_SECRET (64 characters)
 JWT_SECRET=$(node -e "console.log(require('crypto').randomBytes(32).toString('hex'))")
@@ -92,18 +92,11 @@ echo -e "${GREEN}✅ JWT_SECRET set${NC}"
 echo -e "\n${BLUE}🌐 Site Configuration${NC}"
 prompt_for_env "NEXT_PUBLIC_SITE_URL" "Your production domain" "https://zignal.vercel.app" false
 
-# Auto-generate redirect URIs based on site URL
+# Clerk handles redirects automatically
 if [ ! -z "$value" ]; then
     SITE_URL="$value"
-    REDIRECT_URI="${SITE_URL}/api/auth/workos/callback"
-    LOGOUT_REDIRECT_URI="${SITE_URL}/"
-    
-    vercel env add "WORKOS_REDIRECT_URI" production <<< "$REDIRECT_URI"
-    vercel env add "WORKOS_LOGOUT_REDIRECT_URI" production <<< "$LOGOUT_REDIRECT_URI"
-    
-    echo -e "${GREEN}✅ Auto-generated redirect URIs:${NC}"
-    echo "   WORKOS_REDIRECT_URI: $REDIRECT_URI"
-    echo "   WORKOS_LOGOUT_REDIRECT_URI: $LOGOUT_REDIRECT_URI"
+    echo -e "${GREEN}✅ Clerk redirect URIs configured automatically${NC}"
+    echo "   Clerk handles redirects automatically based on your domain: $SITE_URL"
 fi
 
 # Supabase Configuration
@@ -122,24 +115,27 @@ vercel env add "SECURITY_LOGGING_ENABLED" production <<< "true"
 vercel env add "SECURITY_LOG_LEVEL" production <<< "info"
 echo -e "${GREEN}✅ Security configuration set${NC}"
 
-# Optional: Advanced WorkOS Configuration
-echo -e "\n${YELLOW}🔧 Optional: Advanced WorkOS Configuration${NC}"
-read -p "Do you want to configure advanced WorkOS settings? (y/n): " configure_advanced
+# Optional: Advanced Clerk Configuration
+echo -e "\n${YELLOW}🔧 Optional: Advanced Clerk Configuration${NC}"
+read -p "Do you want to configure advanced Clerk settings? (y/n): " configure_advanced
 
 if [[ $configure_advanced =~ ^[Yy]$ ]]; then
-    prompt_for_env "WORKOS_AUTHKIT_DOMAIN" "Custom AuthKit domain" "your-domain.authkit.app" true
-    prompt_for_env "WORKOS_EMAIL_DOMAIN" "Custom email domain" "your-domain.com" true
+    echo -e "\n${BLUE}Advanced Clerk Settings${NC}"
+    prompt_for_env "NEXT_PUBLIC_CLERK_SIGN_IN_URL" "Custom sign-in URL" "/sign-in" false
+    prompt_for_env "NEXT_PUBLIC_CLERK_SIGN_UP_URL" "Custom sign-up URL" "/sign-up" false
+    prompt_for_env "NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL" "After sign-in redirect" "/dashboard" false
+    prompt_for_env "NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL" "After sign-up redirect" "/dashboard" false
 fi
 
 echo -e "\n${GREEN}🎉 Environment setup complete!${NC}"
 echo -e "\n${BLUE}📋 Next Steps:${NC}"
 echo "1. Verify all variables are set: vercel env ls"
 echo "2. Deploy to production: vercel --prod"
-echo "3. Update WorkOS redirect URIs in dashboard"
+echo "3. Update Clerk dashboard with production domain"
 echo "4. Test the production deployment"
 
 echo -e "\n${YELLOW}⚠️  Important Reminders:${NC}"
-echo "• Update WorkOS dashboard with production redirect URIs"
+echo "• Update Clerk dashboard with production domain"
 echo "• Ensure Supabase storage bucket 'public_image' exists"
 echo "• Test all functionality after deployment"
 echo "• Monitor logs for any issues"

@@ -15,9 +15,9 @@ npm run generate-secrets
 JWT_SECRET=your_generated_64_character_hex_string_here
 ```
 
-### 1.5. "WORKOS_COOKIE_PASSWORD must be exactly 32 characters long"
+### 1.5. "NEXTAUTH_SECRET is required"
 
-**Problem**: WorkOS cookie password is wrong length (WorkOS requires exactly 32 characters, not more or less).
+**Problem**: NextAuth secret is missing or invalid.
 
 **Solution**:
 ```bash
@@ -25,24 +25,24 @@ JWT_SECRET=your_generated_64_character_hex_string_here
 npm run generate-secrets
 
 # Add to your .env.local file:
-WORKOS_COOKIE_PASSWORD=your_generated_32_character_hex_string
+NEXTAUTH_SECRET=your_generated_base64_secret
 ```
 
-### 2. "Invalid client secret" (WorkOS Error)
+### 2. "Invalid Clerk credentials" (Clerk Error)
 
-**Problem**: WorkOS credentials are missing or incorrect.
+**Problem**: Clerk credentials are missing or incorrect.
 
 **Solution**:
 ```bash
 # Check your environment variables
 npm run check-env
 
-# Get credentials from WorkOS Dashboard:
-# https://dashboard.workos.com/
+# Get credentials from Clerk Dashboard:
+# https://dashboard.clerk.com/
 
 # Add to .env.local:
-WORKOS_API_KEY=sk_test_your_actual_api_key
-WORKOS_CLIENT_ID=client_your_actual_client_id
+CLERK_SECRET_KEY=sk_test_your_actual_secret_key
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_your_actual_publishable_key
 ```
 
 ### 3. "No authorization code provided"
@@ -83,20 +83,20 @@ npm run dev
 
 ## Environment Variables Checklist
 
-Required variables with specific length requirements:
-- ✅ WORKOS_API_KEY (from WorkOS dashboard)
-- ✅ WORKOS_CLIENT_ID (from WorkOS dashboard) 
-- ✅ WORKOS_COOKIE_PASSWORD (exactly 32 characters)
+Required variables for Clerk authentication:
+- ✅ CLERK_SECRET_KEY (from Clerk dashboard)
+- ✅ NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY (from Clerk dashboard)
+- ✅ NEXTAUTH_SECRET (base64 encoded secret)
 - ✅ JWT_SECRET (32+ characters)
 - ✅ NEXT_PUBLIC_SITE_URL (http://localhost:3000 for dev)
 
-## WorkOS Dashboard Configuration
+## Clerk Dashboard Configuration
 
-1. Go to https://dashboard.workos.com/
+1. Go to https://dashboard.clerk.com/
 2. Navigate to your application
-3. Set redirect URIs:
-   - `http://localhost:3000/api/auth/workos/callback` (development)
-   - `https://zignals.org/api/auth/workos/callback` (production)
+3. Set allowed origins:
+   - `http://localhost:3000` (development)
+   - `https://zignals.org` (production)
 4. Copy your API Key and Client ID to .env.local
 
 ## Still Having Issues?

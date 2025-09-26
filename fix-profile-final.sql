@@ -27,7 +27,7 @@ DELETE FROM public.refresh_tokens WHERE user_id = 'user_01K56MTX5FSR76K9GQNMZMV4
 -- Let's use a simpler approach with only essential fields
 INSERT INTO public.user_profiles (
     user_id,
-    workos_user_id,
+    clerk_user_id,
     email,
     username,
     full_name,
@@ -37,10 +37,10 @@ INSERT INTO public.user_profiles (
     created_at,
     updated_at
 ) VALUES (
-    'user_01K56MTX5FSR76K9GQNMZMV454',         -- WorkOS user ID as user_id
-    'user_01K56MTX5FSR76K9GQNMZMV454',         -- WorkOS user ID
+    'user_01K56MTX5FSR76K9GQNMZMV454',         -- Clerk user ID as user_id
+    'user_01K56MTX5FSR76K9GQNMZMV454',         -- Clerk user ID
     'dagz55@gmail.com',                        -- Email
-    'dagz55_workos',                           -- Unique username
+    'dagz55_clerk',                            -- Unique username
     'Dagz Suarez',                             -- Full name
     'admin',                                   -- Role
     true,                                      -- Is admin
@@ -62,7 +62,7 @@ BEGIN
         RAISE NOTICE '✅ Admin profile created successfully:';
         RAISE NOTICE '   ID: %', admin_profile.id;
         RAISE NOTICE '   User ID: %', admin_profile.user_id;
-        RAISE NOTICE '   WorkOS User ID: %', admin_profile.workos_user_id;
+        RAISE NOTICE '   Clerk User ID: %', admin_profile.clerk_user_id;
         RAISE NOTICE '   Email: %', admin_profile.email;
         RAISE NOTICE '   Username: %', admin_profile.username;
         RAISE NOTICE '   Is Admin: %', admin_profile.is_admin;

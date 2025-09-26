@@ -898,7 +898,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Files Modified
 - `app/layout.tsx` - Removed hardcoded dark theme className
-- `app/api/auth/workos/callback/route.ts` - Enhanced security and username generation
+- `app/api/webhooks/clerk/route.ts` - Enhanced security and user management
 - `CHANGELOG.md` - Added version 2.7.2 release notes
 
 ## [2.7.1] - 2025-09-16
@@ -1035,7 +1035,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - API endpoint testing
   - Configuration validation
 - **Documentation**: Complete setup and usage documentation
-  - WORKOS_SETUP.md with detailed configuration instructions
+  - CLERK_SETUP_GUIDE.md with detailed configuration instructions
   - Updated README.md with Clerk authentication features
   - Architecture documentation for hybrid auth/database setup
 

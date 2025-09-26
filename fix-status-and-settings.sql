@@ -6,7 +6,7 @@ UPDATE public.user_profiles
 SET 
     status = 'ONLINE',
     updated_at = NOW()
-WHERE workos_user_id = 'user_01K56MTX5FSR76K9GQNMZMV454';
+WHERE clerk_user_id = 'user_01K56MTX5FSR76K9GQNMZMV454';
 
 -- STEP 2: Add missing columns that are causing device registration issues
 ALTER TABLE public.user_devices 
@@ -38,7 +38,7 @@ DECLARE
 BEGIN
     SELECT email, username, status, is_admin, role INTO profile_info
     FROM public.user_profiles
-    WHERE workos_user_id = 'user_01K56MTX5FSR76K9GQNMZMV454';
+    WHERE clerk_user_id = 'user_01K56MTX5FSR76K9GQNMZMV454';
     
     IF FOUND THEN
         RAISE NOTICE '✅ Profile Status Updated:';

@@ -8,14 +8,14 @@ DECLARE
 BEGIN
     RAISE NOTICE '=== CURRENT PROFILES ===';
     FOR profile_record IN
-        SELECT email, username, workos_user_id, is_admin, role
+        SELECT email, username, clerk_user_id, is_admin, role
         FROM public.user_profiles
         WHERE email = 'dagz55@gmail.com' OR username = 'dagz55'
     LOOP
-        RAISE NOTICE 'Profile: email=%, username=%, workos_user_id=%, is_admin=%, role=%', 
+        RAISE NOTICE 'Profile: email=%, username=%, clerk_user_id=%, is_admin=%, role=%', 
             profile_record.email, 
             profile_record.username, 
-            profile_record.workos_user_id,
+            profile_record.clerk_user_id,
             profile_record.is_admin,
             profile_record.role;
     END LOOP;
@@ -28,7 +28,7 @@ WHERE email = 'dagz55@gmail.com' OR username = 'dagz55';
 -- STEP 3: Create a clean admin profile for dagz55@gmail.com
 INSERT INTO public.user_profiles (
     user_id,
-    workos_user_id,
+    clerk_user_id,
     email,
     username,
     full_name,
@@ -48,7 +48,7 @@ INSERT INTO public.user_profiles (
     'user_01K56MTX5FSR76K9GQNMZMV454',
     'user_01K56MTX5FSR76K9GQNMZMV454',
     'dagz55@gmail.com',
-    'dagz55_workos',                    -- Unique username
+    'dagz55_clerk',                     -- Unique username
     'Dagz Suarez',
     'Dagz',
     'Suarez',
@@ -71,7 +71,7 @@ DECLARE
 BEGIN
     SELECT * INTO admin_profile
     FROM public.user_profiles
-    WHERE workos_user_id = 'user_01K56MTX5FSR76K9GQNMZMV454';
+    WHERE clerk_user_id = 'user_01K56MTX5FSR76K9GQNMZMV454';
     
     IF FOUND THEN
         RAISE NOTICE '✅ Admin profile created successfully:';
@@ -114,7 +114,7 @@ CREATE TRIGGER auto_admin_trigger
 -- STEP 6: Test the trigger by updating the profile
 UPDATE public.user_profiles 
 SET updated_at = NOW()
-WHERE workos_user_id = 'user_01K56MTX5FSR76K9GQNMZMV454';
+WHERE clerk_user_id = 'user_01K56MTX5FSR76K9GQNMZMV454';
 
 -- Final verification
 DO $$
@@ -122,7 +122,7 @@ BEGIN
     RAISE NOTICE '=== FINAL VERIFICATION ===';
     IF EXISTS (
         SELECT 1 FROM public.user_profiles 
-        WHERE workos_user_id = 'user_01K56MTX5FSR76K9GQNMZMV454' 
+        WHERE clerk_user_id = 'user_01K56MTX5FSR76K9GQNMZMV454' 
         AND is_admin = true
     ) THEN
         RAISE NOTICE '✅ Admin profile for dagz55@gmail.com is ready';

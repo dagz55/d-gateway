@@ -83,28 +83,28 @@ BEGIN
     END LOOP;
 END $$;
 
--- STEP 5: Add workos_user_id column to user_profiles
+-- STEP 5: Add clerk_user_id column to user_profiles
 ALTER TABLE public.user_profiles 
-ADD COLUMN IF NOT EXISTS workos_user_id TEXT UNIQUE;
+ADD COLUMN IF NOT EXISTS clerk_user_id TEXT UNIQUE;
 
 -- STEP 6: Create SIMPLE, NON-RECURSIVE policies
 -- User profiles - SIMPLE policies without self-references
 CREATE POLICY "user_profiles_select" ON public.user_profiles
     FOR SELECT USING (
         user_id = auth.uid()::text 
-        OR workos_user_id = auth.uid()::text
+        OR clerk_user_id = auth.uid()::text
     );
 
 CREATE POLICY "user_profiles_insert" ON public.user_profiles
     FOR INSERT WITH CHECK (
         user_id = auth.uid()::text 
-        OR workos_user_id = auth.uid()::text
+        OR clerk_user_id = auth.uid()::text
     );
 
 CREATE POLICY "user_profiles_update" ON public.user_profiles
     FOR UPDATE USING (
         user_id = auth.uid()::text 
-        OR workos_user_id = auth.uid()::text
+        OR clerk_user_id = auth.uid()::text
     );
 
 -- Token families - direct user_id check only
@@ -157,7 +157,7 @@ SET search_path = public
 AS $$
     SELECT EXISTS (
         SELECT 1 FROM public.user_profiles 
-        WHERE (user_id = user_uuid OR workos_user_id = user_uuid)
+        WHERE (user_id = user_uuid OR clerk_user_id = user_uuid)
         AND is_admin = true
     );
 $$;
@@ -186,7 +186,7 @@ GRANT ALL ON public.user_devices TO authenticated, service_role;
 GRANT ALL ON public.refresh_tokens TO authenticated, service_role;
 
 -- STEP 9: Create indexes for performance
-CREATE INDEX IF NOT EXISTS idx_user_profiles_workos_user_id ON public.user_profiles(workos_user_id);
+CREATE INDEX IF NOT EXISTS idx_user_profiles_clerk_user_id ON public.user_profiles(clerk_user_id);
 CREATE INDEX IF NOT EXISTS idx_user_profiles_user_id ON public.user_profiles(user_id);
 CREATE INDEX IF NOT EXISTS idx_token_families_user_id ON public.token_families(user_id);
 CREATE INDEX IF NOT EXISTS idx_token_families_last_used ON public.token_families(last_used);
@@ -196,8 +196,8 @@ CREATE INDEX IF NOT EXISTS idx_user_devices_user_id ON public.user_devices(user_
 CREATE INDEX IF NOT EXISTS idx_refresh_tokens_user_id ON public.refresh_tokens(user_id);
 
 -- STEP 10: Add helpful comments
-COMMENT ON COLUMN public.user_profiles.user_id IS 'User ID - Supabase UUID or WorkOS user ID string';
-COMMENT ON COLUMN public.user_profiles.workos_user_id IS 'WorkOS user ID for SSO authentication';
+COMMENT ON COLUMN public.user_profiles.user_id IS 'User ID - Supabase UUID or Clerk user ID string';
+COMMENT ON COLUMN public.user_profiles.clerk_user_id IS 'Clerk user ID for authentication';
 COMMENT ON COLUMN public.token_families.last_used IS 'Last token usage timestamp';
 COMMENT ON COLUMN public.token_families.token_chain IS 'Token chain for rotation tracking';
 COMMENT ON COLUMN public.user_sessions.device_fingerprint IS 'Device fingerprint for security';

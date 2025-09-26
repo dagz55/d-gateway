@@ -33,8 +33,8 @@ NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL=/dashboard
 NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL=/dashboard
 NEXT_PUBLIC_CLERK_AFTER_SIGN_OUT_URL=/
 
-# Enable Clerk (set to true when ready to switch from WorkOS)
-NEXT_PUBLIC_USE_CLERK=false
+# Clerk is now the primary authentication provider
+NEXT_PUBLIC_USE_CLERK=true
 ```
 
 ## Step 4: Configure Clerk Dashboard
@@ -85,19 +85,15 @@ NEXT_PUBLIC_USE_CLERK=true
 
 1. Replace the middleware:
 ```bash
-# Backup current middleware
-mv middleware.ts middleware.workos.bak
-
-# Use Clerk middleware
+# The middleware is already configured for Clerk
+# No backup needed as we're using Clerk as the primary auth provider
 cp middleware.clerk.ts middleware.ts
 ```
 
 2. Update the providers:
 ```bash
-# Backup current providers
-mv app/providers.tsx app/providers.workos.bak
-
-# Use unified providers
+# The providers are already configured for Clerk
+# No backup needed as we're using Clerk as the primary auth provider
 cp app/providers-unified.tsx app/providers.tsx
 ```
 
@@ -123,14 +119,11 @@ npm run dev
 
 ## Step 7: Migrate User Data
 
-### Export Users from WorkOS
-Run the migration script (when available):
-```bash
-npm run migrate:users
-```
+### User Data Migration
+The application is already using Clerk for user management. No migration needed as we're using Clerk as the primary authentication provider.
 
-### Import Users to Clerk
-Users can be imported via:
+### User Management
+Users are managed through:
 1. Clerk Dashboard → **Users** → **Import**
 2. Using Clerk's Backend API
 3. Using the migration script
@@ -180,13 +173,10 @@ zignal-login/
 
 ## API Endpoints
 
-Clerk handles authentication internally, so you don't need custom API endpoints. The following WorkOS endpoints can be removed after migration:
+Clerk handles authentication internally, so you don't need custom API endpoints. The application uses Clerk's built-in authentication system with the following endpoints:
 
-- `/api/auth/workos/login`
-- `/api/auth/workos/callback`
-- `/api/auth/workos/logout`
-- `/api/auth/workos/me`
-- `/api/auth/workos/refresh`
+- `/api/webhooks/clerk` - Webhook endpoint for user events
+- `/api/auth/clerk` - Custom Clerk integration endpoints (if needed)
 
 ## Common Use Cases
 
@@ -295,9 +285,9 @@ export async function GET() {
 - [ ] Added `<ClerkProvider>` to layout
 - [ ] Created sign-in/sign-up pages
 - [ ] Tested authentication flows
-- [ ] Migrated user data
+- [ ] Verified user data in Clerk
 - [ ] Updated production environment
-- [ ] Removed WorkOS code (after full migration)
+- [ ] Confirmed Clerk authentication is working
 
 ## Next Steps
 

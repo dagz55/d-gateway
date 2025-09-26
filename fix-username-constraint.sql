@@ -37,7 +37,7 @@ AND email != 'dagz55@gmail.com';
 UPDATE public.user_profiles 
 SET username = 'dagz55'
 WHERE email = 'dagz55@gmail.com'
-AND workos_user_id = 'user_01K56MTX5FSR76K9GQNMZMV454';
+AND clerk_user_id = 'user_01K56MTX5FSR76K9GQNMZMV454';
 
 -- STEP 4: Drop the problematic unique constraint
 DROP INDEX IF EXISTS user_profiles_username_key;
@@ -62,7 +62,7 @@ BEGIN
     -- Check your profile
     SELECT email, username, status, is_admin INTO profile_info
     FROM public.user_profiles
-    WHERE workos_user_id = 'user_01K56MTX5FSR76K9GQNMZMV454';
+    WHERE clerk_user_id = 'user_01K56MTX5FSR76K9GQNMZMV454';
     
     -- Check for any remaining duplicates
     SELECT COUNT(*) INTO duplicate_count
