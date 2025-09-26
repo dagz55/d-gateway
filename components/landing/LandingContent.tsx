@@ -198,8 +198,8 @@ export function LandingContent() {
   
   const { scrollY } = useScroll();
   const { data: cryptoResponse, isLoading: isCryptoLoading, error: cryptoError, refetch: refetchCrypto } = useCryptoPrices();
-  const cryptoData = cryptoResponse?.data || [];
-  const cryptoStats = cryptoResponse?.stats;
+  const cryptoData = Array.isArray(cryptoResponse) ? cryptoResponse : [];
+  const cryptoStats = null; // Will be implemented when stats are available in the API
 
   // Parallax effects
   const heroY = useTransform(scrollY, [0, 1000], [0, -200]);
@@ -481,7 +481,7 @@ export function LandingContent() {
           logError(error instanceof Error ? error : new Error('Chart data point processing error'), 'data', 'chart-processing');
           return null;
         }
-      }).filter(Boolean);
+      }).filter((point): point is NonNullable<typeof point> => point !== null);
       
     } catch (error) {
       logError(error instanceof Error ? error : new Error('Chart data processing error'), 'data', 'chart-processing');
@@ -500,7 +500,7 @@ export function LandingContent() {
   );
 
   const lastSparkX = chartData.length > 1 ? 260 : 0;
-  const lastSparkY = chartData.length > 0 ? chartData[chartData.length - 1].y : 0;
+  const lastSparkY = chartData.length > 0 ? chartData[chartData.length - 1]?.y || 0 : 0;
 
   const closeMenu = () => setMenuOpen(false);
 
@@ -786,7 +786,7 @@ export function LandingContent() {
                 <p className="mt-2 text-sm text-white/50">
                   {isCryptoLoading ? 'Loading live data...' : 
                    cryptoError ? 'Data temporarily unavailable' :
-                   `Last synced ${cryptoStats ? new Date(cryptoStats.lastUpdate).toLocaleTimeString() : '2 minutes ago'}`}
+                   'Last synced 2 minutes ago'}
                 </p>
                 <div 
                   className="mt-8 h-36 rounded-2xl border border-white/10 bg-white/[0.04] p-4 relative"
@@ -802,13 +802,16 @@ export function LandingContent() {
                     const pointIndex = Math.round((x / rect.width) * (chartData.length - 1));
                     const clampedIndex = Math.max(0, Math.min(pointIndex, chartData.length - 1));
                     const point = chartData[clampedIndex];
-                    setHoveredPoint({
-                      x: point.x,
-                      y: point.y,
-                      value: point.value,
-                      date: point.date,
-                      time: point.time
-                    });
+                    
+                    if (point) {
+                      setHoveredPoint({
+                        x: point.x,
+                        y: point.y,
+                        value: point.value,
+                        date: point.date,
+                        time: point.time
+                      });
+                    }
                   }}
                   onMouseLeave={() => {
                     setHoveredPoint(null);
@@ -870,8 +873,8 @@ export function LandingContent() {
                     {chartData.map((point, index) => (
                       <circle
                         key={index}
-                        cx={point.x}
-                        cy={point.y}
+                        cx={point?.x || 0}
+                        cy={point?.y || 0}
                         r="2"
                         fill="#34d399"
                         opacity="0.6"
@@ -903,14 +906,14 @@ export function LandingContent() {
                 <div className="mt-6 flex items-center justify-between">
                   <div>
                     <p className="text-xs text-white/50">Running P&amp;L</p>
-                    <p className={`text-lg font-semibold ${cryptoStats && parseFloat(cryptoStats.priceChange) >= 0 ? 'text-emerald-300' : 'text-red-400'}`}>
-                      {cryptoStats ? `${cryptoStats.priceChange >= 0 ? '+' : ''}${cryptoStats.priceChange}%` : 'Loading...'}
+                    <p className="text-lg font-semibold text-white/60">
+                      Loading...
                     </p>
                   </div>
                   <div className="text-right">
                     <p className="text-xs text-white/50">Volatility Risk</p>
                     <p className="text-lg font-semibold text-white">
-                      {cryptoStats ? `${cryptoStats.volatility}%` : 'Loading...'}
+                      Loading...
                     </p>
                   </div>
                 </div>
