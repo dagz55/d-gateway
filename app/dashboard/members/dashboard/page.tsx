@@ -19,6 +19,7 @@ export default async function MemberDashboardPage() {
 
   const firstName = user.firstName || 'Trader';
 
+  return (
     <div className="flex gap-6 h-[calc(100vh-120px)]">
       {/* Main Content */}
       <div className="flex-1 space-y-8 overflow-y-auto">
