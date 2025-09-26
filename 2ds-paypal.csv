@@ -1,0 +1,7 @@
+Aspect,Detail
+Application's Role,Does not directly implement 2DS (3D Secure) protocol
+2DS Handling,Delegated to PayPal's payment gateway
+User Flow,Users are redirected to PayPal's approveUrl
+PayPal's Role,Manages any necessary 2DS authentication on its platform
+Transaction Outcome,Communicated back to the application via PayPal webhooks
+Database Update,Application's database reflects this status
