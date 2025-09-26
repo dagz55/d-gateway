@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { createServerSupabaseClient } from '@/lib/supabase/serverClient';
 import crypto from 'crypto';
 
 export async function POST(request: NextRequest) {
@@ -46,7 +46,7 @@ export async function POST(request: NextRequest) {
 
 async function handlePaymentCompleted(webhookData: any) {
   try {
-    const supabase = await createClient();
+    const supabase = await createServerSupabaseClient();
     
     // Extract payment information from webhook
     const capture = webhookData.resource;
@@ -95,7 +95,7 @@ async function handlePaymentCompleted(webhookData: any) {
 
 async function handlePaymentFailed(webhookData: any) {
   try {
-    const supabase = await createClient();
+    const supabase = await createServerSupabaseClient();
     
     const capture = webhookData.resource;
     const orderId = capture.supplementary_data?.related_ids?.order_id;
@@ -136,7 +136,7 @@ async function handlePaymentFailed(webhookData: any) {
 
 async function handlePaymentPending(webhookData: any) {
   try {
-    const supabase = await createClient();
+    const supabase = await createServerSupabaseClient();
     
     const capture = webhookData.resource;
     const orderId = capture.supplementary_data?.related_ids?.order_id;

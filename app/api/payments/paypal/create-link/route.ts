@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { createServerSupabaseClient } from '@/lib/supabase/serverClient';
 import { v4 as uuidv4 } from 'uuid';
 
 interface CreatePaymentLinkRequest {
@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
     const paymentLink = `${baseUrl}/pay/${paymentId}`;
 
     // Store payment data in database
-    const supabase = await createClient();
+    const supabase = await createServerSupabaseClient();
     
     const { data: paymentData, error } = await supabase
       .from('paypal_payments')
