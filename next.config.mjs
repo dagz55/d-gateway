@@ -14,6 +14,16 @@ if (typeof global !== 'undefined' && !global.self) {
 /** @type {import('next').NextConfig} */
 const nextConfig = {
 
+  async redirects() {
+    return [
+      // Canonicalize auth routes to Clerk's hyphenated paths
+      { source: '/signin', destination: '/sign-in', permanent: true },
+      { source: '/signin/:path*', destination: '/sign-in/:path*', permanent: true },
+      { source: '/signup', destination: '/sign-up', permanent: true },
+      { source: '/signup/:path*', destination: '/sign-up/:path*', permanent: true },
+    ];
+  },
+
   // Fix lockfile warning by setting the correct project root
   outputFileTracingRoot: path.resolve(process.cwd()),
   

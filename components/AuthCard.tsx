@@ -12,6 +12,7 @@ import { Eye, EyeOff, ExternalLink, AlertCircle } from "lucide-react"
 import Link from "next/link"
 import { supabase } from "@/lib/supabase/browserClient"
 import { TermsModal, PrivacyModal, SupportModal } from "@/components/modals"
+import DashboardLink from "@/components/auth/DashboardLink"
 
 export function AuthCard() {
   const [showEmailForm, setShowEmailForm] = useState(false)
@@ -327,34 +328,8 @@ export function AuthCard() {
         <div className="space-y-2">
           <div className="text-sm text-[#EAF2FF]/60 text-center mb-3">Quick Access (Sign in required)</div>
 
-          <div className="grid grid-cols-2 gap-2">
-            <Link href="/dashboard" className="group relative">
-              <Button
-                variant="outline"
-                disabled
-                className="w-full border-[#33E1DA]/30 text-[#EAF2FF]/50 hover:border-[#33E1DA]/50 hover:text-[#EAF2FF] disabled:opacity-50 bg-transparent"
-              >
-                Member Dashboard
-                <ExternalLink className="w-3 h-3 ml-1" />
-              </Button>
-              <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-[#1E2A44] text-[#EAF2FF] text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-                Sign in required
-              </div>
-            </Link>
-
-            <Link href="/admin" className="group relative">
-              <Button
-                variant="outline"
-                disabled
-                className="w-full border-[#33E1DA]/30 text-[#EAF2FF]/50 hover:border-[#33E1DA]/50 hover:text-[#EAF2FF] disabled:opacity-50 bg-transparent"
-              >
-                Admin Panel
-                <ExternalLink className="w-3 h-3 ml-1" />
-              </Button>
-              <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-[#1E2A44] text-[#EAF2FF] text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-                Sign in required
-              </div>
-            </Link>
+          <div className="grid grid-cols-1 gap-2">
+            <DashboardLink />
           </div>
         </div>
 

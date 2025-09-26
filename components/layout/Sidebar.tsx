@@ -11,24 +11,22 @@ import ProfileSection from './ProfileSection';
 import { useUser } from '@clerk/nextjs';
 import { useNavigationLoading } from '@/hooks/useNavigationLoading';
 import { useSidebar } from '@/contexts/SidebarContext';
-import { BASE_NAVIGATION, ADMIN_NAVIGATION, NavItem } from './navigation-data';
+import { BASE_NAVIGATION, ADMIN_ONLY_NAVIGATION, NavItem } from './navigation-data';
 
 interface SidebarProps {
   className?: string;
+  isAdmin?: boolean;
 }
 
-export default function Sidebar({ className }: SidebarProps) {
+export default function Sidebar({ className, isAdmin = false }: SidebarProps) {
   const { isCollapsed, setIsCollapsed, isMobileOpen, setIsMobileOpen } = useSidebar();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const { user } = useUser();
   const { navigateWithLoading } = useNavigationLoading();
-  
-  // Check if user is admin using client-side user object
-  const isAdmin = user?.publicMetadata?.isAdmin === true || user?.publicMetadata?.role === 'admin';
 
   const allNavigation = useMemo(
-    () => [...BASE_NAVIGATION, ...(isAdmin ? ADMIN_NAVIGATION : [])],
+    () => isAdmin ? ADMIN_ONLY_NAVIGATION : BASE_NAVIGATION,
     [isAdmin]
   );
 
@@ -59,15 +57,16 @@ export default function Sidebar({ className }: SidebarProps) {
   const getNavItemClasses = useCallback(
     (isActiveLink: boolean, isCollapsed: boolean, isAdminItem?: boolean) =>
       cn(
-        "flex items-center text-sm font-medium rounded-xl transition-all duration-300 relative group",
-        isCollapsed ? "md:px-2 md:py-3 md:justify-center" : "md:px-3 md:py-3",
-        "max-md:px-2 max-md:py-3 max-md:justify-center",
+        "flex items-center text-sm font-medium transition-all duration-300 relative group w-full",
+        // Full-width equal sizing for all items - no margins to ensure side-to-side coverage
+        isCollapsed ? "md:px-4 md:py-4 md:justify-center h-[56px]" : "md:px-6 md:py-4 h-[56px]",
+        "max-md:px-4 max-md:py-4 max-md:justify-center h-[56px]",
+        // Enhanced neon green styling with full-width background
         isActiveLink
-          ? "bg-accent/20 text-accent shadow-lg border border-accent/30 card-glow"
-          : "text-white/90 hover:bg-muted hover:text-white hover:shadow-md hover:border hover:border-border", // Improved contrast
-        isAdminItem &&
-          !isActiveLink &&
-          "hover:bg-yellow-500/10 hover:text-yellow-300 hover:border-yellow-500/30 dark:hover:text-yellow-300" // Better contrast for admin items
+          ? "nav-item-active rounded-none"
+          : "text-white/90 nav-item-hover rounded-none border-2 border-transparent",
+        // Ensure consistent full-width box sizing
+        "border-2"
       ),
     []
   );
@@ -137,8 +136,8 @@ export default function Sidebar({ className }: SidebarProps) {
           )}
 
           {/* Navigation */}
-          <ScrollArea className="flex-1 px-1 py-2 md:px-2 md:py-4">
-            <nav className="space-y-2">
+          <ScrollArea className="flex-1 py-2 px-0">
+            <nav className="space-y-1 w-full">
               {allNavigation.map((item) => {
                 const Icon = item.icon;
                 const isActiveLink = isActive(item.href);

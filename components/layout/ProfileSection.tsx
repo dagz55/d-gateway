@@ -94,67 +94,6 @@ export default function ProfileSection({ isCollapsed = false, onNavigate }: Prof
     }
   };
 
-  const menuItems = [
-    {
-      icon: Edit3,
-      label: 'Edit Profile',
-      onClick: () => {
-        router.push('/profile');
-        onNavigate?.();
-      },
-      color: 'text-blue-600 dark:text-blue-400',
-      bgColor: 'bg-blue-100 dark:bg-blue-900/30',
-      hoverBg: 'hover:bg-blue-50 dark:hover:bg-blue-900/20',
-    },
-    {
-      icon: Settings,
-      label: 'Account Settings',
-      onClick: () => {
-        router.push('/settings');
-        onNavigate?.();
-      },
-      color: 'text-gray-700 dark:text-gray-300',
-      bgColor: 'bg-gray-100 dark:bg-gray-800/30',
-      hoverBg: 'hover:bg-gray-50 dark:hover:bg-gray-800/20',
-    },
-    {
-      icon: Bell,
-      label: 'Notifications',
-      onClick: () => {
-        router.push('/notifications');
-        onNavigate?.();
-      },
-      color: 'text-green-600 dark:text-green-400',
-      bgColor: 'bg-green-100 dark:bg-green-900/30',
-      hoverBg: 'hover:bg-green-50 dark:hover:bg-green-900/20',
-    },
-    {
-      icon: HelpCircle,
-      label: 'Help & Support',
-      onClick: () => {
-        router.push('/help');
-        onNavigate?.();
-      },
-      color: 'text-purple-600 dark:text-purple-400',
-      bgColor: 'bg-purple-100 dark:bg-purple-900/30',
-      hoverBg: 'hover:bg-purple-50 dark:hover:bg-purple-900/20',
-    },
-  ];
-
-  if (isAdmin) {
-    menuItems.push({
-      icon: Shield,
-      label: 'Admin Panel',
-      onClick: () => {
-        router.push('/admin');
-        onNavigate?.();
-      },
-      color: 'text-yellow-600 dark:text-yellow-400',
-      bgColor: 'bg-yellow-100 dark:bg-yellow-900/30',
-      hoverBg: 'hover:bg-yellow-100 dark:hover:bg-yellow-900/30 hover:border-yellow-400/50',
-    });
-  }
-
   if (isCollapsed) {
     return (
       <div className="p-1 md:p-2 border-t border-border">
@@ -174,17 +113,6 @@ export default function ProfileSection({ isCollapsed = false, onNavigate }: Prof
 
         {isExpanded && (
           <div className="mt-1 md:mt-2 space-y-1">
-            {menuItems.map((item, index) => (
-              <Button
-                key={index}
-                variant="ghost"
-                size="sm"
-                className="w-full p-1 md:p-2"
-                onClick={item.onClick}
-              >
-                <item.icon className="h-3 w-3 md:h-4 md:w-4" />
-              </Button>
-            ))}
             <Button
               variant="ghost"
               size="sm"
@@ -252,28 +180,7 @@ export default function ProfileSection({ isCollapsed = false, onNavigate }: Prof
 
       {/* Quick Actions */}
       <div className="space-y-1 mb-4">
-        <p className="text-xs font-bold text-white dark:text-white mb-2 px-2">Manage account</p>
-        {menuItems.map((item, index) => (
-          <Button
-            key={index}
-            variant="ghost"
-            size="sm"
-            className={cn(
-              "w-full justify-start h-9 px-2 text-white dark:text-white transition-all duration-200 border border-transparent",
-              item.hoverBg,
-              "hover:scale-[1.02] hover:shadow-sm hover:border-border/50",
-              // Special admin panel styling
-              item.label === 'Admin Panel' && "hover:text-yellow-300 dark:hover:text-yellow-300 hover:bg-yellow-50 dark:hover:bg-yellow-900/20 hover:border-yellow-400/30"
-            )}
-            onClick={item.onClick}
-          >
-            <div className={cn("p-1.5 rounded-full mr-3 transition-all duration-200", item.bgColor)}>
-              <item.icon className={cn("h-3 w-3", item.color)} />
-            </div>
-            <span className="text-xs font-semibold">{item.label}</span>
-            <ChevronRight className="h-3 w-3 ml-auto opacity-80 transition-transform duration-200 group-hover:translate-x-0.5" />
-          </Button>
-        ))}
+        
       </div>
 
       {/* Sign Out */}

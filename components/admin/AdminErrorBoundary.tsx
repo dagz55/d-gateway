@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { AlertTriangle, RefreshCw, Home, Settings, Shield } from 'lucide-react';
 import Link from 'next/link';
+import DashboardLink from '@/components/auth/DashboardLink';
 
 interface Props {
   children: ReactNode;
@@ -183,12 +184,7 @@ export class AdminErrorBoundary extends Component<Props, State> {
               <div className="pt-4 border-t border-border/50">
                 <h4 className="font-medium text-sm mb-3 text-center">Alternative Options</h4>
                 <div className="grid gap-2 sm:grid-cols-2">
-                  <Button asChild variant="ghost" size="sm" className="w-full">
-                    <Link href="/dashboard">
-                      <Home className="h-4 w-4 mr-2" />
-                      Member Dashboard
-                    </Link>
-                  </Button>
+                  <DashboardLink />
                   
                   <Button asChild variant="ghost" size="sm" className="w-full">
                     <Link href="/admin/system-status">

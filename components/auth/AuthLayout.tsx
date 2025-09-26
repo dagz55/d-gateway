@@ -115,7 +115,7 @@ export default function AuthLayout({ defaultMode = 'sign-in' }: AuthLayoutProps)
 {mode === 'sign-in' ? (
               <SignIn
                 routing="virtual"
-                afterSignInUrl="/"
+                afterSignInUrl="/auth/post-login"
                 signUpUrl="/sign-up"
                 appearance={{
                   elements: {

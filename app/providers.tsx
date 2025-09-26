@@ -14,8 +14,8 @@ function ClerkProviderWrapper({ children }: { children: React.ReactNode }) {
   return (
     <ClerkProvider
       appearance={clerkAppearance}
-      signInFallbackRedirectUrl="/dashboard"
-      signUpFallbackRedirectUrl="/dashboard"
+      signInFallbackRedirectUrl="/auth/post-login"
+      signUpFallbackRedirectUrl="/auth/post-login"
       // Completely disable organization features
       allowOrganizationCreation={false}
       allowOrganizationInvitation={false}

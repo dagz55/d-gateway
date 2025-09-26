@@ -37,7 +37,7 @@ export default function RootLayout({
         <Providers>
           <Suspense fallback={null}>{children}</Suspense>
         </Providers>
-        {process.env.NODE_ENV === 'production' && <Analytics />}
+        {process.env.NODE_ENV === 'production' && (process.env.VERCEL === '1' || process.env.NEXT_PUBLIC_ENABLE_VERCEL_ANALYTICS === 'true') && <Analytics />}
       </body>
     </html>
   )

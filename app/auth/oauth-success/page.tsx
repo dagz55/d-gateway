@@ -10,6 +10,6 @@ import { redirect } from 'next/navigation';
  * This handler redirects to the dashboard for compatibility.
  */
 export default function OAuthSuccessRedirect() {
-  // Immediately redirect to dashboard - middleware will handle role-based routing
-  redirect('/dashboard');
+  // Immediately redirect to role-based destination
+  redirect('/auth/post-login');
 }

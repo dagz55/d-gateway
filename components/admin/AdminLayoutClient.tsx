@@ -73,7 +73,7 @@ export default function AdminLayoutClient({ children, adminUser }: AdminLayoutCl
   }
 
   return (
-    <AppLayout>
+    <AppLayout isAdmin>
       {children}
       
       {/* Development error indicator */}

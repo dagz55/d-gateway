@@ -16,12 +16,19 @@ const isPublicRoute = createRouteMatcher([
   "/signup(.*)",
   "/admin-setup",
   "/auth/oauth-success",
+  "/auth/post-login", // allow client-side role routing without middleware auth
   "/.well-known/oauth-authorization-server(.*)",
   "/.well-known/oauth-protected-resource(.*)",
   "/api/webhooks(.*)",
   // Public API endpoints (avoid auth in middleware to prevent NEXT_HTTP_ERROR_FALLBACK noise)
   "/api/crypto(.*)",
+  "/api/payments/paypal(.*)",
 ]);
+
+// Auth pages matcher to avoid rendering SignIn/SignUp for authenticated users
+const isAuthPage = createRouteMatcher(["/sign-in(.*)", "/sign-up(.*)", "/signin(.*)", "/signup(.*)"]);
+// Dashboard alias matcher (we will redirect to role-based dashboards)
+const isDashboardAlias = createRouteMatcher(["/dashboard(.*)"]);
 
 export default clerkMiddleware(async (auth, req) => {
   const { pathname } = req.nextUrl;
@@ -33,6 +40,18 @@ export default clerkMiddleware(async (auth, req) => {
     pathname.includes("SignUp_clerk_")
   ) {
     return NextResponse.next();
+  }
+
+  // If authenticated and visiting auth pages, redirect to post-login handler
+  try {
+    const { userId, publicMetadata } = auth();
+    if (userId && isAuthPage(req)) {
+      const postLoginUrl = new URL('/auth/post-login', req.url);
+      return NextResponse.redirect(postLoginUrl);
+    }
+
+  } catch {
+    // no-op: fall back to standard flow
   }
 
   // Allow public routes through without protection

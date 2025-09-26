@@ -1,8 +1,11 @@
 import { SignIn } from '@clerk/nextjs';
 import Image from 'next/image';
 import Logo from '@/components/ui/Logo';
+import { auth } from '@clerk/nextjs/server';
+import { redirect } from 'next/navigation';
 
-export default function SignInPage() {
+export default async function SignInPage() {
+  // Middleware will redirect authenticated users away from auth pages
   return (
     <div className="min-h-screen flex">
       {/* Left side - Wallpaper */}
@@ -50,9 +53,9 @@ export default function SignInPage() {
             />
           </div>
           
-          <SignIn 
+<SignIn 
             routing="virtual" 
-            fallbackRedirectUrl="/dashboard" 
+            fallbackRedirectUrl="/auth/post-login" 
             signUpUrl="/sign-up"
             // Disable organization features
             skipOrganizationCreation={true}

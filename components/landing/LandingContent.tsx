@@ -27,6 +27,7 @@ import {
 import Logo from '@/components/ui/Logo';
 import { PromotionalBanner } from './PromotionalBanner';
 import { SignedIn, SignedOut, useUser, UserButton } from '@clerk/nextjs';
+import DashboardLink from '@/components/auth/DashboardLink';
 
 // Lazy load heavy components for better performance with preload hints
 const OptimizedTradingChart = dynamic(() => import('@/components/trading/OptimizedTradingChart').then(mod => ({ default: mod.OptimizedTradingChart })), {
@@ -211,12 +212,12 @@ export function LandingContent() {
     
     // Take only the last 24 points for better performance
     const recentData = cryptoData.slice(-24);
-    const prices = recentData.map(item => item.close);
+    const prices = recentData.map((item: { close: any; }) => item.close);
     const minPrice = Math.min(...prices);
     const maxPrice = Math.max(...prices);
     const priceRange = maxPrice - minPrice || 1;
     
-    return recentData.map((item, index) => {
+    return recentData.map((item: { close: number; t: string; }, index: number) => {
       const normalizedPrice = ((item.close - minPrice) / priceRange) * 100 + 20; // Scale to 20-120 range
       const date = new Date(parseInt(item.t));
       return {
@@ -289,13 +290,7 @@ export function LandingContent() {
                 </Link>
               </SignedOut>
               <SignedIn>
-                <Link
-                  href="/dashboard"
-                  className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm font-semibold text-white transition hover:border-white/30 hover:bg-white/15 hover:shadow-lg hover:shadow-white/10"
-                >
-                  <LayoutDashboard className="h-4 w-4" />
-                  Dashboard
-                </Link>
+                <DashboardLink />
                 <div className="flex items-center gap-3 rounded-xl border border-white/15 bg-white/5 px-3 py-2">
                   <UserButton afterSignOutUrl="/" />
                   <div className="flex flex-col">
@@ -356,14 +351,7 @@ export function LandingContent() {
                     </Link>
                   </SignedOut>
                   <SignedIn>
-                    <Link
-                      href="/dashboard"
-                      onClick={closeMenu}
-                      className="flex items-center justify-center gap-2 rounded-full border border-white/20 bg-white/10 px-5 py-2 text-sm font-semibold text-white transition hover:border-white/30 hover:bg-white/15"
-                    >
-                      <LayoutDashboard className="h-4 w-4" />
-                      Dashboard
-                    </Link>
+                    <DashboardLink />
                     <Link
                       href="/profile"
                       onClick={closeMenu}
@@ -539,7 +527,7 @@ export function LandingContent() {
                     )}
                     
                     {/* Data points */}
-                    {chartData.map((point, index) => (
+                    {chartData.map((point: { x: number; y: number; }, index: React.Key | null | undefined) => (
                       <circle
                         key={index}
                         cx={point.x}
@@ -574,9 +562,9 @@ export function LandingContent() {
                 </div>
                 <div className="mt-6 flex items-center justify-between">
                   <div>
-                    <p className="text-xs text-white/50">Running P&amp;L</p>
+                    <p className="text-xs text-white/50">Running P&L</p>
                     <p className={`text-lg font-semibold ${cryptoStats && parseFloat(cryptoStats.priceChange) >= 0 ? 'text-emerald-300' : 'text-red-400'}`}>
-                      {cryptoStats ? `${cryptoStats.priceChange >= 0 ? '+' : ''}${cryptoStats.priceChange}%` : 'Loading...'}
+                      {cryptoStats ? `${parseFloat(cryptoStats.priceChange) >= 0 ? '+' : ''}${cryptoStats.priceChange}%` : 'Loading...'}
                     </p>
                   </div>
                   <div className="text-right">

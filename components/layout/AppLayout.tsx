@@ -11,16 +11,17 @@ import { cn } from '@/lib/utils';
 interface AppLayoutProps {
   children: ReactNode;
   showTradingPanel?: boolean;
+  isAdmin?: boolean;
 }
 
-function AppLayoutContent({ children, showTradingPanel = false }: { children: ReactNode; showTradingPanel?: boolean }) {
+function AppLayoutContent({ children, showTradingPanel = false, isAdmin = false }: { children: ReactNode; showTradingPanel?: boolean, isAdmin?: boolean }) {
   const { isCollapsed } = useSidebar();
   const tradingPanel = useTradingPanel();
 
   return (
     <div className="min-h-screen dashboard-bg">
       <Suspense fallback={<div className="fixed left-0 top-0 h-full w-64 glass border-r border-border" />}>
-        <Sidebar />
+        <Sidebar isAdmin={isAdmin} />
       </Suspense>
       <div className={cn(
         "transition-all duration-300 ease-in-out",
@@ -52,11 +53,11 @@ function AppLayoutContent({ children, showTradingPanel = false }: { children: Re
   );
 }
 
-export default function AppLayout({ children, showTradingPanel = false }: AppLayoutProps) {
+export default function AppLayout({ children, showTradingPanel = false, isAdmin = false }: AppLayoutProps) {
   return (
     <SidebarProvider>
       <TradingPanelProvider>
-        <AppLayoutContent showTradingPanel={showTradingPanel}>{children}</AppLayoutContent>
+        <AppLayoutContent showTradingPanel={showTradingPanel} isAdmin={isAdmin}>{children}</AppLayoutContent>
       </TradingPanelProvider>
     </SidebarProvider>
   );
