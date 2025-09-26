@@ -5,6 +5,5 @@ export const dynamic = 'force-dynamic';
 
 export default async function LegacyMemberPage() {
   // Middleware handles authentication - just redirect to new member path
-  // This prevents conflicts between page-level auth and middleware auth
-  redirect('/dashboard/members');
+  redirect('/member/dashboard');
 }

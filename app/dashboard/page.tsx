@@ -1,22 +1,24 @@
-import { redirect } from 'next/navigation';
 import { auth } from '@clerk/nextjs/server';
+import { redirect } from 'next/navigation';
+import { getUserProfile } from '@/lib/user-profile';
 
-export default async function DashboardPage() {
-  const { userId, sessionClaims } = await auth();
-  
+// Force dynamic rendering since this route uses authentication
+export const dynamic = 'force-dynamic';
+
+export default async function DashboardRootPage() {
+  const { userId, orgId, publicMetadata } = auth();
+
   if (!userId) {
-    redirect('/signin');
-    return;
+    redirect('/sign-in');
   }
 
   // Check if user is admin
-  const publicMetadata = sessionClaims?.publicMetadata as any;
   const isAdmin = publicMetadata?.role === "admin" || publicMetadata?.is_admin === true;
 
-  // Redirect based on role
   if (isAdmin) {
-    redirect('/dashboard/admins');
-  } else {
-    redirect('/dashboard/members');
+    redirect('/admin/dashboard');
   }
+
+  // If not admin, redirect to member dashboard
+  redirect('/member/dashboard');
 }
