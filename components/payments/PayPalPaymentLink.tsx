@@ -368,6 +368,7 @@ export default function PayPalPaymentLink({ onPaymentSuccess, onPaymentError }: 
                     <PayPalButtons
                       createOrder={(data, actions) => {
                         return actions.order.create({
+                          intent: 'CAPTURE',
                           purchase_units: [
                             {
                               amount: {

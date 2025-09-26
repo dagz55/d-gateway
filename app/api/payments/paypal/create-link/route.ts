@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
     
     // Create payment link
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
-    const paymentLink = `${baseUrl}/pay/${paymentId}`;
+    const paymentLink = `${baseUrl}/ncp/payment/${paymentId}`;
 
     // Store payment data in database
     const supabase = await createServerSupabaseClient();

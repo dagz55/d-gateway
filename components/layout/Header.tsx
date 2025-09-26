@@ -17,8 +17,8 @@ interface HeaderProps {
 
 
 export default function Header({ className, showTradingToggle = false }: HeaderProps) {
-  // Trading panel state (only used if showTradingToggle is true)
-  const tradingPanel = showTradingToggle ? useTradingPanel() : null;
+  // Trading panel state - always call the hook but only use if showTradingToggle is true
+  const tradingPanel = useTradingPanel();
   const [currentBanner, setCurrentBanner] = useState(0);
   const [animationPhase, setAnimationPhase] = useState<'entering' | 'paused' | 'exiting'>('entering');
   const [isHovered, setIsHovered] = useState(false);

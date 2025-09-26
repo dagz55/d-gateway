@@ -23,6 +23,9 @@ const isPublicRoute = createRouteMatcher([
   // Public API endpoints (avoid auth in middleware to prevent NEXT_HTTP_ERROR_FALLBACK noise)
   "/api/crypto(.*)",
   "/api/payments/paypal(.*)",
+  // Test and payment pages
+  "/test-payment",
+  "/ncp/payment(.*)",
 ]);
 
 // Auth pages matcher to avoid rendering SignIn/SignUp for authenticated users
@@ -44,7 +47,7 @@ export default clerkMiddleware(async (auth, req) => {
 
   // If authenticated and visiting auth pages, redirect to post-login handler
   try {
-    const { userId, publicMetadata } = auth();
+    const { userId } = await auth();
     if (userId && isAuthPage(req)) {
       const postLoginUrl = new URL('/auth/post-login', req.url);
       return NextResponse.redirect(postLoginUrl);

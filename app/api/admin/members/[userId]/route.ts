@@ -3,6 +3,10 @@ import { requireAdmin } from '@/lib/admin';
 import { clerkClient } from '@clerk/nextjs/server';
 import { createServerSupabaseClient } from '@/lib/supabase/serverClient';
 
+async function getClerkClient() {
+  return await clerkClient();
+}
+
 export async function GET(
   request: NextRequest,
   { params }: { params: { userId: string } }
@@ -14,7 +18,8 @@ export async function GET(
     const { userId } = params;
 
     // Get user details from Clerk
-    const clerkUser = await clerkClient.users.getUser(userId);
+    const clerk = await getClerkClient();
+    const clerkUser = await clerk.users.getUser(userId);
 
     if (!clerkUser) {
       return NextResponse.json(
@@ -78,8 +83,8 @@ export async function GET(
       avatar_url: clerkUser.imageUrl,
       role: clerkUser.publicMetadata?.role || (clerkUser.publicMetadata?.isAdmin ? 'admin' : 'member'),
       is_admin: clerkUser.publicMetadata?.isAdmin || false,
-      created_at: clerkUser.createdAt.toISOString(),
-      last_sign_in_at: clerkUser.lastSignInAt?.toISOString(),
+      created_at: new Date(clerkUser.createdAt).toISOString(),
+      last_sign_in_at: clerkUser.lastSignInAt ? new Date(clerkUser.lastSignInAt).toISOString() : undefined,
       email_verified: clerkUser.emailAddresses[0]?.verification?.status === 'verified',
       phone: clerkUser.phoneNumbers[0]?.phoneNumber,
       banned: clerkUser.banned,
@@ -122,13 +127,13 @@ export async function PUT(
     const { userId } = params;
     const body = await request.json();
     const { action, ...updateData } = body;
+    const clerk = await getClerkClient();
 
     switch (action) {
-      case 'suspend':
-        // Suspend user in Clerk
-        const currentUser = await clerkClient.users.getUser(userId);
+      case 'suspend': {
+        const currentUser = await clerk.users.getUser(userId);
         const currentMetadata = currentUser.publicMetadata || {};
-        await clerkClient.users.updateUser(userId, {
+        await clerk.users.updateUser(userId, {
           publicMetadata: {
             ...currentMetadata,
             suspended: true,
@@ -141,14 +146,13 @@ export async function PUT(
           success: true,
           message: 'User suspended successfully'
         });
-
-      case 'activate':
-        // Activate user in Clerk
-        const currentUserActivate = await clerkClient.users.getUser(userId);
-        const currentMetadataActivate = currentUserActivate.publicMetadata || {};
-        await clerkClient.users.updateUser(userId, {
+      }
+      case 'activate': {
+        const currentUser = await clerk.users.getUser(userId);
+        const currentMetadata = currentUser.publicMetadata || {};
+        await clerk.users.updateUser(userId, {
           publicMetadata: {
-            ...currentMetadataActivate,
+            ...currentMetadata,
             suspended: false,
             activatedAt: new Date().toISOString(),
             activatedBy: 'admin'
@@ -159,14 +163,13 @@ export async function PUT(
           success: true,
           message: 'User activated successfully'
         });
-
-      case 'promote':
-        // Promote user to admin in Clerk
-        const currentUserPromote = await clerkClient.users.getUser(userId);
-        const currentMetadataPromote = currentUserPromote.publicMetadata || {};
-        await clerkClient.users.updateUser(userId, {
+      }
+      case 'promote': {
+        const currentUser = await clerk.users.getUser(userId);
+        const currentMetadata = currentUser.publicMetadata || {};
+        await clerk.users.updateUser(userId, {
           publicMetadata: {
-            ...currentMetadataPromote,
+            ...currentMetadata,
             isAdmin: true,
             role: 'admin',
             promotedAt: new Date().toISOString(),
@@ -188,14 +191,13 @@ export async function PUT(
           success: true,
           message: 'User promoted to admin successfully'
         });
-
-      case 'demote':
-        // Demote admin to member in Clerk
-        const currentUserDemote = await clerkClient.users.getUser(userId);
-        const currentMetadataDemote = currentUserDemote.publicMetadata || {};
-        await clerkClient.users.updateUser(userId, {
+      }
+      case 'demote': {
+        const currentUser = await clerk.users.getUser(userId);
+        const currentMetadata = currentUser.publicMetadata || {};
+        await clerk.users.updateUser(userId, {
           publicMetadata: {
-            ...currentMetadataDemote,
+            ...currentMetadata,
             isAdmin: false,
             role: 'member',
             demotedAt: new Date().toISOString(),
@@ -204,8 +206,8 @@ export async function PUT(
         });
 
         // Update in Supabase user_profiles if exists
-        const supabase2 = await createServerSupabaseClient();
-        await supabase2
+        const supabase = await createServerSupabaseClient();
+        await supabase
           .from('user_profiles')
           .upsert({
             clerk_user_id: userId,
@@ -217,8 +219,8 @@ export async function PUT(
           success: true,
           message: 'User demoted to member successfully'
         });
-
-      case 'update':
+      }
+      case 'update': {
         // Update user details in Clerk
         const updatePayload: any = {};
 
@@ -226,12 +228,13 @@ export async function PUT(
         if (updateData.lastName) updatePayload.lastName = updateData.lastName;
         if (updateData.username) updatePayload.username = updateData.username;
 
-        await clerkClient.users.updateUser(userId, updatePayload);
+        await clerk.users.updateUser(userId, updatePayload);
 
         return NextResponse.json({
           success: true,
           message: 'User updated successfully'
         });
+      }
 
       default:
         return NextResponse.json(
@@ -260,7 +263,8 @@ export async function DELETE(
     const { userId } = params;
 
     // Delete user from Clerk
-    await clerkClient.users.deleteUser(userId);
+    const clerk = await getClerkClient();
+    await clerk.users.deleteUser(userId);
 
     // Note: Supabase data will be automatically cleaned up due to CASCADE constraints
 

@@ -24,6 +24,7 @@ interface State {
 export class AdminErrorBoundary extends Component<Props, State> {
   private retryCount = 0;
   private maxRetries = 3;
+  private isLogging = false;
   
   constructor(props: Props) {
     super(props);
@@ -42,13 +43,13 @@ export class AdminErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    // Log error details for debugging
-    this.logAdminError(error, errorInfo);
-    
-    // Update state with error info
+    // Update state with error info first
     this.setState({
       error,
       errorInfo,
+    }, () => {
+      // Log error details for debugging after state is updated
+      this.logAdminError(error, errorInfo);
     });
 
     // Redirect to admin fallback after a delay if too many errors
@@ -60,6 +61,10 @@ export class AdminErrorBoundary extends Component<Props, State> {
   }
 
   private async logAdminError(error: Error, errorInfo: ErrorInfo) {
+    // Prevent recursive logging
+    if (this.isLogging) return;
+    this.isLogging = true;
+
     try {
       const errorData = {
         message: error.message,
@@ -85,6 +90,8 @@ export class AdminErrorBoundary extends Component<Props, State> {
 
     } catch (logError) {
       console.error('Error logging failed:', logError);
+    } finally {
+      this.isLogging = false;
     }
   }
 

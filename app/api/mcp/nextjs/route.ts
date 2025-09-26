@@ -76,10 +76,9 @@ export async function POST(request: NextRequest) {
     }
 
     // Create a session token for the user
-    const clerkClient = createClerkClient({ secretKey: clerkSecretKey });
-    const sessionToken = await clerkClient.sessions.createSession({
-      userId: user.id,
-      expiresInSeconds: 3600 // 1 hour
+    const clerk = createClerkClient({ secretKey: clerkSecretKey });
+    const sessionToken = await clerk.sessions.createSession({
+      userId: user.id
     });
 
     // Prepare headers for the gateway request
@@ -88,7 +87,7 @@ export async function POST(request: NextRequest) {
       'Authorization': `Bearer ${sessionToken.id}`,
       'X-User-ID': user.id,
       'X-User-Email': user.emailAddresses[0]?.emailAddress || '',
-      'X-User-Role': user.publicMetadata?.role || 'member',
+      'X-User-Role': String(user.publicMetadata?.role || 'member'),
       'X-Request-ID': crypto.randomUUID(),
       'X-Timestamp': new Date().toISOString()
     };

@@ -14,7 +14,8 @@ async function assertAdmin(request?: NextRequest) {
   if (!user) return { user: null, isAdmin: false }
   
   // For now, we'll check if the user's email contains 'admin' or is a specific admin email
-  const isAdminUser = user.email?.includes('admin') || user.email === 'admin@zignals.org'
+  const userEmail = user.emailAddresses[0]?.emailAddress || '';
+  const isAdminUser = userEmail.includes('admin') || userEmail === 'admin@zignals.org'
   return { user, isAdmin: isAdminUser }
 }
 

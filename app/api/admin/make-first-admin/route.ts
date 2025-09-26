@@ -17,7 +17,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Get all users
-    const users = await clerkClient.users.getUserList({
+    const clerk = await clerkClient();
+    const users = await clerk.users.getUserList({
       limit: 100
     });
 
@@ -50,7 +51,7 @@ export async function POST(request: NextRequest) {
         const isAlreadyAdmin = user.publicMetadata?.role === 'admin';
 
         if (!isAlreadyAdmin) {
-          await clerkClient.users.updateUser(user.id, {
+          await clerk.users.updateUser(user.id, {
             publicMetadata: {
               role: 'admin'
             }
