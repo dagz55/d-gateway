@@ -7,11 +7,11 @@ import AdvancedTradingAnalysis from './AdvancedTradingAnalysis';
 
 export default function DashboardSidePanel() {
   return (
-    <div className="w-full h-full glass border-l border-border">
+    <div className="w-full h-full glass-sidebar border-l border-border/50">
       <ScrollArea className="h-full">
         <div className="p-6 space-y-8">
           <MarketOverview />
-          <Separator className="my-8" />
+          <Separator className="my-8 opacity-30" />
           <AdvancedTradingAnalysis />
         </div>
       </ScrollArea>

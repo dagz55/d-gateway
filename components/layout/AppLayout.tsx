@@ -15,7 +15,7 @@ function AppLayoutContent({ children }: { children: ReactNode }) {
 
   return (
     <div className="min-h-screen dashboard-bg">
-      <Suspense fallback={<div className="fixed left-0 top-0 h-full w-64 glass border-r border-border" />}>
+      <Suspense fallback={<div className="fixed left-0 top-0 h-full w-64 glass-sidebar" />}>
         <Sidebar />
       </Suspense>
       <div className={cn(

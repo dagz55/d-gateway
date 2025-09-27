@@ -78,7 +78,7 @@ function CryptoCard({ crypto }: { crypto: any }) {
       whileHover={{ scale: 1.02, y: -2 }}
       className="relative"
     >
-      <Card className="glass glass-hover transition-all duration-300 group relative overflow-hidden">
+      <Card className="glass-card glass-hover card-glow-hover transition-all duration-300 group relative overflow-hidden border-border/50">
         {/* Animated background effect */}
         <div className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-gradient-to-br ${isNegative ? 'from-red-500/10 to-red-600/5' : 'from-green-500/10 to-green-600/5'}`} />
 

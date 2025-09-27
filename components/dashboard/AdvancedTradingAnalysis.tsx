@@ -99,7 +99,7 @@ function StatCard({ stat, index }: { stat: any; index: number }) {
       transition={{ duration: 0.3, delay: index * 0.1 }}
       whileHover={{ scale: 1.02 }}
     >
-      <Card className="glass glass-hover relative overflow-hidden">
+      <Card className="glass-card glass-hover card-glow-hover relative overflow-hidden border-border/50">
         <div className={`absolute inset-0 opacity-10 bg-gradient-to-br ${
           stat.trend === 'up' ? 'from-green-500 to-green-600' :
           stat.trend === 'down' ? 'from-red-500 to-red-600' :
@@ -128,7 +128,7 @@ function StatCard({ stat, index }: { stat: any; index: number }) {
 // Trading Signals Component
 function TradingSignals({ signals }: { signals: any[] }) {
   return (
-    <Card className="glass mt-6">
+    <Card className="glass-card glass-hover card-glow-hover mt-6 border-border/50">
       <CardHeader>
         <CardTitle className="text-lg flex items-center gap-2">
           <Target className="w-5 h-5 text-primary" />
@@ -242,7 +242,7 @@ export default function AdvancedTradingAnalysis() {
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.4, delay: 0.1 }}
       >
-        <Card className="glass glass-hover">
+        <Card className="glass-card glass-hover card-glow-hover border-border/50">
           <CardHeader>
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">

@@ -164,7 +164,7 @@ export default function Sidebar({ className }: SidebarProps) {
       {/* Sidebar */}
       <div
         className={cn(
-          "fixed left-0 z-40 glass border-r border-border transform transition-all duration-300 ease-in-out",
+          "fixed left-0 z-40 glass-sidebar transform transition-all duration-300 ease-in-out",
           "top-0 h-full",
           "md:w-64 md:translate-x-0", // Desktop expanded
           isCollapsed && "md:w-16", // Desktop collapsed

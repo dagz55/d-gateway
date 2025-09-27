@@ -527,6 +527,155 @@
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
+/* Enhanced glassmorphic variants for admin dashboard */
+.glass-admin {
+  background: rgba(26, 127, 179, 0.08);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(51, 225, 218, 0.15);
+  box-shadow: 
+    0 12px 40px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 0 0 1px rgba(51, 225, 218, 0.05);
+}
+
+.glass-card {
+  background: rgba(30, 42, 68, 0.25);
+  backdrop-filter: blur(18px);
+  border: 1px solid rgba(51, 225, 218, 0.12);
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.glass-header {
+  background: rgba(10, 15, 31, 0.85);
+  backdrop-filter: blur(24px);
+  border-bottom: 1px solid rgba(51, 225, 218, 0.15);
+  box-shadow: 
+    0 4px 20px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.glass-sidebar {
+  background: rgba(21, 33, 54, 0.75);
+  backdrop-filter: blur(20px);
+  border-right: 1px solid rgba(51, 225, 218, 0.1);
+  box-shadow: 
+    4px 0 20px rgba(0, 0, 0, 0.25),
+    inset -1px 0 0 rgba(255, 255, 255, 0.03);
+}
+
+.glass-hover {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-hover:hover {
+  background: rgba(30, 42, 68, 0.35);
+  border-color: rgba(51, 225, 218, 0.2);
+  box-shadow: 
+    0 12px 40px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 0 0 1px rgba(51, 225, 218, 0.1);
+  transform: translateY(-2px);
+}
+
+.card-glow-hover {
+  transition: all 0.3s ease;
+}
+
+.card-glow-hover:hover {
+  box-shadow: 
+    0 12px 40px rgba(51, 225, 218, 0.15),
+    0 8px 32px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+/* Enhanced admin-specific glassmorphic effects */
+.glass-admin-panel {
+  background: rgba(26, 127, 179, 0.12);
+  backdrop-filter: blur(24px);
+  border: 1px solid rgba(51, 225, 218, 0.2);
+  box-shadow: 
+    0 16px 48px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    0 0 0 1px rgba(51, 225, 218, 0.08);
+}
+
+.glass-admin-panel:hover {
+  background: rgba(26, 127, 179, 0.15);
+  border-color: rgba(51, 225, 218, 0.25);
+  box-shadow: 
+    0 20px 56px rgba(0, 0, 0, 0.6),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    0 0 0 1px rgba(51, 225, 218, 0.12);
+  transform: translateY(-3px);
+}
+
+/* Enhanced gradient text for admin elements */
+.admin-gradient-text {
+  background: linear-gradient(135deg, #33E1DA 0%, #1A7FB3 50%, #33E1DA 100%);
+  background-size: 200% 200%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: gradient-shift 3s ease-in-out infinite;
+}
+
+@keyframes gradient-shift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+/* Enhanced status indicators for admin */
+.admin-status-active {
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  color: #10b981;
+  box-shadow: 0 0 20px rgba(16, 185, 129, 0.2);
+}
+
+.admin-status-inactive {
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #ef4444;
+  box-shadow: 0 0 20px rgba(239, 68, 68, 0.2);
+}
+
+.admin-status-pending {
+  background: rgba(245, 158, 11, 0.15);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  color: #f59e0b;
+  box-shadow: 0 0 20px rgba(245, 158, 11, 0.2);
+}
+
+/* Enhanced profile dropdown glassmorphic styles */
+.profile-dropdown-glass {
+  background: rgba(30, 42, 68, 0.25);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(51, 225, 218, 0.15);
+  box-shadow: 
+    0 16px 48px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 0 0 1px rgba(51, 225, 218, 0.05);
+  border-radius: 12px;
+}
+
+.profile-dropdown-item {
+  color: #eaf2ff;
+  font-weight: 500;
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin: 4px 8px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.profile-dropdown-item:hover {
+  background: rgba(51, 225, 218, 0.1);
+  color: #ffffff;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(51, 225, 218, 0.2);
+}
+
 /* Additional animation utilities */
 .animate-fade-in {
   animation: fadeIn 0.6s ease-out forwards;

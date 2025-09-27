@@ -1,22 +1,22 @@
 import { redirect } from 'next/navigation';
 import { auth } from '@clerk/nextjs/server';
+import { isAdmin } from '@/lib/admin';
 
 export default async function DashboardPage() {
-  const { userId, sessionClaims } = await auth();
-  
+  const { userId } = await auth();
+
   if (!userId) {
-    redirect('/signin');
+    redirect('/sign-in');
     return;
   }
 
-  // Check if user is admin
-  const publicMetadata = sessionClaims?.publicMetadata as any;
-  const isAdmin = publicMetadata?.role === "admin" || publicMetadata?.is_admin === true;
+  // Use the same admin check logic as the rest of the app
+  const userIsAdmin = await isAdmin();
 
   // Redirect based on role
-  if (isAdmin) {
-    redirect('/dashboard/admins');
+  if (userIsAdmin) {
+    redirect('/dashboard/admins/dashboard');
   } else {
-    redirect('/dashboard/members');
+    redirect('/dashboard/members/dashboard');
   }
 }

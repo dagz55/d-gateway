@@ -9,9 +9,9 @@ import ActiveTrading from './ActiveTrading';
 
 export default function ZigTradesWorkflow() {
   return (
-    <Card className="glass glass-hover card-glow-hover border-border/50">
+    <Card className="glass-admin glass-hover card-glow-hover border-border/50">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
+        <CardTitle className="flex items-center gap-2 admin-gradient-text">
           <Target className="h-6 w-6 text-accent" />
           ZIG TRADES
         </CardTitle>

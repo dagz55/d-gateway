@@ -118,19 +118,19 @@ export default function Header({ className }: HeaderProps) {
         }
       `}</style>
 
-      <header className={`relative flex h-16 items-center justify-between px-6 glass border-b border-border overflow-hidden ${className}`}>
+      <header className={`relative flex h-16 items-center justify-between px-6 glass-header overflow-hidden ${className}`}>
         {/* Logo Section - Removed redundant logo, keeping only the title */}
         <div className="flex items-center z-10">
-          <h1 className="text-xl font-bold gradient-text hidden sm:block">Zignal Dashboard</h1>
+          <h1 className="text-xl font-bold admin-gradient-text hidden sm:block">Zignal Dashboard</h1>
         </div>
 
         {/* Animated Banner Section */}
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none px-4">
           <div className="relative w-full max-w-lg mx-auto overflow-hidden">
             <div
-              className={`flex items-center justify-center space-x-2 px-3 sm:px-4 py-2 rounded-lg border backdrop-blur-sm transition-all duration-300 cursor-pointer pointer-events-auto ${
-                isHovered ? 'scale-105 shadow-lg' : ''
-              } ${getAnimationClass()} ${banner.bgColor} ${banner.borderColor}`}
+              className={`flex items-center justify-center space-x-2 px-3 sm:px-4 py-2 rounded-xl glass-card glass-hover transition-all duration-300 cursor-pointer pointer-events-auto ${
+                isHovered ? 'scale-105' : ''
+              } ${getAnimationClass()}`}
               onMouseEnter={() => setIsHovered(true)}
               onMouseLeave={() => setIsHovered(false)}
               style={{
@@ -158,19 +158,24 @@ export default function Header({ className }: HeaderProps) {
         {/* Dashboard, Notifications and Profile Section */}
         <div className="flex items-center space-x-2 z-10">
           {/* Dashboard Button */}
-          <Link 
+          <Link
             href="/dashboard"
-            className="hidden sm:flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-200 shadow-sm hover:shadow-md"
+            className="hidden sm:flex items-center gap-3 px-4 py-3 text-sm font-medium text-foreground glass-card glass-hover rounded-xl transition-all duration-200 border border-border/50"
             aria-label="Dashboard"
           >
-            <LayoutDashboard className="h-4 w-4" />
-            <span>Dashboard</span>
+            <div className="w-8 h-8 rounded-full bg-gradient-to-r from-primary to-accent flex items-center justify-center">
+              <LayoutDashboard className="h-4 w-4 text-white" />
+            </div>
+            <div className="flex flex-col items-start">
+              <span className="font-semibold">Dashboard</span>
+              <span className="text-xs text-muted-foreground">Main Panel</span>
+            </div>
           </Link>
-          
+
           {/* Mobile Dashboard Button - Icon only */}
-          <Link 
+          <Link
             href="/dashboard"
-            className="flex sm:hidden items-center justify-center p-2 text-gray-700 dark:text-gray-200 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-200 shadow-sm"
+            className="flex sm:hidden items-center justify-center p-2 text-foreground glass-card glass-hover rounded-xl transition-all duration-200 border border-border/50"
             aria-label="Dashboard"
           >
             <LayoutDashboard className="h-4 w-4" />
