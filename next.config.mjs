@@ -1,5 +1,4 @@
 import path from 'path';
-import webpack from 'next/dist/compiled/webpack/webpack-lib.js';
 
 // Load global polyfill for SSR compatibility
 if (typeof global !== 'undefined' && !global.self) {

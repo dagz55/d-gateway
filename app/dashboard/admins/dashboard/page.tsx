@@ -16,10 +16,7 @@ import {
   CheckCircle,
   UserCheck,
   CreditCard,
-  BarChart3,
-  Plus,
-  Search,
-  Filter
+  Plus
 } from 'lucide-react';
 import Link from 'next/link';
 import { createServerSupabaseClient } from '@/lib/supabase/serverClient';
@@ -393,40 +390,6 @@ export default async function AdminDashboardPage() {
 
       </div>
 
-      {/* Quick Actions */}
-      <Card className="glass border-border/50">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <BarChart3 className="h-5 w-5 text-accent" />
-            Quick Actions
-          </CardTitle>
-          <CardDescription>
-            Common administrative tasks and shortcuts
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid gap-4 md:grid-cols-3 grid-cols-1">
-            <Button asChild variant="outline" className="h-12">
-              <Link href="/admin/users">
-                <Search className="h-4 w-4 mr-2" />
-                Manage Users
-              </Link>
-            </Button>
-            <Button asChild variant="outline" className="h-12">
-              <Link href="/admin/member-activity">
-                <Filter className="h-4 w-4 mr-2" />
-                Member Activity
-              </Link>
-            </Button>
-            <Button asChild variant="outline" className="h-12">
-              <Link href="/admin/packages/create">
-                <Plus className="h-4 w-4 mr-2" />
-                New Package
-              </Link>
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
 
       {/* System Status */}
       <Card className="glass border-border/50">

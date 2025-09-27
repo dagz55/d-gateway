@@ -641,6 +641,12 @@ export function LandingContent() {
                 </Link>
               </SignedOut>
               <SignedIn>
+                <Link
+                  href="/dashboard"
+                  className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-[#0577DA] to-[#1199FA] px-5 py-2 text-sm font-semibold text-white shadow-lg shadow-[#0577DA]/20 transition hover:from-[#0a8ae8] hover:to-[#22a9ff]"
+                >
+                  Dashboard
+                </Link>
                 <div className="flex items-center gap-3 rounded-xl border border-white/15 bg-white/5 px-3 py-2">
                   <UserButton afterSignOutUrl="/" />
                   <div className="flex flex-col">
@@ -684,20 +690,38 @@ export function LandingContent() {
                 ))}
 
                 <div className="flex flex-col gap-3 pt-2">
-                  <Link
-                    href="/sign-in"
-                    onClick={closeMenu}
-                    className="block rounded-full border border-white/15 px-5 py-2 text-center text-sm font-medium text-white/80 transition hover:text-white"
-                  >
-                    Sign In
-                  </Link>
-                  <Link
-                    href="/sign-up"
-                    onClick={closeMenu}
-                    className="block rounded-full bg-gradient-to-r from-[#0577DA] to-[#1199FA] px-5 py-2 text-center text-sm font-semibold text-white transition hover:from-[#0a8ae8] hover:to-[#22a9ff]"
-                  >
-                    Join Free
-                  </Link>
+                  <SignedOut>
+                    <Link
+                      href="/sign-in"
+                      onClick={closeMenu}
+                      className="block rounded-full border border-white/15 px-5 py-2 text-center text-sm font-medium text-white/80 transition hover:text-white"
+                    >
+                      Sign In
+                    </Link>
+                    <Link
+                      href="/sign-up"
+                      onClick={closeMenu}
+                      className="block rounded-full bg-gradient-to-r from-[#0577DA] to-[#1199FA] px-5 py-2 text-center text-sm font-semibold text-white transition hover:from-[#0a8ae8] hover:to-[#22a9ff]"
+                    >
+                      Join Free
+                    </Link>
+                  </SignedOut>
+                  <SignedIn>
+                    <Link
+                      href="/dashboard"
+                      onClick={closeMenu}
+                      className="block rounded-full bg-gradient-to-r from-[#0577DA] to-[#1199FA] px-5 py-2 text-center text-sm font-semibold text-white transition hover:from-[#0a8ae8] hover:to-[#22a9ff]"
+                    >
+                      Dashboard
+                    </Link>
+                    <Link
+                      href="/profile"
+                      onClick={closeMenu}
+                      className="block rounded-full border border-white/15 px-5 py-2 text-center text-sm font-medium text-white/80 transition hover:text-white"
+                    >
+                      Account Settings
+                    </Link>
+                  </SignedIn>
                 </div>
               </div>
             </div>

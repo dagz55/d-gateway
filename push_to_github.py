@@ -40,7 +40,8 @@ class GitPusher:
     def __init__(self, repo_url: str, default_branch: str, dry_run: bool = False, use_rebase: bool = False):
         self.repo_url = repo_url
         self.default_branch = default_branch
-        self.current_branch = self._get_current_branch() or default_branch
+        # Default to the desired default branch; current branch may be different at runtime
+        self.current_branch = default_branch
         self.dry_run = dry_run
         self.use_rebase = use_rebase
 
@@ -118,6 +119,33 @@ class GitPusher:
                 return False
         else:
             c_print(Colors.OKGREEN, "Remote 'origin' is already configured correctly.")
+        return True
+
+    def ensure_on_branch(self) -> bool:
+        """Ensures we are on the target default branch (creates it if needed)."""
+        c_print(Colors.HEADER, f"Ensuring we are on '{self.default_branch}' branch...")
+        code, stdout, _ = self._run_command("git rev-parse --abbrev-ref HEAD", check_error=False)
+        current = stdout if code == 0 else None
+        if current == self.default_branch:
+            self.current_branch = self.default_branch
+            c_print(Colors.OKGREEN, f"Already on '{self.default_branch}'.")
+            return True
+        # Check if branch exists
+        code, _, _ = self._run_command(f"git rev-parse --verify {self.default_branch}", check_error=False)
+        if code != 0:
+            c_print(Colors.OKBLUE, f"Creating and switching to '{self.default_branch}'...")
+            code, _, stderr = self._run_command(f"git checkout -b {self.default_branch}")
+            if code != 0:
+                c_print(Colors.FAIL, f"Failed to create branch '{self.default_branch}'. Error: {stderr}")
+                return False
+        else:
+            c_print(Colors.OKBLUE, f"Switching to '{self.default_branch}'...")
+            code, _, stderr = self._run_command(f"git checkout {self.default_branch}")
+            if code != 0:
+                c_print(Colors.FAIL, f"Failed to checkout '{self.default_branch}'. Error: {stderr}")
+                return False
+        self.current_branch = self.default_branch
+        c_print(Colors.OKGREEN, f"Now on '{self.default_branch}'.")
         return True
 
     def add_files(self) -> bool:
@@ -247,6 +275,10 @@ class GitPusher:
         if not self.setup_remote():
             sys.exit(1)
         
+        # Ensure we are on the main branch before adding/committing
+        if not self.ensure_on_branch():
+            sys.exit(1)
+
         if not self.add_files():
             sys.exit(1)
         

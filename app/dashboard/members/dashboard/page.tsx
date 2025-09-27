@@ -3,7 +3,6 @@ import Spark from '@/components/charts/Spark';
 import OpenPositions from '@/components/Tables/OpenPositions';
 import StatusDot from '@/components/ui/StatusDot';
 import ZigTradesWorkflow from '@/components/dashboard/ZigTradesWorkflow';
-import PremiumFeatureTeasers from '@/components/dashboard/PremiumFeatureTeasers';
 import DashboardSidePanel from '@/components/dashboard/DashboardSidePanel';
 import { currentUser } from '@clerk/nextjs/server';
 import { redirect } from 'next/navigation';
@@ -115,11 +114,6 @@ export default async function MemberDashboardPage() {
               </div>
             </CardContent>
           </Card>
-        </div>
-
-        {/* Premium Feature Teasers - Full Width */}
-        <div className="space-y-6">
-          <PremiumFeatureTeasers />
         </div>
 
         {/* Main Content Grid */}

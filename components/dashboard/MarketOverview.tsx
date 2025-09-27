@@ -1,10 +1,14 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ArrowRight, Bitcoin, BadgeEuro, X, BadgeIndianRupee, BadgeSwissFranc } from 'lucide-react';
-import { LineChart, Line, ResponsiveContainer } from 'recharts';
+import { ArrowRight, Bitcoin, BadgeEuro, X, BadgeIndianRupee, BadgeSwissFranc, TrendingUp, TrendingDown, Zap, RefreshCw } from 'lucide-react';
+import { LineChart, Line, ResponsiveContainer, XAxis, YAxis, Tooltip } from 'recharts';
+import { useCryptoPrices } from '@/hooks/api/useCryptoPrices';
+import { motion, AnimatePresence } from 'framer-motion';
+import Link from 'next/link';
 
 interface CryptoData {
   symbol: string;
@@ -18,228 +22,268 @@ interface CryptoData {
   data: Array<{ value: number }>;
 }
 
-const cryptoData: CryptoData[] = [
-  {
-    symbol: 'BTC',
-    name: 'Bitcoin',
-    price: '$115,782.9',
-    change: '-0.77%',
-    changePercent: '-0.77%',
-    marketCap: '$2,306,777,649,371.17',
-    icon: Bitcoin,
-    color: '#F7931A',
-    data: [
-      { value: 115800 },
-      { value: 115900 },
-      { value: 115700 },
-      { value: 115600 },
-      { value: 115500 },
-      { value: 115400 },
-      { value: 115300 },
-      { value: 115200 },
-      { value: 115100 },
-      { value: 115000 },
-      { value: 114900 },
-      { value: 114800 },
-      { value: 115000 },
-      { value: 115200 },
-      { value: 115400 },
-      { value: 115600 },
-      { value: 115782 }
-    ]
-  },
+// Market data for multiple cryptocurrencies (mock data - can be replaced with real API calls)
+const marketData = [
   {
     symbol: 'ETH',
     name: 'Ethereum',
-    price: '$4,471.6',
-    change: '-1.31%',
-    changePercent: '-1.31%',
-    marketCap: '$539,749,941,707.40',
     icon: BadgeEuro,
     color: '#627EEA',
-    data: [
-      { value: 4500 },
-      { value: 4520 },
-      { value: 4480 },
-      { value: 4460 },
-      { value: 4440 },
-      { value: 4420 },
-      { value: 4400 },
-      { value: 4380 },
-      { value: 4360 },
-      { value: 4340 },
-      { value: 4320 },
-      { value: 4300 },
-      { value: 4350 },
-      { value: 4400 },
-      { value: 4450 },
-      { value: 4470 },
-      { value: 4471 }
-    ]
+    fallbackPrice: 4471.69,
+    fallbackChange: -1.31,
+    fallbackMarketCap: '$539,749,941,707.40'
   },
   {
     symbol: 'XRP',
     name: 'XRP',
-    price: '$3.00',
-    change: '-1.11%',
-    changePercent: '-1.11%',
-    marketCap: '$179,492,030,212.14',
     icon: X,
     color: '#23292F',
-    data: [
-      { value: 3.05 },
-      { value: 3.08 },
-      { value: 3.02 },
-      { value: 2.98 },
-      { value: 2.95 },
-      { value: 2.92 },
-      { value: 2.90 },
-      { value: 2.88 },
-      { value: 2.85 },
-      { value: 2.82 },
-      { value: 2.80 },
-      { value: 2.78 },
-      { value: 2.85 },
-      { value: 2.92 },
-      { value: 2.98 },
-      { value: 3.02 },
-      { value: 3.00 }
-    ]
+    fallbackPrice: 3.00,
+    fallbackChange: -1.11,
+    fallbackMarketCap: '$179,492,030,212.14'
   },
   {
     symbol: 'SOL',
     name: 'Solana',
-    price: '$239.21',
-    change: '-1.93%',
-    changePercent: '-1.93%',
-    marketCap: '$129,899,502,213.55',
     icon: BadgeIndianRupee,
     color: '#9945FF',
-    data: [
-      { value: 245 },
-      { value: 248 },
-      { value: 242 },
-      { value: 238 },
-      { value: 235 },
-      { value: 232 },
-      { value: 230 },
-      { value: 228 },
-      { value: 225 },
-      { value: 222 },
-      { value: 220 },
-      { value: 218 },
-      { value: 225 },
-      { value: 232 },
-      { value: 238 },
-      { value: 242 },
-      { value: 239 }
-    ]
+    fallbackPrice: 239.21,
+    fallbackChange: -1.93,
+    fallbackMarketCap: '$129,899,502,213.55'
   },
   {
     symbol: 'CRO',
     name: 'Cronos',
-    price: '$0.232679',
-    change: '-0.34%',
-    changePercent: '-0.34%',
-    marketCap: '$8,100,649,111.74',
     icon: BadgeSwissFranc,
     color: '#003CDA',
-    data: [
-      { value: 0.235 },
-      { value: 0.238 },
-      { value: 0.232 },
-      { value: 0.230 },
-      { value: 0.228 },
-      { value: 0.226 },
-      { value: 0.224 },
-      { value: 0.222 },
-      { value: 0.220 },
-      { value: 0.218 },
-      { value: 0.216 },
-      { value: 0.214 },
-      { value: 0.220 },
-      { value: 0.226 },
-      { value: 0.230 },
-      { value: 0.234 },
-      { value: 0.232679 }
-    ]
+    fallbackPrice: 0.232679,
+    fallbackChange: -0.34,
+    fallbackMarketCap: '$8,100,649,111.74'
   }
 ];
 
-function CryptoCard({ crypto }: { crypto: CryptoData }) {
+function CryptoCard({ crypto }: { crypto: any }) {
   const Icon = crypto.icon;
-  const isNegative = crypto.change.startsWith('-');
+  const isNegative = crypto.change < 0;
+  const changeDisplay = `${isNegative ? '' : '+'}${crypto.change.toFixed(2)}%`;
+  const priceDisplay = crypto.price >= 1 ?
+    `$${crypto.price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` :
+    `$${crypto.price.toFixed(6)}`;
 
   return (
-    <Card className="glass glass-hover transition-all duration-300 hover:scale-105">
-      <CardContent className="p-4">
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center space-x-3">
-            <div 
-              className="w-10 h-10 rounded-full flex items-center justify-center"
-              style={{ backgroundColor: crypto.color }}
-            >
-              <Icon size={20} className="text-white" />
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3, delay: Math.random() * 0.2 }}
+      whileHover={{ scale: 1.02, y: -2 }}
+      className="relative"
+    >
+      <Card className="glass glass-hover transition-all duration-300 group relative overflow-hidden">
+        {/* Animated background effect */}
+        <div className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-gradient-to-br ${isNegative ? 'from-red-500/10 to-red-600/5' : 'from-green-500/10 to-green-600/5'}`} />
+
+        <CardContent className="p-4 relative z-10">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center space-x-3">
+              <div
+                className="w-10 h-10 rounded-full flex items-center justify-center shadow-lg transition-transform group-hover:scale-110"
+                style={{ backgroundColor: crypto.color }}
+              >
+                <Icon size={20} className="text-white" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-foreground">{crypto.name}</h3>
+                <p className="text-sm text-muted-foreground flex items-center gap-1">
+                  {crypto.symbol}
+                  <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
+                </p>
+              </div>
             </div>
-            <div>
-              <h3 className="font-semibold text-foreground">{crypto.name}</h3>
-              <p className="text-sm text-muted-foreground">{crypto.symbol}</p>
+            <div className="flex flex-col items-end space-y-1">
+              <Badge variant={isNegative ? "destructive" : "default"} className="text-xs flex items-center gap-1">
+                {isNegative ? <TrendingDown size={12} /> : <TrendingUp size={12} />}
+                {changeDisplay}
+              </Badge>
+              <div className="text-xs text-muted-foreground flex items-center gap-1">
+                <Zap size={10} className="text-yellow-400" />
+                Live
+              </div>
             </div>
           </div>
-          <Badge variant={isNegative ? "destructive" : "default"} className="text-xs">
-            {crypto.changePercent}
-          </Badge>
-        </div>
-        
-        <div className="space-y-2 mb-4">
-          <div className="text-2xl font-bold text-foreground">{crypto.price}</div>
-          <div className={`text-sm ${isNegative ? 'text-red-400' : 'text-green-400'}`}>
-            {crypto.change}
+
+          <div className="space-y-2 mb-4">
+            <div className="text-2xl font-bold text-foreground">{priceDisplay}</div>
+            <div className={`text-sm font-medium ${isNegative ? 'text-red-400' : 'text-green-400'}`}>
+              {changeDisplay} (24h)
+            </div>
           </div>
-        </div>
 
-        <div className="h-16 mb-3">
-          <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={crypto.data}>
-              <Line 
-                type="monotone" 
-                dataKey="value" 
-                stroke={isNegative ? "#ef4444" : "#10b981"}
-                strokeWidth={2}
-                dot={false}
-              />
-            </LineChart>
-          </ResponsiveContainer>
-        </div>
+          <div className="h-16 mb-3">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={crypto.chartData}>
+                <XAxis hide />
+                <YAxis hide />
+                <Tooltip
+                  content={({ active, payload, label }) => {
+                    if (active && payload && payload.length) {
+                      return (
+                        <div className="bg-background/95 border border-border rounded-lg p-2 shadow-lg">
+                          <p className="text-sm font-medium">${payload[0].value?.toFixed(2)}</p>
+                          <p className="text-xs text-muted-foreground">{new Date(label).toLocaleTimeString()}</p>
+                        </div>
+                      );
+                    }
+                    return null;
+                  }}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="value"
+                  stroke={isNegative ? "#ef4444" : "#10b981"}
+                  strokeWidth={2.5}
+                  dot={false}
+                  strokeLinecap="round"
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
 
-        <div className="text-xs text-muted-foreground">
-          <div>Market cap</div>
-          <div className="font-mono">{crypto.marketCap}</div>
-        </div>
-      </CardContent>
-    </Card>
+          <div className="text-xs text-muted-foreground">
+            <div className="flex justify-between items-center">
+              <span>Market cap</span>
+              <span className="font-mono">{crypto.marketCap}</span>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    </motion.div>
   );
 }
 
 export default function MarketOverview() {
+  const { data: liveBitcoinData, isLoading, error, refetch } = useCryptoPrices();
+  const [lastUpdate, setLastUpdate] = useState(new Date());
+  const [cryptoList, setCryptoList] = useState<any[]>([]);
+
+  // Process live Bitcoin data and create chart data for other cryptos
+  useEffect(() => {
+    const processedCryptos = [];
+
+    // Bitcoin (live data)
+    if (liveBitcoinData && liveBitcoinData.length > 0) {
+      const currentPrice = liveBitcoinData[liveBitcoinData.length - 1]?.close || 0;
+      const previousPrice = liveBitcoinData[liveBitcoinData.length - 2]?.close || currentPrice;
+      const change = previousPrice ? ((currentPrice - previousPrice) / previousPrice) * 100 : 0;
+
+      const chartData = liveBitcoinData.slice(-12).map((point, index) => ({
+        value: point.close,
+        time: new Date(parseInt(point.t)).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      }));
+
+      processedCryptos.push({
+        symbol: 'BTC',
+        name: 'Bitcoin',
+        icon: Bitcoin,
+        color: '#F7931A',
+        price: currentPrice,
+        change: change,
+        marketCap: '$2,306,777,649,371.17', // This would come from another API call
+        chartData: chartData,
+        isLive: true
+      });
+    } else {
+      // Fallback Bitcoin data
+      const mockChartData = Array.from({ length: 12 }, (_, i) => {
+        const basePrice = 115782;
+        const variation = (Math.random() - 0.5) * 2000;
+        return {
+          value: basePrice + variation,
+          time: new Date(Date.now() - (11 - i) * 60 * 60 * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        };
+      });
+
+      processedCryptos.push({
+        symbol: 'BTC',
+        name: 'Bitcoin',
+        icon: Bitcoin,
+        color: '#F7931A',
+        price: 115782,
+        change: -0.77,
+        marketCap: '$2,306,777,649,371.17',
+        chartData: mockChartData,
+        isLive: false
+      });
+    }
+
+    // Add other cryptocurrencies with simulated data
+    marketData.forEach(crypto => {
+      const mockChartData = Array.from({ length: 12 }, (_, i) => {
+        const variation = (Math.random() - 0.5) * 0.1;
+        return {
+          value: crypto.fallbackPrice * (1 + variation),
+          time: new Date(Date.now() - (11 - i) * 60 * 60 * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        };
+      });
+
+      processedCryptos.push({
+        ...crypto,
+        price: crypto.fallbackPrice,
+        change: crypto.fallbackChange,
+        marketCap: crypto.fallbackMarketCap,
+        chartData: mockChartData,
+        isLive: false
+      });
+    });
+
+    setCryptoList(processedCryptos);
+    setLastUpdate(new Date());
+  }, [liveBitcoinData]);
+
+  const handleRefresh = () => {
+    refetch();
+    setLastUpdate(new Date());
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-foreground">Market overview</h2>
+          <h2 className="text-2xl font-bold text-foreground flex items-center gap-2">
+            Market overview
+            {isLoading && <RefreshCw size={18} className="animate-spin text-primary" />}
+          </h2>
           <p className="text-muted-foreground">Stay on top of leading assets before the next alert fires.</p>
+          <p className="text-xs text-muted-foreground mt-1">
+            Last updated: {lastUpdate.toLocaleTimeString()}
+            {error && <span className="text-red-400 ml-2">(Using cached data)</span>}
+          </p>
         </div>
-        <Button variant="outline" className="flex items-center space-x-2">
-          <span>View full market board</span>
-          <ArrowRight size={16} />
-        </Button>
+        <div className="flex items-center space-x-2">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleRefresh}
+            disabled={isLoading}
+            className="text-muted-foreground hover:text-foreground"
+          >
+            <RefreshCw size={14} className={isLoading ? 'animate-spin' : ''} />
+          </Button>
+          <Link href="/market">
+            <Button variant="outline" className="flex items-center space-x-2">
+              <span>View full market board</span>
+              <ArrowRight size={16} />
+            </Button>
+          </Link>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-4">
-        {cryptoData.map((crypto) => (
-          <CryptoCard key={crypto.symbol} crypto={crypto} />
-        ))}
-      </div>
+      <AnimatePresence>
+        <div className="grid grid-cols-1 gap-4">
+          {cryptoList.map((crypto) => (
+            <CryptoCard key={crypto.symbol} crypto={crypto} />
+          ))}
+        </div>
+      </AnimatePresence>
     </div>
   );
 }
