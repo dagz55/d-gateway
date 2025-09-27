@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea';
 import { ArrowDownLeft, DollarSign, User, CreditCard, Wallet } from 'lucide-react';
 import { useState } from 'react';
+import { toast } from 'sonner';
 
 interface WithdrawFormData {
   completeName: string;
@@ -76,9 +77,9 @@ export default function WithdrawComponent({ portfolioData }: WithdrawComponentPr
       notes: ''
     });
     setIsSubmitting(false);
-    
+
     // Show success message
-    alert('Withdrawal request submitted successfully!');
+    toast.success('Withdrawal request submitted successfully!');
   };
 
   const isFormValid = 

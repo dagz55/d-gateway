@@ -153,7 +153,7 @@ const CandlestickChart: React.FC<{
 }> = ({ data, width, height, onHover }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
-  const animationRef = useRef<number>();
+  const animationRef = useRef<number>(undefined);
 
   const padding = { top: 20, right: 60, bottom: 40, left: 60 };
   const chartWidth = width - padding.left - padding.right;

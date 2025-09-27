@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { currentUser } from '@clerk/nextjs/server';
-import { createClient } from '@/lib/supabase/client';
+import { createServerSupabaseClient } from '@/lib/supabase/serverClient';
 import { validateImageFile } from '@/lib/validation';
 
 // Type definitions
@@ -52,7 +52,7 @@ export async function POST(request: NextRequest) {
     }
 
     let avatarUrl: string;
-    const supabase = createClient();
+    const supabase = await createServerSupabaseClient();
 
     // Try Supabase storage first if file is provided
     if (file) {
@@ -127,14 +127,21 @@ export async function POST(request: NextRequest) {
       console.log(`Avatar uploaded via base64 only for user ${user.id}`);
     }
 
-    // Update user profile
-    const { error: updateError } = await (supabase
-      .from('user_profiles'))
-      .update({
+    // Update user profile - create if doesn't exist
+    const { error: updateError } = await supabase
+      .from('user_profiles')
+      .upsert({
+        clerk_user_id: user.id,
+        email: user.emailAddresses[0]?.emailAddress || '',
+        username: user.username || user.emailAddresses[0]?.emailAddress?.split('@')[0] || 'user',
+        full_name: `${user.firstName || ''} ${user.lastName || ''}`.trim() || 'User',
         avatar_url: avatarUrl,
         updated_at: new Date().toISOString(),
-      })
-      .eq('clerk_user_id', user.id);
+        created_at: new Date().toISOString(),
+      }, {
+        onConflict: 'clerk_user_id',
+        ignoreDuplicates: false
+      });
 
     if (updateError) {
       throw new Error(`Failed to update profile: ${updateError.message}`);
@@ -172,7 +179,7 @@ export async function DELETE() {
       );
     }
 
-    const supabase = createClient();
+    const supabase = await createServerSupabaseClient();
 
     // Get current avatar URL
     const { data: profile } = await supabase
@@ -191,14 +198,21 @@ export async function DELETE() {
       }
     }
 
-    // Remove avatar URL from profile
-    const { error: updateError } = await (supabase
-      .from('user_profiles'))
-      .update({
+    // Remove avatar URL from profile - create if doesn't exist
+    const { error: updateError } = await supabase
+      .from('user_profiles')
+      .upsert({
+        clerk_user_id: user.id,
+        email: user.emailAddresses[0]?.emailAddress || '',
+        username: user.username || user.emailAddresses[0]?.emailAddress?.split('@')[0] || 'user',
+        full_name: `${user.firstName || ''} ${user.lastName || ''}`.trim() || 'User',
         avatar_url: null,
         updated_at: new Date().toISOString(),
-      })
-      .eq('clerk_user_id', user.id);
+        created_at: new Date().toISOString(),
+      }, {
+        onConflict: 'clerk_user_id',
+        ignoreDuplicates: false
+      });
 
     if (updateError) {
       throw new Error(`Failed to update profile: ${updateError.message}`);

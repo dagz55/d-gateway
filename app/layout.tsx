@@ -25,19 +25,25 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" data-scroll-behavior="smooth" className="bg-background text-foreground">
+    <html lang="en" data-scroll-behavior="smooth" className="bg-background text-foreground" suppressHydrationWarning>
       <head>
         {/* Resource hints for better performance */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link rel="preconnect" href="https://api.coingecko.com" />
-        {/* Only preload critical images that are used immediately */}
-        <link rel="preload" href="/zignal-logo.png" as="image" type="image/png" />
+        {/* Google Fonts */}
+        <link
+          href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@300;400;500;600;700&display=swap"
+          rel="stylesheet"
+        />
+        {/* Preload critical resources for better performance */}
+        <link rel="preload" href="/zignal-logo.png" as="image" type="image/png" media="(min-width: 1024px)" fetchPriority="high" />
       </head>
-      <body className={`font-sans ${GeistSans.variable} ${GeistMono.variable} antialiased`}>
+      <body className={`font-sans ${GeistSans.variable} ${GeistMono.variable} antialiased`} suppressHydrationWarning>
         <Providers>
           <Suspense fallback={null}>{children}</Suspense>
         </Providers>
-        {process.env.NODE_ENV === 'production' && <Analytics />}
+        {process.env.NODE_ENV === 'production' && (process.env.VERCEL === '1' || process.env.NEXT_PUBLIC_ENABLE_VERCEL_ANALYTICS === 'true') && <Analytics />}
       </body>
     </html>
   )

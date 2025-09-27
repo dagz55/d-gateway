@@ -10,7 +10,8 @@ export async function GET(request: NextRequest) {
     }
 
     // Check if current user is admin
-    const currentUser = await clerkClient.users.getUser(currentUserId);
+    const clerk = await clerkClient();
+    const currentUser = await clerk.users.getUser(currentUserId);
     const isCurrentUserAdmin = currentUser.publicMetadata?.role === 'admin';
 
     if (!isCurrentUserAdmin) {
@@ -18,7 +19,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Get all users and filter for admins
-    const users = await clerkClient.users.getUserList({
+    const users = await clerk.users.getUserList({
       limit: 500 // Adjust based on your needs
     });
 

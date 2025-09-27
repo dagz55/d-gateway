@@ -38,7 +38,7 @@ export const BackgroundCells = ({
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [ripples, setRipples] = useState<Array<{ id: string; x: number; y: number; timestamp: number }>>([]);
   const ref = useRef<HTMLDivElement>(null);
-  const animationRef = useRef<number>();
+  const animationRef = useRef<number>(undefined);
 
   // Performance optimization: throttle mouse updates
   const handleMouseMove = useCallback((event: React.MouseEvent) => {

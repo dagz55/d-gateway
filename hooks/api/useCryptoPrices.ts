@@ -1,14 +1,13 @@
-import { CryptoPrice } from '@/types';
+import { ApiResponse, CryptoPrice } from '@/types';
 import { useQuery } from '@tanstack/react-query';
 
-async function fetchCryptoPrices(): Promise<CryptoPrice[]> {
+async function fetchCryptoPrices(): Promise<ApiResponse<CryptoPrice[]>> {
   const response = await fetch('/api/crypto/prices');
   if (!response.ok) {
     throw new Error('Failed to fetch crypto prices');
   }
 
-  const result = await response.json();
-  return result.data;
+  return response.json();
 }
 
 export function useCryptoPrices() {

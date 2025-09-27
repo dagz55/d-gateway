@@ -5,5 +5,5 @@ export const dynamic = 'force-dynamic';
 
 export default async function AdminCreatePackagePage() {
   // Redirect to the correct admin create package path
-  redirect('/dashboard/admins/packages/create');
+  redirect('/admin/dashboard/packages/create');
 }

@@ -5,5 +5,5 @@ export const dynamic = 'force-dynamic';
 
 export default async function AdminUsersPage() {
   // Redirect to the correct admin users path
-  redirect('/dashboard/admins/users');
+  redirect('/admin/dashboard/users');
 }

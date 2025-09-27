@@ -33,7 +33,7 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="container max-w-4xl mx-auto py-8 space-y-8">
+    <div className="dashboard-content container max-w-4xl mx-auto py-8 space-y-8">
       <div>
         <h1 className="text-3xl font-bold gradient-text">Account Settings</h1>
         <p className="text-muted-foreground mt-2">

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState, Suspense, useRef, useCallback } from 'react';
+import { useEffect, useMemo, useState, Suspense, useRef } from 'react';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import { motion, useScroll, useTransform } from 'framer-motion';
@@ -22,14 +22,12 @@ import {
   Users,
   UserCheck,
   LifeBuoy,
-  AlertTriangle,
-  RefreshCw,
-  Wifi,
-  WifiOff,
+  LayoutDashboard,
 } from 'lucide-react';
 import Logo from '@/components/ui/Logo';
 import { PromotionalBanner } from './PromotionalBanner';
 import { SignedIn, SignedOut, useUser, UserButton } from '@clerk/nextjs';
+import DashboardLink from '@/components/auth/DashboardLink';
 
 // Lazy load heavy components for better performance with preload hints
 const OptimizedTradingChart = dynamic(() => import('@/components/trading/OptimizedTradingChart').then(mod => ({ default: mod.OptimizedTradingChart })), {
@@ -156,161 +154,20 @@ const cryptoPrices = [
   { symbol: 'CRO', name: 'Cronos', price: '0.232679', change: '-0.34%', marketCap: '$8,100,649,111.74' },
 ];
 
-// Error handling interfaces
-interface ErrorState {
-  hasError: boolean;
-  errorMessage: string | null;
-  errorType: 'network' | 'component' | 'data' | 'unknown';
-  retryCount: number;
-  lastErrorTime: number | null;
-}
-
-interface NetworkStatus {
-  isOnline: boolean;
-  lastOnlineTime: number | null;
-  connectionQuality: 'good' | 'poor' | 'offline';
-}
-
 export function LandingContent() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [hoveredPoint, setHoveredPoint] = useState<{x: number, y: number, value: number, date: string, time: string} | null>(null);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-  
-  // Enhanced error handling state
-  const [errorState, setErrorState] = useState<ErrorState>({
-    hasError: false,
-    errorMessage: null,
-    errorType: 'unknown',
-    retryCount: 0,
-    lastErrorTime: null
-  });
-  
-  const [networkStatus, setNetworkStatus] = useState<NetworkStatus>({
-    isOnline: typeof navigator !== 'undefined' ? navigator.onLine : true,
-    lastOnlineTime: Date.now(),
-    connectionQuality: 'good'
-  });
-  
-  const [isRetrying, setIsRetrying] = useState(false);
-  const retryTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const errorLogRef = useRef<Array<{timestamp: number, error: string, type: string}>>([]);
-  
   const { scrollY } = useScroll();
-  const { data: cryptoResponse, isLoading: isCryptoLoading, error: cryptoError, refetch: refetchCrypto } = useCryptoPrices();
-  const cryptoData = Array.isArray(cryptoResponse) ? cryptoResponse : [];
-  const cryptoStats = null; // Will be implemented when stats are available in the API
+  const { data: cryptoResponse, isLoading: isCryptoLoading } = useCryptoPrices();
+  const cryptoData = cryptoResponse?.data || [];
+  const cryptoStats = cryptoResponse?.stats;
 
   // Parallax effects
   const heroY = useTransform(scrollY, [0, 1000], [0, -200]);
   const featuresY = useTransform(scrollY, [0, 2000], [0, -100]);
 
-  // Enhanced error handling functions
-  const logError = useCallback((error: Error | string, type: ErrorState['errorType'] = 'unknown', context?: string) => {
-    const errorMessage = typeof error === 'string' ? error : error.message;
-    const timestamp = Date.now();
-    
-    // Log to console in development
-    if (process.env.NODE_ENV === 'development') {
-      console.error(`[LandingContent] ${type.toUpperCase()} Error:`, {
-        message: errorMessage,
-        type,
-        context,
-        timestamp: new Date(timestamp).toISOString(),
-        stack: typeof error === 'object' ? error.stack : undefined
-      });
-    }
-    
-    // Store in error log
-    errorLogRef.current.push({
-      timestamp,
-      error: errorMessage,
-      type
-    });
-    
-    // Keep only last 10 errors
-    if (errorLogRef.current.length > 10) {
-      errorLogRef.current = errorLogRef.current.slice(-10);
-    }
-    
-    // Update error state
-    setErrorState(prev => ({
-      ...prev,
-      hasError: true,
-      errorMessage,
-      errorType: type,
-      lastErrorTime: timestamp
-    }));
-  }, []);
-
-  const clearError = useCallback(() => {
-    setErrorState(prev => ({
-      ...prev,
-      hasError: false,
-      errorMessage: null,
-      errorType: 'unknown'
-    }));
-  }, []);
-
-  const retryOperation = useCallback(async (operation: () => Promise<void> | void, maxRetries: number = 3) => {
-    if (isRetrying) return;
-    
-    setIsRetrying(true);
-    setErrorState(prev => ({ ...prev, retryCount: prev.retryCount + 1 }));
-    
-    try {
-      await operation();
-      clearError();
-    } catch (error) {
-      const currentRetryCount = errorState.retryCount + 1;
-      
-      if (currentRetryCount < maxRetries) {
-        // Exponential backoff
-        const delay = Math.min(1000 * Math.pow(2, currentRetryCount), 10000);
-        
-        retryTimeoutRef.current = setTimeout(() => {
-          retryOperation(operation, maxRetries);
-        }, delay);
-      } else {
-        logError(error instanceof Error ? error : new Error(String(error)), 'component');
-      }
-    } finally {
-      setIsRetrying(false);
-    }
-  }, [isRetrying, errorState.retryCount, clearError, logError]);
-
-  const handleCryptoDataRetry = useCallback(() => {
-    retryOperation(async () => {
-      if (refetchCrypto) {
-        await refetchCrypto();
-      }
-    });
-  }, [retryOperation, refetchCrypto]);
-
-  // Network status monitoring
-  const updateNetworkStatus = useCallback(() => {
-    const isOnline = navigator.onLine;
-    const now = Date.now();
-    
-    setNetworkStatus(prev => {
-      const connectionQuality = isOnline ? 
-        (prev.lastOnlineTime && (now - prev.lastOnlineTime) < 5000 ? 'good' : 'poor') : 
-        'offline';
-      
-      return {
-        isOnline,
-        lastOnlineTime: isOnline ? now : prev.lastOnlineTime,
-        connectionQuality
-      };
-    });
-  }, []);
-
-  // Component error boundary
-  const handleComponentError = useCallback((error: Error, errorInfo?: any) => {
-    logError(error, 'component', errorInfo?.componentStack);
-  }, [logError]);
-
-  // Enhanced useEffect hooks with error handling
   useEffect(() => {
     if (typeof window === 'undefined') return;
     
@@ -319,80 +176,18 @@ export function LandingContent() {
     const handleScroll = () => {
       if (!ticking) {
         requestAnimationFrame(() => {
-          try {
-            setIsScrolled(window.scrollY > 50);
-          } catch (error) {
-            logError(error instanceof Error ? error : new Error('Scroll handling error'), 'component');
-          }
+          setIsScrolled(window.scrollY > 50);
           ticking = false;
         });
         ticking = true;
       }
     };
 
-    try {
-      handleScroll();
-      window.addEventListener('scroll', handleScroll, { passive: true });
-    } catch (error) {
-      logError(error instanceof Error ? error : new Error('Scroll event setup error'), 'component');
-    }
+    handleScroll();
+    window.addEventListener('scroll', handleScroll, { passive: true });
 
     return () => {
-      try {
-        window.removeEventListener('scroll', handleScroll);
-      } catch (error) {
-        logError(error instanceof Error ? error : new Error('Scroll cleanup error'), 'component');
-      }
-    };
-  }, [logError]);
-
-  // Network status monitoring
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-
-    const handleOnline = () => {
-      updateNetworkStatus();
-      clearError(); // Clear network errors when back online
-    };
-
-    const handleOffline = () => {
-      updateNetworkStatus();
-      logError('Network connection lost', 'network');
-    };
-
-    try {
-      window.addEventListener('online', handleOnline);
-      window.addEventListener('offline', handleOffline);
-      
-      // Initial network status check
-      updateNetworkStatus();
-    } catch (error) {
-      logError(error instanceof Error ? error : new Error('Network monitoring setup error'), 'component');
-    }
-
-    return () => {
-      try {
-        window.removeEventListener('online', handleOnline);
-        window.removeEventListener('offline', handleOffline);
-      } catch (error) {
-        logError(error instanceof Error ? error : new Error('Network monitoring cleanup error'), 'component');
-      }
-    };
-  }, [updateNetworkStatus, clearError, logError]);
-
-  // Crypto data error monitoring
-  useEffect(() => {
-    if (cryptoError) {
-      logError(cryptoError instanceof Error ? cryptoError : new Error(String(cryptoError)), 'data', 'crypto-prices');
-    }
-  }, [cryptoError, logError]);
-
-  // Cleanup timeouts on unmount
-  useEffect(() => {
-    return () => {
-      if (retryTimeoutRef.current) {
-        clearTimeout(retryTimeoutRef.current);
-      }
+      window.removeEventListener('scroll', handleScroll);
     };
   }, []);
 
@@ -411,83 +206,30 @@ export function LandingContent() {
     };
   }, [menuOpen]);
 
-  // Process live crypto data for the chart with error handling
+  // Process live crypto data for the chart
   const chartData = useMemo(() => {
-    try {
-      if (!cryptoData || cryptoData.length === 0) {
-        if (cryptoData === null || cryptoData === undefined) {
-          logError('Crypto data is null or undefined', 'data', 'chart-processing');
-        }
-        return [];
-      }
-      
-      // Validate data structure
-      if (!Array.isArray(cryptoData)) {
-        logError('Crypto data is not an array', 'data', 'chart-processing');
-        return [];
-      }
-      
-      // Take only the last 24 points for better performance
-      const recentData = cryptoData.slice(-24);
-      
-      if (recentData.length === 0) {
-        logError('No recent crypto data available', 'data', 'chart-processing');
-        return [];
-      }
-      
-      // Validate data items
-      const validData = recentData.filter(item => {
-        if (!item || typeof item !== 'object') {
-          logError('Invalid crypto data item structure', 'data', 'chart-processing');
-          return false;
-        }
-        if (typeof item.close !== 'number' || typeof item.t !== 'string') {
-          logError('Invalid crypto data item properties', 'data', 'chart-processing');
-          return false;
-        }
-        return true;
-      });
-      
-      if (validData.length === 0) {
-        logError('No valid crypto data items found', 'data', 'chart-processing');
-        return [];
-      }
-      
-      const prices = validData.map(item => item.close);
-      const minPrice = Math.min(...prices);
-      const maxPrice = Math.max(...prices);
-      const priceRange = maxPrice - minPrice || 1;
-      
-      return validData.map((item, index) => {
-        try {
-          const normalizedPrice = ((item.close - minPrice) / priceRange) * 100 + 20; // Scale to 20-120 range
-          const date = new Date(parseInt(item.t));
-          
-          // Validate date
-          if (isNaN(date.getTime())) {
-            logError('Invalid timestamp in crypto data', 'data', 'chart-processing');
-            return null;
-          }
-          
-          return {
-            x: (index / (validData.length - 1)) * 260,
-            y: 140 - normalizedPrice,
-            value: item.close,
-            date: date.toLocaleDateString(),
-            time: date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-            timestamp: item.t
-          };
-        } catch (error) {
-          logError(error instanceof Error ? error : new Error('Chart data point processing error'), 'data', 'chart-processing');
-          return null;
-        }
-      }).filter((point): point is NonNullable<typeof point> => point !== null);
-      
-    } catch (error) {
-      logError(error instanceof Error ? error : new Error('Chart data processing error'), 'data', 'chart-processing');
-      return [];
-    }
-  }, [cryptoData, logError]);
+    if (!cryptoData || cryptoData.length === 0) return [];
+    
+    // Take only the last 24 points for better performance
+    const recentData = cryptoData.slice(-24);
+    const prices = recentData.map((item: { close: any; }) => item.close);
+    const minPrice = Math.min(...prices);
+    const maxPrice = Math.max(...prices);
+    const priceRange = maxPrice - minPrice || 1;
+    
+    return recentData.map((item: { close: number; t: string; }, index: number) => {
+      const normalizedPrice = ((item.close - minPrice) / priceRange) * 100 + 20; // Scale to 20-120 range
+      const date = new Date(parseInt(item.t));
+      return {
+        x: (index / (recentData.length - 1)) * 260,
+        y: 140 - normalizedPrice,
+        value: item.close,
+        date: date.toLocaleDateString(),
+        time: date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        timestamp: item.t
+      };
+    });
+  }, [cryptoData]);
 
   const heroSparklinePath = useMemo(
     () =>
@@ -500,105 +242,12 @@ export function LandingContent() {
   );
 
   const lastSparkX = chartData.length > 1 ? 260 : 0;
-  const lastSparkY = chartData.length > 0 ? chartData[chartData.length - 1]?.y || 0 : 0;
+  const lastSparkY = chartData.length > 0 ? chartData[chartData.length - 1].y : 0;
 
   const closeMenu = () => setMenuOpen(false);
 
-  // Error display components
-  const ErrorBanner = ({ error, onRetry, onDismiss }: { error: ErrorState, onRetry?: () => void, onDismiss?: () => void }) => {
-    if (!error.hasError) return null;
-
-    const getErrorIcon = () => {
-      switch (error.errorType) {
-        case 'network': return <WifiOff className="h-4 w-4" />;
-        case 'data': return <AlertTriangle className="h-4 w-4" />;
-        case 'component': return <AlertTriangle className="h-4 w-4" />;
-        default: return <AlertTriangle className="h-4 w-4" />;
-      }
-    };
-
-    const getErrorColor = () => {
-      switch (error.errorType) {
-        case 'network': return 'border-yellow-500/20 bg-yellow-500/10 text-yellow-300';
-        case 'data': return 'border-orange-500/20 bg-orange-500/10 text-orange-300';
-        case 'component': return 'border-red-500/20 bg-red-500/10 text-red-300';
-        default: return 'border-gray-500/20 bg-gray-500/10 text-gray-300';
-      }
-    };
-
-    return (
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: -20 }}
-        className={`fixed top-20 left-4 right-4 z-50 rounded-lg border p-4 backdrop-blur-sm ${getErrorColor()}`}
-      >
-        <div className="flex items-start gap-3">
-          {getErrorIcon()}
-          <div className="flex-1">
-            <p className="text-sm font-medium">
-              {error.errorType === 'network' ? 'Connection Issue' : 
-               error.errorType === 'data' ? 'Data Loading Error' : 
-               'Application Error'}
-            </p>
-            <p className="text-xs opacity-80 mt-1">{error.errorMessage}</p>
-            {error.retryCount > 0 && (
-              <p className="text-xs opacity-60 mt-1">Retry attempts: {error.retryCount}</p>
-            )}
-          </div>
-          <div className="flex items-center gap-2">
-            {onRetry && (
-              <button
-                onClick={onRetry}
-                disabled={isRetrying}
-                className="p-1 rounded hover:bg-white/10 transition-colors disabled:opacity-50"
-                title="Retry"
-              >
-                <RefreshCw className={`h-4 w-4 ${isRetrying ? 'animate-spin' : ''}`} />
-              </button>
-            )}
-            {onDismiss && (
-              <button
-                onClick={onDismiss}
-                className="p-1 rounded hover:bg-white/10 transition-colors"
-                title="Dismiss"
-              >
-                <X className="h-4 w-4" />
-              </button>
-            )}
-          </div>
-        </div>
-      </motion.div>
-    );
-  };
-
-  const NetworkStatusIndicator = () => {
-    if (networkStatus.isOnline && networkStatus.connectionQuality === 'good') return null;
-
-    return (
-      <div className={`fixed bottom-4 right-4 z-50 flex items-center gap-2 rounded-full px-3 py-2 text-xs font-medium backdrop-blur-sm ${
-        !networkStatus.isOnline ? 'bg-red-500/20 text-red-300 border border-red-500/30' :
-        networkStatus.connectionQuality === 'poor' ? 'bg-yellow-500/20 text-yellow-300 border border-yellow-500/30' :
-        'bg-green-500/20 text-green-300 border border-green-500/30'
-      }`}>
-        {!networkStatus.isOnline ? <WifiOff className="h-3 w-3" /> : <Wifi className="h-3 w-3" />}
-        <span>
-          {!networkStatus.isOnline ? 'Offline' : 'Poor Connection'}
-        </span>
-      </div>
-    );
-  };
-
   return (
     <div className="relative z-10 flex min-h-screen flex-col bg-[#040918] text-white">
-      {/* Error Display Components */}
-      <ErrorBanner 
-        error={errorState} 
-        onRetry={errorState.errorType === 'data' ? handleCryptoDataRetry : undefined}
-        onDismiss={clearError}
-      />
-      <NetworkStatusIndicator />
-      
       {/* Fixed Header Container - Always Visible */}
       <div className="fixed top-0 left-0 right-0 z-50">
         <PromotionalBanner />
@@ -641,12 +290,7 @@ export function LandingContent() {
                 </Link>
               </SignedOut>
               <SignedIn>
-                <Link
-                  href="/dashboard"
-                  className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-[#0577DA] to-[#1199FA] px-5 py-2 text-sm font-semibold text-white shadow-lg shadow-[#0577DA]/20 transition hover:from-[#0a8ae8] hover:to-[#22a9ff]"
-                >
-                  Dashboard
-                </Link>
+                <DashboardLink />
                 <div className="flex items-center gap-3 rounded-xl border border-white/15 bg-white/5 px-3 py-2">
                   <UserButton afterSignOutUrl="/" />
                   <div className="flex flex-col">
@@ -707,13 +351,7 @@ export function LandingContent() {
                     </Link>
                   </SignedOut>
                   <SignedIn>
-                    <Link
-                      href="/dashboard"
-                      onClick={closeMenu}
-                      className="block rounded-full bg-gradient-to-r from-[#0577DA] to-[#1199FA] px-5 py-2 text-center text-sm font-semibold text-white transition hover:from-[#0a8ae8] hover:to-[#22a9ff]"
-                    >
-                      Dashboard
-                    </Link>
+                    <DashboardLink />
                     <Link
                       href="/profile"
                       onClick={closeMenu}
@@ -808,9 +446,7 @@ export function LandingContent() {
                   </span>
                 </div>
                 <p className="mt-2 text-sm text-white/50">
-                  {isCryptoLoading ? 'Loading live data...' : 
-                   cryptoError ? 'Data temporarily unavailable' :
-                   'Last synced 2 minutes ago'}
+                  {isCryptoLoading ? 'Loading live data...' : `Last synced ${cryptoStats ? new Date(cryptoStats.lastUpdate).toLocaleTimeString() : '2 minutes ago'}`}
                 </p>
                 <div 
                   className="mt-8 h-36 rounded-2xl border border-white/10 bg-white/[0.04] p-4 relative"
@@ -826,16 +462,13 @@ export function LandingContent() {
                     const pointIndex = Math.round((x / rect.width) * (chartData.length - 1));
                     const clampedIndex = Math.max(0, Math.min(pointIndex, chartData.length - 1));
                     const point = chartData[clampedIndex];
-                    
-                    if (point) {
-                      setHoveredPoint({
-                        x: point.x,
-                        y: point.y,
-                        value: point.value,
-                        date: point.date,
-                        time: point.time
-                      });
-                    }
+                    setHoveredPoint({
+                      x: point.x,
+                      y: point.y,
+                      value: point.value,
+                      date: point.date,
+                      time: point.time
+                    });
                   }}
                   onMouseLeave={() => {
                     setHoveredPoint(null);
@@ -894,11 +527,11 @@ export function LandingContent() {
                     )}
                     
                     {/* Data points */}
-                    {chartData.map((point, index) => (
+                    {chartData.map((point: { x: number; y: number; }, index: React.Key | null | undefined) => (
                       <circle
                         key={index}
-                        cx={point?.x || 0}
-                        cy={point?.y || 0}
+                        cx={point.x}
+                        cy={point.y}
                         r="2"
                         fill="#34d399"
                         opacity="0.6"
@@ -929,15 +562,15 @@ export function LandingContent() {
                 </div>
                 <div className="mt-6 flex items-center justify-between">
                   <div>
-                    <p className="text-xs text-white/50">Running P&amp;L</p>
-                    <p className="text-lg font-semibold text-white/60">
-                      Loading...
+                    <p className="text-xs text-white/50">Running P&L</p>
+                    <p className={`text-lg font-semibold ${cryptoStats && parseFloat(cryptoStats.priceChange) >= 0 ? 'text-emerald-300' : 'text-red-400'}`}>
+                      {cryptoStats ? `${parseFloat(cryptoStats.priceChange) >= 0 ? '+' : ''}${cryptoStats.priceChange}%` : 'Loading...'}
                     </p>
                   </div>
                   <div className="text-right">
                     <p className="text-xs text-white/50">Volatility Risk</p>
                     <p className="text-lg font-semibold text-white">
-                      Loading...
+                      {cryptoStats ? `${cryptoStats.volatility}%` : 'Loading...'}
                     </p>
                   </div>
                 </div>

@@ -1,22 +1,8 @@
-import { redirect } from 'next/navigation';
-import { auth } from '@clerk/nextjs/server';
+import { notFound } from 'next/navigation';
 
-export default async function DashboardPage() {
-  const { userId, sessionClaims } = await auth();
-  
-  if (!userId) {
-    redirect('/signin');
-    return;
-  }
+// This route has been removed. Use /auth/post-login, /member/dashboard, or /admin/dashboard.
+export const dynamic = 'force-dynamic';
 
-  // Check if user is admin
-  const publicMetadata = sessionClaims?.publicMetadata as any;
-  const isAdmin = publicMetadata?.role === "admin" || publicMetadata?.is_admin === true;
-
-  // Redirect based on role
-  if (isAdmin) {
-    redirect('/dashboard/admins');
-  } else {
-    redirect('/dashboard/members');
-  }
+export default function RemovedDashboard() {
+  notFound();
 }

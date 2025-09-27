@@ -21,7 +21,7 @@ export default function PrivacyModal({ children }: PrivacyModalProps) {
       <DialogTrigger asChild>
         {children}
       </DialogTrigger>
-      <DialogContent className="max-w-4xl max-h-[80vh]">
+      <DialogContent className="modal-content max-w-4xl max-h-[80vh]">
         <DialogHeader>
           <DialogTitle className="text-xl font-bold">Privacy Policy</DialogTitle>
           <DialogDescription>

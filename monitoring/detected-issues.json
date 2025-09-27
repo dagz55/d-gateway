@@ -1,0 +1,62 @@
+{
+  "issues": [
+    {
+      "id": "issue_1758772669176_b4id5m5bw",
+      "timestamp": "2025-09-25T03:57:49.177Z",
+      "severity": "low",
+      "type": "performance",
+      "source": "build",
+      "message": "<w> [webpack.cache.PackFileCacheStrategy] Serializing big strings (192kiB) impacts deserialization performance (consider using Buffer instead and decode when needed)",
+      "status": "resolved",
+      "agentAssigned": "troubleshooter_issue_1758772669176_b4id5m5bw",
+      "solution": "Generic troubleshooting: check logs and restart",
+      "recommendedAction": "npm run dev"
+    },
+    {
+      "id": "issue_1758772697685_98o58x5dz",
+      "timestamp": "2025-09-25T03:58:17.685Z",
+      "severity": "high",
+      "type": "error",
+      "source": "build",
+      "message": "├ ƒ /api/admin/errors                            232 B         372 kB",
+      "status": "resolved",
+      "agentAssigned": "troubleshooter_issue_1758772697685_98o58x5dz",
+      "solution": "Generic troubleshooting: check logs and restart",
+      "recommendedAction": "npm run dev"
+    },
+    {
+      "id": "issue_1758772701063_y9k58l1dv",
+      "timestamp": "2025-09-25T03:58:21.063Z",
+      "severity": "high",
+      "type": "failure",
+      "source": "server",
+      "message": "⨯ Failed to start server",
+      "status": "investigating",
+      "agentAssigned": "troubleshooter_issue_1758772701063_y9k58l1dv"
+    },
+    {
+      "id": "issue_1758772701065_itzmb5ff2",
+      "timestamp": "2025-09-25T03:58:21.065Z",
+      "severity": "high",
+      "type": "error",
+      "source": "server",
+      "message": "Error: listen EADDRINUSE: address already in use :::3000",
+      "status": "investigating",
+      "agentAssigned": "troubleshooter_issue_1758772701065_itzmb5ff2"
+    },
+    {
+      "id": "issue_1758772701066_zm3l1c995",
+      "timestamp": "2025-09-25T03:58:21.067Z",
+      "severity": "high",
+      "type": "error",
+      "source": "server",
+      "message": "at <unknown> (Error: listen EADDRINUSE: address already in use :::3000)",
+      "status": "detected",
+      "agentAssigned": null
+    }
+  ],
+  "lastUpdated": "2025-09-25T03:58:21.067Z",
+  "totalIssues": 5,
+  "criticalIssues": 0,
+  "highIssues": 4
+}

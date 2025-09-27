@@ -4,116 +4,29 @@ import { Button } from '@/components/ui/button';
 import Logo from '@/components/ui/Logo';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
-import {
-  ArrowDownLeft,
-  ArrowUpRight,
-  Copy,
-  History,
-  LayoutDashboard,
-  Menu,
-  Newspaper,
-  Settings,
-  Signal,
-  Wallet,
-  X,
-  ChevronLeft,
-  ChevronRight,
-  Shield,
-  TrendingUp,
-  Rocket,
-} from 'lucide-react';
-import Link from 'next/link';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { usePathname, useSearchParams } from 'next/navigation';
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useMemo, useCallback } from 'react';
 import ProfileSection from './ProfileSection';
 import { useUser } from '@clerk/nextjs';
 import { useNavigationLoading } from '@/hooks/useNavigationLoading';
 import { useSidebar } from '@/contexts/SidebarContext';
-
-type NavItem = {
-  name: string;
-  href: string;
-  icon: React.ComponentType<{ className?: string }>;
-  isAdmin?: boolean;
-};
-
-const BASE_NAVIGATION: NavItem[] = [
-  {
-    name: 'Dashboard',
-    href: '/dashboard',
-    icon: LayoutDashboard,
-  },
-  {
-    name: 'Market',
-    href: '/market',
-    icon: TrendingUp,
-  },
-  {
-    name: 'Trading History',
-    href: '/dashboard?tab=trades',
-    icon: History,
-  },
-  {
-    name: 'Trading Signals',
-    href: '/dashboard?tab=signals',
-    icon: Signal,
-  },
-  {
-    name: 'Wallet',
-    href: '/wallet',
-    icon: Wallet,
-  },
-  {
-    name: 'Crypto News',
-    href: '/dashboard?tab=news',
-    icon: Newspaper,
-  },
-  {
-    name: 'Copy Trading Signal',
-    href: '/dashboard?tab=copy-trading',
-    icon: Copy,
-  },
-  {
-    name: 'Settings',
-    href: '/settings',
-    icon: Settings,
-  },
-];
+import { BASE_NAVIGATION, ADMIN_ONLY_NAVIGATION, NavItem } from './navigation-data';
 
 interface SidebarProps {
   className?: string;
+  isAdmin?: boolean;
 }
 
-export default function Sidebar({ className }: SidebarProps) {
+export default function Sidebar({ className, isAdmin = false }: SidebarProps) {
   const { isCollapsed, setIsCollapsed, isMobileOpen, setIsMobileOpen } = useSidebar();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const { user } = useUser();
   const { navigateWithLoading } = useNavigationLoading();
-  
-  // Check if user is admin using client-side user object
-  const isAdmin = user?.publicMetadata?.isAdmin === true || user?.publicMetadata?.role === 'admin';
-
-
-
-  // Add admin navigation if user is admin
-  const ADMIN_NAVIGATION: NavItem[] = [
-    {
-      name: 'Admin Panel',
-      href: '/admin',
-      icon: Shield,
-      isAdmin: true,
-    },
-    {
-      name: 'Deployment',
-      href: '/deployment',
-      icon: Rocket,
-      isAdmin: true,
-    }
-  ];
 
   const allNavigation = useMemo(
-    () => [...BASE_NAVIGATION, ...(isAdmin ? ADMIN_NAVIGATION : [])],
+    () => isAdmin ? ADMIN_ONLY_NAVIGATION : BASE_NAVIGATION,
     [isAdmin]
   );
 
@@ -131,7 +44,7 @@ export default function Sidebar({ className }: SidebarProps) {
         return pathname === "/dashboard" && !searchParams.get("tab");
       }
 
-      const exactPaths = ["/settings", "/admin", "/market", "/wallet", "/deployment"];
+      const exactPaths = ["/settings", "/admin", "/dashboard/market", "/wallet", "/deployment"];
       if (exactPaths.includes(href)) {
         return pathname === href;
       }
@@ -144,15 +57,16 @@ export default function Sidebar({ className }: SidebarProps) {
   const getNavItemClasses = useCallback(
     (isActiveLink: boolean, isCollapsed: boolean, isAdminItem?: boolean) =>
       cn(
-        "flex items-center text-sm font-medium rounded-xl transition-all duration-300 relative group",
-        isCollapsed ? "md:px-2 md:py-3 md:justify-center" : "md:px-3 md:py-3",
-        "max-md:px-2 max-md:py-3 max-md:justify-center",
+        "flex items-center text-sm font-medium transition-all duration-300 relative group w-full",
+        // Full-width equal sizing for all items - no margins to ensure side-to-side coverage
+        isCollapsed ? "md:px-4 md:py-4 md:justify-center h-[56px]" : "md:px-6 md:py-4 h-[56px]",
+        "max-md:px-4 max-md:py-4 max-md:justify-center h-[56px]",
+        // Enhanced neon green styling with full-width background
         isActiveLink
-          ? "bg-accent/20 text-accent shadow-lg border border-accent/30 card-glow"
-          : "text-foreground/70 hover:bg-muted hover:text-foreground hover:shadow-md hover:border hover:border-border",
-        isAdminItem &&
-          !isActiveLink &&
-          "hover:bg-yellow-500/10 hover:text-yellow-600 hover:border-yellow-500/30 dark:hover:text-yellow-400"
+          ? "nav-item-active rounded-none"
+          : "text-white/90 nav-item-hover rounded-none border-2 border-transparent",
+        // Ensure consistent full-width box sizing
+        "border-2"
       ),
     []
   );
@@ -168,19 +82,19 @@ export default function Sidebar({ className }: SidebarProps) {
           "top-0 h-full",
           "md:w-64 md:translate-x-0", // Desktop expanded
           isCollapsed && "md:w-16", // Desktop collapsed
-          "max-md:w-16 max-md:translate-x-0", // Mobile always compact
+          "max-md:w-12 max-md:translate-x-0", // Mobile always compact - reduced width
           className
         )}
       >
         <div className="flex h-full flex-col">
           {/* Logo */}
           <div className={cn(
-            "flex h-16 items-center border-b border-border transition-all duration-300",
+            "flex h-12 md:h-16 items-center border-b border-border transition-all duration-300",
             // Desktop layout
             "md:px-6",
             isCollapsed ? "md:justify-center md:px-2" : "md:justify-between",
             // Mobile layout - always centered and compact
-            "max-md:justify-center max-md:px-2"
+            "max-md:justify-center max-md:px-1"
           )}>
             <div className="flex items-center">
               <Logo
@@ -222,8 +136,8 @@ export default function Sidebar({ className }: SidebarProps) {
           )}
 
           {/* Navigation */}
-          <ScrollArea className="flex-1 px-2 py-4 max-md:px-1">
-            <nav className="space-y-2">
+          <ScrollArea className="flex-1 py-2 px-0">
+            <nav className="space-y-1 w-full">
               {allNavigation.map((item) => {
                 const Icon = item.icon;
                 const isActiveLink = isActive(item.href);
@@ -238,7 +152,7 @@ export default function Sidebar({ className }: SidebarProps) {
                     className={getNavItemClasses(isActiveLink, isCollapsed, isAdminItem)}
                   >
                     <Icon className={cn(
-                      "h-5 w-5 transition-transform duration-200",
+                      "h-4 w-4 md:h-5 md:w-5 transition-transform duration-200",
                       isActiveLink ? "scale-110" : "",
                       !isCollapsed ? "md:mr-3" : ""
                     )} />

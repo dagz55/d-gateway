@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -23,14 +24,21 @@ import {
 import { cn } from '@/lib/utils';
 import { useMarketData, formatPrice, formatMarketCap, formatVolume, formatPercentage } from '@/hooks/useLegacyMarketData';
 import { useUser } from '@clerk/nextjs';
-import AppLayout from '@/components/layout/AppLayout';
 import { supabase } from '@/lib/supabase/browserClient';
 import { toast } from 'sonner';
 
 export default function MarketPage() {
+  const router = useRouter();
   const { isSignedIn, user } = useUser();
   const { cryptoData, marketStats, loading, error, lastUpdated, refetch } = useMarketData();
   const [searchTerm, setSearchTerm] = useState('');
+
+  // If signed in, redirect to the authenticated dashboard market
+  useEffect(() => {
+    if (isSignedIn) {
+      router.replace('/dashboard/market');
+    }
+  }, [isSignedIn, router]);
   const [favorites, setFavorites] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState<'market_cap' | 'price_change_percentage_24h' | 'volume_24h'>('market_cap');
 
@@ -537,13 +545,9 @@ export default function MarketPage() {
     </>
   );
 
-  // If signed in, render inside dashboard layout (Sidebar + Header)
+  // If signed in, we immediately redirect above; avoid double render here
   if (isSignedIn) {
-    return (
-      <AppLayout>
-        <MarketContent />
-      </AppLayout>
-    );
+    return null;
   }
 
   // Public view with standalone header

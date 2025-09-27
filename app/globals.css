@@ -1,51 +1,52 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
+/* ===== TAILWIND CSS IMPORTS ===== */
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
 
-/* Custom animations for Zignals branding */
-@keyframes fade-in {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
+/* ===== ZIGNAL GLOBAL STYLES =====
+ * Modern crypto signals platform styling
+ * Organized, optimized, and maintainable CSS
+ */
 
-.animate-fade-in {
-  animation: fade-in 1s ease-out;
-}
+/* ===== CSS CUSTOM PROPERTIES (VARIABLES) ===== */
 
+/* Animation timings */
 :root {
-  /* Zignal Brand Colors */
+  --animation-duration-fast: 0.2s;
+  --animation-duration-normal: 0.3s;
+  --animation-duration-slow: 0.6s;
+  --animation-timing: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Zignal Brand Colors */
+:root {
   --zignal-primary: #1a7fb3; /* teal-blue */
   --zignal-accent: #33e1da; /* aqua */
   --zignal-secondary: #1e2a44; /* midnight navy */
   --zignal-background: #0a0f1f; /* dark background */
   --zignal-text: #eaf2ff; /* light text */
+}
 
-  /* Enhanced theme colors for Zignal dashboard - DARK THEME ONLY */
+/* Enhanced Theme Colors - DARK THEME ONLY */
+:root {
   --background: #0a0f1f;
-  --foreground: #eaf2ff;
-  --card: rgba(30, 42, 68, 0.4);
-  --card-foreground: #eaf2ff;
-  --popover: rgba(30, 42, 68, 0.9);
-  --popover-foreground: #eaf2ff;
+  --foreground: #ffffff;
+  --card: rgba(30, 42, 68, 0.6);
+  --card-foreground: #ffffff;
+  --popover: rgba(30, 42, 68, 0.95);
+  --popover-foreground: #ffffff;
   --primary: #1a7fb3;
-  --primary-foreground: #eaf2ff;
-  --secondary: rgba(30, 42, 68, 0.6);
-  --secondary-foreground: #eaf2ff;
-  --muted: rgba(234, 242, 255, 0.1);
-  --muted-foreground: rgba(234, 242, 255, 0.7);
+  --primary-foreground: #ffffff;
+  --secondary: rgba(30, 42, 68, 0.8);
+  --secondary-foreground: #ffffff;
+  --muted: rgba(255, 255, 255, 0.15);
+  --muted-foreground: rgba(255, 255, 255, 0.75);
   --accent: #33e1da;
-  --accent-foreground: #0a0f1f;
+  --accent-foreground: #ffffff;
   --destructive: #ef4444;
-  --destructive-foreground: #eaf2ff;
-  --border: rgba(51, 225, 218, 0.2);
-  --input: rgba(30, 42, 68, 0.5);
+  --destructive-foreground: #ffffff;
+  --border: rgba(51, 225, 218, 0.3);
+  --input: rgba(30, 42, 68, 0.7);
   --ring: #33e1da;
   --chart-1: #33e1da;
   --chart-2: #1a7fb3;
@@ -53,17 +54,17 @@
   --chart-4: #f59e0b;
   --chart-5: #ef4444;
   --radius: 12px;
-  --sidebar: rgba(21, 33, 54, 0.8);
-  --sidebar-foreground: #eaf2ff;
+  --sidebar: rgba(21, 33, 54, 0.9);
+  --sidebar-foreground: #ffffff;
   --sidebar-primary: #33e1da;
   --sidebar-primary-foreground: #0a0f1f;
-  --sidebar-accent: rgba(51, 225, 218, 0.1);
-  --sidebar-accent-foreground: #eaf2ff;
-  --sidebar-border: rgba(51, 225, 218, 0.2);
+  --sidebar-accent: rgba(51, 225, 218, 0.2);
+  --sidebar-accent-foreground: #ffffff;
+  --sidebar-border: rgba(51, 225, 218, 0.3);
   --sidebar-ring: #33e1da;
 }
 
-/* Zignal theme colors */
+/* Color mapping for utilities */
 :root {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -103,194 +104,195 @@
   --color-sidebar-ring: var(--sidebar-ring);
 }
 
+/* ===== BASE STYLES ===== */
+
 @layer base {
   * {
-    @apply border-gray-200;
+    @apply border-border;
   }
+
   body {
-    @apply bg-[var(--color-background)] text-[var(--color-foreground)] font-sans;
+    @apply bg-background text-foreground;
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    /* Hardware acceleration for better performance */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
-  
+
   h1, h2, h3, h4, h5, h6 {
     font-family: 'Space Grotesk', system-ui, -apple-system, sans-serif;
   }
 }
 
-/* Added custom animations for Zignal theme */
-@keyframes grid-pulse {
-  0%,
-  100% {
-    opacity: 0.3;
-  }
-  50% {
-    opacity: 0.8;
-  }
+/* ===== ADMIN DASHBOARD TEXT CONTRAST FIXES ===== */
+
+/* Comprehensive text color fixes for admin areas */
+.admin-dashboard,
+.admin-users-client,
+[class*="admin-"] {
+  /* Override any dark text colors */
+  color: rgb(255 255 255) !important;
 }
 
-@keyframes signal-line {
-  0% {
-    transform: translateX(-100%);
-  }
-  100% {
-    transform: translateX(100%);
-  }
+/* Force readable text colors in admin dashboard */
+.admin-dashboard .text-gray-900,
+.admin-dashboard [class*="text-gray-9"],
+.admin-users-client .text-gray-900,
+.admin-users-client [class*="text-gray-9"],
+.admin-dashboard [class*="text-slate-9"],
+.admin-users-client [class*="text-slate-9"],
+.admin-dashboard [class*="text-stone-9"],
+.admin-users-client [class*="text-stone-9"],
+.admin-dashboard [class*="text-neutral-9"],
+.admin-users-client [class*="text-neutral-9"],
+.admin-dashboard [class*="text-zinc-9"],
+.admin-users-client [class*="text-zinc-9"] {
+  color: rgb(255 255 255) !important;
+}
+
+/* Ensure proper contrast for all admin text elements */
+.admin-dashboard *,
+.admin-users-client * {
+  --tw-text-opacity: 1;
+}
+
+/* Specifically target all text elements in admin areas */
+.admin-dashboard p,
+.admin-dashboard span,
+.admin-dashboard div,
+.admin-dashboard h1,
+.admin-dashboard h2,
+.admin-dashboard h3,
+.admin-dashboard h4,
+.admin-dashboard h5,
+.admin-dashboard h6,
+.admin-dashboard label,
+.admin-users-client p,
+.admin-users-client span,
+.admin-users-client div,
+.admin-users-client h1,
+.admin-users-client h2,
+.admin-users-client h3,
+.admin-users-client h4,
+.admin-users-client h5,
+.admin-users-client h6,
+.admin-users-client label {
+  color: inherit !important;
+}
+
+/* Ensure semantic color classes work properly in admin areas, dashboard content and modals */
+.admin-dashboard .text-foreground,
+.admin-users-client .text-foreground,
+.dashboard-content .text-foreground,
+.modal-content .text-foreground {
+  color: rgb(255 255 255) !important;
+}
+
+.admin-dashboard .text-muted-foreground,
+.admin-users-client .text-muted-foreground,
+.dashboard-content .text-muted-foreground,
+.modal-content .text-muted-foreground {
+  color: rgba(255, 255, 255, 0.75) !important;
+}
+
+.admin-dashboard .text-card-foreground,
+.admin-users-client .text-card-foreground,
+.dashboard-content .text-card-foreground,
+.modal-content .text-card-foreground {
+  color: rgb(255 255 255) !important;
+}
+
+/* Fix hardcoded text-white in modals and dashboard content to use theme colors */
+.modal-content .text-white,
+.dashboard-content .text-white {
+  color: rgb(255 255 255) !important;
+}
+
+/* Fix input and form elements in admin areas and dashboard content */
+.admin-dashboard input,
+.admin-dashboard textarea,
+.dashboard-content input,
+.dashboard-content textarea,
+.admin-dashboard select,
+.admin-users-client input,
+.admin-users-client textarea,
+.admin-users-client select {
+  color: rgb(255 255 255) !important;
+}
+
+.admin-dashboard input::placeholder,
+.admin-dashboard textarea::placeholder,
+.admin-users-client input::placeholder,
+.admin-users-client textarea::placeholder {
+  color: rgba(255, 255, 255, 0.5) !important;
+}
+
+/* Fix button text in admin areas */
+.admin-dashboard button,
+.admin-users-client button {
+  color: inherit !important;
+}
+
+/* Fix card content text in admin areas */
+.admin-dashboard .card-content,
+.admin-dashboard .card-header,
+.admin-dashboard .card-title,
+.admin-dashboard .card-description,
+.admin-users-client .card-content,
+.admin-users-client .card-header,
+.admin-users-client .card-title,
+.admin-users-client .card-description {
+  color: rgb(255 255 255) !important;
+}
+
+/* Fix table and grid text in admin areas */
+.admin-dashboard .grid,
+.admin-dashboard .table,
+.admin-users-client .grid,
+.admin-users-client .table {
+  color: rgb(255 255 255) !important;
+}
+
+/* Ensure avatar fallback text is visible */
+.admin-dashboard .avatar,
+.admin-users-client .avatar {
+  color: var(--accent) !important;
+}
+
+/* Badge and status text fixes */
+.admin-dashboard .badge,
+.admin-users-client .badge {
+  color: inherit !important;
+}
+
+/* Icon color fixes */
+.admin-dashboard svg,
+.admin-users-client svg {
+  color: inherit !important;
+}
+
+/* ===== ANIMATION KEYFRAMES ===== */
+
+/* Core animations */
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes float {
-  0%, 100% {
-    transform: translateY(0px);
-  }
-  50% {
-    transform: translateY(-20px);
-  }
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-20px); }
 }
 
 @keyframes spin-slow {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-@keyframes reverse-spin {
-  from {
-    transform: rotate(360deg);
-  }
-  to {
-    transform: rotate(0deg);
-  }
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
 @keyframes gradient-shift {
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
-}
-
-@keyframes parallax-float {
-  0%, 100% {
-    transform: translateY(0px) rotate(0deg);
-  }
-  33% {
-    transform: translateY(-10px) rotate(2deg);
-  }
-  66% {
-    transform: translateY(10px) rotate(-2deg);
-  }
-}
-
-@keyframes drift-slow {
-  0%, 100% {
-    transform: translate(0px, 0px) scale(1);
-  }
-  33% {
-    transform: translate(30px, -30px) scale(1.1);
-  }
-  66% {
-    transform: translate(-20px, 20px) scale(0.9);
-  }
-}
-
-@keyframes drift-reverse {
-  0%, 100% {
-    transform: translate(0px, 0px) scale(1);
-  }
-  33% {
-    transform: translate(-25px, 25px) scale(0.95);
-  }
-  66% {
-    transform: translate(35px, -15px) scale(1.05);
-  }
-}
-
-@keyframes drift-fast {
-  0%, 100% {
-    transform: translate(0px, 0px) scale(1);
-  }
-  25% {
-    transform: translate(20px, -20px) scale(1.1);
-  }
-  50% {
-    transform: translate(-30px, 10px) scale(0.9);
-  }
-  75% {
-    transform: translate(15px, 25px) scale(1.05);
-  }
-}
-
-@keyframes draw {
-  0% {
-    stroke-dasharray: 0 1000;
-  }
-  100% {
-    stroke-dasharray: 1000 0;
-  }
-}
-
-@keyframes bullet-move {
-  0% {
-    transform: translate(0, 100vh) scale(0);
-    opacity: 0;
-  }
-  10% {
-    opacity: 1;
-    transform: translate(0, 90vh) scale(1);
-  }
-  90% {
-    opacity: 1;
-    transform: translate(0, -10vh) scale(1);
-  }
-  100% {
-    transform: translate(0, -20vh) scale(0);
-    opacity: 0;
-  }
-}
-
-@keyframes bullet-diagonal {
-  0% {
-    transform: translate(100vw, 100vh) scale(0) rotate(45deg);
-    opacity: 0;
-  }
-  10% {
-    opacity: 1;
-    transform: translate(90vw, 90vh) scale(1) rotate(45deg);
-  }
-  90% {
-    opacity: 1;
-    transform: translate(-10vw, -10vh) scale(1) rotate(45deg);
-  }
-  100% {
-    transform: translate(-20vw, -20vh) scale(0) rotate(45deg);
-    opacity: 0;
-  }
-}
-
-@keyframes bullet-fast {
-  0% {
-    transform: translate(-50px, 100vh) scale(0) rotate(-10deg);
-    opacity: 0;
-  }
-  5% {
-    opacity: 1;
-    transform: translate(-40px, 95vh) scale(1) rotate(-10deg);
-  }
-  95% {
-    opacity: 1;
-    transform: translate(50px, -5vh) scale(1) rotate(-10deg);
-  }
-  100% {
-    transform: translate(60px, -10vh) scale(0) rotate(-10deg);
-    opacity: 0;
-  }
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
 
 /* Crypto-specific animations */
@@ -314,31 +316,10 @@
 }
 
 @keyframes price-drift {
-  0% {
-    transform: translateY(0px) translateX(0px);
-    opacity: 0;
-  }
-  10% {
-    opacity: 0.6;
-  }
-  90% {
-    opacity: 0.4;
-  }
-  100% {
-    transform: translateY(-80px) translateX(30px);
-    opacity: 0;
-  }
-}
-
-@keyframes candle-pulse {
-  0%, 100% {
-    opacity: 0.4;
-    transform: scaleY(1);
-  }
-  50% {
-    opacity: 0.7;
-    transform: scaleY(1.1);
-  }
+  0% { transform: translateY(0px) translateX(0px); opacity: 0; }
+  10% { opacity: 0.6; }
+  90% { opacity: 0.4; }
+  100% { transform: translateY(-80px) translateX(30px); opacity: 0; }
 }
 
 @keyframes data-stream {
@@ -360,195 +341,172 @@
   }
 }
 
-@keyframes volume-pulse {
-  0%, 100% {
-    transform: scaleY(0.3);
-    opacity: 0.3;
-  }
-  50% {
-    transform: scaleY(1);
-    opacity: 0.8;
-  }
+/* UI animations */
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
 }
 
-@keyframes chart-draw {
-  0% {
-    stroke-dasharray: 0 2000;
-    opacity: 0;
-  }
-  10% {
-    opacity: 1;
-  }
-  100% {
-    stroke-dasharray: 2000 0;
-    opacity: 0.8;
-  }
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 20px rgba(51, 225, 218, 0.3); }
+  50% { box-shadow: 0 0 40px rgba(51, 225, 218, 0.6); }
 }
 
-@keyframes crypto-glow {
-  0%, 100% {
-    transform: scale(1) translate(0, 0);
-    opacity: 0.1;
-  }
-  33% {
-    transform: scale(1.2) translate(20px, -10px);
-    opacity: 0.2;
-  }
-  66% {
-    transform: scale(0.8) translate(-15px, 15px);
-    opacity: 0.15;
-  }
+/* Bullet animations */
+@keyframes bullet-move {
+  0% { transform: translate(0, 100vh) scale(0); opacity: 0; }
+  10% { opacity: 1; transform: translate(0, 90vh) scale(1); }
+  90% { opacity: 1; transform: translate(0, -10vh) scale(1); }
+  100% { transform: translate(0, -20vh) scale(0); opacity: 0; }
 }
 
-@keyframes crypto-glow-delayed {
-  0%, 100% {
-    transform: scale(1) translate(0, 0);
-    opacity: 0.08;
-  }
-  40% {
-    transform: scale(1.3) translate(-25px, 20px);
-    opacity: 0.18;
-  }
-  80% {
-    transform: scale(0.9) translate(30px, -15px);
-    opacity: 0.12;
-  }
-}
+/* ===== ANIMATION CLASSES ===== */
 
-@keyframes crypto-pulse {
-  0%, 100% {
-    transform: scale(1);
-    opacity: 0.15;
-  }
-  50% {
-    transform: scale(1.4);
-    opacity: 0.25;
-  }
-}
+.animate-fade-in { animation: fade-in var(--animation-duration-slow) ease-out; }
+.animate-float { animation: float 6s ease-in-out infinite; }
+.animate-spin-slow { animation: spin-slow 20s linear infinite; }
+.animate-gradient-shift { animation: gradient-shift 4s ease-in-out infinite; }
+.animate-shimmer { animation: shimmer 2s infinite; }
+.animate-pulse-glow { animation: pulse-glow 2s ease-in-out infinite; }
 
-.animate-grid-pulse {
-  animation: grid-pulse 3s ease-in-out infinite;
-}
+/* Crypto animations */
+.animate-crypto-float { animation: crypto-float 15s ease-in-out infinite; }
+.animate-price-drift { animation: price-drift 10s ease-out infinite; }
+.animate-data-stream { animation: data-stream 6s linear infinite; }
 
-.animate-signal-line {
-  animation: signal-line 2s ease-in-out infinite;
-}
+/* Bullet animations */
+.animate-bullet-move { animation: bullet-move 4s linear infinite; }
 
-.animate-float {
-  animation: float 6s ease-in-out infinite;
-}
+/* ===== GLASSMORPHISM EFFECTS ===== */
 
-.animate-spin-slow {
-  animation: spin-slow 20s linear infinite;
-}
-
-.animate-reverse-spin {
-  animation: reverse-spin 20s linear infinite;
-}
-
-.animate-gradient-shift {
-  animation: gradient-shift 4s ease-in-out infinite;
-}
-
-.animate-parallax-float {
-  animation: parallax-float 8s ease-in-out infinite;
-}
-
-.animate-drift-slow {
-  animation: drift-slow 8s ease-in-out infinite;
-}
-
-.animate-drift-reverse {
-  animation: drift-reverse 10s ease-in-out infinite;
-}
-
-.animate-drift-fast {
-  animation: drift-fast 6s ease-in-out infinite;
-}
-
-.animate-draw {
-  animation: draw 3s ease-in-out infinite;
-}
-
-.animate-bullet-move {
-  animation: bullet-move 4s linear infinite;
-}
-
-.animate-bullet-diagonal {
-  animation: bullet-diagonal 5s linear infinite;
-}
-
-.animate-bullet-fast {
-  animation: bullet-fast 2s linear infinite;
-}
-
-/* Crypto animation classes */
-.animate-crypto-float {
-  animation: crypto-float 15s ease-in-out infinite;
-}
-
-.animate-price-drift {
-  animation: price-drift 10s ease-out infinite;
-}
-
-.animate-candle-pulse {
-  animation: candle-pulse 4s ease-in-out infinite;
-}
-
-.animate-data-stream {
-  animation: data-stream 6s linear infinite;
-}
-
-.animate-volume-pulse {
-  animation: volume-pulse 3s ease-in-out infinite;
-}
-
-.animate-chart-draw {
-  animation: chart-draw 8s ease-in-out infinite;
-}
-
-.animate-crypto-glow {
-  animation: crypto-glow 12s ease-in-out infinite;
-}
-
-.animate-crypto-glow-delayed {
-  animation: crypto-glow-delayed 15s ease-in-out infinite;
-}
-
-.animate-crypto-pulse {
-  animation: crypto-pulse 6s ease-in-out infinite;
-}
-
-/* Enhanced glassmorphism and dashboard utilities */
+/* Base glass effect with fallback */
 .glass {
   background: rgba(30, 42, 68, 0.3);
-  backdrop-filter: blur(16px);
   border: 1px solid rgba(51, 225, 218, 0.1);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
-/* Additional animation utilities */
-.animate-fade-in {
-  animation: fadeIn 0.6s ease-out forwards;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+@supports (backdrop-filter: blur(16px)) {
+  .glass {
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
   }
 }
 
+/* Glass variants */
+.glass-light {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+}
+
+.glass-heavy {
+  background: rgba(30, 42, 68, 0.45);
+  border: 1px solid rgba(51, 225, 218, 0.2);
+  box-shadow:
+    0 12px 40px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.2);
+}
+
+.glass-subtle {
+  background: rgba(30, 42, 68, 0.15);
+  border: 1px solid rgba(51, 225, 218, 0.08);
+  box-shadow:
+    0 4px 20px rgba(0, 0, 0, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}
+
+.glass-card {
+  background: rgba(30, 42, 68, 0.35);
+  border: 1px solid rgba(51, 225, 218, 0.12);
+  border-radius: var(--radius-lg);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+  transition: all var(--animation-duration-normal) var(--animation-timing);
+}
+
+.glass-header {
+  background: linear-gradient(135deg,
+    rgba(30, 42, 68, 0.6) 0%,
+    rgba(26, 127, 179, 0.25) 100%);
+  border: 1px solid rgba(51, 225, 218, 0.2);
+  border-radius: 20px;
+  box-shadow:
+    0 12px 40px rgba(0, 0, 0, 0.4),
+    inset 0 2px 0 rgba(255, 255, 255, 0.1),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.15),
+    0 0 30px rgba(51, 225, 218, 0.15);
+}
+
+.glass-stat-card {
+  background: linear-gradient(145deg,
+    rgba(30, 42, 68, 0.4) 0%,
+    rgba(26, 127, 179, 0.2) 70%,
+    rgba(51, 225, 218, 0.1) 100%);
+  border: 1px solid rgba(51, 225, 218, 0.15);
+  border-radius: var(--radius-md);
+  box-shadow:
+    0 6px 25px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+  transition: all 0.4s var(--animation-timing);
+  position: relative;
+  overflow: hidden;
+}
+
+.glass-activity-card {
+  background: rgba(30, 42, 68, 0.3);
+  border: 1px solid rgba(51, 225, 218, 0.1);
+  border-radius: 18px;
+  box-shadow:
+    0 8px 30px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  position: relative;
+}
+
+/* Interactive states */
 .glass-hover:hover {
   background: rgba(30, 42, 68, 0.4);
   border-color: rgba(51, 225, 218, 0.2);
   transform: translateY(-1px);
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
+
+.glass-stat-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(51, 225, 218, 0.25);
+  box-shadow:
+    0 8px 35px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.15),
+    0 0 25px rgba(51, 225, 218, 0.2);
+}
+
+.glass-activity-card:hover {
+  background: rgba(30, 42, 68, 0.4);
+  border-color: rgba(51, 225, 218, 0.15);
+  transform: translateY(-1px);
+  box-shadow:
+    0 10px 35px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.glass-header:hover {
+  border-color: rgba(51, 225, 218, 0.3);
+  box-shadow:
+    0 15px 45px rgba(0, 0, 0, 0.5),
+    inset 0 2px 0 rgba(255, 255, 255, 0.15),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.2),
+    0 0 40px rgba(51, 225, 218, 0.25);
+}
+
+/* ===== DASHBOARD BACKGROUNDS ===== */
 
 .dashboard-bg {
   background: linear-gradient(135deg, #0a0f1f 0%, #1e2a44 50%, #1a7fb3 100%);
@@ -558,15 +516,14 @@
 .dashboard-bg::before {
   content: '';
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-image: 
+  inset: 0;
+  background-image:
     radial-gradient(circle at 20% 80%, rgba(51, 225, 218, 0.1) 0%, transparent 50%),
     radial-gradient(circle at 80% 20%, rgba(26, 127, 179, 0.1) 0%, transparent 50%);
   pointer-events: none;
 }
+
+/* ===== TEXT EFFECTS ===== */
 
 .gradient-text {
   background: linear-gradient(135deg, #33e1da 0%, #1a7fb3 100%);
@@ -575,9 +532,7 @@
   -webkit-text-fill-color: transparent;
 }
 
-.bg-gradient-radial {
-  background: radial-gradient(circle, var(--tw-gradient-stops));
-}
+/* ===== UTILITY CLASSES ===== */
 
 .card-glow {
   box-shadow: 0 0 20px rgba(51, 225, 218, 0.1);
@@ -587,50 +542,94 @@
   box-shadow: 0 0 30px rgba(51, 225, 218, 0.2);
 }
 
-/* Performance optimizations for 60fps animations */
-* {
-  /* Enable hardware acceleration for all elements with transforms */
-  -webkit-transform: translateZ(0);
-  -webkit-backface-visibility: hidden;
-  -webkit-perspective: 1000px;
+.drop-shadow-glow {
+  filter: drop-shadow(0 0 10px rgba(247, 147, 26, 0.6));
 }
 
+/* ===== SCROLLBAR STYLES ===== */
+
+.scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(156, 163, 175, 0.7) rgba(55, 65, 81, 0.3);
+}
+
+.scrollbar-thin::-webkit-scrollbar {
+  width: 8px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: rgba(55, 65, 81, 0.3);
+  border-radius: 4px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: rgba(156, 163, 175, 0.7);
+  border-radius: 4px;
+  border: 1px solid rgba(55, 65, 81, 0.5);
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background: rgba(156, 163, 175, 0.9);
+}
+
+/* ===== PERFORMANCE OPTIMIZATIONS ===== */
+
+/* Hardware acceleration for animating elements only */
 .animate-float,
 .animate-spin-slow,
-.animate-reverse-spin,
 .animate-parallax-float,
-.animate-bullet-move,
-.animate-bullet-diagonal,
-.animate-bullet-fast {
-  /* Force GPU acceleration for smooth animations */
-  transform: translate3d(0, 0, 0);
-  will-change: transform, opacity;
+.animate-bullet-move {
+  will-change: transform;
   backface-visibility: hidden;
 }
 
-/* Add glow effects for bullet animations */
-.animate-bullet-move {
-  box-shadow: 0 0 8px rgba(51, 225, 218, 0.6);
-}
-
-.animate-bullet-diagonal {
-  box-shadow: 0 0 6px rgba(26, 127, 179, 0.5);
-}
-
-.animate-bullet-fast {
-  box-shadow: 0 0 10px rgba(34, 197, 94, 0.7);
-}
-
-/* Optimize transitions for performance */
+/* Transition optimizations */
 .transition-all,
 .transition-transform,
 .transition-opacity {
-  /* Use hardware acceleration */
-  transform: translateZ(0);
   will-change: transform, opacity;
 }
 
-/* Reduce motion on lower-end devices */
+/* ===== RESPONSIVE DESIGN ===== */
+
+@media (max-width: 768px) {
+  .animate-float {
+    animation-duration: 8s;
+  }
+
+  .animate-parallax-float {
+    animation-duration: 12s;
+  }
+
+  .glass-card,
+  .glass-header,
+  .glass-stat-card,
+  .glass-activity-card {
+    @supports (backdrop-filter: blur(12px)) {
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .animate-gradient-shift {
+    animation: none;
+    background-position: 0% 50%;
+  }
+}
+
+/* ===== ACCESSIBILITY ===== */
+
+button:focus-visible,
+a:focus-visible {
+  outline: 2px solid var(--zignal-accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* ===== REDUCED MOTION ===== */
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -642,26 +641,8 @@
   }
 }
 
-/* Performance optimizations for mobile devices */
-@media (max-width: 768px) {
-  .animate-float {
-    animation-duration: 8s; /* Slower on mobile */
-  }
-  
-  .animate-parallax-float {
-    animation-duration: 12s; /* Slower on mobile */
-  }
-  
-  /* Disable complex animations on very small screens */
-  @media (max-width: 480px) {
-    .animate-gradient-shift {
-      animation: none;
-      background-position: 0% 50%;
-    }
-  }
-}
+/* ===== CONTAINER QUERIES ===== */
 
-/* Container queries for responsive animations */
 @container (max-width: 600px) {
   .crypto-grid {
     grid-template-columns: repeat(3, 1fr);
@@ -674,7 +655,8 @@
   }
 }
 
-/* Improve scroll performance */
+/* ===== SCROLL BEHAVIOR ===== */
+
 html {
   scroll-behavior: smooth;
 }
@@ -685,477 +667,48 @@ html {
   }
 }
 
-/* Optimize for retina displays */
+/* ===== RETINA OPTIMIZATION ===== */
+
 @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
   .crypto-icon {
+    image-rendering: -webkit-optimize-contrast;
     image-rendering: crisp-edges;
   }
 }
 
-/* Focus states for accessibility */
-button:focus-visible,
-a:focus-visible {
-  outline: 2px solid #33E1DA;
-  outline-offset: 2px;
-  border-radius: 4px;
+/* ===== SIDEBAR EFFECTS ===== */
+
+.nav-item-active {
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.15), rgba(16, 185, 129, 0.1));
+  border-left: 4px solid rgba(34, 197, 94, 0.8);
+  border-right: 4px solid rgba(34, 197, 94, 0.8);
+  border-top: 2px solid rgba(34, 197, 94, 0.6);
+  border-bottom: 2px solid rgba(34, 197, 94, 0.6);
+  color: rgb(34, 197, 94);
+  box-shadow:
+    0 0 15px rgba(34, 197, 94, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
-/* Stock Exchange Style Promotional Banner Animations */
-@keyframes stock-ticker {
-  0% {
-    transform: translateX(0px);
-  }
-  25% {
-    transform: translateX(2px);
-  }
-  50% {
-    transform: translateX(0px);
-  }
-  75% {
-    transform: translateX(-2px);
-  }
-  100% {
-    transform: translateX(0px);
-  }
+.nav-item-hover:hover {
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.1), rgba(16, 185, 129, 0.05));
+  border-left: 4px solid rgba(34, 197, 94, 0.5);
+  border-right: 4px solid rgba(34, 197, 94, 0.5);
+  border-top: 2px solid rgba(34, 197, 94, 0.4);
+  border-bottom: 2px solid rgba(34, 197, 94, 0.4);
+  color: rgb(74, 222, 128);
+  box-shadow: 0 0 10px rgba(34, 197, 94, 0.2);
 }
 
-@keyframes stock-flash {
-  0%, 90%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.8;
-    transform: scale(1.05);
-  }
-}
-
-@keyframes blink-cta {
-  0%, 70%, 100% {
-    opacity: 1;
-  }
-  85% {
-    opacity: 0.7;
-  }
-}
-
-@keyframes live-pulse {
+@keyframes neon-glow {
   0%, 100% {
-    opacity: 1;
-    transform: scale(1);
+    box-shadow: 0 0 10px rgba(34, 197, 94, 0.2), 0 0 20px rgba(34, 197, 94, 0.1);
   }
   50% {
-    opacity: 0.8;
-    transform: scale(1.1);
+    box-shadow: 0 0 20px rgba(34, 197, 94, 0.4), 0 0 40px rgba(34, 197, 94, 0.2);
   }
 }
 
-@keyframes ticker-scroll {
-  0% {
-    transform: translateX(-100%);
-  }
-  100% {
-    transform: translateX(100%);
-  }
-}
-
-@keyframes border-sweep {
-  0% {
-    transform: translateX(-100%);
-    opacity: 0;
-  }
-  50% {
-    opacity: 1;
-  }
-  100% {
-    transform: translateX(100%);
-    opacity: 0;
-  }
-}
-
-@keyframes pulse-glow {
-  0%, 100% {
-    box-shadow: 0 0 10px rgba(51, 225, 218, 0.3);
-  }
-  50% {
-    box-shadow: 0 0 20px rgba(51, 225, 218, 0.6);
-  }
-}
-
-@keyframes fade-in-delayed {
-  0% {
-    opacity: 0;
-    transform: translateY(5px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes indicator-active {
-  0%, 100% {
-    transform: scale(1);
-    opacity: 1;
-  }
-  50% {
-    transform: scale(1.2);
-    opacity: 0.8;
-  }
-}
-
-@keyframes arrow-pulse {
-  0%, 100% {
-    transform: translateX(0px);
-    opacity: 0.8;
-  }
-  50% {
-    transform: translateX(3px);
-    opacity: 1;
-  }
-}
-
-/* Stock Exchange Animation Classes */
-.animate-stock-ticker {
-  animation: stock-ticker 3s ease-in-out infinite;
-}
-
-.animate-stock-flash {
-  animation: stock-flash 2s ease-in-out infinite;
-}
-
-.animate-blink-cta {
-  animation: blink-cta 4s ease-in-out infinite;
-}
-
-.animate-live-pulse {
-  animation: live-pulse 1.5s ease-in-out infinite;
-}
-
-.animate-ticker-scroll {
-  animation: ticker-scroll 2s linear infinite;
-}
-
-.animate-border-sweep {
-  animation: border-sweep 3s ease-in-out infinite;
-}
-
-.animate-pulse-glow {
-  animation: pulse-glow 2s ease-in-out infinite;
-}
-
-.animate-fade-in-delayed {
-  animation: fade-in-delayed 0.6s ease-out 0.3s both;
-}
-
-.animate-indicator-active {
-  animation: indicator-active 1s ease-in-out infinite;
-}
-
-.animate-arrow-pulse {
-  animation: arrow-pulse 2s ease-in-out infinite;
-}
-
-/* Enhanced Crypto Banner Animations */
-@keyframes crypto-float-intense {
-  0%, 100% {
-    transform: translateY(0) rotate(0deg) scale(1);
-    opacity: 0.1;
-  }
-  25% {
-    transform: translateY(-15px) rotate(5deg) scale(1.1);
-    opacity: 0.2;
-  }
-  50% {
-    transform: translateY(-25px) rotate(-5deg) scale(1.2);
-    opacity: 0.15;
-  }
-  75% {
-    transform: translateY(-10px) rotate(3deg) scale(1.05);
-    opacity: 0.25;
-  }
-}
-
-@keyframes price-flash-intense {
-  0%, 70%, 100% {
-    opacity: 0.3;
-    transform: scaleX(0);
-  }
-  35% {
-    opacity: 1;
-    transform: scaleX(1);
-  }
-}
-
-@keyframes border-glow-intense {
-  0%, 100% {
-    opacity: 0.5;
-    box-shadow: 0 0 20px rgba(247, 147, 26, 0.3);
-  }
-  50% {
-    opacity: 1;
-    box-shadow: 0 0 40px rgba(247, 147, 26, 0.8), 0 0 60px rgba(51, 225, 218, 0.4);
-  }
-}
-
-@keyframes crypto-mega-glow {
-  0%, 100% {
-    box-shadow:
-      0 0 20px rgba(247, 147, 26, 0.4),
-      0 0 40px rgba(51, 225, 218, 0.3),
-      inset 0 0 20px rgba(255, 255, 255, 0.1);
-    transform: scale(1);
-  }
-  50% {
-    box-shadow:
-      0 0 40px rgba(247, 147, 26, 0.8),
-      0 0 80px rgba(51, 225, 218, 0.6),
-      inset 0 0 30px rgba(255, 255, 255, 0.2);
-    transform: scale(1.05);
-  }
-}
-
-@keyframes crypto-icon-intense {
-  0%, 100% {
-    transform: rotate(0deg) scale(1);
-    filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.3));
-  }
-  25% {
-    transform: rotate(-5deg) scale(1.1);
-    filter: drop-shadow(0 0 15px rgba(247, 147, 26, 0.8));
-  }
-  50% {
-    transform: rotate(5deg) scale(1.2);
-    filter: drop-shadow(0 0 20px rgba(51, 225, 218, 0.8));
-  }
-  75% {
-    transform: rotate(-3deg) scale(1.05);
-    filter: drop-shadow(0 0 10px rgba(34, 197, 94, 0.6));
-  }
-}
-
-@keyframes live-pulse-intense {
-  0%, 100% {
-    opacity: 1;
-    transform: scale(1);
-    box-shadow: 0 0 10px rgba(34, 197, 94, 0.5);
-  }
-  50% {
-    opacity: 0.7;
-    transform: scale(1.4);
-    box-shadow: 0 0 25px rgba(34, 197, 94, 1);
-  }
-}
-
-@keyframes crypto-symbol-bounce {
-  0%, 100% {
-    transform: translateY(0) scale(1);
-    text-shadow: 0 0 10px rgba(247, 147, 26, 0.5);
-  }
-  50% {
-    transform: translateY(-5px) scale(1.1);
-    text-shadow: 0 0 20px rgba(247, 147, 26, 1);
-  }
-}
-
-@keyframes crypto-title-glow {
-  0%, 100% {
-    text-shadow:
-      0 0 10px rgba(255, 255, 255, 0.3),
-      0 0 20px rgba(51, 225, 218, 0.3);
-    transform: scale(1);
-  }
-  50% {
-    text-shadow:
-      0 0 20px rgba(255, 255, 255, 0.6),
-      0 0 40px rgba(51, 225, 218, 0.6),
-      0 0 60px rgba(247, 147, 26, 0.4);
-    transform: scale(1.02);
-  }
-}
-
-@keyframes crypto-subtitle-flash {
-  0%, 80%, 100% {
-    opacity: 1;
-    text-shadow: 0 0 10px rgba(51, 225, 218, 0.5);
-  }
-  90% {
-    opacity: 0.8;
-    text-shadow: 0 0 30px rgba(51, 225, 218, 1);
-  }
-}
-
-@keyframes crypto-cta-intense {
-  0%, 100% {
-    transform: scale(1);
-    text-shadow:
-      0 0 15px rgba(247, 147, 26, 0.8),
-      0 0 30px rgba(247, 147, 26, 0.4);
-  }
-  25% {
-    transform: scale(1.02);
-    text-shadow:
-      0 0 25px rgba(247, 147, 26, 1),
-      0 0 50px rgba(247, 147, 26, 0.6);
-  }
-  50% {
-    transform: scale(1.05);
-    text-shadow:
-      0 0 35px rgba(247, 147, 26, 1),
-      0 0 70px rgba(247, 147, 26, 0.8);
-  }
-  75% {
-    transform: scale(1.02);
-    text-shadow:
-      0 0 25px rgba(247, 147, 26, 1),
-      0 0 50px rgba(247, 147, 26, 0.6);
-  }
-}
-
-@keyframes crypto-live-text {
-  0%, 100% {
-    opacity: 1;
-    text-shadow: 0 0 10px rgba(34, 197, 94, 0.5);
-  }
-  50% {
-    opacity: 0.8;
-    text-shadow: 0 0 20px rgba(34, 197, 94, 1);
-  }
-}
-
-@keyframes crypto-data-scroll {
-  0% {
-    transform: translateX(0);
-    opacity: 1;
-  }
-  50% {
-    transform: translateX(3px);
-    opacity: 0.8;
-  }
-  100% {
-    transform: translateX(0);
-    opacity: 1;
-  }
-}
-
-@keyframes price-ticker {
-  0%, 100% {
-    transform: scale(1);
-    text-shadow: 0 0 10px rgba(34, 197, 94, 0.5);
-  }
-  50% {
-    transform: scale(1.1);
-    text-shadow: 0 0 20px rgba(34, 197, 94, 1);
-  }
-}
-
-@keyframes crypto-indicator-active {
-  0%, 100% {
-    transform: scale(1);
-    opacity: 1;
-    box-shadow: 0 0 10px rgba(247, 147, 26, 0.5);
-  }
-  50% {
-    transform: scale(1.3);
-    opacity: 0.8;
-    box-shadow: 0 0 20px rgba(247, 147, 26, 1);
-  }
-}
-
-@keyframes crypto-arrow-intense {
-  0%, 100% {
-    transform: translateX(0) scale(1);
-    filter: drop-shadow(0 0 5px rgba(247, 147, 26, 0.5));
-  }
-  50% {
-    transform: translateX(5px) scale(1.1);
-    filter: drop-shadow(0 0 15px rgba(247, 147, 26, 1));
-  }
-}
-
-/* Enhanced Crypto Animation Classes */
-.animate-crypto-float-intense {
-  animation: crypto-float-intense 12s ease-in-out infinite;
-}
-
-.animate-price-flash-intense {
-  animation: price-flash-intense 2s ease-in-out infinite;
-}
-
-.animate-border-glow-intense {
-  animation: border-glow-intense 3s ease-in-out infinite;
-}
-
-.animate-crypto-mega-glow {
-  animation: crypto-mega-glow 2s ease-in-out infinite;
-}
-
-.animate-crypto-icon-intense {
-  animation: crypto-icon-intense 3s ease-in-out infinite;
-}
-
-.animate-live-pulse-intense {
-  animation: live-pulse-intense 1s ease-in-out infinite;
-}
-
-.animate-crypto-symbol-bounce {
-  animation: crypto-symbol-bounce 2s ease-in-out infinite;
-}
-
-.animate-crypto-title-glow {
-  animation: crypto-title-glow 4s ease-in-out infinite;
-}
-
-.animate-crypto-subtitle-flash {
-  animation: crypto-subtitle-flash 3s ease-in-out infinite;
-}
-
-.animate-crypto-cta-intense {
-  animation: crypto-cta-intense 2s ease-in-out infinite;
-}
-
-.animate-crypto-live-text {
-  animation: crypto-live-text 2s ease-in-out infinite;
-}
-
-.animate-crypto-data-scroll {
-  animation: crypto-data-scroll 4s ease-in-out infinite;
-}
-
-.animate-price-ticker {
-  animation: price-ticker 1.5s ease-in-out infinite;
-}
-
-.animate-crypto-indicator-active {
-  animation: crypto-indicator-active 1.5s ease-in-out infinite;
-}
-
-.animate-crypto-arrow-intense {
-  animation: crypto-arrow-intense 2s ease-in-out infinite;
-}
-
-/* Drop shadow utilities */
-.drop-shadow-glow {
-  filter: drop-shadow(0 0 10px rgba(247, 147, 26, 0.6));
-}
-
-/* Right-to-left scrolling animation */
-@keyframes scroll-right-to-left {
-  0% {
-    transform: translateX(100%);
-  }
-  100% {
-    transform: translateX(-100%);
-  }
-}
-
-.animate-scroll-right-to-left {
-  animation: scroll-right-to-left 60s linear infinite;
-}
-
-/* Preload critical animations */
-.preload-animations {
-  content: '';
-  position: absolute;
-  left: -9999px;
-  animation: float 0s, spin-slow 0s, gradient-shift 0s;
+.nav-item-active {
+  animation: neon-glow 2s ease-in-out infinite;
 }

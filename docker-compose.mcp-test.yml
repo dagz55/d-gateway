@@ -1,0 +1,138 @@
+version: '3.8'
+
+services:
+  # MCP Gateway - Test Configuration
+  mcp-gateway-test:
+    build:
+      context: ./docker/mcp-gateway
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      # Test environment variables
+      - NODE_ENV=test
+      - GATEWAY_PORT=8080
+      - LOG_LEVEL=debug
+      - TEST_MODE=true
+      - ENABLE_OAUTH_AUTH=true
+      - CLERK_SECRET_KEY=${CLERK_SECRET_KEY}
+      - SUPABASE_ACCESS_TOKEN=${SUPABASE_ACCESS_TOKEN}
+      - TAVILY_API_KEY=${TAVILY_API_KEY}
+      # Override test values
+      - TEST_OVERRIDE_VALUE=test_override_123
+      - DEBUG_MODE=true
+      - VERBOSE_LOGGING=true
+    volumes:
+      - ${PWD}:/workspace:ro
+      - /tmp:/tmp
+      - ./test-mcp-gateway.js:/app/test-mcp-gateway.js:ro
+    networks:
+      - mcp-test-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    restart: unless-stopped
+    command: >
+      sh -c "
+        echo 'Starting MCP Gateway in test mode...' &&
+        echo 'Environment variables:' &&
+        env | grep -E '(NODE_ENV|LOG_LEVEL|TEST_|DEBUG|VERBOSE)' &&
+        echo 'Starting gateway server...' &&
+        node mcp-gateway-server.js &
+        GATEWAY_PID=$$! &&
+        echo 'Gateway PID: $$GATEWAY_PID' &&
+        echo 'Waiting for gateway to be ready...' &&
+        sleep 10 &&
+        echo 'Running test suite...' &&
+        node test-mcp-gateway.js &&
+        echo 'Tests completed. Keeping gateway running...' &&
+        wait $$GATEWAY_PID
+      "
+
+  # Test Client - Runs the test suite
+  mcp-test-client:
+    image: node:20-alpine
+    working_dir: /app
+    environment:
+      - NODE_ENV=test
+      - MCP_GATEWAY_URL=http://mcp-gateway-test:8080
+      - CLERK_SECRET_KEY=${CLERK_SECRET_KEY}
+      - TEST_USER_EMAIL=${TEST_USER_EMAIL:-test@example.com}
+    volumes:
+      - ${PWD}:/app:ro
+    networks:
+      - mcp-test-network
+    depends_on:
+      - mcp-gateway-test
+    command: >
+      sh -c "
+        echo 'Installing test dependencies...' &&
+        npm install @clerk/backend &&
+        echo 'Waiting for gateway to be ready...' &&
+        sleep 30 &&
+        echo 'Running comprehensive test suite...' &&
+        node test-mcp-gateway.js
+      "
+
+  # Environment Variable Test Container
+  env-test-container:
+    image: node:20-alpine
+    working_dir: /app
+    environment:
+      # Test various environment variable overrides
+      - NODE_ENV=production
+      - LOG_LEVEL=info
+      - GATEWAY_PORT=8080
+      - TEST_OVERRIDE_1=value1
+      - TEST_OVERRIDE_2=value2
+      - DEBUG_MODE=false
+      - VERBOSE_LOGGING=false
+      # Override with different values
+      - NODE_ENV=development
+      - LOG_LEVEL=debug
+      - TEST_OVERRIDE_1=overridden_value1
+      - DEBUG_MODE=true
+      - VERBOSE_LOGGING=true
+    volumes:
+      - ${PWD}:/app:ro
+    networks:
+      - mcp-test-network
+    command: >
+      sh -c "
+        echo 'Testing environment variable overrides...' &&
+        echo 'Initial environment:' &&
+        env | sort &&
+        echo 'Testing override functionality...' &&
+        node -e '
+          console.log(\"NODE_ENV:\", process.env.NODE_ENV);
+          console.log(\"LOG_LEVEL:\", process.env.LOG_LEVEL);
+          console.log(\"TEST_OVERRIDE_1:\", process.env.TEST_OVERRIDE_1);
+          console.log(\"DEBUG_MODE:\", process.env.DEBUG_MODE);
+          console.log(\"VERBOSE_LOGGING:\", process.env.VERBOSE_LOGGING);
+          
+          // Test override functionality
+          const originalNodeEnv = process.env.NODE_ENV;
+          process.env.NODE_ENV = \"test_override\";
+          console.log(\"Override test - NODE_ENV changed to:\", process.env.NODE_ENV);
+          
+          // Restore
+          process.env.NODE_ENV = originalNodeEnv;
+          console.log(\"Restore test - NODE_ENV restored to:\", process.env.NODE_ENV);
+          
+          console.log(\"Environment variable override test completed successfully\");
+        '
+      "
+
+networks:
+  mcp-test-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.21.0.0/16
+
+volumes:
+  mcp-test-data:
+    driver: local

@@ -1,0 +1,50 @@
+{
+  "timestamp": "2025-09-25T03:58:19.862Z",
+  "uptime": 60004,
+  "totalLogs": 112,
+  "totalIssues": 2,
+  "activeAgents": [
+    {
+      "id": "troubleshooter_issue_1758772669176_b4id5m5bw",
+      "issueType": "performance",
+      "status": "completed",
+      "runtime": 30684
+    },
+    {
+      "id": "troubleshooter_issue_1758772697685_98o58x5dz",
+      "issueType": "error",
+      "status": "active",
+      "runtime": 2177
+    }
+  ],
+  "issueBreakdown": {
+    "critical": 0,
+    "high": 1,
+    "medium": 0,
+    "low": 1
+  },
+  "recentIssues": [
+    {
+      "id": "issue_1758772669176_b4id5m5bw",
+      "timestamp": "2025-09-25T03:57:49.177Z",
+      "severity": "low",
+      "type": "performance",
+      "source": "build",
+      "message": "<w> [webpack.cache.PackFileCacheStrategy] Serializing big strings (192kiB) impacts deserialization performance (consider using Buffer instead and decode when needed)",
+      "status": "resolved",
+      "agentAssigned": "troubleshooter_issue_1758772669176_b4id5m5bw",
+      "solution": "Generic troubleshooting: check logs and restart",
+      "recommendedAction": "npm run dev"
+    },
+    {
+      "id": "issue_1758772697685_98o58x5dz",
+      "timestamp": "2025-09-25T03:58:17.685Z",
+      "severity": "high",
+      "type": "error",
+      "source": "build",
+      "message": "├ ƒ /api/admin/errors                            232 B         372 kB",
+      "status": "investigating",
+      "agentAssigned": "troubleshooter_issue_1758772697685_98o58x5dz"
+    }
+  ]
+}

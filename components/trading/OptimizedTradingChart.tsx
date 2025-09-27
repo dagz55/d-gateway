@@ -38,7 +38,7 @@ const OptimizedCandlestickChart: React.FC<{
 }> = ({ data, width, height, onHover, getTechnicalIndicators, getSupportResistanceLevels }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
-  const animationRef = useRef<number>();
+  const animationRef = useRef<number>(undefined);
   const lastDrawTime = useRef<number>(0);
   
   const padding = { top: 20, right: 80, bottom: 40, left: 80 };
@@ -342,7 +342,7 @@ const OptimizedLineChart: React.FC<{
 }> = ({ data, width, height, onHover, getTechnicalIndicators, getSupportResistanceLevels }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
-  const animationRef = useRef<number>();
+  const animationRef = useRef<number>(undefined);
   const lastDrawTime = useRef<number>(0);
   
   const padding = { top: 20, right: 80, bottom: 40, left: 80 };
@@ -605,7 +605,7 @@ const OptimizedAreaChart: React.FC<{
 }> = ({ data, width, height, onHover, getTechnicalIndicators, getSupportResistanceLevels }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
-  const animationRef = useRef<number>();
+  const animationRef = useRef<number>(undefined);
   const lastDrawTime = useRef<number>(0);
   
   const padding = { top: 20, right: 80, bottom: 40, left: 80 };

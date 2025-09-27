@@ -115,7 +115,7 @@ export default function AuthLayout({ defaultMode = 'sign-in' }: AuthLayoutProps)
 {mode === 'sign-in' ? (
               <SignIn
                 routing="virtual"
-                afterSignInUrl="/"
+                afterSignInUrl="/auth/post-login"
                 signUpUrl="/sign-up"
                 appearance={{
                   elements: {
@@ -129,7 +129,7 @@ export default function AuthLayout({ defaultMode = 'sign-in' }: AuthLayoutProps)
                     formButtonPrimary:
                       'bg-[#0577DA] hover:bg-[#0466c4] text-white font-medium',
                     formFieldInput:
-                      'border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white text-gray-900 bg-white',
+                      'border-gray-300 dark:border-gray-600 bg-white text-gray-900 dark:bg-gray-700 dark:text-white transition-colors hover:bg-[#F5F7FA] focus:bg-[#F5F7FA] active:bg-[#E9EEF5] hover:text-gray-900 focus:text-gray-900 active:text-gray-900 dark:hover:bg-[#4B5563] dark:focus:bg-[#4B5563] dark:active:bg-[#4B5563] dark:hover:text-white dark:focus:text-white dark:active:text-white',
                     formFieldLabel: 'text-gray-900 dark:text-white font-medium',
                     footerActionLink:
                       'text-[#0577DA] hover:text-[#0466c4] dark:text-[#1199FA] dark:hover:text-[#33E1DA] font-medium',
@@ -163,7 +163,7 @@ export default function AuthLayout({ defaultMode = 'sign-in' }: AuthLayoutProps)
                     formButtonPrimary:
                       'bg-[#0577DA] hover:bg-[#0466c4] text-white font-medium',
                     formFieldInput:
-                      'border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white text-gray-900 bg-white',
+                      'border-gray-300 dark:border-gray-600 bg-white text-gray-900 dark:bg-gray-700 dark:text-white transition-colors hover:bg-[#F5F7FA] focus:bg-[#F5F7FA] active:bg-[#E9EEF5] hover:text-gray-900 focus:text-gray-900 active:text-gray-900 dark:hover:bg-[#4B5563] dark:focus:bg-[#4B5563] dark:active:bg-[#4B5563] dark:hover:text-white dark:focus:text-white dark:active:text-white',
                     formFieldLabel: 'text-gray-900 dark:text-white font-medium',
                     footerActionLink:
                       'text-[#0577DA] hover:text-[#0466c4] dark:text-[#1199FA] dark:hover:text-[#33E1DA] font-medium',

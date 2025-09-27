@@ -10,7 +10,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if current user is admin
-    const currentUser = await clerkClient.users.getUser(currentUserId);
+    const clerk = await clerkClient();
+    const currentUser = await clerk.users.getUser(currentUserId);
     const isCurrentUserAdmin = currentUser.publicMetadata?.role === 'admin';
 
     if (!isCurrentUserAdmin) {
@@ -28,7 +29,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Update user role
-    await clerkClient.users.updateUser(targetUserId, {
+    await clerk.users.updateUser(targetUserId, {
       publicMetadata: {
         ...currentUser.publicMetadata,
         role: role

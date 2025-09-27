@@ -69,43 +69,45 @@ export default function ChangeUsernameForm({ currentUsername }: ChangeUsernameFo
 
   return (
     <Card>
-      <CardHeader>
-        <CardTitle>Change Username</CardTitle>
-        <CardDescription>
+      <CardHeader className="pb-3 md:pb-6">
+        <CardTitle className="text-lg md:text-xl">Change Username</CardTitle>
+        <CardDescription className="text-sm md:text-base">
           Update your username. This will be visible to other users.
         </CardDescription>
       </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+      <CardContent className="pt-0">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-3 md:space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="currentUsername">Current Username</Label>
+            <Label htmlFor="currentUsername" className="text-sm md:text-base">Current Username</Label>
             <Input
               id="currentUsername"
               {...register('currentUsername')}
               placeholder="Current username"
               disabled={isSubmitting}
+              className="text-sm md:text-base"
             />
             {errors.currentUsername && (
-              <p className="text-sm text-destructive">{errors.currentUsername.message}</p>
+              <p className="text-xs md:text-sm text-destructive">{errors.currentUsername.message}</p>
             )}
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="newUsername">New Username</Label>
+            <Label htmlFor="newUsername" className="text-sm md:text-base">New Username</Label>
             <Input
               id="newUsername"
               {...register('newUsername')}
               placeholder="New username"
               disabled={isSubmitting}
+              className="text-sm md:text-base"
             />
             {errors.newUsername && (
-              <p className="text-sm text-destructive">{errors.newUsername.message}</p>
+              <p className="text-xs md:text-sm text-destructive">{errors.newUsername.message}</p>
             )}
           </div>
 
-          <div className="p-4 bg-muted rounded-lg">
-            <h4 className="font-medium mb-2">Username Guidelines</h4>
-            <ul className="text-sm text-muted-foreground space-y-1">
+          <div className="p-3 md:p-4 bg-muted rounded-lg">
+            <h4 className="font-medium mb-2 text-sm md:text-base">Username Guidelines</h4>
+            <ul className="text-xs md:text-sm text-muted-foreground space-y-1">
               <li>• Must be at least 3 characters long</li>
               <li>• Can contain letters, numbers, and underscores</li>
               <li>• Must be unique across all users</li>
@@ -113,7 +115,7 @@ export default function ChangeUsernameForm({ currentUsername }: ChangeUsernameFo
             </ul>
           </div>
 
-          <Button type="submit" disabled={isSubmitting}>
+          <Button type="submit" disabled={isSubmitting} className="w-full md:w-auto text-sm md:text-base">
             {isSubmitting ? 'Updating...' : 'Update Username'}
           </Button>
         </form>

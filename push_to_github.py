@@ -40,10 +40,9 @@ class GitPusher:
     def __init__(self, repo_url: str, default_branch: str, dry_run: bool = False, use_rebase: bool = False):
         self.repo_url = repo_url
         self.default_branch = default_branch
-        # Default to the desired default branch; current branch may be different at runtime
-        self.current_branch = default_branch
-        self.dry_run = dry_run
+        self.dry_run = dry_run  # Initialize dry_run first
         self.use_rebase = use_rebase
+        self.current_branch = self._get_current_branch() or default_branch # Now this call will work
 
     def _run_command(self, command: str, capture_output: bool = True, check_error: bool = True) -> Tuple[int, str, str]:
         """Runs a shell command and returns its exit code, stdout, and stderr."""
@@ -59,9 +58,12 @@ class GitPusher:
                 text=True,
                 check=False
             )
-            if check_error and process.returncode != 0 and process.stderr:
-                c_print(Colors.FAIL, f"Command failed with error: {process.stderr}")
-            return process.returncode, process.stdout.strip(), process.stderr.strip()
+            stdout_output = process.stdout.strip() if capture_output else ""
+            stderr_output = process.stderr.strip() if capture_output else ""
+
+            if check_error and process.returncode != 0 and stderr_output:
+                c_print(Colors.FAIL, f"Command failed with error: {stderr_output}")
+            return process.returncode, stdout_output, stderr_output
         except FileNotFoundError:
             c_print(Colors.FAIL, f"Command not found: {command.split()[0]}")
             return -1, "", f"Command not found: {command.split()[0]}"
@@ -121,33 +123,6 @@ class GitPusher:
             c_print(Colors.OKGREEN, "Remote 'origin' is already configured correctly.")
         return True
 
-    def ensure_on_branch(self) -> bool:
-        """Ensures we are on the target default branch (creates it if needed)."""
-        c_print(Colors.HEADER, f"Ensuring we are on '{self.default_branch}' branch...")
-        code, stdout, _ = self._run_command("git rev-parse --abbrev-ref HEAD", check_error=False)
-        current = stdout if code == 0 else None
-        if current == self.default_branch:
-            self.current_branch = self.default_branch
-            c_print(Colors.OKGREEN, f"Already on '{self.default_branch}'.")
-            return True
-        # Check if branch exists
-        code, _, _ = self._run_command(f"git rev-parse --verify {self.default_branch}", check_error=False)
-        if code != 0:
-            c_print(Colors.OKBLUE, f"Creating and switching to '{self.default_branch}'...")
-            code, _, stderr = self._run_command(f"git checkout -b {self.default_branch}")
-            if code != 0:
-                c_print(Colors.FAIL, f"Failed to create branch '{self.default_branch}'. Error: {stderr}")
-                return False
-        else:
-            c_print(Colors.OKBLUE, f"Switching to '{self.default_branch}'...")
-            code, _, stderr = self._run_command(f"git checkout {self.default_branch}")
-            if code != 0:
-                c_print(Colors.FAIL, f"Failed to checkout '{self.default_branch}'. Error: {stderr}")
-                return False
-        self.current_branch = self.default_branch
-        c_print(Colors.OKGREEN, f"Now on '{self.default_branch}'.")
-        return True
-
     def add_files(self) -> bool:
         """Adds all files to the staging area."""
         c_print(Colors.HEADER, "Adding files to staging...")
@@ -158,8 +133,8 @@ class GitPusher:
         c_print(Colors.OKGREEN, "All files added to staging.")
         return True
 
-    def commit_changes(self) -> bool:
-        """Commits staged changes, prompting for a commit message."""
+    def commit_changes(self, commit_message: str) -> bool:
+        """Commits staged changes."""
         c_print(Colors.HEADER, "Committing changes...")
         
         # Check if there are any changes to commit (staged or unstaged)
@@ -175,10 +150,6 @@ class GitPusher:
             if not self.add_files():
                 return False
 
-        commit_message = input(f"Enter commit message (default: {DEFAULT_COMMIT_MESSAGE}): ").strip()
-        if not commit_message:
-            commit_message = DEFAULT_COMMIT_MESSAGE
-        
         c_print(Colors.OKBLUE, f"Committing with message: '{commit_message}'")
         
         if self.dry_run:
@@ -255,7 +226,7 @@ class GitPusher:
         c_print(Colors.OKGREEN, "Pull successful. Retrying push...")
         return self.push_changes()
 
-    def run(self, force_push: bool = False):
+    def run(self, commit_message: str, force_push: bool = False):
         """Executes the full sequence of Git operations."""
         c_print(Colors.HEADER, "\n--- GitHub Push Script (Python Version) ---")
         c_print(Colors.HEADER, "-------------------------------------------")
@@ -275,14 +246,10 @@ class GitPusher:
         if not self.setup_remote():
             sys.exit(1)
         
-        # Ensure we are on the main branch before adding/committing
-        if not self.ensure_on_branch():
-            sys.exit(1)
-
         if not self.add_files():
             sys.exit(1)
         
-        if not self.commit_changes():
+        if not self.commit_changes(commit_message):
             sys.exit(1)
         
         if not self.push_changes(force=force_push):
@@ -300,6 +267,7 @@ def main():
     parser.add_argument("--force", action="store_true", help="Force push to the remote repository. Use with caution.")
     parser.add_argument("--dry-run", action="store_true", help="Show commands that would be executed without running them.")
     parser.add_argument("--rebase", action="store_true", help="Use git pull --rebase instead of git pull --no-rebase (merge) when integrating remote changes.")
+    parser.add_argument("--message", type=str, default=DEFAULT_COMMIT_MESSAGE, help="Commit message to use.")
     args = parser.parse_args()
 
     if args.force:
@@ -310,7 +278,7 @@ def main():
             sys.exit(0)
 
     pusher = GitPusher(REPO_URL, DEFAULT_BRANCH, dry_run=args.dry_run, use_rebase=args.rebase)
-    pusher.run(force_push=args.force)
+    pusher.run(commit_message=args.message, force_push=args.force)
 
 if __name__ == "__main__":
     main()

@@ -92,12 +92,30 @@ export function useAdminErrorHandler(options: AdminErrorHandlerOptions = {}) {
   const handleTimeout = useCallback(() => {
     if (!enabled || !enableTimeoutDetection) return;
 
-    setState(prev => ({
-      ...prev,
-      timeoutCount: prev.timeoutCount + 1,
-      hasError: true,
-      lastError: 'Admin panel load timeout'
-    }));
+    setState(prev => {
+      const newTimeoutCount = prev.timeoutCount + 1;
+
+      // Check if we should redirect to fallback
+      if (newTimeoutCount >= maxRetries) {
+        const errorId = generateErrorId();
+        const params = new URLSearchParams({
+          error: 'Admin panel timeout - redirected to fallback',
+          errorId
+        });
+
+        // Prevent infinite loops by redirecting immediately
+        setTimeout(() => {
+          router.push(`${fallbackUrl}?${params.toString()}`);
+        }, 100);
+      }
+
+      return {
+        ...prev,
+        timeoutCount: newTimeoutCount,
+        hasError: true,
+        lastError: 'Admin panel load timeout'
+      };
+    });
 
     const errorId = generateErrorId();
     logError({
@@ -105,21 +123,11 @@ export function useAdminErrorHandler(options: AdminErrorHandlerOptions = {}) {
       errorId,
       stack: `Timeout after ${timeoutThreshold}ms`
     });
-
-    // Redirect to fallback if max timeouts reached
-    if (state.timeoutCount >= maxRetries) {
-      const params = new URLSearchParams({
-        error: 'Admin panel timeout - redirected to fallback',
-        errorId
-      });
-      router.push(`${fallbackUrl}?${params.toString()}`);
-    }
   }, [
     enabled,
     enableTimeoutDetection,
     timeoutThreshold,
     maxRetries,
-    state.timeoutCount,
     generateErrorId,
     logError,
     router,

@@ -5,8 +5,8 @@
  * with Supabase user profiles, especially for photo upload functionality.
  */
 
-import { createClientSupabaseClient } from './client';
-import { createServerSupabaseClient } from './server';
+import { createClient } from './client';
+import { createServerSupabaseClient } from './serverClient';
 
 export interface UserProfileWithClerk {
   id: string;
@@ -38,7 +38,7 @@ export interface UserProfileWithClerk {
  * Get user profile by Clerk user ID (client-side)
  */
 export async function getUserProfileByClerkId(clerkUserId: string): Promise<UserProfileWithClerk | null> {
-  const supabase = createClientSupabaseClient();
+  const supabase = createClient();
   
   const { data, error } = await supabase
     .from('user_profiles')
@@ -81,7 +81,7 @@ export async function updateUserAvatarByClerkId(
   clerkUserId: string, 
   avatarUrl: string
 ): Promise<boolean> {
-  const supabase = createClientSupabaseClient();
+  const supabase = createClient();
   
   const { error } = await supabase
     .from('user_profiles')
@@ -106,7 +106,7 @@ export async function upsertUserProfileWithClerkId(
   clerkUserId: string,
   profileData: Partial<UserProfileWithClerk>
 ): Promise<UserProfileWithClerk | null> {
-  const supabase = createClientSupabaseClient();
+  const supabase = createClient();
   
   const { data, error } = await supabase
     .from('user_profiles')
@@ -136,7 +136,7 @@ export async function linkUserProfileToClerkId(
   userId: string,
   clerkUserId: string
 ): Promise<boolean> {
-  const supabase = createClientSupabaseClient();
+  const supabase = createClient();
   
   const { error } = await supabase
     .from('user_profiles')
@@ -158,7 +158,7 @@ export async function linkUserProfileToClerkId(
  * Check if Clerk user ID already exists in profiles
  */
 export async function clerkUserIdExists(clerkUserId: string): Promise<boolean> {
-  const supabase = createClientSupabaseClient();
+  const supabase = createClient();
   
   const { data, error } = await supabase
     .from('user_profiles')
@@ -178,7 +178,7 @@ export async function clerkUserIdExists(clerkUserId: string): Promise<boolean> {
  * Get all user profiles with Clerk integration
  */
 export async function getAllUserProfilesWithClerk(): Promise<UserProfileWithClerk[]> {
-  const supabase = createClientSupabaseClient();
+  const supabase = createClient();
   
   const { data, error } = await supabase
     .from('user_profiles')
@@ -194,7 +194,7 @@ export async function getAllUserProfilesWithClerk(): Promise<UserProfileWithCler
 }
 
 /**
- * Sync Clerk user data with Supabase profile
+ * Sync Clerk user data with Supabase profile (client-side)
  */
 export async function syncClerkUserWithProfile(
   clerkUserId: string,
@@ -214,6 +214,50 @@ export async function syncClerkUserWithProfile(
     full_name: fullName || clerkUserData.email.split('@')[0],
     avatar_url: clerkUserData.imageUrl || null,
   });
+}
+
+/**
+ * Sync Clerk user data with Supabase profile (server-side with service role)
+ */
+export async function syncClerkUserWithProfileServer(
+  clerkUserId: string,
+  clerkUserData: {
+    email: string;
+    firstName?: string;
+    lastName?: string;
+    username?: string;
+    imageUrl?: string;
+  }
+): Promise<UserProfileWithClerk | null> {
+  const supabase = await createServerSupabaseClient();
+  const fullName = `${clerkUserData.firstName || ''} ${clerkUserData.lastName || ''}`.trim();
+  
+  // Use the server-side upsert function with service role
+  const { data, error } = await supabase
+    .from('user_profiles')
+    .upsert({
+      clerk_user_id: clerkUserId,
+      email: clerkUserData.email,
+      username: clerkUserData.username || clerkUserData.email.split('@')[0],
+      full_name: fullName || clerkUserData.email.split('@')[0],
+      avatar_url: clerkUserData.imageUrl || null,
+      first_name: clerkUserData.firstName || null,
+      last_name: clerkUserData.lastName || null,
+      updated_at: new Date().toISOString(),
+      created_at: new Date().toISOString(),
+    }, {
+      onConflict: 'clerk_user_id',
+      ignoreDuplicates: false
+    })
+    .select()
+    .single();
+  
+  if (error) {
+    console.error('Error syncing Clerk user with profile (server):', error);
+    return null;
+  }
+  
+  return data;
 }
 
 /**

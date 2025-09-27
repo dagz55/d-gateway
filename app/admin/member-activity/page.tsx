@@ -5,5 +5,5 @@ export const dynamic = 'force-dynamic';
 
 export default async function AdminMemberActivityPage() {
   // Redirect to the correct admin member activity path
-  redirect('/dashboard/admins/member-activity');
+  redirect('/admin/dashboard/member-activity');
 }

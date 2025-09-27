@@ -1,14 +1,15 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { Bell, Check, X, AlertCircle, TrendingUp, Settings, Users } from 'lucide-react';
+import { useState, useEffect, useMemo } from 'react';
+import { Bell, Check, X, AlertCircle, TrendingUp, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { useUser } from '@clerk/nextjs';
-import { supabase as createSupabaseClient } from '@/lib/supabase/browserClient';
+import { cn } from '@/lib/utils';
+import { createRealtimeClient, getRealtimeStatus, reconnectRealtime } from '@/lib/supabase/realtime-client';
 
 interface Notification {
   id: string;
@@ -22,36 +23,52 @@ interface Notification {
 }
 
 const getNotificationIcon = (type: string) => {
+  const baseClass = 'h-4 w-4';
   switch (type) {
     case 'trade':
-      return <TrendingUp className="h-4 w-4 text-emerald-400" />;
+      return <TrendingUp className={baseClass} />;
     case 'warning':
-      return <AlertCircle className="h-4 w-4 text-amber-400" />;
+      return <AlertCircle className={baseClass} />;
     case 'error':
-      return <X className="h-4 w-4 text-red-400" />;
+      return <X className={baseClass} />;
     case 'success':
-      return <Check className="h-4 w-4 text-emerald-400" />;
+      return <Check className={baseClass} />;
     case 'system':
-      return <Settings className="h-4 w-4 text-cyan-400" />;
+      return <Settings className={baseClass} />;
     default:
-      return <Bell className="h-4 w-4 text-slate-400" />;
+      return <Bell className={baseClass} />;
   }
 };
 
 const getNotificationBgColor = (type: string) => {
   switch (type) {
     case 'trade':
-      return 'bg-emerald-50 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-700/50';
-    case 'warning':
-      return 'bg-amber-50 dark:bg-amber-950/30 border-amber-200 dark:border-amber-700/50';
-    case 'error':
-      return 'bg-red-50 dark:bg-red-950/30 border-red-200 dark:border-red-700/50';
     case 'success':
-      return 'bg-emerald-50 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-700/50';
+      return 'bg-emerald-500/15 dark:bg-emerald-500/20 border-emerald-400/40';
+    case 'warning':
+      return 'bg-amber-400/15 dark:bg-amber-500/20 border-amber-300/40';
+    case 'error':
+      return 'bg-red-500/15 dark:bg-red-500/20 border-red-400/35';
     case 'system':
-      return 'bg-cyan-50 dark:bg-cyan-950/30 border-cyan-200 dark:border-cyan-700/50';
+      return 'bg-cyan-500/15 dark:bg-cyan-500/20 border-cyan-400/35';
     default:
-      return 'bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-600/50';
+      return 'bg-slate-500/10 dark:bg-slate-900/60 border-slate-400/30';
+  }
+};
+
+const getNotificationAccent = (type: string) => {
+  switch (type) {
+    case 'trade':
+    case 'success':
+      return 'text-emerald-300 border-emerald-400/40 bg-emerald-500/10';
+    case 'warning':
+      return 'text-amber-200 border-amber-300/40 bg-amber-500/10';
+    case 'error':
+      return 'text-red-300 border-red-400/40 bg-red-500/10';
+    case 'system':
+      return 'text-cyan-200 border-cyan-300/40 bg-cyan-500/10';
+    default:
+      return 'text-slate-200 border-slate-400/30 bg-slate-500/10';
   }
 };
 
@@ -59,32 +76,59 @@ export default function NotificationDropdown() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
   const [isOpen, setIsOpen] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const { user } = useUser();
-  const supabase = createSupabaseClient();
+  const supabase = useMemo(() => createRealtimeClient(), []);
 
   const unreadCount = notifications.filter(n => !n.is_read).length;
 
-  // Fetch notifications
+  // Fetch notifications with improved error handling
   const fetchNotifications = async () => {
-    if (!user) return;
+    if (!user) {
+      setLoading(false);
+      return;
+    }
 
     try {
       setLoading(true);
-      const { data, error } = await supabase
+      setError(null);
+      
+      const { data, error: supabaseError } = await supabase
         .from('notifications')
         .select('*')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false })
         .limit(20);
 
-      if (error) {
-        console.error('Error fetching notifications:', error);
+      if (supabaseError) {
+        const errorMessage = supabaseError.message || 'Unknown database error';
+        console.error('Supabase notifications error:', {
+          message: errorMessage,
+          details: supabaseError,
+          code: supabaseError.code,
+          hint: supabaseError.hint
+        });
+        
+        // Check for specific error types
+        if (errorMessage.includes('Invalid API key') || errorMessage.includes('JWT')) {
+          setError('Database connection issue. Notifications temporarily unavailable.');
+        } else if (errorMessage.includes('relation') && errorMessage.includes('does not exist')) {
+          setError('Notifications feature not yet configured.');
+        } else {
+          setError(`Database error: ${errorMessage}`);
+        }
         return;
       }
 
       setNotifications(data || []);
-    } catch (error) {
-      console.error('Error fetching notifications:', error);
+    } catch (error: any) {
+      const errorMessage = error?.message || 'Failed to fetch notifications';
+      console.error('Fetch notifications error:', {
+        message: errorMessage,
+        error,
+        stack: error?.stack
+      });
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -178,146 +222,340 @@ export default function NotificationDropdown() {
     }
   }, [user]);
 
-  // Set up real-time subscription for new notifications
+  // Set up real-time subscription for new notifications with enhanced error handling
   useEffect(() => {
-    if (!user) return;
-
+    if (!user || error) return; // Don't setup realtime if there's a database error
+  
     let channel: any = null;
-
-    try {
-      channel = supabase
-        .channel('notifications_realtime', {
-          config: {
-            presence: {
-              key: user.id,
-            },
-          },
-        })
-        .on(
-          'postgres_changes',
-          {
-            event: 'INSERT',
-            schema: 'public',
-            table: 'notifications',
-            filter: `user_id=eq.${user.id}`,
-          },
-          (payload) => {
-            const newNotification = payload.new as Notification;
-            setNotifications(prev => [newNotification, ...prev]);
-          }
-        )
-        .subscribe((status) => {
-          if (status === 'SUBSCRIBED') {
-            console.log('Notifications realtime subscription active');
-          } else if (status === 'CHANNEL_ERROR') {
-            console.warn('Notifications realtime subscription error');
-          } else if (status === 'TIMED_OUT') {
-            console.warn('Notifications realtime subscription timed out');
-          }
-        });
-    } catch (error) {
-      console.warn('Failed to set up notifications realtime subscription:', error);
-    }
-
-    return () => {
+    let retryTimeout: NodeJS.Timeout | null = null;
+    let pollInterval: NodeJS.Timeout | null = null;
+    let connectionCheckInterval: NodeJS.Timeout | null = null;
+    let retryCount = 0;
+    const maxRetries = 3; // Reduced retry attempts to fail faster to polling
+    let isConnected = false;
+    let lastSuccessfulConnection = Date.now();
+    let isDestroyed = false;
+    let isHandlingError = false; // Guard against simultaneous error handling
+  
+    const cleanup = () => {
+      isDestroyed = true;
+      isHandlingError = false; // Reset error handling flag
+      if (retryTimeout) clearTimeout(retryTimeout);
+      if (pollInterval) clearInterval(pollInterval);
+      if (connectionCheckInterval) clearInterval(connectionCheckInterval);
       if (channel) {
         try {
           supabase.removeChannel(channel);
         } catch (error) {
-          console.warn('Error removing notifications channel:', error);
+          console.warn("Error removing notifications channel:", error);
         }
       }
     };
-  }, [user, supabase]);
+
+    const startPollingFallback = () => {
+      if (isDestroyed || error) return; // Don't poll if there's a database error
+      console.log("🔄 Starting polling fallback for notifications");
+      if (pollInterval) clearInterval(pollInterval);
+      pollInterval = setInterval(() => {
+        if (!isDestroyed && !error) {
+          fetchNotifications();
+        }
+      }, 30000); // Poll every 30 seconds
+    };
+
+    const checkConnectionHealth = () => {
+      if (isDestroyed || retryCount >= maxRetries) return;
+      const timeSinceLastConnection = Date.now() - lastSuccessfulConnection;
+      // If no successful connection for 2 minutes, force retry
+      if (timeSinceLastConnection > 120000 && !isConnected) {
+        console.log("🔍 Connection health check: Forcing retry due to long disconnection");
+        // Prevent recursive calls by clearing the connection check first
+        if (connectionCheckInterval) {
+          clearInterval(connectionCheckInterval);
+          connectionCheckInterval = null;
+        }
+        handleSubscriptionError();
+      }
+    };
+  
+    const setupSubscription = () => {
+      if (isDestroyed || error) return; // Don't setup subscription if there's a database error
+      
+      try {
+        // Clear any existing polling interval when a new subscription is attempted
+        if (pollInterval) clearInterval(pollInterval);
+  
+        // Create a unique channel name to avoid conflicts
+        const channelName = `notifications_${user.id}_${Date.now()}`;
+        
+        console.log(`🔌 Setting up notifications subscription: ${channelName}`);
+        
+        channel = supabase
+          .channel(channelName, {
+            config: { 
+              presence: { key: user.id },
+              broadcast: { self: false }
+            },
+          })
+          .on(
+            "postgres_changes",
+            {
+              event: "INSERT",
+              schema: "public",
+              table: "notifications",
+              filter: `user_id=eq.${user.id}`,
+            },
+            (payload) => {
+              if (isDestroyed) return;
+              const newNotification = payload.new as Notification;
+              setNotifications((prev) => [newNotification, ...prev]);
+              lastSuccessfulConnection = Date.now();
+            }
+          )
+          .on('presence', { event: 'sync' }, () => {
+            if (isDestroyed) return;
+            console.log('👥 Presence synced for notifications');
+            lastSuccessfulConnection = Date.now();
+          })
+          .subscribe((status) => {
+            if (isDestroyed) return;
+            console.log(`📡 Notifications subscription status: ${status}`);
+            
+            if (status === "SUBSCRIBED") {
+              console.log("✅ Notifications realtime subscription active");
+              isConnected = true;
+              retryCount = 0; // Reset on success
+              lastSuccessfulConnection = Date.now();
+              
+              // Start connection health monitoring
+              if (connectionCheckInterval) clearInterval(connectionCheckInterval);
+              connectionCheckInterval = setInterval(checkConnectionHealth, 60000); // Check every minute
+              
+            } else if (status === "CHANNEL_ERROR" || status === "TIMED_OUT" || status === "CLOSED") {
+              console.warn(`❌ Notifications realtime subscription ${status}`);
+              isConnected = false;
+              handleSubscriptionError();
+            }
+          });
+      } catch (error) {
+        console.warn("Failed to set up notifications realtime subscription:", error);
+        isConnected = false;
+        handleSubscriptionError();
+      }
+    };
+  
+    const handleSubscriptionError = () => {
+      if (isDestroyed || retryCount >= maxRetries || isHandlingError) return;
+
+      // Prevent multiple simultaneous error handling calls
+      isHandlingError = true;
+
+      isConnected = false;
+
+      // Stop connection health checks during error handling
+      if (connectionCheckInterval) {
+        clearInterval(connectionCheckInterval);
+        connectionCheckInterval = null;
+      }
+
+      // Safely cleanup channel without triggering recursive errors
+      if (channel) {
+        try {
+          // Use removeChannel instead of unsubscribe to avoid event triggers
+          supabase.removeChannel(channel);
+        } catch (error) {
+          // Silently handle cleanup errors to prevent infinite loops
+          console.debug("Channel cleanup error (ignored):", error);
+        }
+        channel = null;
+      }
+
+      // Clear any existing retry timeout to prevent multiple retries
+      if (retryTimeout) {
+        clearTimeout(retryTimeout);
+        retryTimeout = null;
+      }
+
+      // Circuit breaker: if we're getting too many errors too quickly, stop retrying
+      if (retryCount >= maxRetries || isDestroyed) {
+        console.warn("⚠️ Max retries reached for notifications subscription. Using polling only.");
+        retryCount = 0; // Reset for next attempt cycle
+        isHandlingError = false; // Reset error handling flag
+        if (!isDestroyed) {
+          startPollingFallback();
+        }
+        return;
+      }
+
+      retryCount++;
+      const delay = Math.min(Math.pow(2, retryCount) * 1000, 10000); // Cap at 10 seconds
+      console.log(`🔄 Retrying notifications subscription in ${delay}ms (attempt ${retryCount}/${maxRetries})`);
+
+      retryTimeout = setTimeout(() => {
+        if (!isDestroyed) {
+          setupSubscription();
+        }
+        isHandlingError = false; // Reset error handling flag
+      }, delay);
+    };
+
+    // Start with polling fallback immediately, then try WebSocket
+    startPollingFallback();
+    
+    // Try WebSocket connection after a short delay
+    setTimeout(() => {
+      if (!isDestroyed && !error) {
+        setupSubscription();
+      }
+    }, 1000);
+  
+    return () => {
+      cleanup();
+    };
+  }, [user, error]); // Add error as dependency
 
   if (!user) return null;
 
   return (
     <Popover open={isOpen} onOpenChange={setIsOpen}>
       <PopoverTrigger asChild>
-        <Button variant="ghost" size="sm" className="relative">
-          <Bell className="h-5 w-5" />
+        <Button
+          variant="ghost"
+          size="sm"
+          aria-label="Open notifications"
+          className={cn(
+            'relative rounded-full border border-transparent transition-all duration-200',
+            'focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-accent/60 focus-visible:ring-offset-slate-900',
+            isOpen ? 'bg-slate-800/70 border-slate-600/60 shadow-lg shadow-slate-900/60' : 'hover:bg-slate-800/60'
+          )}
+        >
+          <Bell className="h-5 w-5 text-white" />
           {unreadCount > 0 && (
             <Badge
               variant="destructive"
-              className="absolute -top-2 -right-2 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs"
+              className="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full p-0 text-xs shadow-[0_2px_6px_rgba(17,24,39,0.45)]"
+              aria-live="polite"
             >
               {unreadCount > 99 ? '99+' : unreadCount}
             </Badge>
           )}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-80 p-0" align="end">
-        <div className="flex items-center justify-between p-4 border-b border-slate-600/50">
-          <h3 className="font-semibold text-white">Notifications</h3>
+      <PopoverContent
+        className="w-[320px] sm:w-[360px] p-0 border border-slate-700/60 bg-slate-950/90 backdrop-blur-xl shadow-2xl shadow-slate-950/40 rounded-2xl"
+        align="end"
+      >
+        <div className="flex items-center justify-between gap-3 px-4 py-3 border-b border-slate-700/60 bg-slate-900/80">
+          <div>
+            <h3 className="text-sm font-semibold text-white">Notifications</h3>
+            <p className="text-[11px] uppercase tracking-wider text-white/50">Latest updates & alerts</p>
+          </div>
           {unreadCount > 0 && (
             <Button
               variant="ghost"
               size="sm"
               onClick={markAllAsRead}
-              className="text-xs text-slate-300 hover:text-white hover:bg-slate-700/50"
+              className="h-8 px-3 text-xs font-semibold text-white/85 hover:text-white hover:bg-slate-800/80 focus-visible:ring-1 focus-visible:ring-accent"
             >
               Mark all read
             </Button>
           )}
         </div>
 
-        <ScrollArea className="h-96">
+        <ScrollArea className="max-h-[26rem]">
           {loading ? (
             <div className="flex items-center justify-center p-8">
               <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-[#33E1DA]"></div>
             </div>
+          ) : error ? (
+            <div className="flex flex-col items-center justify-center p-8 text-center">
+              <AlertCircle className="h-8 w-8 text-red-400 mb-2" />
+              <p className="text-sm text-white/90 mb-1">Notifications Unavailable</p>
+              <p className="text-xs text-white/70">{error}</p>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={fetchNotifications}
+                className="mt-4 text-xs"
+              >
+                Retry
+              </Button>
+            </div>
           ) : notifications.length === 0 ? (
             <div className="flex flex-col items-center justify-center p-8 text-center">
-              <Bell className="h-8 w-8 text-slate-400 mb-2" />
-              <p className="text-sm text-slate-300">No notifications yet</p>
-              <p className="text-xs text-slate-400 mt-1">
+              <Bell className="h-8 w-8 text-white/60 mb-2" />
+              <p className="text-sm text-white/90">No notifications yet</p>
+              <p className="text-xs text-white/70 mt-1">
                 You'll see notifications about trades, market updates, and system alerts here
               </p>
             </div>
           ) : (
             <div className="p-0">
-              {notifications.map((notification, index) => (
-                <div key={notification.id}>
-                  <div
-                    className={`p-4 cursor-pointer transition-colors hover:bg-slate-700/30 ${
-                      !notification.is_read ? 'bg-slate-800/40' : ''
-                    }`}
-                    onClick={() => {
-                      if (!notification.is_read) {
-                        markAsRead(notification.id);
-                      }
-                    }}
-                  >
-                    <div className="flex items-start space-x-3">
-                      <div className="flex-shrink-0 mt-0.5">
-                        {getNotificationIcon(notification.type)}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center justify-between">
-                          <p className={`text-sm font-medium truncate ${
-                            !notification.is_read ? 'text-white' : 'text-slate-300'
-                          }`}>
-                            {notification.title}
-                          </p>
-                          {!notification.is_read && (
-                            <div className="w-2 h-2 bg-[#33E1DA] rounded-full flex-shrink-0" />
+              {notifications.map((notification, index) => {
+                const unread = !notification.is_read;
+                return (
+                  <div key={notification.id}>
+                    <button
+                      type="button"
+                      className={cn(
+                        'w-full text-left p-4 transition-all duration-200 rounded-2xl border',
+                        'focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-accent/60 focus-visible:ring-offset-slate-900',
+                        getNotificationBgColor(notification.type),
+                        unread
+                          ? 'shadow-[0_0_0_1px_rgba(51,225,218,0.25)] hover:shadow-[0_0_0_1px_rgba(51,225,218,0.4)]'
+                          : 'hover:bg-slate-800/40 border-slate-700/60'
+                      )}
+                      onClick={() => {
+                        if (unread) {
+                          markAsRead(notification.id);
+                        }
+                      }}
+                    >
+                      <div className="flex items-start gap-3">
+                        <span
+                          className={cn(
+                            'flex h-9 w-9 items-center justify-center rounded-full border transition-transform duration-200',
+                            getNotificationAccent(notification.type),
+                            unread ? 'scale-100' : 'scale-95 opacity-80'
                           )}
+                        >
+                          {getNotificationIcon(notification.type)}
+                        </span>
+                        <div className="flex-1 min-w-0 space-y-1.5">
+                          <div className="flex items-start justify-between gap-2">
+                            <p
+                              className={cn(
+                                'text-sm font-semibold leading-tight',
+                                unread ? 'text-white' : 'text-white/85'
+                              )}
+                            >
+                              {notification.title}
+                            </p>
+                            {unread && (
+                              <span
+                                className="mt-1 inline-flex h-2.5 w-2.5 flex-shrink-0 rounded-full bg-[#33E1DA]"
+                                aria-hidden="true"
+                              />
+                            )}
+                          </div>
+                          <p
+                            className={cn(
+                              'text-xs leading-relaxed line-clamp-2',
+                              unread ? 'text-white/90' : 'text-white/60'
+                            )}
+                          >
+                            {notification.message}
+                          </p>
+                          <p className="text-[11px] font-medium uppercase tracking-wide text-white/50">
+                            {timeAgo(notification.created_at)}
+                          </p>
                         </div>
-                        <p className={`text-xs mt-1 line-clamp-2 ${
-                          !notification.is_read ? 'text-slate-200' : 'text-slate-400'
-                        }`}>
-                          {notification.message}
-                        </p>
-                        <p className="text-xs text-slate-400 mt-2">
-                          {timeAgo(notification.created_at)}
-                        </p>
                       </div>
-                    </div>
+                    </button>
+                    {index < notifications.length - 1 && <Separator className="bg-slate-700/50" />}
                   </div>
-                  {index < notifications.length - 1 && <Separator />}
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </ScrollArea>
@@ -329,7 +567,7 @@ export default function NotificationDropdown() {
               <Button
                 variant="ghost"
                 size="sm"
-                className="w-full text-xs text-slate-300 hover:text-white hover:bg-slate-700/50"
+                className="w-full text-xs text-white/90 hover:text-white hover:bg-slate-700/60"
                 onClick={() => {
                   setIsOpen(false);
                   // Could navigate to a full notifications page here

@@ -52,9 +52,7 @@ const fetchWithRetry = async (url: string, options: RequestInit, retries = 3, ba
       const response = await fetch(url, {
         ...options,
         headers: {
-          'Accept': 'application/json',
-          'User-Agent': 'Zignal-Dashboard/1.0',
-          ...options.headers,
+          ...(options.headers as Record<string, string>),
         },
       });
       
@@ -130,13 +128,22 @@ export async function GET() {
 
   try {
     // 3. Fetch with Retry and better error handling
+    const apiKey = process.env.COINGECKO_API_KEY;
+    
+    const headers: Record<string, string> = { 
+      'Accept': 'application/json',
+      'User-Agent': 'Zignal-Dashboard/1.0',
+    };
+
+    // Add API key to headers if available
+    if (apiKey && apiKey.trim() !== '') {
+      headers['x-cg-demo-api-key'] = apiKey;
+    }
+
     const response = await fetchWithRetry(
-      'https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=1&interval=hourly',
+      'https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=1',
       {
-        headers: { 
-          'Accept': 'application/json',
-          'User-Agent': 'Zignal-Dashboard/1.0',
-        },
+        headers,
         signal: AbortSignal.timeout(10000), // Increased timeout for retries
       }
     );

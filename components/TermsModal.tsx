@@ -13,7 +13,7 @@ export function TermsModal({ children }: TermsModalProps) {
   return (
     <Dialog>
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent className="max-w-4xl max-h-[80vh] bg-[#1E2A44] border-[#33E1DA]/20">
+      <DialogContent className="modal-content max-w-4xl max-h-[80vh] bg-[#1E2A44] border-[#33E1DA]/20">
         <DialogHeader>
           <DialogTitle className="text-[#EAF2FF] text-xl">Terms of Service</DialogTitle>
         </DialogHeader>

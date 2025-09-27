@@ -5,7 +5,237 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [2.11.13] - 2025-09-23
+## [2.11.21] - 2025-01-28
+
+### 🔧 Fixed
+- **Critical Build Errors**: Resolved missing `@/lib/auth` imports across admin pages
+  - Fixed 6 admin pages with incorrect import paths: `advanced-panel`, `analytics`, `database`, `paypal-payments`, `security`, `signals`
+  - Updated imports to use correct `@/lib/clerk-auth` module
+  - Enhanced Stripe API route with lazy initialization to prevent build failures
+  - All production builds now compile successfully without errors
+
+- **Comprehensive Theme System Fixes**: Resolved dark text visibility issues across all UI components
+  - **10 Modal Components**: Applied theme classes (`admin-dashboard`, `modal-content`) to ensure proper text visibility
+  - **5 Dashboard Pages**: Added `dashboard-content` class for theme support (profile, settings, wallet, market, dashboard)
+  - **5 Admin Pages**: Confirmed `admin-dashboard` class application for consistent theming
+  - **User Action Dropdown**: Fixed dark text in admin user management modal menu items
+  - Enhanced CSS with universal theme overrides for `.text-white`, `.text-foreground`, `.text-muted-foreground`
+
+### 🎯 Improved
+- **Visual Validation**: Implemented comprehensive Playwright testing for theme fixes
+  - Created visual regression test suite for all pages and modals
+  - Added automated screenshot capture for theme validation
+  - Confirmed text visibility fixes across the entire application
+- **Documentation Updates**: Updated project documentation and version references
+  - Bumped version to 2.11.21 in package.json and CLAUDE.md
+  - Enhanced changelog with detailed fix descriptions
+
+### 📋 Technical Details
+- **CSS Theme System**: Enhanced `app/globals.css` with comprehensive modal and dashboard support
+- **Build Process**: Optimized for production deployment with 58 pages successfully generated
+- **Authentication**: Streamlined admin authentication flow with proper import resolution
+
+## [2.11.20] - 2025-01-27
+
+### 🎨 Enhanced
+- **Glassmorphic Admin Dashboard**: Complete design overhaul with modern glassmorphic effects
+  - Enhanced glassmorphic variants: `.glass-light`, `.glass-heavy`, `.glass-premium`, `.glass-stat-card`
+  - Sophisticated backdrop-blur effects with proper depth and lighting
+  - Advanced hover animations with smooth transitions and elevation effects
+  - Consistent glassmorphic design language across all dashboard components
+  - Premium admin panel styling with enhanced shadows and borders
+
+### 🔧 Fixed
+- **Critical Infinite Loop Bug**: Resolved "Maximum call stack size exceeded" error
+  - Fixed NotificationDropdown useEffect dependency causing infinite re-renders
+  - Stabilized Supabase client with useMemo to prevent object recreation
+  - Enhanced error handling and cleanup functions for realtime subscriptions
+  - Improved retry logic with proper timeout management
+  - Added comprehensive error boundaries and monitoring
+
+### 🎯 Improved
+- **ProfileDropdown Redesign**: Streamlined and cleaned up redundant elements
+  - Removed duplicate admin badges and crown icons
+  - Simplified subscription plan display
+  - Enhanced glassmorphic styling with proper contrast
+  - Cleaner visual hierarchy and professional appearance
+  - Integrated admin status indicator inline with user name
+
+### 🚀 Enhanced
+- **Sign In Page Layout**: Restored split view design consistency
+  - Fixed missing wallpaper and branding overlay
+  - Consistent styling with Sign Up page
+  - Proper responsive design and mobile logo display
+  - Enhanced Clerk appearance configuration
+
+### 🎨 Styling
+- **Enhanced Color System**: Improved contrast and accessibility
+  - Updated CSS variables for better text contrast ratios
+  - Enhanced glassmorphic effects with proper opacity levels
+  - Improved dark mode support with consistent theming
+  - Advanced gradient text effects and animations
+
+### Technical Details
+- **Performance**: Eliminated infinite loop causing memory leaks and crashes
+- **Accessibility**: Improved contrast ratios meeting WCAG AA standards
+- **Design System**: Comprehensive glassmorphic component library
+- **Error Handling**: Robust subscription management with fallback mechanisms
+- **Code Quality**: Cleaner component structure and reduced redundancy
+
+## [2.11.19] - 2025-01-15
+
+### Added
+- **💳 PayPal Payment Integration**: Complete payment processing system
+  - Payment link generator with secure PayPal integration
+  - Admin payment management dashboard with comprehensive controls
+  - Multi-currency support (USD, EUR, GBP, CAD, AUD)
+  - Real-time payment status tracking and updates
+  - Customer payment portal with dedicated payment pages
+  - Secure database schema with RLS policies and performance indexes
+  - Full REST API for payment creation, status updates, and management
+  - Seamless integration with existing admin panel navigation
+
+### Technical Details
+- **Database**: New `paypal_payments` table with complete schema
+- **API Endpoints**: `/api/payments/paypal/*` for all payment operations
+- **Components**: `PayPalPaymentLink` and `PayPalPaymentsManager` components
+- **Admin Integration**: Added to admin navigation and quick actions
+- **Security**: Row-level security policies for admin and public access
+- **Documentation**: Comprehensive PayPal integration guide
+
+## [2.11.18] - 2025-09-25
+
+### Fixed
+- **🚨 Critical WebSocket Connection Failures**: Resolved persistent WebSocket connection issues
+  - Implemented immediate polling fallback with WebSocket retry logic
+  - Added connection health monitoring with automatic recovery
+  - Reduced retry attempts to fail faster to polling fallback
+  - Enhanced cleanup mechanisms to prevent memory leaks
+  - Added comprehensive debug logging for production troubleshooting
+
+- **🔐 Admin Authentication 403 Errors**: Fixed admin API authentication issues
+  - Enhanced admin status checking with detailed logging
+  - Added comprehensive debug information for production troubleshooting
+  - Improved error messages with user context and metadata
+  - Added organization membership checking for admin roles
+
+### Enhanced
+- **Connection Resilience**: Improved WebSocket connection handling with better fallback mechanisms
+- **Debug Information**: Added comprehensive debug information for production troubleshooting
+- **Error Handling**: Enhanced error handling and recovery mechanisms
+- **Memory Management**: Improved cleanup mechanisms to prevent memory leaks
+
+## [2.11.17] - 2025-09-25
+
+### Enhanced
+- **🔧 Database Connection Resilience**: Improved WebSocket and admin authentication handling
+  - Enhanced WebSocket connection handling with proper cleanup and memory leak prevention
+  - Added configurable admin permissions via environment variables (`ADMIN_PERMISSIONS`)
+  - Improved error handling and retry logic for real-time subscriptions
+  - Added development vs production logging optimization for better performance
+  - Fixed memory leaks in notification subscriptions with proper cleanup
+  - Enhanced admin setup script with configurable permissions and user limits
+  - Better error messages and debugging information for production troubleshooting
+
+### Fixed
+- **Memory Leaks**: Fixed memory leaks in notification subscriptions with proper cleanup
+- **Logging Performance**: Optimized logging to only show debug info in development mode
+- **Admin Permissions**: Made admin permissions configurable via environment variables
+- **Error Handling**: Improved error handling in WebSocket connections and admin authentication
+
+## [2.11.16] - 2025-09-25
+
+### Fixed
+- **🚀 Vercel Deployment Error**: Resolved critical build failure with react-window import
+  - Fixed `FixedSizeList` import error from `react-window` package
+  - Installed missing dependencies: `react-window` and `@types/react-window`
+  - Simplified component implementation by removing virtualized list rendering
+  - Ensured successful production builds on Vercel platform
+  - Maintained all filtering and search functionality while improving stability
+  - Resolved webpack cache warnings and build optimization issues
+
+## [2.11.15] - 2025-09-25
+
+### Added
+- **🔍 Admin User Filtering System**: Comprehensive filtering and search functionality for admin users page
+  - Real-time search with 500ms debouncing for optimal performance
+  - Role-based filtering dropdown (Admin, User, Moderator)
+  - Status-based filtering dropdown (Active, Inactive, Suspended)
+  - Server-side search integration with existing `/api/admin/users` endpoint
+  - Pagination support with Previous/Next navigation controls
+  - Virtualized list rendering for improved performance with large datasets
+  - Clear filters functionality for easy reset of all applied filters
+  - Comprehensive loading states and error handling
+  - Responsive design optimized for all screen sizes
+
+### Fixed
+- **🔍 User Filtering Functionality**: Resolved non-functional filtering on admin users page
+  - Converted from server-side rendering to client-side rendering for dynamic filtering
+  - Fixed disconnected UI components that weren't connected to filtering logic
+  - Integrated search component with actual API calls and data fetching
+  - Resolved mixed data sources by using consistent API endpoint
+  - Fixed pagination issues with proper server-side data handling
+
+## [2.11.14] - 2025-01-27
+
+### Fixed
+- **🔧 Vercel Deployment Build Error**: Resolved critical build failure with MCP adapter imports
+  - Fixed `Module not found: Can't resolve '@vercel/mcp-adapter'` error
+  - Separated combined import statements into individual imports for better module resolution
+  - Ensured Vercel deployment compatibility while maintaining all MCP functionality
+  - Verified build success both locally and for Vercel deployment
+- **👤 User Profile Integration**: Resolved Supabase profile creation issues for Clerk users
+  - Fixed "User profile not found in Supabase for Clerk ID" errors
+  - Added automatic profile creation when users exist in Clerk but not in Supabase
+  - Updated wallet page to auto-create profiles using Clerk user data
+  - Modified avatar upload routes to use upsert operations for missing profiles
+  - Implemented graceful fallbacks for profile creation failures
+  - Enhanced error handling and logging for better debugging
+- **⚙️ Clerk Middleware Authentication**: Resolved authentication errors in development
+  - Fixed deprecated `auth().protect()` API usage in middleware
+  - Updated to modern Clerk v5 middleware syntax with `publicRoutes` configuration
+  - Resolved development server authentication errors for protected routes
+  - Cleaned up middleware configuration for better compatibility
+  - Enabled proper authentication flow for dashboard routes
+
+### Enhanced
+- **📱 Mobile Responsiveness**: Improved mobile user experience across dashboard
+  - Optimized sidebar width and spacing for mobile devices
+  - Reduced padding and margins for better space utilization
+  - Scaled typography and form elements for mobile screens
+  - Enhanced profile settings page mobile layout
+  - Improved form component responsiveness (ChangePasswordForm, ChangeUsernameForm, ProfileForm)
+  - Better mobile navigation and user interface elements
+
+### Added
+- **🎛️ Configurable Market Overview**: Enhanced market dashboard with user preferences
+  - Added display count selector (10, 20, 30, 50, 100 cryptocurrencies)
+  - Implemented localStorage persistence for user preferences
+  - Enhanced market data filtering and display options
+  - Added settings icon and improved UI controls
+  - Updated footer to show current display limits
+
+### Added
+- **🏠 Landing Page Navigation**: Enhanced navigation for dashboard users
+  - Added "Dashboard" button to landing page navigation for signed-in users
+  - Implemented responsive design for both desktop and mobile
+  - Maintained consistent styling with landing page theme
+  - Added proper Clerk authentication checks for navigation visibility
+
+## [2.11.13] - 2025-09-24
+
+### Added
+- **🔌 MCP Gateway Integration**: Comprehensive Model Context Protocol gateway implementation
+  - Created centralized MCP gateway with Docker containerization
+  - Added Clerk OAuth token authentication for MCP requests
+  - Implemented metadata validation and response enhancement
+  - Added environment variable override functionality in containers
+  - Created comprehensive test suite for MCP gateway functionality
+  - Added NextJS API integration at `/api/mcp/nextjs`
+  - Implemented service discovery and health monitoring
+  - Added support for multiple MCP services (filesystem, supabase, memory, puppeteer, context7, reactbits)
+  - Created Docker Compose configurations for testing and production
+  - Added comprehensive documentation and test results
 
 ### Improved
 - **🧹 Sidebar Refactor & Navigation Enhancements**
@@ -113,13 +343,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Maintained consistent design language with existing dashboard components
   - Enhanced user journey toward premium plan sign-ups
 
-### Fixed
-- **⚙️ Clerk Middleware Authentication**: Resolved authentication errors in development
-  - Fixed deprecated `auth().protect()` API usage in middleware
-  - Updated to modern Clerk v5 middleware syntax with `publicRoutes` configuration
-  - Resolved development server authentication errors for protected routes
-  - Cleaned up middleware configuration for better compatibility
-  - Enabled proper authentication flow for dashboard routes
 
 ### Technical
 - **🔧 Development Environment**: Improved build stability and error handling

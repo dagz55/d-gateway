@@ -22,18 +22,11 @@ export async function isAdmin(): Promise<boolean> {
     const { userId, sessionClaims } = await auth();
     if (!userId) return false;
 
+    const user = await currentUser();
+    if (!user) return false;
+
     // Check multiple possible locations for admin role (matching middleware logic exactly)
-    const isClerkAdmin = 
-      // Check publicMetadata
-      (sessionClaims as any)?.publicMetadata?.role === 'admin' ||
-      // Check metadata
-      (sessionClaims as any)?.metadata?.role === 'admin' ||
-      // Check nested publicMetadata
-      (sessionClaims?.publicMetadata as any)?.role === 'admin' ||
-      // Check if there's a direct role property
-      (sessionClaims as any)?.role === 'admin' ||
-      // Check organization role (Clerk organization structure) - MAIN METHOD
-      (sessionClaims as any)?.o?.rol === 'admin';
+    const isClerkAdmin = user.publicMetadata?.role === 'admin';
 
     if (isClerkAdmin) return true;
 
@@ -88,17 +81,7 @@ export async function getAdminUser(): Promise<AdminUser | null> {
     }
     
     // Check multiple possible locations for admin role (matching middleware logic exactly)
-    const isClerkAdmin = 
-      // Check publicMetadata
-      (sessionClaims as any)?.publicMetadata?.role === 'admin' ||
-      // Check metadata
-      (sessionClaims as any)?.metadata?.role === 'admin' ||
-      // Check nested publicMetadata
-      (sessionClaims?.publicMetadata as any)?.role === 'admin' ||
-      // Check if there's a direct role property
-      (sessionClaims as any)?.role === 'admin' ||
-      // Check organization role (Clerk organization structure) - MAIN METHOD
-      (sessionClaims as any)?.o?.rol === 'admin';
+    const isClerkAdmin = user.publicMetadata?.role === 'admin';
       
     const clerkPermissions = (sessionClaims as any)?.publicMetadata?.admin_permissions as string[] || 
                             user.publicMetadata?.admin_permissions as string[] || [];

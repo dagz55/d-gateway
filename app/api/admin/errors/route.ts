@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerSupabaseClient } from '@/lib/supabase/serverClient';
 import { createAdminClient } from '@/lib/supabase/adminClient';
-import { getCurrentUser } from '@/lib/clerk-auth';
+import { getAdminUser } from '@/lib/admin';
 
 interface ErrorLog {
   message: string;
@@ -20,21 +20,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Build time execution' }, { status: 503 });
     }
 
-    // Verify authentication
-    const user = await getCurrentUser();
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    // Verify admin status
-    const supabase = await createServerSupabaseClient();
-    const { data: profile } = await supabase
-      .from('user_profiles')
-      .select('is_admin, role')
-      .eq('clerk_user_id', user.id)
-      .single();
-
-    if (!profile?.is_admin && profile?.role !== 'admin') {
+    // Verify admin authentication
+    const adminUser = await getAdminUser();
+    if (!adminUser) {
       return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
     }
 
@@ -47,7 +35,7 @@ export async function POST(request: NextRequest) {
 
     // For now, we'll log to console and create a simplified error record
     console.error('Admin Panel Error Details:', {
-      user_id: user.id,
+      user_id: adminUser.id,
       error_id: errorData.errorId,
       error_message: errorData.message,
       error_stack: errorData.stack,
@@ -66,7 +54,7 @@ export async function POST(request: NextRequest) {
     // Also log to console for development
     console.error('Admin Panel Error Logged:', {
       errorId: errorData.errorId,
-      userId: user.id,
+      userId: adminUser.id,
       message: errorData.message,
       url: errorData.url,
       timestamp: errorData.timestamp
@@ -78,7 +66,7 @@ export async function POST(request: NextRequest) {
         errorData.message.toLowerCase().includes('auth')) {
       
       try {
-        await notifyAdminError(errorData, user);
+        await notifyAdminError(errorData, adminUser);
       } catch (notifyError) {
         console.warn('Failed to send admin error notification:', notifyError);
       }
@@ -102,19 +90,19 @@ export async function POST(request: NextRequest) {
 }
 
 // Helper function to notify about critical admin errors
-async function notifyAdminError(errorData: ErrorLog, user: any) {
+async function notifyAdminError(errorData: ErrorLog, adminUser: any) {
   try {
     const admin = await createAdminClient();
     
     // Log critical error notification (simplified for now)
     console.error('CRITICAL ADMIN ERROR NOTIFICATION:', {
       title: 'Critical Admin Panel Error',
-      message: `Admin panel error occurred for user ${user.email}: ${errorData.message}`,
+      message: `Admin panel error occurred for user ${adminUser.email}: ${errorData.message}`,
       type: 'error',
       severity: 'high',
       data: {
         errorId: errorData.errorId,
-        userId: user.id,
+        userId: adminUser.id,
         url: errorData.url,
         timestamp: errorData.timestamp
       },
@@ -142,20 +130,9 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    // Verify authentication and admin status
-    const user = await getCurrentUser();
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    const supabase = await createServerSupabaseClient();
-    const { data: profile } = await supabase
-      .from('user_profiles')
-      .select('is_admin, role')
-      .eq('clerk_user_id', user.id)
-      .single();
-
-    if (!profile?.is_admin && profile?.role !== 'admin') {
+    // Verify admin authentication
+    const adminUser = await getAdminUser();
+    if (!adminUser) {
       return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
     }
 

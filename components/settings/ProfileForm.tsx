@@ -115,74 +115,77 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
 
   return (
     <Card>
-      <CardHeader>
-        <CardTitle>Profile Information</CardTitle>
-        <CardDescription>
+      <CardHeader className="pb-3 md:pb-6">
+        <CardTitle className="text-lg md:text-xl">Profile Information</CardTitle>
+        <CardDescription className="text-sm md:text-base">
           Update your personal information and preferences.
         </CardDescription>
       </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <CardContent className="pt-0">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 md:space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
             <div className="space-y-2">
-              <Label htmlFor="full_name">Full Name</Label>
+              <Label htmlFor="full_name" className="text-sm md:text-base">Full Name</Label>
               <Input
                 id="full_name"
                 {...register('full_name')}
                 placeholder="Enter your full name"
                 disabled={isSubmitting}
+                className="text-sm md:text-base"
               />
               {errors.full_name && (
-                <p className="text-sm text-destructive">{errors.full_name.message}</p>
+                <p className="text-xs md:text-sm text-destructive">{errors.full_name.message}</p>
               )}
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="phone">Phone Number</Label>
+              <Label htmlFor="phone" className="text-sm md:text-base">Phone Number</Label>
               <Input
                 id="phone"
                 {...register('phone')}
                 placeholder="Enter your phone number"
                 disabled={isSubmitting}
+                className="text-sm md:text-base"
               />
               {errors.phone && (
-                <p className="text-sm text-destructive">{errors.phone.message}</p>
+                <p className="text-xs md:text-sm text-destructive">{errors.phone.message}</p>
               )}
             </div>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="bio">Bio</Label>
+            <Label htmlFor="bio" className="text-sm md:text-base">Bio</Label>
             <Textarea
               id="bio"
               {...register('bio')}
               placeholder="Tell us about yourself..."
-              className="min-h-[100px]"
+              className="min-h-[80px] md:min-h-[100px] text-sm md:text-base"
               disabled={isSubmitting}
             />
             {errors.bio && (
-              <p className="text-sm text-destructive">{errors.bio.message}</p>
+              <p className="text-xs md:text-sm text-destructive">{errors.bio.message}</p>
             )}
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
             <div className="space-y-2">
-              <Label htmlFor="country">Country</Label>
+              <Label htmlFor="country" className="text-sm md:text-base">Country</Label>
               <Input
                 id="country"
                 {...register('country')}
                 placeholder="Enter your country"
                 disabled={isSubmitting}
+                className="text-sm md:text-base"
               />
               {errors.country && (
-                <p className="text-sm text-destructive">{errors.country.message}</p>
+                <p className="text-xs md:text-sm text-destructive">{errors.country.message}</p>
               )}
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="timezone">Timezone</Label>
+              <Label htmlFor="timezone" className="text-sm md:text-base">Timezone</Label>
               <Select onValueChange={(value) => setValue('timezone', value)}>
-                <SelectTrigger>
+                <SelectTrigger className="text-sm md:text-base">
                   <SelectValue placeholder="Select timezone" />
                 </SelectTrigger>
                 <SelectContent>
@@ -198,15 +201,15 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
                 </SelectContent>
               </Select>
               {errors.timezone && (
-                <p className="text-sm text-destructive">{errors.timezone.message}</p>
+                <p className="text-xs md:text-sm text-destructive">{errors.timezone.message}</p>
               )}
             </div>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="language">Language</Label>
+            <Label htmlFor="language" className="text-sm md:text-base">Language</Label>
             <Select onValueChange={(value) => setValue('language', value)}>
-              <SelectTrigger>
+              <SelectTrigger className="text-sm md:text-base">
                 <SelectValue placeholder="Select language" />
               </SelectTrigger>
               <SelectContent>
@@ -223,13 +226,13 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
               </SelectContent>
             </Select>
             {errors.language && (
-              <p className="text-sm text-destructive">{errors.language.message}</p>
+              <p className="text-xs md:text-sm text-destructive">{errors.language.message}</p>
             )}
           </div>
 
-          <div className="p-4 bg-muted rounded-lg">
-            <h4 className="font-medium mb-2">Profile Guidelines</h4>
-            <ul className="text-sm text-muted-foreground space-y-1">
+          <div className="p-3 md:p-4 bg-muted rounded-lg">
+            <h4 className="font-medium mb-2 text-sm md:text-base">Profile Guidelines</h4>
+            <ul className="text-xs md:text-sm text-muted-foreground space-y-1">
               <li>• Keep your information up to date</li>
               <li>• Use a professional profile picture</li>
               <li>• Your bio helps other users understand your background</li>
@@ -237,7 +240,7 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
             </ul>
           </div>
 
-          <Button type="submit" disabled={isSubmitting}>
+          <Button type="submit" disabled={isSubmitting} className="w-full md:w-auto text-sm md:text-base">
             {isSubmitting ? 'Updating...' : 'Update Profile'}
           </Button>
         </form>

@@ -59,57 +59,60 @@ export default function ChangePasswordForm() {
 
   return (
     <Card>
-      <CardHeader>
-        <CardTitle>Change Password</CardTitle>
-        <CardDescription>
+      <CardHeader className="pb-3 md:pb-6">
+        <CardTitle className="text-lg md:text-xl">Change Password</CardTitle>
+        <CardDescription className="text-sm md:text-base">
           Update your password to keep your account secure.
         </CardDescription>
       </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+      <CardContent className="pt-0">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-3 md:space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="currentPassword">Current Password</Label>
+            <Label htmlFor="currentPassword" className="text-sm md:text-base">Current Password</Label>
             <PasswordInput
               id="currentPassword"
               {...register('currentPassword')}
               placeholder="Enter current password"
               disabled={isSubmitting}
+              className="text-sm md:text-base"
             />
             {errors.currentPassword && (
-              <p className="text-sm text-destructive">{errors.currentPassword.message}</p>
+              <p className="text-xs md:text-sm text-destructive">{errors.currentPassword.message}</p>
             )}
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="newPassword">New Password</Label>
+            <Label htmlFor="newPassword" className="text-sm md:text-base">New Password</Label>
             <PasswordInput
               id="newPassword"
               {...register('newPassword')}
               placeholder="Enter new password"
               disabled={isSubmitting}
               showStrengthIndicator
+              className="text-sm md:text-base"
             />
             {errors.newPassword && (
-              <p className="text-sm text-destructive">{errors.newPassword.message}</p>
+              <p className="text-xs md:text-sm text-destructive">{errors.newPassword.message}</p>
             )}
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="confirmPassword">Confirm New Password</Label>
+            <Label htmlFor="confirmPassword" className="text-sm md:text-base">Confirm New Password</Label>
             <PasswordInput
               id="confirmPassword"
               {...register('confirmPassword')}
               placeholder="Confirm new password"
               disabled={isSubmitting}
+              className="text-sm md:text-base"
             />
             {errors.confirmPassword && (
-              <p className="text-sm text-destructive">{errors.confirmPassword.message}</p>
+              <p className="text-xs md:text-sm text-destructive">{errors.confirmPassword.message}</p>
             )}
           </div>
 
-          <div className="p-4 bg-muted rounded-lg">
-            <h4 className="font-medium mb-2">Password Requirements</h4>
-            <ul className="text-sm text-muted-foreground space-y-1">
+          <div className="p-3 md:p-4 bg-muted rounded-lg">
+            <h4 className="font-medium mb-2 text-sm md:text-base">Password Requirements</h4>
+            <ul className="text-xs md:text-sm text-muted-foreground space-y-1">
               <li>• At least 8 characters long</li>
               <li>• Mix of letters, numbers, and symbols</li>
               <li>• Different from your current password</li>
@@ -117,7 +120,7 @@ export default function ChangePasswordForm() {
             </ul>
           </div>
 
-          <Button type="submit" disabled={isSubmitting}>
+          <Button type="submit" disabled={isSubmitting} className="w-full md:w-auto text-sm md:text-base">
             {isSubmitting ? 'Changing...' : 'Change Password'}
           </Button>
         </form>

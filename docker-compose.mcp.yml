@@ -14,11 +14,22 @@ services:
     networks:
       - mcp-network
     depends_on:
-      - mcp-supabase
-      - mcp-filesystem
-      - mcp-memory
-      - mcp-puppeteer
-      - mcp-context7
+      mcp-supabase:
+        condition: service_healthy
+      mcp-filesystem:
+        condition: service_healthy
+      mcp-memory:
+        condition: service_healthy
+      mcp-puppeteer:
+        condition: service_healthy
+      mcp-context7:
+        condition: service_healthy
+      mcp-reactbits:
+        condition: service_healthy
+      mcp-browser-tools:
+        condition: service_healthy
+      mcp-tavily:
+        condition: service_healthy
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
       interval: 30s
@@ -28,21 +39,21 @@ services:
 
   # Supabase MCP Server
   mcp-supabase:
-    image: node:20-alpine
-    working_dir: /app
-    command: ["sh", "-c", "npm install -g @supabase/mcp-server-supabase@latest && mcp-server-supabase --read-only --project-ref=elnntdfdlojxpcjiyehe"]
-    environment:
-      - NODE_ENV=production
-      - SUPABASE_ACCESS_TOKEN=${SUPABASE_ACCESS_TOKEN:-}
+    build:
+      context: ./docker/mcp-supabase
+      dockerfile: Dockerfile
+    env_file:
+      - .env
     networks:
       - mcp-network
     ports:
       - "8081:3000"
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/health", "||", "true"]
-      interval: 60s
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
       timeout: 10s
-      retries: 5
+      retries: 3
+      start_period: 30s
     restart: unless-stopped
 
   # Filesystem MCP Server
@@ -56,11 +67,14 @@ services:
       - mcp-network
     environment:
       - NODE_ENV=production
+    ports:
+      - "3001"
     healthcheck:
       test: ["CMD", "ls", "/workspace"]
       interval: 30s
       timeout: 5s
       retries: 3
+      start_period: 10s
     restart: unless-stopped
 
   # Memory MCP Server
@@ -74,34 +88,33 @@ services:
       - NODE_ENV=production
     volumes:
       - mcp-memory-data:/app/data
+    ports:
+      - "3002"
     healthcheck:
       test: ["CMD", "test", "-f", "/app/data/memory.json"]
       interval: 30s
       timeout: 5s
       retries: 3
+      start_period: 10s
     restart: unless-stopped
 
   # Puppeteer MCP Server
   mcp-puppeteer:
-    image: node:20-alpine
-    working_dir: /app
-    command: ["npx", "mcp-server-puppeteer"]
+    build:
+      context: ./docker/mcp-puppeteer
+      dockerfile: Dockerfile
+    env_file:
+      - .env
     networks:
       - mcp-network
-    environment:
-      - NODE_ENV=production
-      - PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
-    # Install Chromium for Puppeteer
-    entrypoint: |
-      sh -c "
-        apk add --no-cache chromium nss freetype freetype-dev harfbuzz ca-certificates ttf-freefont &&
-        npx mcp-server-puppeteer
-      "
+    ports:
+      - "3003"
     healthcheck:
-      test: ["CMD", "pgrep", "node"]
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
       interval: 30s
       timeout: 10s
       retries: 3
+      start_period: 30s
     restart: unless-stopped
 
   # Context7 MCP Server
@@ -113,11 +126,14 @@ services:
       - mcp-network
     environment:
       - NODE_ENV=production
+    ports:
+      - "3004"
     healthcheck:
       test: ["CMD", "pgrep", "node"]
       interval: 30s
       timeout: 5s
       retries: 3
+      start_period: 10s
     restart: unless-stopped
 
   # ReactBits MCP Server
@@ -129,11 +145,14 @@ services:
       - mcp-network
     environment:
       - NODE_ENV=development
+    ports:
+      - "3005"
     healthcheck:
       test: ["CMD", "pgrep", "node"]
       interval: 30s
       timeout: 5s
       retries: 3
+      start_period: 10s
     restart: unless-stopped
 
   # Browser Tools MCP Server
@@ -143,6 +162,8 @@ services:
     command: ["npx", "@agentdeskai/browser-tools-mcp@1.2.0"]
     networks:
       - mcp-network
+    ports:
+      - "3006"
     environment:
       - NODE_ENV=production
     healthcheck:
@@ -150,6 +171,7 @@ services:
       interval: 30s
       timeout: 5s
       retries: 3
+      start_period: 10s
     restart: unless-stopped
 
   # Tavily MCP Server (Search)
@@ -159,14 +181,12 @@ services:
     command: ["npx", "tavily-mcp@0.2.3"]
     networks:
       - mcp-network
-    environment:
-      - NODE_ENV=production
-      - TAVILY_API_KEY=${TAVILY_API_KEY:-}
     healthcheck:
       test: ["CMD", "pgrep", "node"]
       interval: 30s
       timeout: 5s
       retries: 3
+      start_period: 10s
     restart: unless-stopped
 
 networks:

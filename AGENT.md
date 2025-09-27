@@ -75,8 +75,11 @@ cp .env.example .env.local
 
 ### Development
 ```bash
-# Start development server
+# Start development server with Turbopack
 npm run dev
+
+# Start development server for QA
+npm run dev:qa
 
 # Build for production
 npm run build
@@ -86,6 +89,15 @@ npm run start
 
 # Run linting
 npm run lint
+
+# Clean project (removes .next and node_modules/.cache)
+npm run clean
+
+# Fresh start (clean, install, dev)
+npm run fresh
+
+# Analyze bundle size
+npm run analyze
 ```
 
 ## Environment Configuration
@@ -178,21 +190,23 @@ export function ComponentName({ prop1, prop2 }: ComponentNameProps) {
 
 ### Test Structure
 ```bash
-# Unit tests (when implemented)
-npm run test
+# Test Clerk integration
+npm run test:clerk
 
-# E2E tests (when implemented)
-npm run test:e2e
+# Test Supabase connection and setup
+npm run test:supabase
+
+# Run all tests
+npm run test:all
 
 # Type checking
 npm run type-check
 ```
 
 ### Testing Guidelines
-- **Unit Tests**: Test individual components and functions
-- **Integration Tests**: Test component interactions
-- **E2E Tests**: Test complete user flows
-- **Coverage**: Aim for >80% code coverage
+- **Integration Tests**: The project includes scripts to test Clerk and Supabase integrations.
+- **E2E Tests**: End-to-end tests can be added using a framework like Playwright or Cypress.
+- **Unit Tests**: Focus on testing individual components and utility functions.
 
 ## Authentication Architecture
 
@@ -544,9 +558,9 @@ npm ls @supabase/supabase-js
 - **Text**: `#EAF2FF` (Light blue)
 
 ### Core Dependencies
-- **Framework**: Next.js 15.5.3
-- **React**: 19.0.0
-- **Styling**: Tailwind CSS 4.1.9 with PostCSS plugin
+- **Framework**: Next.js 15.5.4
+- **React**: 19.1.1
+- **Styling**: Tailwind CSS 3.4.17 with PostCSS plugin
 - **UI Components**: shadcn/ui (30+ components)
 - **Authentication**: Clerk + Supabase
 - **State Management**: Zustand + TanStack Query
@@ -594,16 +608,63 @@ npm ls @supabase/supabase-js
 ### Correct Clerk Implementation Pattern
 ```typescript
 // middleware.ts
-import { clerkMiddleware } from '@clerk/nextjs/server'
+import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
+import { NextResponse } from "next/server";
 
-export default clerkMiddleware()
+// Environment validation is handled by scripts/validate-env.js (run via npm run check-env)
+
+// Public routes that are accessible without authentication
+const isPublicRoute = createRouteMatcher([
+  "/", // Landing page
+  "/market",
+  "/enterprise",
+  "/help",
+  "/sign-in(.*)",
+  "/sign-up(.*)",
+  // Legacy aliases that we redirect to canonical routes
+  "/signin(.*)",
+  "/signup(.*)",
+  "/admin-setup",
+  "/auth/oauth-success",
+  "/.well-known/oauth-authorization-server(.*)",
+  "/.well-known/oauth-protected-resource(.*)",
+  "/api/webhooks(.*)",
+  // Public API endpoints (avoid auth in middleware to prevent NEXT_HTTP_ERROR_FALLBACK noise)
+  "/api/crypto(.*)",
+]);
+
+export default clerkMiddleware(async (auth, req) => {
+  const { pathname } = req.nextUrl;
+
+  // Early return for Clerk internal catchall checks to prevent 404 digest throws in middleware
+  if (
+    pathname.includes("_clerk_catchall_check_") ||
+    pathname.includes("SignIn_clerk_") ||
+    pathname.includes("SignUp_clerk_")
+  ) {
+    return NextResponse.next();
+  }
+
+  // Allow public routes through without protection
+  if (isPublicRoute(req)) {
+    return NextResponse.next();
+  }
+
+  // Protect everything else; prefer redirect over notFound to avoid NEXT_HTTP_ERROR_FALLBACK noise
+  // Clerk/Next middleware requires absolute URLs for redirects
+  const signInUrl = new URL('/sign-in', req.url).toString();
+  await auth.protect({ unauthenticatedUrl: signInUrl });
+  return NextResponse.next();
+});
 
 export const config = {
   matcher: [
-    '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)',
-    '/(api|trpc)(.*)',
+    // Run on all routes except static files and _next
+    "/((?!.+\\.[\\w]+$|_next).*)",
+    // Keep webhooks under middleware (but they are public per matcher above)
+    "/(api/webhooks)(.*)",
   ],
-}
+};
 ```
 
 ```typescript

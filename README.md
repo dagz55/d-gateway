@@ -4,7 +4,127 @@ Zignal is a comprehensive crypto trading platform built with [Next.js 15.5.3](ht
 
 ## 🚀 Features
 
-### Latest Improvements (v2.11.12)
+### Latest Improvements (v2.11.20)
+
+- 🎨 **Glassmorphic Admin Dashboard**: Complete design overhaul with modern glassmorphic effects
+  - **Enhanced Glassmorphic System**: Advanced glassmorphic variants with sophisticated backdrop-blur effects
+  - **Premium Admin Panel**: Professional glassmorphic styling with enhanced shadows and depth
+  - **Smooth Animations**: Advanced hover effects with smooth transitions and elevation
+  - **Consistent Design Language**: Unified glassmorphic design across all dashboard components
+  - **Enhanced Accessibility**: Improved contrast ratios meeting WCAG AA standards
+
+- 🔧 **Critical Bug Fixes**: Resolved major stability issues
+  - **Fixed Infinite Loop Bug**: Eliminated "Maximum call stack size exceeded" error in NotificationDropdown
+  - **Stabilized Supabase Client**: Used useMemo to prevent object recreation and infinite re-renders
+  - **Enhanced Error Handling**: Improved realtime subscription management with robust cleanup
+  - **Performance Optimization**: Eliminated memory leaks and crashes from subscription loops
+
+- 🎯 **UI/UX Improvements**: Streamlined and enhanced user interface
+  - **ProfileDropdown Redesign**: Removed redundant elements and simplified design
+  - **Sign In Page Fix**: Restored split view layout consistency with Sign Up page
+  - **Enhanced Color System**: Improved contrast and accessibility across the platform
+  - **Cleaner Visual Hierarchy**: Professional appearance with reduced visual clutter
+
+### Previous Improvements (v2.11.19)
+
+- 💳 **PayPal Payment Integration**: Complete payment processing system with secure link generation
+  - **Payment Link Generator**: Create secure PayPal payment links for customers with account details collection
+  - **Admin Payment Management**: Comprehensive dashboard for managing all PayPal payments and transactions
+  - **Multi-Currency Support**: Support for USD, EUR, GBP, CAD, AUD currencies
+  - **Real-time Status Tracking**: Live payment status updates with PayPal integration
+  - **Customer Payment Portal**: Dedicated payment pages for customers to complete transactions
+  - **Secure Database Schema**: Complete PayPal payments table with RLS policies and indexes
+  - **API Endpoints**: Full REST API for payment creation, status updates, and management
+  - **Admin Integration**: Seamlessly integrated into existing admin panel with navigation and quick actions
+
+### Previous Improvements (v2.11.18)
+
+- 🚨 **Critical WebSocket & Admin Authentication Fixes**: Resolved persistent connection and authentication issues
+  - **WebSocket Connection Resilience**: Implemented immediate polling fallback with WebSocket retry logic
+  - **Admin Authentication Debugging**: Enhanced admin API with detailed logging and debug information
+  - **Connection Health Monitoring**: Added automatic connection health checks and recovery
+  - **Memory Leak Prevention**: Improved cleanup mechanisms to prevent memory leaks
+  - **Production Debugging**: Added comprehensive debug information for production troubleshooting
+  - **Faster Failure Recovery**: Reduced retry attempts to fail faster to polling fallback
+  - **Enhanced Error Handling**: Better error messages and debugging for WebSocket failures
+
+### Previous Improvements (v2.11.17)
+
+- 🔧 **Enhanced Database Connection Resilience**: Improved WebSocket and admin authentication handling
+  - Enhanced WebSocket connection handling with proper cleanup and memory leak prevention
+  - Added configurable admin permissions via environment variables (`ADMIN_PERMISSIONS`)
+  - Improved error handling and retry logic for real-time subscriptions
+  - Added development vs production logging optimization
+  - Fixed memory leaks in notification subscriptions with proper cleanup
+  - Enhanced admin setup script with configurable permissions and user limits
+  - Better error messages and debugging information for production troubleshooting
+
+### Previous Improvements (v2.11.16)
+
+- 🚀 **Vercel Deployment Fix**: Resolved critical deployment issues for production
+  - Fixed `react-window` import error that was causing Vercel build failures
+  - Installed missing dependencies (`react-window` and `@types/react-window`)
+  - Simplified component implementation for better compatibility
+  - Ensured successful production builds on Vercel platform
+  - Maintained all filtering and search functionality while improving stability
+
+- 🔍 **Admin User Filtering**: Fixed and enhanced user filtering functionality on admin users page
+  - Converted from server-side to client-side rendering for dynamic filtering
+  - Added real-time search with debouncing (500ms) for better performance
+  - Implemented role-based filtering (Admin, User, Moderator) with dropdown selection
+  - Added status-based filtering (Active, Inactive, Suspended) for member management
+  - Integrated with existing `/api/admin/users` endpoint for server-side search
+  - Added pagination support for large member lists with Previous/Next navigation
+  - Added comprehensive loading states, error handling, and user feedback
+  - Created responsive design that works on all screen sizes
+  - Added clear filters functionality for easy reset of all filters
+
+- 🔧 **Vercel Deployment Fix**: Resolved critical build error for production deployment
+  - Fixed `Module not found: Can't resolve '@vercel/mcp-adapter'` error
+  - Separated combined import statements for better module resolution
+  - Ensured Vercel deployment compatibility while maintaining MCP functionality
+  - Verified successful builds both locally and on Vercel platform
+
+- 👤 **User Profile Integration**: Enhanced Clerk-Supabase user management
+  - Fixed "User profile not found in Supabase for Clerk ID" errors
+  - Added automatic profile creation for users existing in Clerk but not Supabase
+  - Updated wallet page and avatar upload routes with upsert operations
+  - Implemented graceful fallbacks and enhanced error handling
+  - Improved user onboarding experience with seamless profile creation
+
+- 📱 **Mobile Responsiveness**: Enhanced mobile user experience across dashboard
+  - Optimized sidebar width and spacing for mobile devices (reduced from 64px to 48px)
+  - Reduced padding and margins for better space utilization
+  - Scaled typography and form elements for mobile screens
+  - Enhanced profile settings page mobile layout
+  - Improved form component responsiveness across all settings pages
+
+- 🎛️ **Configurable Market Overview**: Enhanced market dashboard with user preferences
+  - Added display count selector (10, 20, 30, 50, 100 cryptocurrencies)
+  - Implemented localStorage persistence for user preferences
+  - Enhanced market data filtering and display options
+  - Added settings icon and improved UI controls
+
+- 🏠 **Landing Page Navigation**: Enhanced navigation for dashboard users
+  - Added "Dashboard" button to landing page navigation for signed-in users
+  - Implemented responsive design for both desktop and mobile
+  - Maintained consistent styling with landing page theme
+
+### Recent Improvements (v2.11.13)
+
+- 🔌 **MCP Gateway Integration**: Implemented comprehensive MCP (Model Context Protocol) gateway
+  - Created centralized MCP gateway with Docker containerization
+  - Added Clerk OAuth token authentication for MCP requests
+  - Implemented metadata validation and response enhancement
+  - Added environment variable override functionality in containers
+  - Created comprehensive test suite for MCP gateway functionality
+  - Added NextJS API integration at `/api/mcp/nextjs`
+  - Implemented service discovery and health monitoring
+  - Added support for multiple MCP services (filesystem, supabase, memory, puppeteer, context7, reactbits)
+  - Created Docker Compose configurations for testing and production
+  - Added comprehensive documentation and test results
+
+### Recent Improvements (v2.11.12)
 
 - 📱 **Mobile Layout Overlapping Fixed**: Resolved mobile sidebar overlapping main content
   - Sidebar now always visible on mobile in compact mode (64px wide)

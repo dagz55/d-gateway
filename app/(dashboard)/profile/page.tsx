@@ -32,11 +32,11 @@ export default async function ProfilePage() {
   const profile = profileResult.success ? profileResult.profile : null;
 
   return (
-    <div className="container mx-auto py-6 space-y-6 max-w-4xl">
+    <div className="dashboard-content container mx-auto py-2 md:py-6 space-y-3 md:space-y-6 max-w-4xl px-1 md:px-0">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Profile Settings</h1>
-          <p className="text-muted-foreground">Manage your account settings and preferences</p>
+          <h1 className="text-xl md:text-3xl font-bold tracking-tight">Profile Settings</h1>
+          <p className="text-xs md:text-base text-muted-foreground">Manage your account settings and preferences</p>
         </div>
       </div>
 
@@ -69,35 +69,35 @@ export default async function ProfilePage() {
           <CardDescription>Your current account details</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
             <div>
-              <h4 className="font-medium text-sm text-muted-foreground mb-1">Username</h4>
-              <p className="text-sm">{profile?.username || 'Not set'}</p>
+              <h4 className="font-medium text-xs md:text-sm text-muted-foreground mb-1">Username</h4>
+              <p className="text-xs md:text-sm break-all">{profile?.username || 'Not set'}</p>
             </div>
             <div>
-              <h4 className="font-medium text-sm text-muted-foreground mb-1">Email Address</h4>
-              <p className="text-sm">{email}</p>
+              <h4 className="font-medium text-xs md:text-sm text-muted-foreground mb-1">Email Address</h4>
+              <p className="text-xs md:text-sm break-all">{email}</p>
             </div>
             <div>
-              <h4 className="font-medium text-sm text-muted-foreground mb-1">Account Type</h4>
-              <p className="text-sm">{profile?.package || 'Basic'}</p>
+              <h4 className="font-medium text-xs md:text-sm text-muted-foreground mb-1">Account Type</h4>
+              <p className="text-xs md:text-sm">{profile?.package || 'Basic'}</p>
             </div>
             <div>
-              <h4 className="font-medium text-sm text-muted-foreground mb-1">Trader Level</h4>
-              <p className="text-sm">{profile?.trader_level || 'Beginner'}</p>
+              <h4 className="font-medium text-xs md:text-sm text-muted-foreground mb-1">Trader Level</h4>
+              <p className="text-xs md:text-sm">{profile?.trader_level || 'Beginner'}</p>
             </div>
           </div>
         </CardContent>
       </Card>
 
-      <div className="grid gap-6">
+      <div className="grid gap-4 md:gap-6">
         <div>
-          <div className="flex items-center gap-2 mb-4">
-            <Settings className="h-5 w-5" />
-            <h2 className="text-xl font-semibold">Account Settings</h2>
+          <div className="flex items-center gap-2 mb-3 md:mb-4">
+            <Settings className="h-4 w-4 md:h-5 md:w-5" />
+            <h2 className="text-lg md:text-xl font-semibold">Account Settings</h2>
           </div>
           
-          <div className="space-y-6">
+          <div className="space-y-4 md:space-y-6">
             <Suspense fallback={<div>Loading...</div>}>
               <ChangeUsernameForm currentUsername={profile?.username || fullName} />
             </Suspense>

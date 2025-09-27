@@ -254,7 +254,93 @@ app.post('/services/:serviceName/stop', (req, res) => {
   }
 });
 
-// MCP request proxy endpoint
+// NextJS MCP proxy endpoint with OAuth validation (must come before /mcp/:serviceName)
+app.post('/mcp/nextjs', async (req, res) => {
+  const { serviceName } = req.query;
+  const mcpRequest = req.body;
+  const authHeader = req.headers.authorization;
+  const userId = req.headers['x-user-id'];
+  const userEmail = req.headers['x-user-email'];
+  const userRole = req.headers['x-user-role'];
+  
+  // Validate OAuth token
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({
+      success: false,
+      error: 'Unauthorized',
+      message: 'Bearer token required'
+    });
+  }
+  
+  const token = authHeader.substring(7);
+  
+  // Basic token validation (in production, validate with Clerk)
+  if (!token || token.length < 10) {
+    return res.status(401).json({
+      success: false,
+      error: 'Invalid token',
+      message: 'Invalid OAuth token format'
+    });
+  }
+  
+  // Log the request for monitoring
+  logger.info('NextJS MCP request', {
+    serviceName: serviceName || 'default',
+    userId,
+    userEmail,
+    userRole,
+    method: mcpRequest.method,
+    requestId: mcpRequest.id,
+    timestamp: new Date().toISOString()
+  });
+  
+  // Determine service name
+  const targetService = serviceName || 'filesystem';
+  
+  // Check if service exists
+  if (!mcpServices[targetService]) {
+    return res.status(400).json({
+      success: false,
+      error: 'Service not found',
+      message: `Service '${targetService}' is not available`,
+      availableServices: Object.keys(mcpServices)
+    });
+  }
+  
+  try {
+    const response = await sendMCPRequest(targetService, mcpRequest);
+    
+    // Add metadata to response
+    const enhancedResponse = {
+      ...response,
+      metadata: {
+        serviceName: targetService,
+        userId,
+        userEmail,
+        userRole,
+        requestId: mcpRequest.id,
+        responseId: response.id,
+        timestamp: new Date().toISOString(),
+        gatewayVersion: '1.0.0'
+      }
+    };
+    
+    res.json(enhancedResponse);
+  } catch (error) {
+    logger.error(`NextJS MCP request failed for ${targetService}:`, error);
+    res.status(502).json({
+      success: false,
+      error: 'MCP request failed',
+      service: targetService,
+      message: error.message,
+      userId,
+      userEmail,
+      timestamp: new Date().toISOString()
+    });
+  }
+});
+
+// MCP request proxy endpoint (general)
 app.post('/mcp/:serviceName', async (req, res) => {
   const { serviceName } = req.params;
   const mcpRequest = req.body;

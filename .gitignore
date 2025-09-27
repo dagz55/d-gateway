@@ -128,3 +128,4 @@ qa/
 
 # Kilocode configuration files
 .kilocode/
+uploads/

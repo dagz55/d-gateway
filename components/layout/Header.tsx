@@ -1,20 +1,24 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Link from 'next/link';
-import { useUser } from '@clerk/nextjs';
+import { TrendingUp } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import Logo from '@/components/ui/Logo';
 import ProfileDropdown from './ProfileDropdown';
 import NotificationDropdown from './NotificationDropdown';
 import { HEADER_BANNERS } from '@/config/header-banners';
-import { LayoutDashboard } from 'lucide-react';
+import { useTradingPanel } from '@/contexts/TradingPanelContext';
+import { cn } from '@/lib/utils';
 
 interface HeaderProps {
   className?: string;
+  showTradingToggle?: boolean;
 }
 
 
-export default function Header({ className }: HeaderProps) {
+export default function Header({ className, showTradingToggle = false }: HeaderProps) {
+  // Trading panel state - always call the hook but only use if showTradingToggle is true
+  const tradingPanel = useTradingPanel();
   const [currentBanner, setCurrentBanner] = useState(0);
   const [animationPhase, setAnimationPhase] = useState<'entering' | 'paused' | 'exiting'>('entering');
   const [isHovered, setIsHovered] = useState(false);
@@ -121,7 +125,7 @@ export default function Header({ className }: HeaderProps) {
       <header className={`relative flex h-16 items-center justify-between px-6 glass border-b border-border overflow-hidden ${className}`}>
         {/* Logo Section - Removed redundant logo, keeping only the title */}
         <div className="flex items-center z-10">
-          <h1 className="text-xl font-bold gradient-text hidden sm:block">Zignal Dashboard</h1>
+          <h1 className="text-xl font-bold text-white hidden sm:block">Zignal Dashboard</h1>
         </div>
 
         {/* Animated Banner Section */}
@@ -155,27 +159,26 @@ export default function Header({ className }: HeaderProps) {
           </div>
         </div>
 
-        {/* Dashboard, Notifications and Profile Section */}
+        {/* Notifications and Profile Section */}
         <div className="flex items-center space-x-2 z-10">
-          {/* Dashboard Button */}
-          <Link 
-            href="/dashboard"
-            className="hidden sm:flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-200 shadow-sm hover:shadow-md"
-            aria-label="Dashboard"
-          >
-            <LayoutDashboard className="h-4 w-4" />
-            <span>Dashboard</span>
-          </Link>
-          
-          {/* Mobile Dashboard Button - Icon only */}
-          <Link 
-            href="/dashboard"
-            className="flex sm:hidden items-center justify-center p-2 text-gray-700 dark:text-gray-200 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-200 shadow-sm"
-            aria-label="Dashboard"
-          >
-            <LayoutDashboard className="h-4 w-4" />
-          </Link>
-          
+          {/* Trading Panel Toggle - Only show if enabled */}
+          {showTradingToggle && tradingPanel && (
+            <Button
+              variant={tradingPanel.isOpen ? "default" : "outline"}
+              size="sm"
+              onClick={tradingPanel.toggle}
+              className={cn(
+                "transition-all duration-200",
+                tradingPanel.isOpen
+                  ? "bg-gradient-to-r from-[#33e1da] to-[#1e7fb8] hover:from-[#33e1da]/90 hover:to-[#1e7fb8]/90 shadow-lg"
+                  : "hover:bg-accent/20 border-[#33e1da]/30"
+              )}
+            >
+              <TrendingUp className="w-4 h-4 mr-1" />
+              <span className="hidden sm:inline">Trading</span>
+            </Button>
+          )}
+
           <NotificationDropdown />
           <ProfileDropdown />
         </div>

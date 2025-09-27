@@ -22,7 +22,7 @@ export default function SupportModal({ children }: SupportModalProps) {
       <DialogTrigger asChild>
         {children}
       </DialogTrigger>
-      <DialogContent className="max-w-2xl">
+      <DialogContent className="modal-content max-w-2xl">
         <DialogHeader>
           <DialogTitle className="text-xl font-bold flex items-center gap-2">
             <HelpCircle className="h-5 w-5" />
