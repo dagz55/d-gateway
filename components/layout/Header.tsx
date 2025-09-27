@@ -1,10 +1,13 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
+import { useUser } from '@clerk/nextjs';
 import Logo from '@/components/ui/Logo';
 import ProfileDropdown from './ProfileDropdown';
 import NotificationDropdown from './NotificationDropdown';
 import { HEADER_BANNERS } from '@/config/header-banners';
+import { LayoutDashboard } from 'lucide-react';
 
 interface HeaderProps {
   className?: string;
@@ -152,8 +155,27 @@ export default function Header({ className }: HeaderProps) {
           </div>
         </div>
 
-        {/* Notifications and Profile Section */}
+        {/* Dashboard, Notifications and Profile Section */}
         <div className="flex items-center space-x-2 z-10">
+          {/* Dashboard Button */}
+          <Link 
+            href="/dashboard"
+            className="hidden sm:flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-200 shadow-sm hover:shadow-md"
+            aria-label="Dashboard"
+          >
+            <LayoutDashboard className="h-4 w-4" />
+            <span>Dashboard</span>
+          </Link>
+          
+          {/* Mobile Dashboard Button - Icon only */}
+          <Link 
+            href="/dashboard"
+            className="flex sm:hidden items-center justify-center p-2 text-gray-700 dark:text-gray-200 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-200 shadow-sm"
+            aria-label="Dashboard"
+          >
+            <LayoutDashboard className="h-4 w-4" />
+          </Link>
+          
           <NotificationDropdown />
           <ProfileDropdown />
         </div>

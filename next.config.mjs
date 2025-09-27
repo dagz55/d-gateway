@@ -72,10 +72,7 @@ const nextConfig = {
       config.output.globalObject = 'globalThis';
 
       // Ensure "self" resolves to globalThis in server bundles to avoid SSR ReferenceError
-      config.plugins = config.plugins || [];
-      config.plugins.push(new webpack.DefinePlugin({
-        self: 'globalThis',
-      }));
+      // Note: DefinePlugin not needed with proper global object configuration
 
     }
 
