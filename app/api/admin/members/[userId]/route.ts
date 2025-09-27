@@ -7,9 +7,20 @@ async function getClerkClient() {
   return await clerkClient();
 }
 
+async function getClerkUserSafely(clerk: any, userId: string) {
+  try {
+    return await clerk.users.getUser(userId);
+  } catch (error: any) {
+    if (error?.status === 404 || error?.message?.includes('not found')) {
+      return null; // Return null instead of throwing for 404s
+    }
+    throw error; // Re-throw other errors
+  }
+}
+
 export async function GET(
   request: NextRequest,
-  { params }: { params: { userId: string } }
+  { params }: { params: Promise<{ userId: string }> }
 ) {
   try {
     // Check admin authentication
@@ -21,15 +32,15 @@ export async function GET(
       );
     }
 
-    const { userId } = params;
+    const { userId } = await params;
 
     // Get user details from Clerk
     const clerk = await getClerkClient();
-    const clerkUser = await clerk.users.getUser(userId);
+    const clerkUser = await getClerkUserSafely(clerk, userId);
 
     if (!clerkUser) {
       return NextResponse.json(
-        { error: 'User not found' },
+        { error: 'User not found in Clerk' },
         { status: 404 }
       );
     }
@@ -124,7 +135,7 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { userId: string } }
+  { params }: { params: Promise<{ userId: string }> }
 ) {
   try {
     // Check admin authentication
@@ -136,14 +147,20 @@ export async function PUT(
       );
     }
 
-    const { userId } = params;
+    const { userId } = await params;
     const body = await request.json();
     const { action, ...updateData } = body;
     const clerk = await getClerkClient();
 
     switch (action) {
       case 'suspend': {
-        const currentUser = await clerk.users.getUser(userId);
+        const currentUser = await getClerkUserSafely(clerk, userId);
+        if (!currentUser) {
+          return NextResponse.json(
+            { error: 'User not found in Clerk' },
+            { status: 404 }
+          );
+        }
         const currentMetadata = currentUser.publicMetadata || {};
         await clerk.users.updateUser(userId, {
           publicMetadata: {
@@ -160,7 +177,13 @@ export async function PUT(
         });
       }
       case 'activate': {
-        const currentUser = await clerk.users.getUser(userId);
+        const currentUser = await getClerkUserSafely(clerk, userId);
+        if (!currentUser) {
+          return NextResponse.json(
+            { error: 'User not found in Clerk' },
+            { status: 404 }
+          );
+        }
         const currentMetadata = currentUser.publicMetadata || {};
         await clerk.users.updateUser(userId, {
           publicMetadata: {
@@ -177,7 +200,13 @@ export async function PUT(
         });
       }
       case 'deactivate': {
-        const currentUser = await clerk.users.getUser(userId);
+        const currentUser = await getClerkUserSafely(clerk, userId);
+        if (!currentUser) {
+          return NextResponse.json(
+            { error: 'User not found in Clerk' },
+            { status: 404 }
+          );
+        }
         const currentMetadata = currentUser.publicMetadata || {};
         await clerk.users.updateUser(userId, {
           publicMetadata: {
@@ -195,7 +224,13 @@ export async function PUT(
         });
       }
       case 'promote': {
-        const currentUser = await clerk.users.getUser(userId);
+        const currentUser = await getClerkUserSafely(clerk, userId);
+        if (!currentUser) {
+          return NextResponse.json(
+            { error: 'User not found in Clerk' },
+            { status: 404 }
+          );
+        }
         const currentMetadata = currentUser.publicMetadata || {};
         await clerk.users.updateUser(userId, {
           publicMetadata: {
@@ -223,7 +258,13 @@ export async function PUT(
         });
       }
       case 'demote': {
-        const currentUser = await clerk.users.getUser(userId);
+        const currentUser = await getClerkUserSafely(clerk, userId);
+        if (!currentUser) {
+          return NextResponse.json(
+            { error: 'User not found in Clerk' },
+            { status: 404 }
+          );
+        }
         const currentMetadata = currentUser.publicMetadata || {};
         await clerk.users.updateUser(userId, {
           publicMetadata: {
@@ -292,7 +333,7 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { userId: string } }
+  { params }: { params: Promise<{ userId: string }> }
 ) {
   try {
     // Check admin authentication
@@ -304,10 +345,20 @@ export async function DELETE(
       );
     }
 
-    const { userId } = params;
+    const { userId } = await params;
 
     // Delete user from Clerk
     const clerk = await getClerkClient();
+
+    // Check if user exists before trying to delete
+    const userExists = await getClerkUserSafely(clerk, userId);
+    if (!userExists) {
+      return NextResponse.json(
+        { error: 'User not found in Clerk' },
+        { status: 404 }
+      );
+    }
+
     await clerk.users.deleteUser(userId);
 
     // Note: Supabase data will be automatically cleaned up due to CASCADE constraints
