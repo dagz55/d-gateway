@@ -4,7 +4,28 @@ Zignal is a comprehensive crypto trading platform built with [Next.js 15.5.3](ht
 
 ## 🚀 Features
 
-### Latest Improvements (v2.11.19)
+### Latest Improvements (v2.11.20)
+
+- 🎨 **Glassmorphic Admin Dashboard**: Complete design overhaul with modern glassmorphic effects
+  - **Enhanced Glassmorphic System**: Advanced glassmorphic variants with sophisticated backdrop-blur effects
+  - **Premium Admin Panel**: Professional glassmorphic styling with enhanced shadows and depth
+  - **Smooth Animations**: Advanced hover effects with smooth transitions and elevation
+  - **Consistent Design Language**: Unified glassmorphic design across all dashboard components
+  - **Enhanced Accessibility**: Improved contrast ratios meeting WCAG AA standards
+
+- 🔧 **Critical Bug Fixes**: Resolved major stability issues
+  - **Fixed Infinite Loop Bug**: Eliminated "Maximum call stack size exceeded" error in NotificationDropdown
+  - **Stabilized Supabase Client**: Used useMemo to prevent object recreation and infinite re-renders
+  - **Enhanced Error Handling**: Improved realtime subscription management with robust cleanup
+  - **Performance Optimization**: Eliminated memory leaks and crashes from subscription loops
+
+- 🎯 **UI/UX Improvements**: Streamlined and enhanced user interface
+  - **ProfileDropdown Redesign**: Removed redundant elements and simplified design
+  - **Sign In Page Fix**: Restored split view layout consistency with Sign Up page
+  - **Enhanced Color System**: Improved contrast and accessibility across the platform
+  - **Cleaner Visual Hierarchy**: Professional appearance with reduced visual clutter
+
+### Previous Improvements (v2.11.19)
 
 - 💳 **PayPal Payment Integration**: Complete payment processing system with secure link generation
   - **Payment Link Generator**: Create secure PayPal payment links for customers with account details collection

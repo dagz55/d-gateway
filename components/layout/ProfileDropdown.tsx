@@ -151,14 +151,6 @@ export default function ProfileDropdown() {
             aria-label="Open profile menu"
             className="flex items-center space-x-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-accent/50 rounded-lg transition-colors"
           >
-            {isAdmin && (
-              <Badge
-                variant="secondary"
-                className="h-6 px-2 text-xs flex items-center gap-1 bg-gradient-to-r from-yellow-400 to-orange-500 text-white border-0"
-              >
-                <Crown className="h-3 w-3" /> Admin
-              </Badge>
-            )}
             <Avatar className="h-9 w-9 rounded-lg border-2 border-gray-300 dark:border-gray-600 hover:border-blue-500 transition-colors">
               <AvatarImage src={user.imageUrl} alt={fullName} />
               <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-white">
@@ -181,59 +173,46 @@ export default function ProfileDropdown() {
                   </AvatarFallback>
                 </Avatar>
                 <div className="min-w-0">
-                  <div className="flex items-center gap-2">
-                    <p className="text-sm font-bold leading-none truncate text-white dark:text-white">
-                      {fullName}
-                    </p>
-                    {isAdmin && (
-                      <Badge
-                        variant="secondary"
-                        className="h-4 px-1 text-xs bg-gradient-to-r from-yellow-400 to-orange-500 text-white border-0"
-                      >
-                        Admin
-                      </Badge>
-                    )}
-                  </div>
+                   <div className="flex items-center gap-2">
+                     <p className="text-sm font-bold leading-none truncate text-white dark:text-white">
+                       {fullName}
+                       {isAdmin && (
+                         <span className="ml-2 text-xs bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-2 py-0.5 rounded-full">
+                           Admin
+                         </span>
+                       )}
+                     </p>
+                   </div>
                   <p className="text-xs leading-none text-white/70 truncate mt-1 font-medium">
                     {email}
                   </p>
                 </div>
               </div>
 
-              <div className="p-3 rounded-lg bg-gradient-to-r from-blue-50/80 to-purple-50/80 dark:from-blue-900/40 dark:to-purple-900/40 border border-blue-200/50 dark:border-blue-600/50">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-2">
-                    <span
-                      className={cn(
-                        'p-1.5 rounded-full',
-                        subscriptionStatus.isPremium
-                          ? 'bg-gradient-to-r from-blue-500 to-purple-600'
-                          : 'bg-gradient-to-r from-gray-400 to-gray-600'
-                      )}
-                    >
-                      <Crown className="h-3 w-3 text-white" />
-                    </span>
-                    <div>
-                      <p className="text-xs font-bold text-slate-900 dark:text-white">
-                        {subscriptionStatus.planName}
-                      </p>
-                      <p className="text-xs text-slate-800 dark:text-white/90 font-semibold">
-                        {subscriptionStatus.status}
-                      </p>
-                    </div>
-                  </div>
-                  <Badge
-                    className={cn(
-                      'text-white border-0 text-xs font-semibold',
-                      subscriptionStatus.isPremium
-                        ? 'bg-gradient-to-r from-blue-500 to-purple-600'
-                        : 'bg-gradient-to-r from-gray-500 to-gray-600'
-                    )}
-                  >
-                    {subscriptionStatus.isPremium ? 'Pro' : 'Free'}
-                  </Badge>
-                </div>
-              </div>
+               <div className="p-3 rounded-lg bg-gradient-to-r from-blue-50/80 to-purple-50/80 dark:from-blue-900/40 dark:to-purple-900/40 border border-blue-200/50 dark:border-blue-600/50">
+                 <div className="flex items-center justify-between">
+                   <div className="flex items-center space-x-2">
+                     <span
+                       className={cn(
+                         'p-1.5 rounded-full',
+                         subscriptionStatus.isPremium
+                           ? 'bg-gradient-to-r from-blue-500 to-purple-600'
+                           : 'bg-gradient-to-r from-gray-400 to-gray-600'
+                       )}
+                     >
+                       <Crown className="h-3 w-3 text-white" />
+                     </span>
+                     <div>
+                       <p className="text-xs font-bold text-slate-900 dark:text-white">
+                         {subscriptionStatus.planName}
+                       </p>
+                       <p className="text-xs text-slate-800 dark:text-white/90 font-semibold">
+                         {subscriptionStatus.status}
+                       </p>
+                     </div>
+                   </div>
+                 </div>
+               </div>
 
               <div>
                 <p className="text-xs font-bold text-white/80 uppercase tracking-wide px-1">

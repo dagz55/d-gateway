@@ -13,9 +13,6 @@ import {
   Users,
   Package,
   Activity,
-  Database,
-  FileText,
-  Server,
   Cog,
   CreditCard,
 } from 'lucide-react';
@@ -99,21 +96,15 @@ export const ADMIN_ONLY_NAVIGATION: NavItem[] = [
     isAdmin: true,
   },
   {
-    name: 'Manage Users',
-    href: '/admin/dashboard/users',
-    icon: Users,
+    name: 'System Status',
+    href: '/admin/dashboard/system-status',
+    icon: Activity,
     isAdmin: true,
   },
   {
     name: 'Manage Packages',
     href: '/admin/dashboard/packages',
     icon: Package,
-    isAdmin: true,
-  },
-  {
-    name: 'System Status',
-    href: '/admin/dashboard/system-status',
-    icon: Activity,
     isAdmin: true,
   },
   {
@@ -129,9 +120,9 @@ export const ADMIN_ONLY_NAVIGATION: NavItem[] = [
     isAdmin: true,
   },
   {
-    name: 'Deployment',
-    href: '/deployment',
-    icon: Rocket,
+    name: 'Manage Users',
+    href: '/admin/dashboard/users',
+    icon: Users,
     isAdmin: true,
   },
 ];

@@ -1631,3 +1631,191 @@ a:focus-visible {
   box-shadow: 0 0 10px rgba(34, 197, 94, 0.2);
   /* NO transform to maintain exact same size */
 }
+
+/* ===== CUSTOM SCROLLBAR STYLES ===== */
+
+/* Modern scrollbar styles for modal content */
+.scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(156, 163, 175, 0.7) rgba(55, 65, 81, 0.3);
+}
+
+.scrollbar-thin::-webkit-scrollbar {
+  width: 8px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: rgba(55, 65, 81, 0.3);
+  border-radius: 4px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: rgba(156, 163, 175, 0.7);
+  border-radius: 4px;
+  border: 1px solid rgba(55, 65, 81, 0.5);
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background: rgba(156, 163, 175, 0.9);
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb:active {
+  background: rgba(209, 213, 219, 1);
+}
+
+/* Enhanced scrollbar for modal content with visibility */
+.scrollbar-track-gray-800 {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(107, 114, 128, 0.8) rgba(31, 41, 55, 0.6);
+}
+
+.scrollbar-track-gray-800::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+.scrollbar-track-gray-800::-webkit-scrollbar-track {
+  background: rgba(31, 41, 55, 0.6);
+  border-radius: 6px;
+  border: 1px solid rgba(75, 85, 99, 0.3);
+}
+
+.scrollbar-thumb-gray-600 {
+  scrollbar-color: rgba(107, 114, 128, 0.8) rgba(31, 41, 55, 0.6);
+}
+
+.scrollbar-thumb-gray-600::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, rgba(107, 114, 128, 0.8), rgba(75, 85, 99, 0.9));
+  border-radius: 6px;
+  border: 1px solid rgba(55, 65, 81, 0.5);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.scrollbar-thumb-gray-600::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, rgba(107, 114, 128, 1), rgba(75, 85, 99, 1));
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+}
+
+.scrollbar-thumb-gray-600::-webkit-scrollbar-thumb:active {
+  background: linear-gradient(135deg, rgba(156, 163, 175, 1), rgba(107, 114, 128, 1));
+}
+
+/* Alternative visible scrollbar style */
+.scrollbar-visible {
+  scrollbar-width: auto;
+  scrollbar-color: rgba(156, 163, 175, 0.8) rgba(31, 41, 55, 0.4);
+}
+
+.scrollbar-visible::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+.scrollbar-visible::-webkit-scrollbar-track {
+  background: rgba(31, 41, 55, 0.4);
+  border-radius: 8px;
+  border: 2px solid rgba(75, 85, 99, 0.2);
+}
+
+.scrollbar-visible::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg,
+    rgba(156, 163, 175, 0.8) 0%,
+    rgba(107, 114, 128, 0.9) 50%,
+    rgba(75, 85, 99, 1) 100%);
+  border-radius: 8px;
+  border: 2px solid rgba(55, 65, 81, 0.3);
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.scrollbar-visible::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg,
+    rgba(209, 213, 219, 1) 0%,
+    rgba(156, 163, 175, 1) 50%,
+    rgba(107, 114, 128, 1) 100%);
+  box-shadow:
+    0 4px 12px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.scrollbar-visible::-webkit-scrollbar-thumb:active {
+  background: linear-gradient(135deg,
+    rgba(243, 244, 246, 1) 0%,
+    rgba(209, 213, 219, 1) 50%,
+    rgba(156, 163, 175, 1) 100%);
+}
+
+.scrollbar-visible::-webkit-scrollbar-corner {
+  background: rgba(31, 41, 55, 0.4);
+}
+
+/* ===== PROMINENT MODAL SCROLLBAR ===== */
+
+/* Always visible modal scrollbar with high contrast */
+.modal-scrollbar {
+  scrollbar-width: auto; /* Firefox - make sure it's visible */
+  scrollbar-color: rgba(203, 213, 225, 0.9) rgba(51, 65, 85, 0.8); /* Light thumb, darker track */
+}
+
+.modal-scrollbar::-webkit-scrollbar {
+  width: 14px; /* Wide enough to be clearly visible */
+  height: 14px;
+}
+
+.modal-scrollbar::-webkit-scrollbar-track {
+  background: rgba(51, 65, 85, 0.8); /* Darker track for contrast */
+  border-radius: 8px;
+  border: 2px solid rgba(75, 85, 99, 0.5);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.modal-scrollbar::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg,
+    rgba(203, 213, 225, 0.9) 0%,
+    rgba(156, 163, 175, 1) 50%,
+    rgba(107, 114, 128, 1) 100%);
+  border-radius: 8px;
+  border: 2px solid rgba(75, 85, 99, 0.6);
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.2);
+  /* Always visible */
+  min-height: 40px;
+}
+
+.modal-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg,
+    rgba(241, 245, 249, 1) 0%,
+    rgba(203, 213, 225, 1) 50%,
+    rgba(156, 163, 175, 1) 100%);
+  box-shadow:
+    0 4px 12px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.3);
+  transform: scale(1.05);
+}
+
+.modal-scrollbar::-webkit-scrollbar-thumb:active {
+  background: linear-gradient(135deg,
+    rgba(255, 255, 255, 1) 0%,
+    rgba(241, 245, 249, 1) 50%,
+    rgba(203, 213, 225, 1) 100%);
+  transform: scale(1.1);
+}
+
+.modal-scrollbar::-webkit-scrollbar-corner {
+  background: rgba(51, 65, 85, 0.8);
+  border-radius: 8px;
+}
+
+/* Force scrollbar to always be visible when content overflows */
+.modal-scrollbar::-webkit-scrollbar-track:hover {
+  background: rgba(51, 65, 85, 1);
+}
+
+/* Make sure scrollbar appears immediately when needed */
+.modal-scrollbar {
+  overflow-y: scroll !important; /* Force scrollbar to always be present */
+}

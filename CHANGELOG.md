@@ -5,6 +5,53 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.11.20] - 2025-01-27
+
+### 🎨 Enhanced
+- **Glassmorphic Admin Dashboard**: Complete design overhaul with modern glassmorphic effects
+  - Enhanced glassmorphic variants: `.glass-light`, `.glass-heavy`, `.glass-premium`, `.glass-stat-card`
+  - Sophisticated backdrop-blur effects with proper depth and lighting
+  - Advanced hover animations with smooth transitions and elevation effects
+  - Consistent glassmorphic design language across all dashboard components
+  - Premium admin panel styling with enhanced shadows and borders
+
+### 🔧 Fixed
+- **Critical Infinite Loop Bug**: Resolved "Maximum call stack size exceeded" error
+  - Fixed NotificationDropdown useEffect dependency causing infinite re-renders
+  - Stabilized Supabase client with useMemo to prevent object recreation
+  - Enhanced error handling and cleanup functions for realtime subscriptions
+  - Improved retry logic with proper timeout management
+  - Added comprehensive error boundaries and monitoring
+
+### 🎯 Improved
+- **ProfileDropdown Redesign**: Streamlined and cleaned up redundant elements
+  - Removed duplicate admin badges and crown icons
+  - Simplified subscription plan display
+  - Enhanced glassmorphic styling with proper contrast
+  - Cleaner visual hierarchy and professional appearance
+  - Integrated admin status indicator inline with user name
+
+### 🚀 Enhanced
+- **Sign In Page Layout**: Restored split view design consistency
+  - Fixed missing wallpaper and branding overlay
+  - Consistent styling with Sign Up page
+  - Proper responsive design and mobile logo display
+  - Enhanced Clerk appearance configuration
+
+### 🎨 Styling
+- **Enhanced Color System**: Improved contrast and accessibility
+  - Updated CSS variables for better text contrast ratios
+  - Enhanced glassmorphic effects with proper opacity levels
+  - Improved dark mode support with consistent theming
+  - Advanced gradient text effects and animations
+
+### Technical Details
+- **Performance**: Eliminated infinite loop causing memory leaks and crashes
+- **Accessibility**: Improved contrast ratios meeting WCAG AA standards
+- **Design System**: Comprehensive glassmorphic component library
+- **Error Handling**: Robust subscription management with fallback mechanisms
+- **Code Quality**: Cleaner component structure and reduced redundancy
+
 ## [2.11.19] - 2025-01-15
 
 ### Added

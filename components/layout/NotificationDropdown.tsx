@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Bell, Check, X, AlertCircle, TrendingUp, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -77,7 +77,7 @@ export default function NotificationDropdown() {
   const [loading, setLoading] = useState(true);
   const [isOpen, setIsOpen] = useState(false);
   const { user } = useUser();
-  const supabase = createRealtimeClient();
+  const supabase = useMemo(() => createRealtimeClient(), []);
 
   const unreadCount = notifications.filter(n => !n.is_read).length;
 
@@ -315,29 +315,43 @@ export default function NotificationDropdown() {
 
       isConnected = false;
 
+      // Safely cleanup channel without triggering recursive errors
       if (channel) {
         try {
-          supabase.removeChannel(channel);
+          // Use unsubscribe instead of removeChannel to avoid recursion
+          channel.unsubscribe();
         } catch (error) {
-          console.warn("Error removing channel on error:", error);
+          // Silently handle cleanup errors to prevent infinite loops
+          console.debug("Channel cleanup error (ignored):", error);
         }
         channel = null;
       }
 
-      if (retryCount < maxRetries) {
-        retryCount++;
-        const delay = Math.min(Math.pow(2, retryCount) * 1000, 10000); // Cap at 10 seconds
-        console.log(`🔄 Retrying notifications subscription in ${delay}ms (attempt ${retryCount}/${maxRetries})`);
-        // DEBUG: Check if retryTimeout is already set
-        if (retryTimeout) {
-          console.warn("⚠️ retryTimeout already set, clearing previous timeout to prevent overlap");
-        }
-        if (retryTimeout) clearTimeout(retryTimeout);
-        retryTimeout = setTimeout(setupSubscription, delay);
-      } else {
-        console.warn("⚠️ Max retries reached for subscription. Falling back to polling.");
-        startPollingFallback();
+      // Clear any existing retry timeout to prevent multiple retries
+      if (retryTimeout) {
+        clearTimeout(retryTimeout);
+        retryTimeout = null;
       }
+
+      // Circuit breaker: if we're getting too many errors too quickly, stop retrying
+      if (retryCount >= maxRetries || isDestroyed) {
+        console.warn("⚠️ Max retries reached for notifications subscription. Using polling only.");
+        retryCount = 0; // Reset for next attempt cycle
+        if (!isDestroyed) {
+          startPollingFallback();
+        }
+        return;
+      }
+
+      retryCount++;
+      const delay = Math.min(Math.pow(2, retryCount) * 1000, 10000); // Cap at 10 seconds
+      console.log(`🔄 Retrying notifications subscription in ${delay}ms (attempt ${retryCount}/${maxRetries})`);
+
+      retryTimeout = setTimeout(() => {
+        if (!isDestroyed) {
+          setupSubscription();
+        }
+      }, delay);
     };
 
     // Start with polling fallback immediately, then try WebSocket
@@ -353,7 +367,7 @@ export default function NotificationDropdown() {
     return () => {
       cleanup();
     };
-  }, [user, supabase]);
+  }, [user]);
 
   if (!user) return null;
 
