@@ -197,7 +197,7 @@ export default function AdminUsersClient() {
   const hasActiveFilters = searchTerm || roleFilter !== 'all' || statusFilter !== 'all';
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 admin-users-client">
       {/* Header */}
       <div className="space-y-4">
         <div className="flex items-center justify-between">

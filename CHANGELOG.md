@@ -5,6 +5,36 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.11.21] - 2025-01-28
+
+### 🔧 Fixed
+- **Critical Build Errors**: Resolved missing `@/lib/auth` imports across admin pages
+  - Fixed 6 admin pages with incorrect import paths: `advanced-panel`, `analytics`, `database`, `paypal-payments`, `security`, `signals`
+  - Updated imports to use correct `@/lib/clerk-auth` module
+  - Enhanced Stripe API route with lazy initialization to prevent build failures
+  - All production builds now compile successfully without errors
+
+- **Comprehensive Theme System Fixes**: Resolved dark text visibility issues across all UI components
+  - **10 Modal Components**: Applied theme classes (`admin-dashboard`, `modal-content`) to ensure proper text visibility
+  - **5 Dashboard Pages**: Added `dashboard-content` class for theme support (profile, settings, wallet, market, dashboard)
+  - **5 Admin Pages**: Confirmed `admin-dashboard` class application for consistent theming
+  - **User Action Dropdown**: Fixed dark text in admin user management modal menu items
+  - Enhanced CSS with universal theme overrides for `.text-white`, `.text-foreground`, `.text-muted-foreground`
+
+### 🎯 Improved
+- **Visual Validation**: Implemented comprehensive Playwright testing for theme fixes
+  - Created visual regression test suite for all pages and modals
+  - Added automated screenshot capture for theme validation
+  - Confirmed text visibility fixes across the entire application
+- **Documentation Updates**: Updated project documentation and version references
+  - Bumped version to 2.11.21 in package.json and CLAUDE.md
+  - Enhanced changelog with detailed fix descriptions
+
+### 📋 Technical Details
+- **CSS Theme System**: Enhanced `app/globals.css` with comprehensive modal and dashboard support
+- **Build Process**: Optimized for production deployment with 58 pages successfully generated
+- **Authentication**: Streamlined admin authentication flow with proper import resolution
+
 ## [2.11.20] - 2025-01-27
 
 ### 🎨 Enhanced

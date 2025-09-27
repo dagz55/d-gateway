@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { requireAdmin } from '@/lib/admin';
+import { requireAdmin, getAdminUser } from '@/lib/admin';
 import { clerkClient } from '@clerk/nextjs/server';
 import { createServerSupabaseClient } from '@/lib/supabase/serverClient';
 
@@ -12,8 +12,14 @@ export async function GET(
   { params }: { params: { userId: string } }
 ) {
   try {
-    // Require admin authentication
-    await requireAdmin();
+    // Check admin authentication
+    const adminUser = await getAdminUser();
+    if (!adminUser) {
+      return NextResponse.json(
+        { error: 'Unauthorized - Admin access required' },
+        { status: 401 }
+      );
+    }
 
     const { userId } = params;
 
@@ -121,8 +127,14 @@ export async function PUT(
   { params }: { params: { userId: string } }
 ) {
   try {
-    // Require admin authentication
-    await requireAdmin();
+    // Check admin authentication
+    const adminUser = await getAdminUser();
+    if (!adminUser) {
+      return NextResponse.json(
+        { error: 'Unauthorized - Admin access required' },
+        { status: 401 }
+      );
+    }
 
     const { userId } = params;
     const body = await request.json();
@@ -162,6 +174,24 @@ export async function PUT(
         return NextResponse.json({
           success: true,
           message: 'User activated successfully'
+        });
+      }
+      case 'deactivate': {
+        const currentUser = await clerk.users.getUser(userId);
+        const currentMetadata = currentUser.publicMetadata || {};
+        await clerk.users.updateUser(userId, {
+          publicMetadata: {
+            ...currentMetadata,
+            suspended: false,
+            deactivated: true,
+            deactivatedAt: new Date().toISOString(),
+            deactivatedBy: 'admin'
+          }
+        });
+
+        return NextResponse.json({
+          success: true,
+          message: 'User deactivated successfully'
         });
       }
       case 'promote': {
@@ -224,9 +254,17 @@ export async function PUT(
         // Update user details in Clerk
         const updatePayload: any = {};
 
-        if (updateData.firstName) updatePayload.firstName = updateData.firstName;
-        if (updateData.lastName) updatePayload.lastName = updateData.lastName;
-        if (updateData.username) updatePayload.username = updateData.username;
+        // Handle both data structures (from form and modal)
+        if (updateData.firstName || updateData.full_name) {
+          const fullName = updateData.full_name || `${updateData.firstName} ${updateData.lastName || ''}`.trim();
+          const nameParts = fullName.split(' ');
+          updatePayload.firstName = nameParts[0] || '';
+          updatePayload.lastName = nameParts.slice(1).join(' ') || '';
+        }
+        
+        if (updateData.username || updateData.display_name) {
+          updatePayload.username = updateData.username || updateData.display_name;
+        }
 
         await clerk.users.updateUser(userId, updatePayload);
 
@@ -257,8 +295,14 @@ export async function DELETE(
   { params }: { params: { userId: string } }
 ) {
   try {
-    // Require admin authentication
-    await requireAdmin();
+    // Check admin authentication
+    const adminUser = await getAdminUser();
+    if (!adminUser) {
+      return NextResponse.json(
+        { error: 'Unauthorized - Admin access required' },
+        { status: 401 }
+      );
+    }
 
     const { userId } = params;
 

@@ -24,19 +24,19 @@ export default function SystemStatisticsPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="admin-dashboard space-y-6 pb-8">
       <div className="flex items-center gap-3">
         <div className="p-2 bg-accent/20 rounded-lg">
           <BarChart3 className="h-6 w-6 text-accent" />
         </div>
         <div>
-          <h1 className="text-2xl font-bold text-white">System Statistics</h1>
+          <h1 className="text-2xl font-bold text-foreground">System Statistics</h1>
           <p className="text-muted-foreground">Real-time analytics and platform performance metrics</p>
         </div>
       </div>
 
       {/* Key Metrics Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
         {stats.map((stat) => {
           const Icon = stat.icon;
           return (
@@ -48,7 +48,7 @@ export default function SystemStatisticsPage() {
                 <Icon className={`h-4 w-4 ${getColorClasses(stat.color, 'text')}`} />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold text-white">{stat.value}</div>
+                <div className="text-2xl font-bold text-foreground">{stat.value}</div>
                 <div className={`flex items-center text-xs ${
                   stat.trend === 'up' ? 'text-green-400' : 'text-red-400'
                 }`}>
@@ -64,11 +64,11 @@ export default function SystemStatisticsPage() {
       </div>
 
       {/* Charts and Analytics */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
         {/* User Growth Chart Placeholder */}
         <Card className="bg-background/50 border-border">
           <CardHeader>
-            <CardTitle className="text-white">User Growth</CardTitle>
+            <CardTitle className="text-foreground">User Growth</CardTitle>
             <CardDescription>Monthly user registration trends</CardDescription>
           </CardHeader>
           <CardContent>
@@ -85,7 +85,7 @@ export default function SystemStatisticsPage() {
         {/* System Performance */}
         <Card className="bg-background/50 border-border">
           <CardHeader>
-            <CardTitle className="text-white">System Performance</CardTitle>
+            <CardTitle className="text-foreground">System Performance</CardTitle>
             <CardDescription>Real-time system health metrics</CardDescription>
           </CardHeader>
           <CardContent>
@@ -93,7 +93,7 @@ export default function SystemStatisticsPage() {
               <div>
                 <div className="flex justify-between text-sm mb-1">
                   <span className="text-muted-foreground">CPU Usage</span>
-                  <span className="text-white">64%</span>
+                  <span className="text-foreground">64%</span>
                 </div>
                 <div className="h-2 bg-slate-700 rounded-full">
                   <div className="h-full bg-orange-500 rounded-full" style={{ width: '64%' }}></div>
@@ -102,7 +102,7 @@ export default function SystemStatisticsPage() {
               <div>
                 <div className="flex justify-between text-sm mb-1">
                   <span className="text-muted-foreground">Memory Usage</span>
-                  <span className="text-white">78%</span>
+                  <span className="text-foreground">78%</span>
                 </div>
                 <div className="h-2 bg-slate-700 rounded-full">
                   <div className="h-full bg-blue-500 rounded-full" style={{ width: '78%' }}></div>
@@ -111,7 +111,7 @@ export default function SystemStatisticsPage() {
               <div>
                 <div className="flex justify-between text-sm mb-1">
                   <span className="text-muted-foreground">Disk Usage</span>
-                  <span className="text-white">45%</span>
+                  <span className="text-foreground">45%</span>
                 </div>
                 <div className="h-2 bg-slate-700 rounded-full">
                   <div className="h-full bg-green-500 rounded-full" style={{ width: '45%' }}></div>
@@ -123,9 +123,9 @@ export default function SystemStatisticsPage() {
       </div>
 
       {/* Recent Activity Summary */}
-      <Card className="bg-background/50 border-border">
+      <Card className="bg-background/50 border-border mb-8">
         <CardHeader>
-          <CardTitle className="text-white">Activity Summary</CardTitle>
+          <CardTitle className="text-foreground">Activity Summary</CardTitle>
           <CardDescription>Recent system events and user activities</CardDescription>
         </CardHeader>
         <CardContent>
@@ -133,21 +133,21 @@ export default function SystemStatisticsPage() {
             <div className="flex items-center space-x-3 p-3 bg-slate-800/50 rounded-lg">
               <div className="w-2 h-2 bg-green-400 rounded-full"></div>
               <div className="flex-1">
-                <p className="text-sm text-white">245 new user registrations today</p>
+                <p className="text-sm text-foreground">245 new user registrations today</p>
                 <p className="text-xs text-muted-foreground">2 hours ago</p>
               </div>
             </div>
             <div className="flex items-center space-x-3 p-3 bg-slate-800/50 rounded-lg">
               <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
               <div className="flex-1">
-                <p className="text-sm text-white">System backup completed successfully</p>
+                <p className="text-sm text-foreground">System backup completed successfully</p>
                 <p className="text-xs text-muted-foreground">4 hours ago</p>
               </div>
             </div>
             <div className="flex items-center space-x-3 p-3 bg-slate-800/50 rounded-lg">
               <div className="w-2 h-2 bg-purple-400 rounded-full"></div>
               <div className="flex-1">
-                <p className="text-sm text-white">Database optimization completed</p>
+                <p className="text-sm text-foreground">Database optimization completed</p>
                 <p className="text-xs text-muted-foreground">6 hours ago</p>
               </div>
             </div>

@@ -113,7 +113,7 @@ export default async function AdminPackagesPage() {
   };
 
   return (
-    <div className="space-y-8">
+    <div className="admin-dashboard space-y-8">
       {/* Header */}
       <div className="space-y-4">
         <div className="flex items-center justify-between">

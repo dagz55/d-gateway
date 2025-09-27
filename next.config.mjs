@@ -53,15 +53,15 @@ const nextConfig = {
     optimizeCss: true, // Enable CSS optimization
     scrollRestoration: true, // Optimize scroll restoration
   },
-  // Turbopack configuration (moved from experimental.turbo)
-  turbopack: {
-    rules: {
-      '*.svg': {
-        loaders: ['@svgr/webpack'],
-        as: '*.js',
-      },
-    },
-  },
+  // Turbopack configuration disabled due to ES module parsing bug
+  // turbopack: {
+  //   rules: {
+  //     '*.svg': {
+  //       loaders: ['@svgr/webpack'],
+  //       as: '*.js',
+  //     },
+  //   },
+  // },
   // Image optimization settings
   images: {
     formats: ['image/webp', 'image/avif'], // Enable modern image formats

@@ -104,10 +104,10 @@ export default function PayPalPaymentsManager() {
 
   const filteredPayments = payments.filter(payment => {
     const matchesSearch = 
-      payment.customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      payment.customerEmail.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      payment.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      payment.id.toLowerCase().includes(searchTerm.toLowerCase());
+      (payment.customerName || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (payment.customerEmail || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (payment.description || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (payment.id || '').toLowerCase().includes(searchTerm.toLowerCase());
 
     const matchesStatus = statusFilter === 'all' || payment.status === statusFilter;
     

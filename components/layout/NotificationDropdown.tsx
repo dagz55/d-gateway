@@ -76,32 +76,59 @@ export default function NotificationDropdown() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
   const [isOpen, setIsOpen] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const { user } = useUser();
   const supabase = useMemo(() => createRealtimeClient(), []);
 
   const unreadCount = notifications.filter(n => !n.is_read).length;
 
-  // Fetch notifications
+  // Fetch notifications with improved error handling
   const fetchNotifications = async () => {
-    if (!user) return;
+    if (!user) {
+      setLoading(false);
+      return;
+    }
 
     try {
       setLoading(true);
-      const { data, error } = await supabase
+      setError(null);
+      
+      const { data, error: supabaseError } = await supabase
         .from('notifications')
         .select('*')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false })
         .limit(20);
 
-      if (error) {
-        console.error('Error fetching notifications:', error);
+      if (supabaseError) {
+        const errorMessage = supabaseError.message || 'Unknown database error';
+        console.error('Supabase notifications error:', {
+          message: errorMessage,
+          details: supabaseError,
+          code: supabaseError.code,
+          hint: supabaseError.hint
+        });
+        
+        // Check for specific error types
+        if (errorMessage.includes('Invalid API key') || errorMessage.includes('JWT')) {
+          setError('Database connection issue. Notifications temporarily unavailable.');
+        } else if (errorMessage.includes('relation') && errorMessage.includes('does not exist')) {
+          setError('Notifications feature not yet configured.');
+        } else {
+          setError(`Database error: ${errorMessage}`);
+        }
         return;
       }
 
       setNotifications(data || []);
-    } catch (error) {
-      console.error('Error fetching notifications:', error);
+    } catch (error: any) {
+      const errorMessage = error?.message || 'Failed to fetch notifications';
+      console.error('Fetch notifications error:', {
+        message: errorMessage,
+        error,
+        stack: error?.stack
+      });
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -197,7 +224,7 @@ export default function NotificationDropdown() {
 
   // Set up real-time subscription for new notifications with enhanced error handling
   useEffect(() => {
-    if (!user) return;
+    if (!user || error) return; // Don't setup realtime if there's a database error
   
     let channel: any = null;
     let retryTimeout: NodeJS.Timeout | null = null;
@@ -208,9 +235,11 @@ export default function NotificationDropdown() {
     let isConnected = false;
     let lastSuccessfulConnection = Date.now();
     let isDestroyed = false;
+    let isHandlingError = false; // Guard against simultaneous error handling
   
     const cleanup = () => {
       isDestroyed = true;
+      isHandlingError = false; // Reset error handling flag
       if (retryTimeout) clearTimeout(retryTimeout);
       if (pollInterval) clearInterval(pollInterval);
       if (connectionCheckInterval) clearInterval(connectionCheckInterval);
@@ -224,28 +253,33 @@ export default function NotificationDropdown() {
     };
 
     const startPollingFallback = () => {
-      if (isDestroyed) return;
+      if (isDestroyed || error) return; // Don't poll if there's a database error
       console.log("🔄 Starting polling fallback for notifications");
       if (pollInterval) clearInterval(pollInterval);
       pollInterval = setInterval(() => {
-        if (!isDestroyed) {
+        if (!isDestroyed && !error) {
           fetchNotifications();
         }
       }, 30000); // Poll every 30 seconds
     };
 
     const checkConnectionHealth = () => {
-      if (isDestroyed) return;
+      if (isDestroyed || retryCount >= maxRetries) return;
       const timeSinceLastConnection = Date.now() - lastSuccessfulConnection;
       // If no successful connection for 2 minutes, force retry
       if (timeSinceLastConnection > 120000 && !isConnected) {
         console.log("🔍 Connection health check: Forcing retry due to long disconnection");
+        // Prevent recursive calls by clearing the connection check first
+        if (connectionCheckInterval) {
+          clearInterval(connectionCheckInterval);
+          connectionCheckInterval = null;
+        }
         handleSubscriptionError();
       }
     };
   
     const setupSubscription = () => {
-      if (isDestroyed) return;
+      if (isDestroyed || error) return; // Don't setup subscription if there's a database error
       
       try {
         // Clear any existing polling interval when a new subscription is attempted
@@ -311,15 +345,24 @@ export default function NotificationDropdown() {
     };
   
     const handleSubscriptionError = () => {
-      if (isDestroyed) return;
+      if (isDestroyed || retryCount >= maxRetries || isHandlingError) return;
+
+      // Prevent multiple simultaneous error handling calls
+      isHandlingError = true;
 
       isConnected = false;
+
+      // Stop connection health checks during error handling
+      if (connectionCheckInterval) {
+        clearInterval(connectionCheckInterval);
+        connectionCheckInterval = null;
+      }
 
       // Safely cleanup channel without triggering recursive errors
       if (channel) {
         try {
-          // Use unsubscribe instead of removeChannel to avoid recursion
-          channel.unsubscribe();
+          // Use removeChannel instead of unsubscribe to avoid event triggers
+          supabase.removeChannel(channel);
         } catch (error) {
           // Silently handle cleanup errors to prevent infinite loops
           console.debug("Channel cleanup error (ignored):", error);
@@ -337,6 +380,7 @@ export default function NotificationDropdown() {
       if (retryCount >= maxRetries || isDestroyed) {
         console.warn("⚠️ Max retries reached for notifications subscription. Using polling only.");
         retryCount = 0; // Reset for next attempt cycle
+        isHandlingError = false; // Reset error handling flag
         if (!isDestroyed) {
           startPollingFallback();
         }
@@ -351,6 +395,7 @@ export default function NotificationDropdown() {
         if (!isDestroyed) {
           setupSubscription();
         }
+        isHandlingError = false; // Reset error handling flag
       }, delay);
     };
 
@@ -359,7 +404,7 @@ export default function NotificationDropdown() {
     
     // Try WebSocket connection after a short delay
     setTimeout(() => {
-      if (!isDestroyed) {
+      if (!isDestroyed && !error) {
         setupSubscription();
       }
     }, 1000);
@@ -367,7 +412,7 @@ export default function NotificationDropdown() {
     return () => {
       cleanup();
     };
-  }, [user]);
+  }, [user, error]); // Add error as dependency
 
   if (!user) return null;
 
@@ -421,6 +466,20 @@ export default function NotificationDropdown() {
           {loading ? (
             <div className="flex items-center justify-center p-8">
               <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-[#33E1DA]"></div>
+            </div>
+          ) : error ? (
+            <div className="flex flex-col items-center justify-center p-8 text-center">
+              <AlertCircle className="h-8 w-8 text-red-400 mb-2" />
+              <p className="text-sm text-white/90 mb-1">Notifications Unavailable</p>
+              <p className="text-xs text-white/70">{error}</p>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={fetchNotifications}
+                className="mt-4 text-xs"
+              >
+                Retry
+              </Button>
             </div>
           ) : notifications.length === 0 ? (
             <div className="flex flex-col items-center justify-center p-8 text-center">

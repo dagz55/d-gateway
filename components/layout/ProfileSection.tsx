@@ -31,30 +31,6 @@ export default function ProfileSection({ isCollapsed = false, onNavigate }: Prof
   const { signOut } = useClerk();
   const router = useRouter();
   const [isExpanded, setIsExpanded] = useState(false);
-  const [subscriptionStatus, setSubscriptionStatus] = useState<{
-    isPremium: boolean;
-    planName: string;
-    status: string;
-  }>({
-    isPremium: false,
-    planName: 'Free Plan',
-    status: 'Active'
-  });
-
-  // Fetch subscription status from user metadata
-  useEffect(() => {
-    if (user) {
-      const isPremium = user.publicMetadata?.isPremium === true || user.publicMetadata?.subscriptionType === 'premium';
-      const planName = isPremium ? 'Premium Plan' : 'Free Plan';
-      const status = user.publicMetadata?.subscriptionStatus === 'active' ? 'Active' : 'Inactive';
-      
-      setSubscriptionStatus({
-        isPremium,
-        planName,
-        status
-      });
-    }
-  }, [user]);
 
   if (!isLoaded) {
     return (
@@ -160,23 +136,6 @@ export default function ProfileSection({ isCollapsed = false, onNavigate }: Prof
         </div>
       </div>
 
-      {/* Membership Status */}
-      <div className="mb-4 p-3 rounded-lg bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/40 dark:to-purple-900/40 border border-blue-200/50 dark:border-blue-600/50">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <div className={`p-1.5 rounded-full ${subscriptionStatus.isPremium ? 'bg-gradient-to-r from-blue-500 to-purple-600' : 'bg-gradient-to-r from-gray-400 to-gray-600'}`}>
-              <Crown className="h-3 w-3 text-white" />
-            </div>
-            <div>
-              <p className="text-xs font-bold text-slate-900 dark:text-white">{subscriptionStatus.planName}</p>
-              <p className="text-xs text-slate-800 dark:text-white/90 font-semibold">{subscriptionStatus.status}</p>
-            </div>
-          </div>
-          <Badge className={`${subscriptionStatus.isPremium ? 'bg-gradient-to-r from-blue-500 to-purple-600' : 'bg-gradient-to-r from-gray-500 to-gray-600'} text-white border-0 text-xs font-semibold`}>
-            {subscriptionStatus.isPremium ? 'Pro' : 'Free'}
-          </Badge>
-        </div>
-      </div>
 
       {/* Quick Actions */}
       <div className="space-y-1 mb-4">

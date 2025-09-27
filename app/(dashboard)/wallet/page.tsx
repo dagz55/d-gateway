@@ -126,7 +126,7 @@ async function getWalletData(userId: string) {
 
 function renderWalletPage(walletData: any, firstName: string) {
   return (
-    <div className="space-y-8">
+    <div className="dashboard-content space-y-8">
       {/* Header Section */}
       <div className="space-y-4">
         <div className="flex items-center gap-3">

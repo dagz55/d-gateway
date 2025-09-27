@@ -73,13 +73,13 @@ export default function SystemStatusPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="admin-dashboard space-y-6">
       <div className="flex items-center gap-3">
         <div className="p-2 bg-accent/20 rounded-lg">
           <Activity className="h-6 w-6 text-accent" />
         </div>
         <div>
-          <h1 className="text-2xl font-bold text-white">System Status</h1>
+          <h1 className="text-2xl font-bold text-foreground">System Status</h1>
           <p className="text-muted-foreground">Monitor system health, services, and logs</p>
         </div>
       </div>
@@ -92,7 +92,7 @@ export default function SystemStatusPage() {
               <CheckCircle className="h-8 w-8 text-green-400" />
               <div>
                 <p className="text-sm font-medium text-green-400">SYSTEM STATUS</p>
-                <p className="text-xl font-bold text-white">All Systems Operational</p>
+                <p className="text-xl font-bold text-foreground">All Systems Operational</p>
               </div>
             </div>
           </CardContent>
@@ -103,7 +103,7 @@ export default function SystemStatusPage() {
               <Activity className="h-8 w-8 text-blue-400" />
               <div>
                 <p className="text-sm font-medium text-blue-400">UPTIME</p>
-                <p className="text-xl font-bold text-white">99.8%</p>
+                <p className="text-xl font-bold text-foreground">99.8%</p>
               </div>
             </div>
           </CardContent>
@@ -114,7 +114,7 @@ export default function SystemStatusPage() {
               <Server className="h-8 w-8 text-purple-400" />
               <div>
                 <p className="text-sm font-medium text-purple-400">RESPONSE TIME</p>
-                <p className="text-xl font-bold text-white">245ms</p>
+                <p className="text-xl font-bold text-foreground">245ms</p>
               </div>
             </div>
           </CardContent>
@@ -124,7 +124,7 @@ export default function SystemStatusPage() {
       {/* Services Status */}
       <Card className="bg-background/50 border-border">
         <CardHeader>
-          <CardTitle className="text-white">Service Status</CardTitle>
+          <CardTitle className="text-foreground">Service Status</CardTitle>
           <CardDescription>Current status of all system services</CardDescription>
         </CardHeader>
         <CardContent>
@@ -136,7 +136,7 @@ export default function SystemStatusPage() {
                   <div className="flex items-center gap-3">
                     <Icon className="h-5 w-5 text-muted-foreground" />
                     <div>
-                      <p className="font-medium text-white">{service.name}</p>
+                      <p className="font-medium text-foreground">{service.name}</p>
                       <p className="text-xs text-muted-foreground">Last checked: {service.lastCheck}</p>
                     </div>
                   </div>
@@ -161,7 +161,7 @@ export default function SystemStatusPage() {
       {/* System Resources */}
       <Card className="bg-background/50 border-border">
         <CardHeader>
-          <CardTitle className="text-white">System Resources</CardTitle>
+          <CardTitle className="text-foreground">System Resources</CardTitle>
           <CardDescription>Real-time resource utilization</CardDescription>
         </CardHeader>
         <CardContent>
@@ -174,9 +174,9 @@ export default function SystemStatusPage() {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <Icon className="h-4 w-4 text-muted-foreground" />
-                      <span className="text-sm font-medium text-white">{resource.name}</span>
+                      <span className="text-sm font-medium text-foreground">{resource.name}</span>
                     </div>
-                    <span className="text-sm text-white">{resource.value}{resource.unit}</span>
+                    <span className="text-sm text-foreground">{resource.value}{resource.unit}</span>
                   </div>
                   <div className="h-2 bg-slate-700 rounded-full">
                     <div
@@ -197,7 +197,7 @@ export default function SystemStatusPage() {
       {/* System Logs */}
       <Card className="bg-background/50 border-border">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-white">
+          <CardTitle className="flex items-center gap-2 text-foreground">
             <FileText className="h-5 w-5" />
             Recent System Logs
           </CardTitle>
@@ -214,7 +214,7 @@ export default function SystemStatusPage() {
                   {log.level}
                 </Badge>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm text-white">{log.message}</p>
+                  <p className="text-sm text-foreground">{log.message}</p>
                   <p className="text-xs text-muted-foreground">{log.service}</p>
                 </div>
               </div>

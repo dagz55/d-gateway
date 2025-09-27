@@ -1,10 +1,25 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createServerSupabaseClient } from '@/lib/supabase/serverClient';
+import { createAdminClient } from '@/lib/supabase/adminClient';
+
+interface PayPalPaymentDB {
+  id: string;
+  amount: number;
+  currency: string;
+  description: string;
+  customer_name: string;
+  customer_email: string;
+  status: 'pending' | 'completed' | 'failed';
+  payment_link: string;
+  paypal_order_id?: string;
+  transaction_details?: any;
+  created_at: string;
+  updated_at: string;
+}
 
 export async function GET(request: NextRequest) {
   try {
-    // Use server client for PayPal operations
-    const supabase = await createServerSupabaseClient();
+    // Use admin client for PayPal operations
+    const supabase = createAdminClient();
 
     // Get query parameters
     const { searchParams } = new URL(request.url);
@@ -26,7 +41,7 @@ export async function GET(request: NextRequest) {
       query = query.eq('status', status);
     }
 
-    const { data: payments, error } = await query;
+    const { data: payments, error } = await query as { data: PayPalPaymentDB[] | null; error: any };
 
     if (error) {
       console.error('Database error:', error);
@@ -51,8 +66,24 @@ export async function GET(request: NextRequest) {
       console.error('Count error:', countError);
     }
 
+    // Transform the data to match the expected interface
+    const transformedPayments = (payments || []).map(payment => ({
+      id: payment.id,
+      amount: payment.amount,
+      currency: payment.currency,
+      description: payment.description,
+      customerName: payment.customer_name,
+      customerEmail: payment.customer_email,
+      status: payment.status,
+      paymentLink: payment.payment_link,
+      paypalOrderId: payment.paypal_order_id,
+      transactionDetails: payment.transaction_details,
+      createdAt: payment.created_at,
+      updatedAt: payment.updated_at,
+    }));
+
     return NextResponse.json({
-      payments: payments || [],
+      payments: transformedPayments,
       total: count || 0,
       limit,
       offset,

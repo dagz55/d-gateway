@@ -1,6 +1,6 @@
 'use client';
 
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import {
@@ -61,12 +61,15 @@ export default function ViewDetailsModal({ member, isOpen, onClose }: ViewDetail
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl bg-card/95 backdrop-blur-sm border-border/50 max-h-[85vh] p-0 overflow-hidden">
-        <DialogHeader className="px-6 pt-6 pb-2 border-b border-border/30">
+      <DialogContent className="admin-dashboard max-w-2xl bg-gray-900 border-gray-700 max-h-[85vh] p-0 overflow-hidden">
+        <DialogHeader className="px-6 pt-6 pb-2 border-b border-gray-700">
           <DialogTitle className="flex items-center gap-3 text-white">
             <User className="h-5 w-5" />
             Member Details
           </DialogTitle>
+          <DialogDescription className="text-gray-400">
+            View detailed information about this member account.
+          </DialogDescription>
         </DialogHeader>
 
         <div className="px-6 pb-6 max-h-[calc(85vh-80px)] overflow-y-scroll overflow-x-hidden modal-scrollbar">

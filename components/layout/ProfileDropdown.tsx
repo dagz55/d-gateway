@@ -10,18 +10,11 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import {
   Bell,
-  Crown,
   Edit3,
   HelpCircle,
   LogOut,
   Settings,
 } from 'lucide-react';
-
-interface SubscriptionStatus {
-  isPremium: boolean;
-  planName: string;
-  status: string;
-}
 
 interface AccountAction {
   icon: React.ComponentType<{ className?: string }>;
@@ -38,27 +31,6 @@ export default function ProfileDropdown() {
   const { signOut } = useClerk();
   const { user, isLoaded } = useUser();
   const [isOpen, setIsOpen] = useState(false);
-  const [subscriptionStatus, setSubscriptionStatus] = useState<SubscriptionStatus>({
-    isPremium: false,
-    planName: 'Free Plan',
-    status: 'Active',
-  });
-
-  useEffect(() => {
-    if (user) {
-      const isPremium =
-        user.publicMetadata?.isPremium === true ||
-        user.publicMetadata?.subscriptionType === 'premium';
-      const planName = isPremium ? 'Premium Plan' : 'Free Plan';
-      const status = user.publicMetadata?.subscriptionStatus === 'active' ? 'Active' : 'Inactive';
-
-      setSubscriptionStatus({
-        isPremium,
-        planName,
-        status,
-      });
-    }
-  }, [user]);
 
   const handleAccountAction = (action: AccountAction) => {
     setIsOpen(false);
@@ -189,30 +161,6 @@ export default function ProfileDropdown() {
                 </div>
               </div>
 
-               <div className="p-3 rounded-lg bg-gradient-to-r from-blue-50/80 to-purple-50/80 dark:from-blue-900/40 dark:to-purple-900/40 border border-blue-200/50 dark:border-blue-600/50">
-                 <div className="flex items-center justify-between">
-                   <div className="flex items-center space-x-2">
-                     <span
-                       className={cn(
-                         'p-1.5 rounded-full',
-                         subscriptionStatus.isPremium
-                           ? 'bg-gradient-to-r from-blue-500 to-purple-600'
-                           : 'bg-gradient-to-r from-gray-400 to-gray-600'
-                       )}
-                     >
-                       <Crown className="h-3 w-3 text-white" />
-                     </span>
-                     <div>
-                       <p className="text-xs font-bold text-slate-900 dark:text-white">
-                         {subscriptionStatus.planName}
-                       </p>
-                       <p className="text-xs text-slate-800 dark:text-white/90 font-semibold">
-                         {subscriptionStatus.status}
-                       </p>
-                     </div>
-                   </div>
-                 </div>
-               </div>
 
               <div>
                 <p className="text-xs font-bold text-white/80 uppercase tracking-wide px-1">

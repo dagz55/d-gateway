@@ -23,6 +23,7 @@ const isPublicRoute = createRouteMatcher([
   // Public API endpoints (avoid auth in middleware to prevent NEXT_HTTP_ERROR_FALLBACK noise)
   "/api/crypto(.*)",
   "/api/payments/paypal(.*)",
+  "/api/test-supabase",
   // Test and payment pages
   "/test-payment",
   "/ncp/payment(.*)",

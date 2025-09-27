@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createServerSupabaseClient } from '@/lib/supabase/serverClient';
+import { createAdminClient } from '@/lib/supabase/adminClient';
 
 interface UpdatePaymentStatusRequest {
   paymentId: string;
@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const supabase = await createServerSupabaseClient();
+    const supabase = createAdminClient();
 
     // Update payment status
     const updateData: any = {

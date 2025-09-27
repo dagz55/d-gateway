@@ -32,7 +32,7 @@ export default async function ProfilePage() {
   const profile = profileResult.success ? profileResult.profile : null;
 
   return (
-    <div className="container mx-auto py-2 md:py-6 space-y-3 md:space-y-6 max-w-4xl px-1 md:px-0">
+    <div className="dashboard-content container mx-auto py-2 md:py-6 space-y-3 md:space-y-6 max-w-4xl px-1 md:px-0">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-xl md:text-3xl font-bold tracking-tight">Profile Settings</h1>

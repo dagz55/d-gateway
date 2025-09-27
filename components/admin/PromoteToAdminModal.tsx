@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
@@ -77,12 +77,15 @@ export default function PromoteToAdminModal({ member, isOpen, onClose, onPromote
 
   return (
     <Dialog open={isOpen} onOpenChange={handleCancel}>
-      <DialogContent className="max-w-lg bg-card/95 backdrop-blur-sm border-border/50 max-h-[85vh] p-0 overflow-hidden">
+      <DialogContent className="admin-dashboard max-w-lg bg-gray-900 border-gray-700 max-h-[85vh] p-0 overflow-hidden">
         <DialogHeader className="px-6 pt-6 pb-2 border-b border-border/30">
           <DialogTitle className="flex items-center gap-3 text-white">
             <Shield className="h-5 w-5" />
             {confirmed ? 'Confirm Promotion' : 'Promote to Admin'}
           </DialogTitle>
+          <DialogDescription className="text-gray-400">
+            Grant admin privileges to this member.
+          </DialogDescription>
         </DialogHeader>
 
         <div className="px-6 max-h-[calc(85vh-140px)] overflow-y-scroll overflow-x-hidden modal-scrollbar">

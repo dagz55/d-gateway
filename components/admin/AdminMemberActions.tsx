@@ -171,7 +171,7 @@ export default function AdminMemberActions({ member }: AdminMemberActionsProps) 
         </DropdownMenuTrigger>
         <DropdownMenuContent
           align="end"
-          className="glass border-border/50 bg-background/95 backdrop-blur-sm min-w-[180px]"
+          className="admin-dashboard glass border-border/50 bg-background/95 backdrop-blur-sm min-w-[180px]"
           sideOffset={5}
         >
 
@@ -183,8 +183,8 @@ export default function AdminMemberActions({ member }: AdminMemberActionsProps) 
             className="cursor-pointer hover:bg-gray-700/30 focus:bg-gray-700/50 transition-colors duration-150 px-3 py-2.5 mx-1 my-0.5 rounded-md"
           >
             <span className="flex items-center w-full">
-              <Eye className="mr-3 h-4 w-4 flex-shrink-0" />
-              <span className="flex-1">View Details</span>
+              <Eye className="mr-3 h-4 w-4 flex-shrink-0 text-foreground" />
+              <span className="flex-1 text-foreground">View Details</span>
             </span>
           </DropdownMenuItem>
 
@@ -196,8 +196,8 @@ export default function AdminMemberActions({ member }: AdminMemberActionsProps) 
             className="cursor-pointer hover:bg-gray-700/30 focus:bg-gray-700/50 transition-colors duration-150 px-3 py-2.5 mx-1 my-0.5 rounded-md"
           >
             <span className="flex items-center w-full">
-              <Edit className="mr-3 h-4 w-4 flex-shrink-0" />
-              <span className="flex-1">Edit Member</span>
+              <Edit className="mr-3 h-4 w-4 flex-shrink-0 text-foreground" />
+              <span className="flex-1 text-foreground">Edit Member</span>
             </span>
           </DropdownMenuItem>
 
@@ -212,8 +212,8 @@ export default function AdminMemberActions({ member }: AdminMemberActionsProps) 
               className="cursor-pointer hover:bg-gray-700/30 focus:bg-gray-700/50 transition-colors duration-150 px-3 py-2.5 mx-1 my-0.5 rounded-md"
             >
               <span className="flex items-center w-full">
-                <UserCheck className="mr-3 h-4 w-4 flex-shrink-0" />
-                <span className="flex-1">Activate Member</span>
+                <UserCheck className="mr-3 h-4 w-4 flex-shrink-0 text-foreground" />
+                <span className="flex-1 text-foreground">Activate Member</span>
               </span>
             </DropdownMenuItem>
           )}
@@ -227,8 +227,8 @@ export default function AdminMemberActions({ member }: AdminMemberActionsProps) 
               className="cursor-pointer hover:bg-gray-700/30 focus:bg-gray-700/50 transition-colors duration-150 px-3 py-2.5 mx-1 my-0.5 rounded-md"
             >
               <span className="flex items-center w-full">
-                <Shield className="mr-3 h-4 w-4 flex-shrink-0" />
-                <span className="flex-1">Promote to Admin</span>
+                <Shield className="mr-3 h-4 w-4 flex-shrink-0 text-foreground" />
+                <span className="flex-1 text-foreground">Promote to Admin</span>
               </span>
             </DropdownMenuItem>
           )}
@@ -244,8 +244,8 @@ export default function AdminMemberActions({ member }: AdminMemberActionsProps) 
               className="cursor-pointer text-red-400 focus:text-red-400 hover:bg-red-500/10 focus:bg-red-500/10 transition-colors duration-150 px-3 py-2.5 mx-1 my-0.5 rounded-md"
             >
               <span className="flex items-center w-full">
-                <Trash2 className="mr-3 h-4 w-4 flex-shrink-0" />
-                <span className="flex-1">Delete Member</span>
+                <Trash2 className="mr-3 h-4 w-4 flex-shrink-0 text-red-400" />
+                <span className="flex-1 text-red-400">Delete Member</span>
               </span>
             </DropdownMenuItem>
           )}

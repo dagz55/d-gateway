@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -29,8 +29,11 @@ interface MemberData {
   is_admin: boolean;
   created_at: string;
   last_sign_in_at?: string;
-  active_trades?: number;
+  email_verified: boolean;
   phone?: string;
+  banned: boolean;
+  locked: boolean;
+  active_trades?: number;
   wallet_balance?: number;
   status?: 'active' | 'inactive' | 'suspended';
 }
@@ -127,12 +130,15 @@ export default function EditMemberModal({ member, isOpen, onClose, onSave }: Edi
 
   return (
     <Dialog open={isOpen} onOpenChange={handleCancel}>
-      <DialogContent className="max-w-2xl bg-card/95 backdrop-blur-sm border-border/50 max-h-[85vh] p-0 overflow-hidden">
+      <DialogContent className="admin-dashboard max-w-2xl bg-gray-900 border-gray-700 max-h-[85vh] p-0 overflow-hidden">
         <DialogHeader className="px-6 pt-6 pb-2 border-b border-border/30">
           <DialogTitle className="flex items-center gap-3 text-white">
             <User className="h-5 w-5" />
             Edit Member Details
           </DialogTitle>
+          <DialogDescription className="text-gray-400">
+            Update member information, contact details, and account settings.
+          </DialogDescription>
         </DialogHeader>
 
         <div className="px-6 max-h-[calc(85vh-140px)] overflow-y-scroll overflow-x-hidden modal-scrollbar">

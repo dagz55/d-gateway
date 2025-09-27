@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
@@ -98,12 +98,15 @@ export default function ActivateMemberModal({ member, isOpen, onClose, onActivat
 
   return (
     <Dialog open={isOpen} onOpenChange={cancelAction}>
-      <DialogContent className="max-w-md bg-card/95 backdrop-blur-sm border-border/50 max-h-[85vh] p-0 overflow-hidden">
+      <DialogContent className="admin-dashboard max-w-md bg-gray-900 border-gray-700 max-h-[85vh] p-0 overflow-hidden">
         <DialogHeader className="px-6 pt-6 pb-2 border-b border-border/30">
           <DialogTitle className="flex items-center gap-3 text-white">
             <User className="h-5 w-5" />
             {selectedAction ? 'Confirm Action' : 'Manage Member Status'}
           </DialogTitle>
+          <DialogDescription className="text-gray-400">
+            Activate, deactivate, or suspend this member account.
+          </DialogDescription>
         </DialogHeader>
 
         <div className="px-6 max-h-[calc(85vh-140px)] overflow-y-scroll overflow-x-hidden modal-scrollbar">

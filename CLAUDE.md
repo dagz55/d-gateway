@@ -315,7 +315,7 @@ docker-compose -f docker-compose.mcp.yml restart  # Restart
 ## Reference
 
 ### Current Version
-**v2.11.14** - Vercel Deployment & User Profile Integration (January 2025)
+**v2.11.21** - Critical Theme & Build Fixes (January 2025)
 
 ### Key Scripts
 | Command | Purpose |
@@ -343,7 +343,7 @@ docker-compose -f docker-compose.mcp.yml restart  # Restart
 
 ---
 
-*Last updated: January 2025 (v2.11.14)*
+*Last updated: January 2025 (v2.11.21)*
 
 > For detailed version history, see `CHANGELOG.md`
 > For additional documentation, see `README.md` and `/docs` directory

@@ -1,6 +1,6 @@
 {
   "name": "zignal",
-  "version": "2.11.20",
+  "version": "2.11.21",
   "private": true,
   "description": "Zignal - Advanced Trading Signals & Analytics Platform",
   "author": "dagzsuarez",
@@ -14,7 +14,7 @@
   "scripts": {
     "predev": "sh scripts/free-port-3000.sh 3000",
     "prestart": "sh scripts/free-port-3000.sh 3000",
-    "dev": "next dev --turbopack -p 3000",
+    "dev": "next dev -p 3000",
     "dev:qa": "next dev -p 3002",
     "build": "next build",
     "start": "next start",
@@ -46,7 +46,7 @@
     "@anthropic-ai/claude-code": "^1.0.123",
     "@clerk/backend": "^1.21.0",
     "@clerk/mcp-tools": "^0.3.1",
-    "@clerk/nextjs": "^6.32.2",
+    "@clerk/nextjs": "^6.33.0",
     "@clerk/themes": "^2.4.19",
     "@google-pay/button-react": "^3.2.1",
     "@googlemaps/js-api-loader": "^1.16.10",
@@ -126,6 +126,7 @@
     "recharts": "^2.15.4",
     "sonner": "^1.4.4",
     "stripe": "^18.5.0",
+    "svix": "^1.76.1",
     "tailwind-merge": "^2.5.0",
     "tailwindcss-animate": "^1.0.7",
     "three": "^0.180.0",

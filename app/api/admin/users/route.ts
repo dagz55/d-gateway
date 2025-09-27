@@ -18,20 +18,20 @@ async function assertAdmin(request?: NextRequest) {
       console.log('Admin API: No user found');
       return { user: null, isAdmin: false }
     }
-    
+
     // Enhanced admin status checking with detailed logging
     const publicMetadata = user.publicMetadata || {};
     const organizationMemberships = (user as any)?.organizationMemberships || [];
-    
+
     const adminChecks = {
       isAdminFlag: publicMetadata.isAdmin === true,
       adminRole: publicMetadata.role === 'admin',
       superAdminRole: publicMetadata.role === 'super_admin',
-      organizationAdmin: organizationMemberships.some((membership: any) => 
+      organizationAdmin: organizationMemberships.some((membership: any) =>
         membership.role === 'admin' || membership.role === 'owner'
       )
     };
-    
+
     const isAdminUser = Object.values(adminChecks).some(Boolean);
 
     // Log admin check result only in debug mode
@@ -64,13 +64,13 @@ export async function GET(request: NextRequest) {
         note: 'Build time execution - no data available'
       })
     }
-    
+
     const { user, isAdmin } = adminCheck
     if (!user) {
       console.log('Admin API: No user found, returning 401');
       return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 })
     }
-    
+
     if (!isAdmin) {
       if (DEBUG_ADMIN_LOGS) {
         console.log('Admin API: User is not admin', {
@@ -80,7 +80,7 @@ export async function GET(request: NextRequest) {
           organizationMemberships: (user as any)?.organizationMemberships?.length || 0
         });
       }
-      
+
       const responseBody: { success: boolean; message: string; debug?: any } = {
         success: false,
         message: 'Forbidden - Admin access required'
@@ -100,36 +100,86 @@ export async function GET(request: NextRequest) {
       return NextResponse.json(responseBody, { status: 403 })
     }
 
+    // Debug environment variables
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+    console.log('Environment check:', {
+      hasSupabaseUrl: !!supabaseUrl,
+      hasServiceRoleKey: !!serviceRoleKey,
+      supabaseUrlStart: supabaseUrl?.substring(0, 20) + '...',
+      serviceRoleKeyStart: serviceRoleKey?.substring(0, 20) + '...'
+    });
+
+    if (!supabaseUrl || !serviceRoleKey) {
+      console.error('Missing required environment variables:', {
+        NEXT_PUBLIC_SUPABASE_URL: !!supabaseUrl,
+        SUPABASE_SERVICE_ROLE_KEY: !!serviceRoleKey
+      });
+      return NextResponse.json({
+        success: false,
+        message: 'Server configuration error: Missing Supabase credentials'
+      }, { status: 500 });
+    }
+
     const admin = createAdminClient()
     const { searchParams } = new URL(request.url)
     const page = parseInt(searchParams.get('page') || '1')
     const limit = parseInt(searchParams.get('limit') || '10')
     const q = (searchParams.get('q') || '').toLowerCase()
 
-    let query = admin
-      .from('user_profiles')
-      .select('id, email, username, full_name, is_admin, created_at', { count: 'exact' })
-      .order('created_at', { ascending: false })
+    try {
+      let query = admin
+        .from('user_profiles')
+        .select('id, email, username, full_name, is_admin, created_at', { count: 'exact' })
+        .order('created_at', { ascending: false })
 
-    if (q) {
-      query = query.or(`email.ilike.%${q}%,username.ilike.%${q}%,full_name.ilike.%${q}%`)
-    }
-
-    const start = (page - 1) * limit
-    const end = start + limit - 1
-    const { data, error, count } = await query.range(start, end)
-    if (error) throw error
-
-    return NextResponse.json({
-      success: true,
-      data: {
-        items: data,
-        total: count || 0,
-        page,
-        limit,
-        totalPages: Math.max(1, Math.ceil((count || 0) / limit))
+      if (q) {
+        query = query.or(`email.ilike.%${q}%,username.ilike.%${q}%,full_name.ilike.%${q}%`)
       }
-    })
+
+      const start = (page - 1) * limit
+      const end = start + limit - 1
+
+      console.log('Attempting Supabase query with params:', { start, end, q, page, limit });
+
+      const { data, error, count } = await query.range(start, end)
+
+      console.log('Supabase query result:', {
+        dataLength: data?.length,
+        count,
+        error: error?.message || 'none'
+      });
+
+      if (error) {
+        console.error('Supabase query error details:', error);
+        throw error;
+      }
+
+      // Transform field names to match component expectations
+      const transformedData = data?.map(item => ({
+        user_id: item.id,
+        email: item.email,
+        display_name: item.username,
+        full_name: item.full_name,
+        is_admin: item.is_admin,
+        created_at: item.created_at,
+        role: item.is_admin ? 'admin' : 'member'
+      })) || []
+
+      return NextResponse.json({
+        success: true,
+        data: {
+          items: transformedData,
+          total: count || 0,
+          page,
+          limit,
+          totalPages: Math.max(1, Math.ceil((count || 0) / limit))
+        }
+      })
+    } catch (error: any) {
+      return NextResponse.json({ success: false, message: error?.message || 'Internal error' }, { status: 500 })
+    }
   } catch (error: any) {
     return NextResponse.json({ success: false, message: error?.message || 'Internal error' }, { status: 500 })
   }
@@ -163,9 +213,18 @@ export async function PUT(request: NextRequest) {
       .single()
     if (error) throw error
 
-    return NextResponse.json({ success: true, data })
+    // Transform field names to match component expectations
+    const transformedData = {
+      user_id: data.id,
+      email: data.email,
+      display_name: data.username,
+      full_name: data.full_name,
+      is_admin: data.is_admin,
+      role: data.is_admin ? 'admin' : 'member'
+    }
+
+    return NextResponse.json({ success: true, data: transformedData })
   } catch (error: any) {
     return NextResponse.json({ success: false, message: error?.message || 'Internal error' }, { status: 500 })
   }
 }
-

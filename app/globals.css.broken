@@ -527,6 +527,141 @@
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
+/* Advanced Glassmorphic Variants */
+.glass-light {
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+}
+
+.glass-heavy {
+  background: rgba(30, 42, 68, 0.45);
+  backdrop-filter: blur(24px);
+  border: 1px solid rgba(51, 225, 218, 0.2);
+  box-shadow:
+    0 12px 40px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.2);
+}
+
+.glass-subtle {
+  background: rgba(30, 42, 68, 0.15);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(51, 225, 218, 0.08);
+  box-shadow:
+    0 4px 20px rgba(0, 0, 0, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}
+
+.glass-premium {
+  background: linear-gradient(
+    135deg,
+    rgba(30, 42, 68, 0.4) 0%,
+    rgba(26, 127, 179, 0.15) 50%,
+    rgba(51, 225, 218, 0.08) 100%
+  );
+  backdrop-filter: blur(18px);
+  border: 1px solid rgba(51, 225, 218, 0.15);
+  box-shadow:
+    0 10px 35px rgba(0, 0, 0, 0.4),
+    inset 0 2px 0 rgba(255, 255, 255, 0.08),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.15),
+    0 0 20px rgba(51, 225, 218, 0.1);
+}
+
+.glass-card {
+  background: rgba(30, 42, 68, 0.35);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(51, 225, 218, 0.12);
+  border-radius: 16px;
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.glass-header {
+  background: linear-gradient(
+    135deg,
+    rgba(30, 42, 68, 0.6) 0%,
+    rgba(26, 127, 179, 0.25) 100%
+  );
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(51, 225, 218, 0.2);
+  border-radius: 20px;
+  box-shadow:
+    0 12px 40px rgba(0, 0, 0, 0.4),
+    inset 0 2px 0 rgba(255, 255, 255, 0.1),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.15),
+    0 0 30px rgba(51, 225, 218, 0.15);
+}
+
+.glass-stat-card {
+  background: linear-gradient(
+    145deg,
+    rgba(30, 42, 68, 0.4) 0%,
+    rgba(26, 127, 179, 0.2) 70%,
+    rgba(51, 225, 218, 0.1) 100%
+  );
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(51, 225, 218, 0.15);
+  border-radius: 14px;
+  box-shadow:
+    0 6px 25px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.glass-stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.05),
+    transparent
+  );
+  transition: left 0.8s ease;
+}
+
+.glass-activity-card {
+  background: rgba(30, 42, 68, 0.3);
+  backdrop-filter: blur(14px);
+  border: 1px solid rgba(51, 225, 218, 0.1);
+  border-radius: 18px;
+  box-shadow:
+    0 8px 30px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  position: relative;
+}
+
+.glass-activity-card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(51, 225, 218, 0.3),
+    transparent
+  );
+}
+
 /* Additional animation utilities */
 .animate-fade-in {
   animation: fadeIn 0.6s ease-out forwards;
@@ -543,11 +678,44 @@
   }
 }
 
+/* Glass hover and interactive states */
 .glass-hover:hover {
   background: rgba(30, 42, 68, 0.4);
   border-color: rgba(51, 225, 218, 0.2);
   transform: translateY(-1px);
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.glass-stat-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(51, 225, 218, 0.25);
+  box-shadow:
+    0 8px 35px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.15),
+    0 0 25px rgba(51, 225, 218, 0.2);
+}
+
+.glass-stat-card:hover::before {
+  left: 100%;
+}
+
+.glass-activity-card:hover {
+  background: rgba(30, 42, 68, 0.4);
+  border-color: rgba(51, 225, 218, 0.15);
+  transform: translateY(-1px);
+  box-shadow:
+    0 10px 35px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.glass-header:hover {
+  border-color: rgba(51, 225, 218, 0.3);
+  box-shadow:
+    0 15px 45px rgba(0, 0, 0, 0.5),
+    inset 0 2px 0 rgba(255, 255, 255, 0.15),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.2),
+    0 0 40px rgba(51, 225, 218, 0.25);
 }
 
 .dashboard-bg {
@@ -1159,4 +1327,495 @@ a:focus-visible {
   position: absolute;
   left: -9999px;
   animation: float 0s, spin-slow 0s, gradient-shift 0s;
+}
+
+/* ===== GLASSMORPHIC DESIGN SYSTEM ===== */
+
+/* Dashboard Background */
+.dashboard-bg {
+  background: linear-gradient(135deg,
+    rgba(3, 7, 18, 0.95) 0%,
+    rgba(6, 12, 25, 0.9) 50%,
+    rgba(9, 15, 30, 0.85) 100%);
+  position: relative;
+}
+
+.dashboard-bg::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(600px circle at 20% 20%, rgba(120, 119, 198, 0.15), transparent 50%),
+    radial-gradient(800px circle at 80% 80%, rgba(247, 147, 26, 0.1), transparent 50%),
+    radial-gradient(400px circle at 50% 50%, rgba(72, 187, 120, 0.08), transparent 50%);
+  pointer-events: none;
+}
+
+/* Core Glass Effects */
+.glass-light {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 16px;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.37),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.glass-heavy {
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 20px;
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  box-shadow:
+    0 12px 40px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+.glass-subtle {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+}
+
+.glass-premium {
+  background: linear-gradient(135deg,
+    rgba(255, 255, 255, 0.15) 0%,
+    rgba(255, 255, 255, 0.05) 100%);
+  border: 1px solid transparent;
+  border-radius: 24px;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow:
+    0 16px 48px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  position: relative;
+}
+
+.glass-premium::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 24px;
+  padding: 1px;
+  background: linear-gradient(135deg,
+    rgba(247, 147, 26, 0.4) 0%,
+    rgba(120, 119, 198, 0.3) 50%,
+    rgba(72, 187, 120, 0.4) 100%);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: xor;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+}
+
+/* Card Variants */
+.glass-card {
+  background: rgba(255, 255, 255, 0.09);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 18px;
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  box-shadow:
+    0 10px 36px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+
+.glass-card:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 16px 48px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.glass-header {
+  background: linear-gradient(135deg,
+    rgba(247, 147, 26, 0.15) 0%,
+    rgba(120, 119, 198, 0.1) 50%,
+    rgba(72, 187, 120, 0.08) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 20px;
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  box-shadow:
+    0 12px 40px rgba(0, 0, 0, 0.45),
+    inset 0 2px 0 rgba(255, 255, 255, 0.15),
+    0 0 60px rgba(247, 147, 26, 0.1);
+}
+
+.glass-stat-card {
+  background: linear-gradient(135deg,
+    rgba(255, 255, 255, 0.12) 0%,
+    rgba(255, 255, 255, 0.06) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 16px;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  position: relative;
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+
+.glass-stat-card::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(45deg,
+    transparent 30%,
+    rgba(255, 255, 255, 0.1) 50%,
+    transparent 70%);
+  transform: translateX(-100%) translateY(-100%) rotate(45deg);
+  transition: transform 0.6s ease;
+}
+
+.glass-stat-card:hover::before {
+  transform: translateX(100%) translateY(100%) rotate(45deg);
+}
+
+.glass-stat-card:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.6),
+    inset 0 2px 0 rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+.glass-activity-card {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-top: 2px solid rgba(247, 147, 26, 0.6);
+  border-radius: 20px;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow:
+    0 12px 40px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+
+.glass-activity-card:hover {
+  transform: translateY(-3px);
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.5),
+    inset 0 2px 0 rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.18);
+}
+
+/* Text Effects */
+.gradient-text {
+  background: linear-gradient(135deg,
+    rgba(255, 255, 255, 1) 0%,
+    rgba(247, 147, 26, 0.9) 50%,
+    rgba(120, 119, 198, 0.8) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Animation Utilities */
+@keyframes float-glass {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-4px); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 20px rgba(247, 147, 26, 0.3); }
+  50% { box-shadow: 0 0 40px rgba(247, 147, 26, 0.6); }
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+.animate-float-glass {
+  animation: float-glass 3s ease-in-out infinite;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+/* Interactive States */
+.glass-interactive {
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+
+.glass-interactive:hover {
+  transform: translateY(-2px) scale(1.01);
+}
+
+.glass-interactive:active {
+  transform: translateY(0px) scale(0.99);
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .glass-card, .glass-header, .glass-stat-card, .glass-activity-card {
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+
+  .glass-premium {
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+  }
+}
+
+/* Enhanced Glass Variants for Dark Mode */
+@media (prefers-color-scheme: dark) {
+  .glass-light {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+
+  .glass-heavy {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.15);
+  }
+
+  .glass-card {
+    background: rgba(255, 255, 255, 0.07);
+    border-color: rgba(255, 255, 255, 0.12);
+  }
+}
+
+/* ===== NEON GREEN SIDEBAR EFFECTS ===== */
+
+/* Neon green glow animation */
+@keyframes neon-glow {
+  0%, 100% {
+    box-shadow: 0 0 10px rgba(34, 197, 94, 0.2), 0 0 20px rgba(34, 197, 94, 0.1);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(34, 197, 94, 0.4), 0 0 40px rgba(34, 197, 94, 0.2);
+  }
+}
+
+/* Active navigation item with enhanced neon effect - full width */
+.nav-item-active {
+  animation: neon-glow 2s ease-in-out infinite;
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.15), rgba(16, 185, 129, 0.1));
+  border-left: 4px solid rgba(34, 197, 94, 0.8);
+  border-right: 4px solid rgba(34, 197, 94, 0.8);
+  border-top: 2px solid rgba(34, 197, 94, 0.6);
+  border-bottom: 2px solid rgba(34, 197, 94, 0.6);
+  color: rgb(34, 197, 94);
+  box-shadow:
+    0 0 15px rgba(34, 197, 94, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  /* NO transform changes to maintain size */
+}
+
+/* Hover state for navigation items - maintains exact same size */
+.nav-item-hover:hover {
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.1), rgba(16, 185, 129, 0.05));
+  border-left: 4px solid rgba(34, 197, 94, 0.5);
+  border-right: 4px solid rgba(34, 197, 94, 0.5);
+  border-top: 2px solid rgba(34, 197, 94, 0.4);
+  border-bottom: 2px solid rgba(34, 197, 94, 0.4);
+  color: rgb(74, 222, 128);
+  box-shadow: 0 0 10px rgba(34, 197, 94, 0.2);
+  /* NO transform to maintain exact same size */
+}
+
+/* ===== CUSTOM SCROLLBAR STYLES ===== */
+
+/* Modern scrollbar styles for modal content */
+.scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(156, 163, 175, 0.7) rgba(55, 65, 81, 0.3);
+}
+
+.scrollbar-thin::-webkit-scrollbar {
+  width: 8px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: rgba(55, 65, 81, 0.3);
+  border-radius: 4px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: rgba(156, 163, 175, 0.7);
+  border-radius: 4px;
+  border: 1px solid rgba(55, 65, 81, 0.5);
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background: rgba(156, 163, 175, 0.9);
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb:active {
+  background: rgba(209, 213, 219, 1);
+}
+
+/* Enhanced scrollbar for modal content with visibility */
+.scrollbar-track-gray-800 {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(107, 114, 128, 0.8) rgba(31, 41, 55, 0.6);
+}
+
+.scrollbar-track-gray-800::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+.scrollbar-track-gray-800::-webkit-scrollbar-track {
+  background: rgba(31, 41, 55, 0.6);
+  border-radius: 6px;
+  border: 1px solid rgba(75, 85, 99, 0.3);
+}
+
+.scrollbar-thumb-gray-600 {
+  scrollbar-color: rgba(107, 114, 128, 0.8) rgba(31, 41, 55, 0.6);
+}
+
+.scrollbar-thumb-gray-600::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, rgba(107, 114, 128, 0.8), rgba(75, 85, 99, 0.9));
+  border-radius: 6px;
+  border: 1px solid rgba(55, 65, 81, 0.5);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.scrollbar-thumb-gray-600::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, rgba(107, 114, 128, 1), rgba(75, 85, 99, 1));
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+}
+
+.scrollbar-thumb-gray-600::-webkit-scrollbar-thumb:active {
+  background: linear-gradient(135deg, rgba(156, 163, 175, 1), rgba(107, 114, 128, 1));
+}
+
+/* Alternative visible scrollbar style */
+.scrollbar-visible {
+  scrollbar-width: auto;
+  scrollbar-color: rgba(156, 163, 175, 0.8) rgba(31, 41, 55, 0.4);
+}
+
+.scrollbar-visible::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+.scrollbar-visible::-webkit-scrollbar-track {
+  background: rgba(31, 41, 55, 0.4);
+  border-radius: 8px;
+  border: 2px solid rgba(75, 85, 99, 0.2);
+}
+
+.scrollbar-visible::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg,
+    rgba(156, 163, 175, 0.8) 0%,
+    rgba(107, 114, 128, 0.9) 50%,
+    rgba(75, 85, 99, 1) 100%);
+  border-radius: 8px;
+  border: 2px solid rgba(55, 65, 81, 0.3);
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.scrollbar-visible::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg,
+    rgba(209, 213, 219, 1) 0%,
+    rgba(156, 163, 175, 1) 50%,
+    rgba(107, 114, 128, 1) 100%);
+  box-shadow:
+    0 4px 12px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.scrollbar-visible::-webkit-scrollbar-thumb:active {
+  background: linear-gradient(135deg,
+    rgba(243, 244, 246, 1) 0%,
+    rgba(209, 213, 219, 1) 50%,
+    rgba(156, 163, 175, 1) 100%);
+}
+
+.scrollbar-visible::-webkit-scrollbar-corner {
+  background: rgba(31, 41, 55, 0.4);
+}
+
+/* ===== PROMINENT MODAL SCROLLBAR ===== */
+
+/* Always visible modal scrollbar with high contrast */
+.modal-scrollbar {
+  scrollbar-width: auto; /* Firefox - make sure it's visible */
+  scrollbar-color: rgba(203, 213, 225, 0.9) rgba(51, 65, 85, 0.8); /* Light thumb, darker track */
+}
+
+.modal-scrollbar::-webkit-scrollbar {
+  width: 14px; /* Wide enough to be clearly visible */
+  height: 14px;
+}
+
+.modal-scrollbar::-webkit-scrollbar-track {
+  background: rgba(51, 65, 85, 0.8); /* Darker track for contrast */
+  border-radius: 8px;
+  border: 2px solid rgba(75, 85, 99, 0.5);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.modal-scrollbar::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg,
+    rgba(203, 213, 225, 0.9) 0%,
+    rgba(156, 163, 175, 1) 50%,
+    rgba(107, 114, 128, 1) 100%);
+  border-radius: 8px;
+  border: 2px solid rgba(75, 85, 99, 0.6);
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.2);
+  /* Always visible */
+  min-height: 40px;
+}
+
+.modal-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg,
+    rgba(241, 245, 249, 1) 0%,
+    rgba(203, 213, 225, 1) 50%,
+    rgba(156, 163, 175, 1) 100%);
+  box-shadow:
+    0 4px 12px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.3);
+  transform: scale(1.05);
+}
+
+.modal-scrollbar::-webkit-scrollbar-thumb:active {
+  background: linear-gradient(135deg,
+    rgba(255, 255, 255, 1) 0%,
+    rgba(241, 245, 249, 1) 50%,
+    rgba(203, 213, 225, 1) 100%);
+  transform: scale(1.1);
+}
+
+.modal-scrollbar::-webkit-scrollbar-corner {
+  background: rgba(51, 65, 85, 0.8);
+  border-radius: 8px;
+}
+
+/* Force scrollbar to always be visible when content overflows */
+.modal-scrollbar::-webkit-scrollbar-track:hover {
+  background: rgba(51, 65, 85, 1);
+}
+
+/* Make sure scrollbar appears immediately when needed */
+.modal-scrollbar {
+  overflow-y: scroll !important; /* Force scrollbar to always be present */
 }
